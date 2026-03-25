@@ -1,0 +1,62 @@
+system:
+  name: Signal Processing Chain
+  description: >
+    A 3-component signal processing pipeline: generate a noisy sine wave,
+    apply a low-pass filter, then detect threshold crossings. Demonstrates
+    the autoengineering workflow on pure mathematical models.
+
+  components:
+    - name: signal_generator
+      model_type: generator
+      description: Generates a noisy sine wave (sine + Gaussian noise).
+      inputs: []
+      outputs:
+        - name: raw_signal
+          direction: out
+          data_type: timeseries
+          description: Noisy signal to be filtered
+      metadata:
+        frequency: 0.05
+        amplitude: 1.0
+        noise_std: 0.3
+
+    - name: lowpass_filter
+      model_type: filter
+      description: Low-pass filter to remove noise from the signal.
+      inputs:
+        - name: raw_signal
+          direction: in
+          data_type: timeseries
+      outputs:
+        - name: filtered_signal
+          direction: out
+          data_type: timeseries
+          description: Smoothed signal
+      metadata:
+        method: moving_average
+        window: 51
+
+    - name: threshold_detector
+      model_type: detector
+      description: Detects upward zero-crossings in the filtered signal.
+      inputs:
+        - name: filtered_signal
+          direction: in
+          data_type: timeseries
+      outputs:
+        - name: events
+          direction: out
+          data_type: binary
+          description: Binary event indicators at crossing points
+      metadata:
+        threshold: 0.0
+
+  connections:
+    - source: signal_generator
+      target: lowpass_filter
+      port_from: raw_signal
+      port_to: raw_signal
+    - source: lowpass_filter
+      target: threshold_detector
+      port_from: filtered_signal
+      port_to: filtered_signal

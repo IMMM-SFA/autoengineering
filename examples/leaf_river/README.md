@@ -1,0 +1,91 @@
+# Leaf River Hydrology Example
+
+A 5-component rainfall-runoff model for the Leaf River near Collins, MS, using real USGS streamflow and NOAA weather data.
+
+## Overview
+
+This example demonstrates the full autoengineering workflow on a real watershed:
+
+1. **Fetch** publicly available data from USGS and NOAA REST APIs
+2. **Define** a 5-component system (weather data, PET, soil moisture, runoff, routing)
+3. **Validate** each component against observed streamflow and reference models
+4. **Analyze** and rank components by improvement potential
+5. **Improve** in two rounds, quantifying gains at each step
+
+## Data Sources
+
+| Source | API | Station/Gage | Period |
+|---|---|---|---|
+| Streamflow | USGS NWIS Daily Values | 02472000 (Leaf River nr Collins, MS) | 2019-2020 |
+| Weather | NOAA GHCN Daily | USW00003940 (Jackson, MS area) | 2019-2020 |
+
+Both APIs are free, unauthenticated REST endpoints. Data is cached to CSV after first download.
+
+## Model Chain
+
+```mermaid
+graph LR
+    weather_data --> pet_estimator
+    weather_data --> soil_moisture
+    pet_estimator --> soil_moisture
+    soil_moisture --> rainfall_runoff
+    rainfall_runoff --> routing
+```
+
+| Component | Method | Known Weakness |
+|---|---|---|
+| PET estimator | Hamon (temp-only) | Underestimates summer PET |
+| Soil moisture | Simple bucket (FC=100mm) | Fixed field capacity |
+| Rainfall-runoff | SCS Curve Number (CN=75) | No antecedent moisture |
+| Routing | Triangular UH + baseflow | Uncalibrated UH shape |
+
+## Improvement Rounds
+
+**Round 1** -- Swap PET: Hamon to Hargreaves. Uses diurnal temperature range (Tmax-Tmin) as a proxy for solar radiation, producing better seasonal PET estimates.
+
+**Round 2** -- Also swap runoff (SCS-CN with antecedent moisture condition adjustment) and routing (gamma-distribution UH with calibrated baseflow).
+
+### Results
+
+```
+Metric       Baseline   Round 1   Round 2
+rmse           3.0261    2.9877    2.6986
+nse            0.2322    0.2515    0.3894
+kge            0.4350    0.4717    0.5612
+```
+
+Each round improves all three metrics, demonstrating cascading improvement from upstream component fixes.
+
+## Running
+
+```bash
+pixi run python examples/leaf_river/run_workflow.py
+```
+
+First run downloads ~730 days of data from USGS/NOAA (~5 seconds). Subsequent runs use cached data.
+
+## Files
+
+```
+leaf_river/
+  system.yaml              # System definition (5 components, 5 connections)
+  run_workflow.py           # Full 4-step workflow with 2 improvement rounds
+  data/
+    fetch_data.py           # USGS/NOAA REST API data fetcher with CSV caching
+  models/
+    pet_hamon.py            # Hamon PET (baseline)
+    pet_hargreaves.py       # Hargreaves PET (improved)
+    soil_moisture.py        # Simple bucket model
+    scs_runoff.py           # Standard SCS Curve Number
+    scs_runoff_amc.py       # SCS-CN with antecedent moisture (improved)
+    routing.py              # Triangular UH + baseflow (baseline)
+    routing_calibrated.py   # Gamma UH + calibrated baseflow (improved)
+```
+
+## Why Leaf River?
+
+- Classic CAMELS benchmark watershed used in many hydrology papers
+- Small enough to be fast, complex enough to demonstrate real improvement
+- Free data with no authentication required
+- 2 years of daily data keeps it lightweight (~730 timesteps)
+- Temperature data available for PET estimation methods

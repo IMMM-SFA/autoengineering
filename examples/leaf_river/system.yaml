@@ -1,0 +1,132 @@
+system:
+  name: Leaf River Hydrology Chain
+  description: >
+    5-component rainfall-runoff model for the Leaf River near Collins, MS
+    (USGS 02472000). Uses real USGS streamflow and NOAA weather data for
+    validation. Demonstrates both full model swaps and sub-component
+    improvement in the autoengineering workflow.
+
+  components:
+    - name: weather_data
+      model_type: data_source
+      description: Real weather observations from NOAA GHCN Daily.
+      inputs: []
+      outputs:
+        - name: precip
+          direction: out
+          data_type: timeseries
+          units: mm/day
+        - name: tmean
+          direction: out
+          data_type: timeseries
+          units: celsius
+        - name: tmax
+          direction: out
+          data_type: timeseries
+          units: celsius
+        - name: tmin
+          direction: out
+          data_type: timeseries
+          units: celsius
+      metadata:
+        source: NOAA GHCN Daily
+        station: USW00003940
+
+    - name: pet_estimator
+      model_type: evapotranspiration
+      description: Potential evapotranspiration estimation using Hamon method.
+      inputs:
+        - name: tmean
+          direction: in
+          data_type: timeseries
+          units: celsius
+      outputs:
+        - name: pet
+          direction: out
+          data_type: timeseries
+          units: mm/day
+      metadata:
+        method: hamon
+        latitude: 31.7
+
+    - name: soil_moisture
+      model_type: water_balance
+      description: Simple bucket model for soil moisture accounting.
+      inputs:
+        - name: precip
+          direction: in
+          data_type: timeseries
+          units: mm/day
+        - name: pet
+          direction: in
+          data_type: timeseries
+          units: mm/day
+      outputs:
+        - name: excess_rainfall
+          direction: out
+          data_type: timeseries
+          units: mm/day
+        - name: actual_et
+          direction: out
+          data_type: timeseries
+          units: mm/day
+      metadata:
+        field_capacity: 100.0
+
+    - name: rainfall_runoff
+      model_type: transform
+      description: SCS Curve Number direct runoff estimation.
+      inputs:
+        - name: excess_rainfall
+          direction: in
+          data_type: timeseries
+          units: mm/day
+      outputs:
+        - name: direct_runoff
+          direction: out
+          data_type: timeseries
+          units: mm/day
+      metadata:
+        method: scs_curve_number
+        curve_number: 75
+
+    - name: routing
+      model_type: routing
+      description: Unit hydrograph convolution + baseflow recession.
+      inputs:
+        - name: direct_runoff
+          direction: in
+          data_type: timeseries
+          units: mm/day
+      outputs:
+        - name: streamflow
+          direction: out
+          data_type: timeseries
+          units: mm/day
+      metadata:
+        method: triangular_uh_baseflow
+        uh_peak: 3
+        uh_length: 10
+        k_base: 0.85
+
+  connections:
+    - source: weather_data
+      target: pet_estimator
+      port_from: tmean
+      port_to: tmean
+    - source: weather_data
+      target: soil_moisture
+      port_from: precip
+      port_to: precip
+    - source: pet_estimator
+      target: soil_moisture
+      port_from: pet
+      port_to: pet
+    - source: soil_moisture
+      target: rainfall_runoff
+      port_from: excess_rainfall
+      port_to: excess_rainfall
+    - source: rainfall_runoff
+      target: routing
+      port_from: direct_runoff
+      port_to: direct_runoff

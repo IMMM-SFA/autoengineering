@@ -1,0 +1,74 @@
+system:
+  name: Simple Hydrology Chain
+  description: >
+    A minimal 3-component hydrology model chain demonstrating the autoengineering
+    workflow. Precipitation is generated stochastically, transformed to runoff via
+    the SCS Curve Number method, and routed through a simple reservoir.
+
+  components:
+    - name: precip_generator
+      model_type: generator
+      description: Stochastic daily precipitation using Poisson arrivals and exponential depths.
+      inputs: []
+      outputs:
+        - name: daily_precip
+          direction: out
+          data_type: timeseries
+          units: mm/day
+          description: Daily precipitation depth
+      metadata:
+        method: poisson-exponential
+        mean_events_per_day: 0.3
+        mean_depth_mm: 10.0
+
+    - name: rainfall_runoff
+      model_type: transform
+      description: SCS Curve Number method for rainfall-runoff transformation.
+      inputs:
+        - name: daily_precip
+          direction: in
+          data_type: timeseries
+          units: mm/day
+      outputs:
+        - name: daily_runoff
+          direction: out
+          data_type: timeseries
+          units: mm/day
+          description: Daily runoff depth
+      metadata:
+        method: scs_curve_number
+        curve_number: 75
+        initial_abstraction_ratio: 0.2
+
+    - name: reservoir
+      model_type: storage
+      description: Simple mass-balance reservoir with linear release rule.
+      inputs:
+        - name: inflow
+          direction: in
+          data_type: timeseries
+          units: mm/day
+      outputs:
+        - name: release
+          direction: out
+          data_type: timeseries
+          units: mm/day
+          description: Daily reservoir release
+        - name: storage
+          direction: out
+          data_type: timeseries
+          units: mm
+          description: Daily reservoir storage level
+      metadata:
+        capacity_mm: 200.0
+        release_coefficient: 0.1
+
+  connections:
+    - source: precip_generator
+      target: rainfall_runoff
+      port_from: daily_precip
+      port_to: daily_precip
+    - source: rainfall_runoff
+      target: reservoir
+      port_from: daily_runoff
+      port_to: inflow

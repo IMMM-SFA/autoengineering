@@ -1,0 +1,70 @@
+system:
+  name: Predator-Prey Ecosystem
+  description: >
+    Lotka-Volterra predator-prey model decomposed into 3 components:
+    prey growth (logistic), predation (functional response), and predator
+    dynamics. Demonstrates sub-component replacement by swapping the
+    functional response from Type I (linear) to Type II (saturating).
+
+  components:
+    - name: prey_growth
+      model_type: population_dynamics
+      description: Logistic prey growth with carrying capacity.
+      inputs:
+        - name: prey_population
+          direction: in
+          data_type: scalar
+      outputs:
+        - name: growth_rate
+          direction: out
+          data_type: scalar
+          description: Prey growth contribution to dN/dt
+      metadata:
+        r: 1.0
+        K: 100.0
+
+    - name: predation
+      model_type: interaction
+      description: Functional response determining predation rate.
+      inputs:
+        - name: prey_population
+          direction: in
+          data_type: scalar
+        - name: predator_population
+          direction: in
+          data_type: scalar
+      outputs:
+        - name: predation_rate
+          direction: out
+          data_type: scalar
+          description: Total prey consumed per time unit
+      metadata:
+        method: type1_linear
+        alpha: 0.03
+
+    - name: predator_dynamics
+      model_type: population_dynamics
+      description: Predator population change from predation success minus mortality.
+      inputs:
+        - name: predation_rate
+          direction: in
+          data_type: scalar
+      outputs:
+        - name: predator_change
+          direction: out
+          data_type: scalar
+          description: Rate of change of predator population
+      metadata:
+        efficiency: 0.1
+        mortality: 0.3
+
+  connections:
+    - source: prey_growth
+      target: predation
+      port_from: growth_rate
+      port_to: prey_population
+      description: Prey population feeds into predation
+    - source: predation
+      target: predator_dynamics
+      port_from: predation_rate
+      port_to: predation_rate

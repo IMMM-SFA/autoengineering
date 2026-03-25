@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autoengineering"
+version = "0.1.0"
+description = "AI-assisted systems engineering for complex model chains"
+license = "BSD-3-Clause"
+requires-python = ">=3.11"
+dependencies = [
+    "networkx>=3.0",
+    "pyyaml>=6.0",
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "click>=8.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+autoengineering = "autoengineering.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
