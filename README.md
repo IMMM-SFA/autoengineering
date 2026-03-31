@@ -14,9 +14,17 @@ pixi install
 pixi run install
 ```
 
+
 ## Quick Start
 
-Run an example to see the full workflow:
+1. Install the `autoengineering` package:
+   ```bash
+   cd autoengineering/
+   pixi install
+   pixi run install
+   ```
+
+2. Run an example:
 
 ```bash
 # Simple 3-component hydrology chain
@@ -31,6 +39,8 @@ pixi run python examples/lotka_volterra/run_workflow.py
 # Real-data hydrology: Leaf River, MS (fetches USGS/NOAA data)
 pixi run python examples/leaf_river/run_workflow.py
 ```
+
+3. Or invoke the auto-engineer agent in Claude Code to walk through the workflow interactively.
 
 ## The Workflow
 
