@@ -38,14 +38,22 @@ from autoengineering.system import System
 from autoengineering.validate import validate_arrays, ValidationResult
 from autoengineering.analyze import generate_report, rank_opportunities
 from autoengineering.execute import swap_component
+from autoengineering.research import (
+    Candidate, load_candidates, build_feedforward_runner, auto_improve, write_report,
+)
 ```
+
+Research CLI commands: `candidates`, `improve`, `experiments` (see the skills below).
 
 ### Workflow Steps
 
 **Step 1 — Define**: Help the user create a `system.yaml` file. Use `autoengineering describe` to verify.
 **Step 2 — Validate**: Run each component, compare outputs to baselines using `validate_arrays()` or the CLI `validate` command.
 **Step 3 — Analyze**: Use `rank_opportunities()` to identify the weakest components. Use `generate_report()` for a full markdown report.
-**Step 4 — Improve**: Use `swap_component()` to replace the weakest component, re-validate, and compare before/after metrics.
+**Step 3.5 — Research (find candidates)**: For the weakest component, invoke the **`deep-research-candidates`** skill. It runs a cited, multi-hop literature investigation of better replacement models and writes a swap-ready `candidates.yaml` (each candidate honors the component's ports and carries a `runnable` block, a rationale, and sources). This answers *what to replace it with* — the piece `rank_opportunities` alone does not.
+**Step 4 — Improve (test candidates)**: Invoke the **`auto-research-loop`** skill. It drives `auto_improve()`, which swaps each candidate onto the current-best system, executes the chain, validates with `validate_arrays`, records the lineage in an experiment tree (baseline immutable, "grow down not sideways"), and writes an evidence-first report plus provenance sidecar. Keep what improves; report null results honestly.
+
+The research half is LLM-driven and provider-agnostic (it runs through whatever agent drives it); the loop itself is deterministic Python. These capabilities adapt feynman.is and alphaXiv's openresearch-cli — see the repo `NOTICE`.
 
 See these worked examples:
 - `examples/hydro_chain/run_workflow.py` — Simple 3-component hydrology chain

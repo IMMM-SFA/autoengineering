@@ -1,0 +1,42 @@
+autoengineering
+Copyright (c) Battelle Memorial Institute
+Licensed under BSD-3-Clause (see LICENSE).
+
+This product includes research-workflow capabilities (deep research and auto
+research) that were adapted from, and inspired by, the following open projects.
+We are grateful to their authors.
+
+--------------------------------------------------------------------------------
+Feynman (feynman.is)
+    Companion, Inc.  —  https://github.com/companion-inc/feynman
+    License: MIT
+
+    The skills under `.claude/skills/deep-research-candidates/` and
+    `.claude/skills/auto-research-loop/` adapt the workflow discipline of
+    Feynman's `/deepresearch` and `/autoresearch` prompt templates:
+    the plan -> gather -> draft -> cite -> verify -> deliver sequence, the
+    bounded hypothesize -> experiment -> measure -> decide loop, the
+    `outputs/.plans` / `outputs/.drafts` artifact layout, and the
+    `<slug>.provenance.md` provenance sidecar. Artifact names
+    (`autoresearch.md`, `autoresearch.jsonl`) are kept for continuity with a
+    Feynman install. Feynman is bundled in this repo under `.agents/skills/feynman/`.
+
+    MIT License text: https://github.com/companion-inc/feynman/blob/main/LICENSE
+
+--------------------------------------------------------------------------------
+OpenResearch CLI (orx)
+    alphaXiv  —  https://github.com/alphaXiv/openresearch-cli
+
+    Three concepts are adapted (as design, not copied code):
+      - the experiment tree (baseline = root, each variant a child measured
+        against its parent, "grow down, not sideways" = descend onto winners),
+        implemented in `src/autoengineering/research/experiment.py`;
+      - multi-hop literature search (fetch a paper, extract its references,
+        fetch those, repeat), described in
+        `.claude/skills/multi-hop-lit-search/`;
+      - evidence-first reporting (lead with measured evidence before
+        conclusions), implemented in `src/autoengineering/research/provenance.py`.
+
+    Note: no LICENSE file was detectable in that repository at integration time.
+    Only concepts were adapted here; no source code was copied. If verbatim reuse
+    is later desired, confirm the upstream license first.

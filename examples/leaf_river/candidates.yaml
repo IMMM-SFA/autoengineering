@@ -1,0 +1,63 @@
+# Candidate replacement models for the Leaf River chain.
+#
+# These are the swaps the manual run_workflow.py performs, expressed as swap-ready
+# candidates with a rationale and citation each. This is the file the
+# deep-research-candidates skill would produce; run_auto_research.py feeds it to
+# auto_improve(). Candidates are tried in order; the loop grows the experiment tree
+# down from each winner, so ordering matters.
+
+target: pet_estimator
+
+candidates:
+  - name: pet_estimator
+    model_type: evapotranspiration
+    description: >
+      Hargreaves-Samani PET using Tmax/Tmin and extraterrestrial radiation.
+    rationale: >
+      Hamon PET depends on mean temperature alone and underestimates summer ET.
+      Hargreaves adds diurnal temperature range and solar geometry, correcting the
+      seasonal bias that propagates into the runoff and streamflow error.
+    sources:
+      - https://doi.org/10.13031/2013.26773       # Hargreaves & Samani 1985
+      - https://doi.org/10.1061/(ASCE)0733-9437(2003)129:1(53)  # Hargreaves & Allen 2003
+    metadata:
+      method: hargreaves
+      runnable:
+        kind: python
+        entry: "models.pet_hargreaves:hargreaves_pet"
+        inputs: [tmean, tmax, tmin, doy]
+        outputs: [pet]
+
+  - name: rainfall_runoff
+    model_type: transform
+    description: SCS Curve Number with antecedent moisture condition (AMC) adjustment.
+    rationale: >
+      A fixed curve number ignores how wet the basin already is. Adjusting CN by the
+      5-day antecedent precipitation (AMC I/II/III) sharpens the wet/dry runoff
+      response, which the static CN systematically misses.
+    sources:
+      - https://directives.nrcs.usda.gov/  # NRCS National Engineering Handbook, Part 630
+    metadata:
+      method: scs_cn_amc
+      runnable:
+        kind: python
+        entry: "models.scs_runoff_amc:scs_runoff_amc"
+        inputs: [excess_rainfall, precip_raw]
+        outputs: [direct_runoff]
+
+  - name: routing
+    model_type: routing
+    description: Gamma unit hydrograph with a calibrated baseflow recession.
+    rationale: >
+      The triangular UH and default recession are uncalibrated. A gamma UH gives a
+      smoother, better-shaped response and the tuned recession coefficient tracks
+      the observed baseflow decay, improving NSE/KGE on total streamflow.
+    sources:
+      - https://doi.org/10.1016/0022-1694(94)90064-7  # gamma UH in rainfall-runoff routing
+    metadata:
+      method: gamma_uh_calibrated
+      runnable:
+        kind: python
+        entry: "models.routing_runnable:route_calibrated"
+        inputs: [direct_runoff, recharge]
+        outputs: [streamflow]

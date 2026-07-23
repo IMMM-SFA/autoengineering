@@ -47,8 +47,20 @@ Identify which components can be improved or replaced entirely, and estimate the
 autoengineering report system.yaml -r validation_results.json
 ```
 
+### Step 3.5: Research
+Ranking tells you *which* component is weakest; research answers *what to replace it with*. **Deep research** investigates alternative models for the weakest component from the literature and produces swap-ready candidates (each honoring the component's ports, with a runnable entry, a rationale, and citations). This is driven by the `deep-research-candidates` skill and adapts feynman.is; see `NOTICE`.
+
+```bash
+autoengineering candidates system.yaml -c pet_estimator -o candidates.yaml
+```
+
 ### Step 4: Improve
-Swap in an improved component, re-run validation, and quantify the improvement. Compare before/after metrics to demonstrate the value of the change.
+Swap in an improved component, re-run validation, and quantify the improvement. Compare before/after metrics to demonstrate the value of the change. **Auto research** automates this as a bounded loop (`auto_improve`): each candidate is swapped in, the chain is executed, validated, and kept only if it improves, with results recorded in an experiment tree and an evidence-first report.
+
+```bash
+autoengineering improve system.yaml -C candidates.yaml \
+    --chain run_auto_research:make_run_chain -b observed.csv -O routing.streamflow
+```
 
 ## Quick Start
 
