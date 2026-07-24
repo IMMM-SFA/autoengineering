@@ -1,0 +1,36 @@
+# Provenance: Optimization of Multi-Model Compute Systems (Theoretical Foundations)
+
+- **Date:** 2026-07-07
+- **Slug:** `multi-model-system-optimization`
+- **Rounds:** 1 planning + 4 parallel researcher passes + 1 verifier (citation) + 1 reviewer + 1 lead revision.
+- **Sources consulted:** ~65 primary sources across four literatures (MDAO/coupled-simulator BO; global sensitivity + model discrepancy; decision theory / VoI; satisficing / info-gap), plus the user's pre-existing `background_research/deep_research_refs.csv` (~53 Consensus-curated BO/multi-objective papers) as a starting corpus.
+- **Sources accepted:** ~60 in final memo (see the Sources section of `outputs/multi-model-system-optimization.md`).
+- **Sources rejected / removed during review:**
+  - `Cho, Zhang & Zhou 2025, arXiv:2606.21539` — **removed**. Reviewer flagged the arXiv ID as impossible (June 2026 issuance vs. 2025 attribution) and no matching record found on arXiv. Load-bearing "still open in 2025" claim rewritten as the memo's own assessment.
+  - `Peña et al. 2024, HESS` — **corrected** to `Muñoz, Moftakhari & Moradkhani 2024, HESS` (DOI 10.5194/hess-28-2531-2024). Original URL was correct; author attribution was wrong.
+  - `Wilson 2024, arXiv:2507.12453` — **corrected** to `Xie et al. 2025, arXiv:2507.12453` (ICML 2026); confirmed via direct fetch of the arXiv abstract page (first author Qian Xie, v1 submitted 16 Jul 2025).
+- **Verification:** PASS WITH NOTES
+  - **Applied FATAL fixes on disk (F1, F2, F3)** — confirmed via `grep`: 0 occurrences of `Peña`, `2606.21539`, `Cho, Zhang`, `Wilson (2024`, and `Wilson 2024` in `outputs/multi-model-system-optimization.md`; 4 occurrences of `Xie et al. 2025` / `Muñoz` correctly in place.
+  - **Applied MAJOR fixes (M1–M4)** — softened the "no published procedure" gap claim (M1), softened Manski's attribution (M2), split the linked-GP claim across Kyzyurova et al. and Ming & Guillas (M3), attached the functional-output KOH extension primarily to Higdon 2008 (M4).
+  - **Applied MINOR fixes (m3, m5)** — added a specific Sniedovich (2008, *Risk Analysis*) citation for the info-gap critique; added Hwang & Martins (2018, *ACM TOMS*) as the primary source for MAUD.
+  - **Not applied (accepted as MINOR):** m1 (cosmetic abbreviation), m2 (Wu et al. year/PMLR path — original citation is factually correct), m4 (Byron 2004 DOI not directly verified but plausible), m6 (Foster et al. author-list truncation), m7 (Roth & Kroo also has an AIAA version).
+  - **Blocked:** PDF full-text verification of Kennedy & O'Hagan 2001, Martins & Lambe 2013, Tao et al. 2021 (behind paywalls; per workflow guidance, avoided PDF fetches).
+- **Plan:** `outputs/.plans/multi-model-system-optimization.md`
+- **Per-researcher briefs:**
+  - `outputs/.plans/multi-model-system-optimization-T1.md` (MDAO)
+  - `outputs/.plans/multi-model-system-optimization-T2.md` (GSA / model discrepancy)
+  - `outputs/.plans/multi-model-system-optimization-T3.md` (VoI / decision theory)
+  - `outputs/.plans/multi-model-system-optimization-T4.md` (satisficing / info-gap)
+- **Research files:**
+  - `outputs/.drafts/multi-model-system-optimization-research-mdao.md`
+  - `outputs/.drafts/multi-model-system-optimization-research-gsa.md`
+  - `outputs/.drafts/multi-model-system-optimization-research-voi.md`
+  - `outputs/.drafts/multi-model-system-optimization-research-satisficing.md`
+- **Intermediate drafts:**
+  - `outputs/.drafts/multi-model-system-optimization-draft.md` (lead synthesis)
+  - `outputs/.drafts/multi-model-system-optimization-cited.md` (verifier pass)
+  - `outputs/.drafts/multi-model-system-optimization-verification.md` (reviewer findings)
+  - `outputs/.drafts/multi-model-system-optimization-revised.md` (final candidate = delivered)
+- **Pre-existing user materials leveraged:**
+  - `background_research/deep_research_refs.csv` (Consensus-curated corpus, 53 papers)
+  - `background_research/systems_engineering_standards.md`, `background_research/workflow_tools.md`

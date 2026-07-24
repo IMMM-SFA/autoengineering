@@ -228,3 +228,6 @@ __marimo__/# pixi environments
 examples/*/outputs/
 autoresearch.md
 autoresearch.jsonl
+
+# Agent junk
+.pi*
