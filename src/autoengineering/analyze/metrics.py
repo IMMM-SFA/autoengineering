@@ -38,12 +38,23 @@ def rank_opportunities(
         warn_score = len(warnings) / total * 0.5
         score = min(fail_score + warn_score, 1.0)
 
-        # Also factor in magnitude of RMSE/bias if available
+        # A poor absolute goodness-of-fit (NSE/KGE below 0.5) is itself an
+        # improvement opportunity, even when no threshold was set to formally
+        # "fail" it. Contribute a *continuous* shortfall that ramps from 0 at
+        # skill=0.5 to 1 at skill<=0, so worse fit ranks strictly higher and an
+        # improvement measurably lowers the score.
+        #
+        # This replaces an earlier hard floor to 0.6 whenever skill < 0.5, which
+        # (a) collapsed every poor component onto the same value — e.g. NSE 0.23
+        # and 0.39 both scored 0.6, hiding real sub-0.5 gains — and (b) jumped
+        # discontinuously at 0.5. The ramp is continuous at 0.5 (contributes 0
+        # there and above), so it leaves healthy components at score 0.0.
+        skill_shortfall = 0.0
         for r in results:
-            if r.metric == "nse" and r.value < 0.5:
-                score = max(score, 0.6)
-            elif r.metric == "kge" and r.value < 0.5:
-                score = max(score, 0.6)
+            if r.metric in ("nse", "kge"):
+                shortfall = min(max((0.5 - r.value) / 0.5, 0.0), 1.0)
+                skill_shortfall = max(skill_shortfall, shortfall)
+        score = min(max(score, skill_shortfall), 1.0)
 
         summary_parts = []
         if failing:

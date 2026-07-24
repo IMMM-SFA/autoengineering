@@ -48,6 +48,11 @@ system:
       metadata:
         method: hamon
         latitude: 31.7
+        runnable:
+          kind: python
+          entry: "models.pet_hamon:hamon_pet"
+          inputs: [tmean, doy]
+          outputs: [pet]
 
     - name: soil_moisture
       model_type: water_balance
@@ -89,6 +94,11 @@ system:
       metadata:
         method: scs_curve_number
         curve_number: 75
+        runnable:
+          kind: python
+          entry: "models.scs_runoff:scs_runoff"
+          inputs: [excess_rainfall]
+          outputs: [direct_runoff]
 
     - name: routing
       model_type: routing
@@ -108,6 +118,11 @@ system:
         uh_peak: 3
         uh_length: 10
         k_base: 0.85
+        runnable:
+          kind: python
+          entry: "models.routing_runnable:route_baseline"
+          inputs: [direct_runoff, recharge]
+          outputs: [streamflow]
 
   connections:
     - source: weather_data

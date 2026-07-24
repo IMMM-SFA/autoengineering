@@ -2,7 +2,9 @@
 
 AI-assisted systems engineering for complex model chains.
 
-Autoengineering helps you systematically identify, evaluate, and improve components within multi-model systems. Define your system as a graph of connected components, validate each against baselines, rank improvement opportunities, and swap in better implementations -- then quantify the gain.
+Autoengineering helps you systematically identify, evaluate, and improve components within multi-model systems. Define your system as a graph of connected components, validate each against baselines, rank improvement opportunities, research better implementations, and swap them in -- then quantify the gain.
+
+It adds two research capabilities on top of that loop: **deep research** finds candidate replacement models for a weak component (cited, from the literature), and **auto research** runs a bounded loop that swaps each candidate in, executes the chain, validates it, and keeps what improves. These adapt [feynman.is](https://feynman.is) and alphaXiv's [openresearch-cli](https://github.com/alphaXiv/openresearch-cli) -- see [`NOTICE`](NOTICE).
 
 ## Installation
 
@@ -14,9 +16,17 @@ pixi install
 pixi run install
 ```
 
+
 ## Quick Start
 
-Run an example to see the full workflow:
+1. Install the `autoengineering` package:
+   ```bash
+   cd autoengineering/
+   pixi install
+   pixi run install
+   ```
+
+2. Run an example:
 
 ```bash
 # Simple 3-component hydrology chain
@@ -31,6 +41,8 @@ pixi run python examples/lotka_volterra/run_workflow.py
 # Real-data hydrology: Leaf River, MS (fetches USGS/NOAA data)
 pixi run python examples/leaf_river/run_workflow.py
 ```
+
+3. Or invoke the auto-engineer agent in Claude Code to walk through the workflow interactively.
 
 ## The Workflow
 
@@ -119,9 +131,48 @@ report = generate_report(system, all_validation_results)
 print(report)
 ```
 
-### 4. Improve
+### 4. Research (find candidates)
 
-Swap a component with an improved implementation, re-validate, and compare:
+For the weakest component, deep research investigates better replacement models and
+writes swap-ready **candidates** (each honoring the component's ports, with a
+`runnable` block, a rationale, and citations). This is driven by the
+`deep-research-candidates` skill; the resulting `candidates.yaml` is the bridge to
+the loop:
+
+```yaml
+target: pet_estimator
+candidates:
+  - name: pet_estimator
+    model_type: evapotranspiration
+    description: Hargreaves PET using Tmax/Tmin.
+    rationale: Corrects the summer underestimation of temperature-only methods.
+    sources: [https://doi.org/10.13031/2013.26773]
+    metadata:
+      runnable: {kind: python, entry: "models.pet_hargreaves:hargreaves_pet",
+                 inputs: [tmean, tmax, tmin, doy], outputs: [pet]}
+```
+
+### 5. Improve (auto research loop)
+
+Run the bounded loop: each candidate is swapped onto the current-best system,
+executed, validated, and kept only if it improves. Results form an experiment tree
+(baseline immutable, "grow down not sideways") with an evidence-first report:
+
+```python
+from autoengineering.research import auto_improve, load_candidates, write_report
+
+tree = auto_improve(
+    system, run_chain, observed,           # run_chain(system) -> {output: array}
+    validate_output="routing.streamflow",
+    candidates=load_candidates("candidates.yaml"),
+    metrics=["rmse", "bias", "nse", "kge"],
+    thresholds={"nse": 0.4, "kge": 0.4},
+    target={"nse": 0.5}, max_iterations=20, workdir="outputs", slug="my-system",
+)
+write_report(tree, system, "my-system", "outputs")
+```
+
+Or swap a single known-better component directly:
 
 ```python
 from autoengineering.execute.swap import swap_component
@@ -202,6 +253,26 @@ from autoengineering.execute.swap import swap_component
 
 **`swap_component(system, target_name, replacement)`** -- Create a new `System` with one component replaced. All connections are preserved. The replacement can be a `Component` object or a dict.
 
+### Research
+
+```python
+from autoengineering.research import (
+    Candidate, load_candidates, save_candidates,
+    run_component, build_feedforward_runner,
+    auto_improve, ExperimentTree, write_report,
+)
+```
+
+**`run_component(component, inputs)`** -- Execute a component's `metadata["runnable"]` (a `python` module:callable or a `command`) on named input arrays; returns named output arrays. This is the one place the package executes models rather than only describing them.
+
+**`build_feedforward_runner(system, source_arrays)`** -- Build a `run_chain(system)` callable that walks a feed-forward system in topological order, executing each runnable component and passing arrays along edges. For chains with glue arithmetic, hand-write `run_chain` instead (see the Leaf River example).
+
+**`Candidate`** -- A proposed replacement: `name`, `model_type`, `description`, `metadata` (incl. `runnable`), `rationale`, `sources`. `to_component()` feeds `swap_component`. `load_candidates` / `save_candidates` round-trip a `candidates.yaml`.
+
+**`auto_improve(system, run_chain, observed, *, validate_output, candidates, metrics, thresholds, target, max_iterations, workdir, slug)`** -- The bounded loop. Swaps each candidate onto the current-best system, executes, validates, keeps improvements, and returns an `ExperimentTree`. Writes `autoresearch.md`, `autoresearch.jsonl`, and a `CHANGELOG.md` entry.
+
+**`write_report(tree, system, slug, workdir)`** -- Evidence-first report (`<slug>.report.md`) plus a provenance sidecar (`<slug>.provenance.md`).
+
 ## CLI Reference
 
 All commands are available via `pixi run autoengineering <command>`.
@@ -213,6 +284,9 @@ All commands are available via `pixi run autoengineering <command>`.
 | `components <system.yaml>` | List all component names and types |
 | `validate <system.yaml> -c <name> -b <baseline.csv> -s <simulated.csv>` | Validate a component against baseline data |
 | `report <system.yaml> -r <results.json>` | Generate analysis report from saved validation results |
+| `candidates <system.yaml> -c <name> [-o out.yaml]` | Scaffold a `candidates.yaml` for a component |
+| `improve <system.yaml> -C <candidates.yaml> --chain <mod:factory> -b <obs.csv> -O <output>` | Run the auto-research loop |
+| `experiments <autoresearch.jsonl>` | Render a saved experiment tree |
 
 ## Examples
 
@@ -239,9 +313,28 @@ A 5-component rainfall-runoff model for the Leaf River near Collins, MS (USGS ga
 
 Data is cached locally after first download -- subsequent runs complete in seconds.
 
+`run_workflow.py` does the swaps by hand; **`run_auto_research.py`** does the same
+thing through the bounded `auto_improve` loop, reading `candidates.yaml` and writing
+an experiment tree + evidence-first report (reproducing NSE 0.23 -> 0.39
+automatically).
+
 ## Auto-Engineer Agent
 
 The package includes a Claude Code agent (`.claude/agents/auto-engineer.md`) that can walk through the workflow interactively. The agent combines systems engineering expertise with the `autoengineering` Python package to help identify and implement improvements.
+
+### Research skills
+
+Three skills under `.claude/skills/` drive the research half of the workflow (they
+run through whatever agent drives them -- provider-agnostic):
+
+- **`deep-research-candidates`** -- given the weakest component, investigate better
+  replacement models and emit a swap-ready `candidates.yaml` plus a cited brief.
+- **`auto-research-loop`** -- run the bounded `auto_improve` loop over those
+  candidates and produce an evidence-first report.
+- **`multi-hop-lit-search`** -- follow citation chains to reach connected literature
+  a single search misses.
+
+These adapt feynman.is (MIT) and alphaXiv's openresearch-cli; see [`NOTICE`](NOTICE).
 
 ## System Definition Format
 
@@ -257,7 +350,7 @@ See `examples/leaf_river/system.yaml` for a fully specified 5-component example.
 ## Development
 
 ```bash
-pixi run test          # Run tests (34 tests)
+pixi run test          # Run tests (51 tests)
 pixi run lint          # Run ruff linter
 pixi run install       # Reinstall package in development mode
 ```
