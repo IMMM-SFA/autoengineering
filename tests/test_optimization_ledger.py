@@ -3,6 +3,8 @@
 import hashlib
 import json
 import math
+import multiprocessing
+import os
 
 import pytest
 
@@ -14,6 +16,28 @@ from autoengineering.optimization import (
     LedgerCorruptionError,
     ObservationLedger,
 )
+
+
+def _append_duplicate_action_in_process(path, start, outcomes):
+    """Run one competing append in an isolated spawned process."""
+    action = EvaluationAction.system("eval-000001", {"x": 0.25}, seed=17)
+    result = EvaluationResult.success(action.id, {"score": 1.0}, {}, 1.0, "cpu_hour")
+    start.wait(timeout=10)
+    try:
+        ObservationLedger(path).append(action, result)
+    except ValueError as error:
+        outcomes.put(("rejected", str(error)))
+    else:
+        outcomes.put(("appended", ""))
+
+
+def _abandon_ledger_lock_in_process(path, acquired):
+    """Terminate after acquiring the lock to exercise OS-level lock cleanup."""
+    from autoengineering.optimization.ledger import _LedgerLock
+
+    with _LedgerLock(path):
+        acquired.set()
+        os._exit(0)
 
 
 def test_ledger_round_trip_is_byte_stable(tmp_path):
@@ -194,6 +218,25 @@ def test_append_verifies_artifact_hash_before_writing(tmp_path):
         ObservationLedger(path).append(failed, mismatched)
 
 
+def test_append_rejects_a_nonexistent_artifact_before_writing(tmp_path):
+    """Appending an entry whose artifact path does not exist must fail this test."""
+    path = tmp_path / "observations.jsonl"
+    action = EvaluationAction.system("eval-000001", {"x": 0.25})
+    result = EvaluationResult.success(
+        action.id,
+        {"score": 1.0},
+        {},
+        1.0,
+        "cpu_hour",
+        artifacts={"report": "missing.txt"},
+        artifact_sha256={"report": "a" * 64},
+    )
+
+    with pytest.raises(ValueError, match="artifact 'report' is missing"):
+        ObservationLedger(path).append(action, result)
+    assert not path.exists()
+
+
 def test_ledger_rejects_id_mismatch_and_reports_corrupt_line_numbers(tmp_path):
     """Dropping pair validation or line context must fail this test."""
     path = tmp_path / "observations.jsonl"
@@ -271,3 +314,68 @@ def test_replay_rejects_persisted_positive_cost_unit_inconsistency(tmp_path):
 
     with pytest.raises(LedgerCorruptionError, match="line 2.*cost_unit"):
         ObservationLedger(path).entries()
+
+
+def test_replay_reports_line_number_for_a_missing_artifact(tmp_path):
+    """Accepting a hand-authored missing artifact during replay must fail this test."""
+    path = tmp_path / "observations.jsonl"
+    action = EvaluationAction.system("eval-000001", {"x": 0.25})
+    result = EvaluationResult.success(
+        action.id,
+        {"score": 1.0},
+        {},
+        1.0,
+        "cpu_hour",
+        artifacts={"report": "missing.txt"},
+        artifact_sha256={"report": "a" * 64},
+    )
+    path.write_text(
+        json.dumps({"action": action.to_dict(), "result": result.to_dict()}) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(LedgerCorruptionError, match="line 1.*artifact 'report' is missing"):
+        ObservationLedger(path).entries()
+
+
+def test_competing_processes_append_a_duplicate_action_only_once(tmp_path):
+    """Separating validation from append across processes must fail this test."""
+    context = multiprocessing.get_context("spawn")
+    path = tmp_path / "observations.jsonl"
+    start = context.Event()
+    outcomes = context.Queue()
+    processes = [
+        context.Process(target=_append_duplicate_action_in_process, args=(path, start, outcomes))
+        for _ in range(2)
+    ]
+    for process in processes:
+        process.start()
+    start.set()
+    for process in processes:
+        process.join(timeout=20)
+        assert process.exitcode == 0
+
+    results = sorted(outcomes.get(timeout=5) for _ in processes)
+    assert results == [("appended", ""), ("rejected", "duplicate action id: eval-000001")]
+    entries = ObservationLedger(path).entries()
+    assert len(entries) == 1
+    assert entries[0][0].id == "eval-000001"
+
+
+def test_process_exit_releases_a_ledger_lock_without_removing_its_lock_file(tmp_path):
+    """An abandoned writer lock that blocks later appends must fail this test."""
+    context = multiprocessing.get_context("spawn")
+    path = tmp_path / "observations.jsonl"
+    acquired = context.Event()
+    process = context.Process(target=_abandon_ledger_lock_in_process, args=(path, acquired))
+    process.start()
+    assert acquired.wait(timeout=10)
+    process.join(timeout=10)
+    assert process.exitcode == 0
+
+    action = EvaluationAction.system("eval-000001", {"x": 0.25})
+    result = EvaluationResult.success(action.id, {"score": 1.0}, {}, 1.0, "cpu_hour")
+    ObservationLedger(path).append(action, result)
+
+    assert ObservationLedger(path).entries() == ((action, result),)
+    assert path.with_name("observations.jsonl.lock").exists()

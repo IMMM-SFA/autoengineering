@@ -19,6 +19,72 @@ class LedgerCorruptionError(ValueError):
         self.line_number = line_number
 
 
+class LedgerLockError(RuntimeError):
+    """Raised when the interprocess ledger lock cannot be acquired or released."""
+
+
+class _LedgerLock:
+    """Exclusive, OS-managed advisory lock for one ledger path.
+
+    The lock file intentionally remains after release. Its byte-range lock is
+    released when the stream closes or a process exits, so removing the path
+    would create a race between a releasing writer and a new writer.
+    """
+
+    def __init__(self, path: Path) -> None:
+        self.path = Path(f"{path}.lock")
+        self._stream = None
+
+    def __enter__(self) -> "_LedgerLock":
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            stream = self.path.open("a+b")
+            self._stream = stream
+            if os.name == "nt":
+                import msvcrt
+
+                stream.seek(0, os.SEEK_END)
+                if stream.tell() == 0:
+                    stream.write(b"\0")
+                    stream.flush()
+                stream.seek(0)
+                msvcrt.locking(stream.fileno(), msvcrt.LK_LOCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+        except (ImportError, OSError) as error:
+            self._close_after_failure()
+            raise LedgerLockError(f"could not acquire ledger lock: {self.path}") from error
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        stream = self._stream
+        if stream is None:
+            return False
+        try:
+            if os.name == "nt":
+                import msvcrt
+
+                stream.seek(0)
+                msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+        except (ImportError, OSError) as error:
+            raise LedgerLockError(f"could not release ledger lock: {self.path}") from error
+        finally:
+            stream.close()
+            self._stream = None
+        return False
+
+    def _close_after_failure(self) -> None:
+        if self._stream is not None:
+            self._stream.close()
+            self._stream = None
+
+
 class ObservationLedger:
     """A JSONL ledger which only appends verified action/result observations."""
 
@@ -31,15 +97,6 @@ class ObservationLedger:
             raise TypeError("append requires an EvaluationAction and EvaluationResult")
         if action.id != result.action_id:
             raise ValueError("action and result IDs must match")
-        entries = self.entries()
-        if any(existing_action.id == action.id for existing_action, _ in entries):
-            raise ValueError(f"duplicate action id: {action.id}")
-        recorded_units = {
-            existing_result.cost_unit for _, existing_result in entries if existing_result.cost > 0
-        }
-        if result.cost > 0 and recorded_units and result.cost_unit not in recorded_units:
-            raise ValueError("cost_unit must match earlier ledger entries")
-        self._verify_artifacts(result)
         line = (
             json.dumps(
                 {"action": action.to_dict(), "result": result.to_dict()},
@@ -50,14 +107,30 @@ class ObservationLedger:
             ).encode("utf-8")
             + b"\n"
         )
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("ab") as stream:
-            stream.write(line)
-            stream.flush()
-            os.fsync(stream.fileno())
+        with _LedgerLock(self.path):
+            entries = self._entries()
+            if any(existing_action.id == action.id for existing_action, _ in entries):
+                raise ValueError(f"duplicate action id: {action.id}")
+            recorded_units = {
+                existing_result.cost_unit
+                for _, existing_result in entries
+                if existing_result.cost > 0
+            }
+            if result.cost > 0 and recorded_units and result.cost_unit not in recorded_units:
+                raise ValueError("cost_unit must match earlier ledger entries")
+            self._verify_artifacts(result)
+            with self.path.open("ab") as stream:
+                stream.write(line)
+                stream.flush()
+                os.fsync(stream.fileno())
 
     def entries(self) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]:
         """Read and validate every persisted observation without modifying the ledger."""
+        with _LedgerLock(self.path):
+            return self._entries()
+
+    def _entries(self) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]:
+        """Read every entry while the caller holds the exclusive ledger lock."""
         if not self.path.exists():
             return ()
         entries: list[tuple[EvaluationAction, EvaluationResult]] = []
