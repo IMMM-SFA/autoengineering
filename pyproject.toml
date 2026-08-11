@@ -7,7 +7,7 @@ name = "autoengineering"
 version = "0.1.0"
 description = "AI-assisted systems engineering for complex model chains"
 license = "BSD-3-Clause"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "networkx>=3.0",
     "pyyaml>=6.0",
@@ -15,6 +15,14 @@ dependencies = [
     "pandas>=2.0",
     "click>=8.0",
     "rich>=13.0",
+]
+
+[project.optional-dependencies]
+bayes = [
+    "botorch==0.17.2",
+]
+benchmark = [
+    "smac>=2.3,<3",
 ]
 
 [project.scripts]

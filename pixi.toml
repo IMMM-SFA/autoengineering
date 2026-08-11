@@ -2,16 +2,16 @@
 authors = ["Cam Bracken <cameron.bracken@pm.me>"]
 channels = ["conda-forge"]
 name = "autoengineering"
-platforms = ["osx-arm64"]
+platforms = ["osx-arm64", "linux-64"]
 version = "0.1.0"
 
 [tasks]
-test = "pytest tests/ --junitxml=results.xml"
-lint = "ruff check src/ tests/ examples/"
-install = "pip install -e ."
+test = "python -m pytest tests -q -p no:cacheprovider"
+lint = "ruff check --no-cache src tests examples"
+test-bayes = "python -m pytest tests -q -p no:cacheprovider"
 
 [dependencies]
-python = ">=3.11"
+python = "3.12.*"
 networkx = ">=3.0"
 pyyaml = ">=6.0"
 numpy = ">=1.24"
@@ -23,3 +23,17 @@ pip = "*"
 ruff = "*"
 requests = ">=2.28"
 scipy = ">=1.10"
+
+[pypi-dependencies]
+autoengineering = { path = ".", editable = true }
+
+[feature.bayes.dependencies]
+botorch = "==0.17.2"
+pytorch = ">=2.4"
+
+[feature.bayes.pypi-dependencies]
+autoengineering = { path = ".", editable = true }
+
+[environments]
+default = { solve-group = "default" }
+bayes = { features = ["bayes"], solve-group = "default" }
