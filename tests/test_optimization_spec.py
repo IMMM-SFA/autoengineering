@@ -1,6 +1,7 @@
 """Behavior tests for immutable optimization study specifications."""
 
 from dataclasses import FrozenInstanceError
+import math
 
 import pytest
 
@@ -67,6 +68,13 @@ def test_encode_rejects_a_category_outside_the_declared_order():
 
     with pytest.raises(ValueError, match="category"):
         space.encode({"method": "neural_network"})
+
+
+@pytest.mark.parametrize("category", (math.nan, math.inf, -math.inf))
+def test_categorical_parameter_rejects_non_finite_float_categories(category):
+    """Reject float categories that cannot have a deterministic canonical encoding."""
+    with pytest.raises(ValueError, match="finite"):
+        CategoricalParameter("method", ("linear", category))
 
 
 @pytest.mark.parametrize(

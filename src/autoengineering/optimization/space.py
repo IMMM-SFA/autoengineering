@@ -75,6 +75,10 @@ class CategoricalParameter:
         if not all(_is_scalar(category) for category in categories):
             raise ValueError("categories must contain YAML/JSON scalars")
         if any(
+            isinstance(category, float) and not math.isfinite(category) for category in categories
+        ):
+            raise ValueError("float categories must be finite")
+        if any(
             _same_scalar(category, other)
             for index, category in enumerate(categories)
             for other in categories[index + 1 :]
