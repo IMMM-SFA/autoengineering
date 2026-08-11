@@ -30,9 +30,12 @@ autoengineering = { path = ".", editable = true }
 [feature.bayes.dependencies]
 botorch = "==0.17.2"
 pytorch = ">=2.4"
+scikit-learn = ">=1.1.2,<1.5"
+swig = "*"
 
 [feature.bayes.pypi-dependencies]
 autoengineering = { path = ".", editable = true }
+smac = ">=2.3,<3"
 
 [environments]
 default = { solve-group = "default" }
