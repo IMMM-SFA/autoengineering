@@ -5,8 +5,10 @@ import json
 import math
 import multiprocessing
 import os
+import threading
 
 import pytest
+import autoengineering.optimization.ledger as ledger_module
 
 from autoengineering.optimization import (
     EvaluationAction,
@@ -38,6 +40,41 @@ def _abandon_ledger_lock_in_process(path, acquired):
     with _LedgerLock(path):
         acquired.set()
         os._exit(0)
+
+
+class _LockScopeState:
+    """Thread synchronization state used only to prove lock placement."""
+
+    def __init__(self) -> None:
+        self.condition = threading.Condition()
+        self.held = False
+        self.writer_a_paused = threading.Event()
+        self.writer_b_waiting = threading.Event()
+        self.writer_b_replayed = threading.Event()
+        self.writer_a_fsynced = threading.Event()
+        self.release_writer_a = threading.Event()
+
+
+class _BlockingTestLock:
+    """A deterministic replacement for the OS lock in a lock-scope regression."""
+
+    def __init__(self, state):
+        self.state = state
+
+    def __enter__(self):
+        with self.state.condition:
+            if self.state.held:
+                self.state.writer_b_waiting.set()
+                while self.state.held:
+                    self.state.condition.wait()
+            self.state.held = True
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        with self.state.condition:
+            self.state.held = False
+            self.state.condition.notify_all()
+        return False
 
 
 def test_ledger_round_trip_is_byte_stable(tmp_path):
@@ -360,6 +397,65 @@ def test_competing_processes_append_a_duplicate_action_only_once(tmp_path):
     entries = ObservationLedger(path).entries()
     assert len(entries) == 1
     assert entries[0][0].id == "eval-000001"
+
+
+def test_writer_lock_covers_replay_through_fsync_before_a_competing_check(tmp_path, monkeypatch):
+    """Allowing writer B to replay before writer A fsyncs must fail this test."""
+    state = _LockScopeState()
+    path = tmp_path / "observations.jsonl"
+    action = EvaluationAction.system("eval-000001", {"x": 0.25})
+    result = EvaluationResult.success(action.id, {"score": 1.0}, {}, 1.0, "cpu_hour")
+    original_entries = ObservationLedger._entries
+    original_fsync = ledger_module.os.fsync
+    outcomes = []
+
+    def pause_or_observe_replay(ledger):
+        entries = original_entries(ledger)
+        if threading.current_thread().name == "writer-a":
+            state.writer_a_paused.set()
+            assert state.release_writer_a.wait(timeout=10)
+        else:
+            assert state.writer_a_fsynced.is_set()
+            state.writer_b_replayed.set()
+        return entries
+
+    def track_fsync(descriptor):
+        original_fsync(descriptor)
+        if threading.current_thread().name == "writer-a":
+            state.writer_a_fsynced.set()
+
+    def append_in_thread(label):
+        try:
+            ObservationLedger(path).append(action, result)
+        except ValueError as error:
+            outcomes.append((label, "rejected", str(error)))
+        else:
+            outcomes.append((label, "appended", ""))
+
+    monkeypatch.setattr(ObservationLedger, "_entries", pause_or_observe_replay)
+    monkeypatch.setattr(ledger_module, "_LedgerLock", lambda _: _BlockingTestLock(state))
+    monkeypatch.setattr(ledger_module.os, "fsync", track_fsync)
+    writer_a = threading.Thread(target=append_in_thread, args=("a",), name="writer-a")
+    writer_b = threading.Thread(target=append_in_thread, args=("b",), name="writer-b")
+    writer_a.start()
+    assert state.writer_a_paused.wait(timeout=10)
+    writer_b.start()
+    assert state.writer_b_waiting.wait(timeout=10)
+    assert not state.writer_b_replayed.is_set()
+
+    state.release_writer_a.set()
+    writer_a.join(timeout=10)
+    writer_b.join(timeout=10)
+
+    assert not writer_a.is_alive()
+    assert not writer_b.is_alive()
+    assert state.writer_a_fsynced.is_set()
+    assert state.writer_b_replayed.is_set()
+    assert sorted(outcomes) == [
+        ("a", "appended", ""),
+        ("b", "rejected", "duplicate action id: eval-000001"),
+    ]
+    assert ObservationLedger(path).entries() == ((action, result),)
 
 
 def test_process_exit_releases_a_ledger_lock_without_removing_its_lock_file(tmp_path):
