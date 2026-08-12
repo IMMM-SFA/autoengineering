@@ -20,6 +20,7 @@ from .ledger import ObservationLedger
 from .records import (
     BackendDiagnostics,
     EvaluationAction,
+    EvaluationScope,
     EvaluationStatus,
     JSONValue,
     Recommendation,
@@ -52,8 +53,10 @@ class OptimizerBackend(Protocol):
         """Return canonical JSON-compatible local policy state."""
 
 
-_ACTION_ID = re.compile(r"^eval-(\d+)$")
+_ACTION_ID = re.compile(r"^eval-\d{6}$")
 _RETRY_LIMIT = 1024
+_FINITE_ENUMERATION_LIMIT = 100_000
+_SOBOL_RETRIES_PER_CANDIDATE = 64
 
 
 def _canonical_config(config: Mapping[str, Scalar]) -> tuple[tuple[str, str, Scalar], ...]:
@@ -136,6 +139,7 @@ class _BaselineBackend:
             "name": self.name,
             "study_seed": self.spec.seed,
             "retry_limit": _RETRY_LIMIT,
+            "finite_enumeration_limit": _FINITE_ENUMERATION_LIMIT,
             "sequence_state": "derived_from_ledger",
         }
 
@@ -143,10 +147,19 @@ class _BaselineBackend:
         self, ledger: ObservationLedger
     ) -> tuple[int, set[tuple[tuple[str, str, Scalar], ...]]]:
         entries = ledger.entries()
+        for action, _ in entries:
+            if _ACTION_ID.fullmatch(action.id) is None:
+                raise ValueError(f"ledger action has noncanonical action ID: {action.id!r}")
+            if action.scope is not EvaluationScope.SYSTEM:
+                raise ValueError(f"ledger action must have system scope: {action.id!r}")
+            try:
+                self.space.encode(action.config)
+            except (TypeError, ValueError) as error:
+                raise ValueError(
+                    f"ledger action has invalid search-space config: {action.id!r}: {error}"
+                ) from error
         ids = {action.id for action, _ in entries}
-        indices = [
-            int(match.group(1)) for action_id in ids if (match := _ACTION_ID.match(action_id))
-        ]
+        indices = [int(action_id.removeprefix("eval-")) for action_id in ids]
         next_index = max(indices, default=-1) + 1
         while f"eval-{next_index:06d}" in ids:
             next_index += 1
@@ -163,7 +176,10 @@ class _BaselineBackend:
         )
 
     def _finite_configs(self) -> tuple[dict[str, Scalar], ...] | None:
-        """Enumerate a finite conditional space in declaration order, when possible."""
+        """Enumerate only safely small finite conditional spaces in declaration order."""
+        cardinality = self._finite_cardinality(_FINITE_ENUMERATION_LIMIT)
+        if cardinality is None or cardinality > _FINITE_ENUMERATION_LIMIT:
+            return None
         configs: list[dict[str, Scalar]] = []
 
         def visit(parameter_index: int, config: dict[str, Scalar]) -> bool:
@@ -191,6 +207,41 @@ class _BaselineBackend:
             return True
 
         return tuple(configs) if visit(0, {}) else None
+
+    def _finite_cardinality(self, limit: int) -> int | None:
+        """Return a finite cardinality capped above ``limit``, or ``None`` for a continuum."""
+
+        def capped_product(left: int, right: int) -> int:
+            if left == 0 or right == 0:
+                return 0
+            if left > limit // right:
+                return limit + 1
+            return left * right
+
+        def visit(parameter_index: int, config: dict[str, Scalar]) -> int | None:
+            if parameter_index == len(self.space.parameters):
+                return 1
+            parameter = self.space.parameters[parameter_index]
+            if isinstance(parameter, CategoricalParameter):
+                total = 0
+                for category in parameter.categories:
+                    config[parameter.name] = category
+                    child = visit(parameter_index + 1, config)
+                    if child is None:
+                        return None
+                    total = min(limit + 1, total + child)
+                del config[parameter.name]
+                return total
+            if not self.space._is_active(parameter, config):
+                return visit(parameter_index + 1, config)
+            if isinstance(parameter, ContinuousParameter):
+                return None
+            child = visit(parameter_index + 1, config)
+            if child is None:
+                return None
+            return capped_product(parameter.upper - parameter.lower + 1, child)
+
+        return visit(0, {})
 
     def _validate_n(self, n: int) -> None:
         if isinstance(n, bool) or not isinstance(n, int) or n <= 0:
@@ -269,6 +320,12 @@ class SobolBackend(_BaselineBackend):
 
     name = "sobol"
 
+    def state_dict(self) -> dict[str, JSONValue]:
+        """Include the bounded Sobol scan choice needed for policy replay."""
+        state = super().state_dict()
+        state["scan_retries_per_candidate"] = _SOBOL_RETRIES_PER_CANDIDATE
+        return state
+
     def suggest(self, ledger: ObservationLedger, n: int = 1) -> tuple[EvaluationAction, ...]:
         self._validate_n(n)
         next_index, observed = self._next_index_and_observed(ledger)
@@ -285,15 +342,20 @@ class SobolBackend(_BaselineBackend):
         sampler = qmc.Sobol(d=self.space.encoded_dimension, scramble=True, seed=self.spec.seed)
         if next_index:
             sampler.fast_forward(next_index)
-        for point in sampler.random(_RETRY_LIMIT):
-            config = self._decode_projected(point)
-            key = _canonical_config(config)
-            if key in selected_keys:
-                continue
-            selected_keys.add(key)
-            selected_configs.append(config)
-            if len(selected_configs) == n:
-                break
+        chunk_size = _power_of_two_at_least(n)
+        scan_limit = chunk_size * _SOBOL_RETRIES_PER_CANDIDATE
+        scanned = 0
+        while scanned < scan_limit and len(selected_configs) < n:
+            for point in sampler.random(chunk_size):
+                config = self._decode_projected(point)
+                key = _canonical_config(config)
+                if key in selected_keys:
+                    continue
+                selected_keys.add(key)
+                selected_configs.append(config)
+                if len(selected_configs) == n:
+                    break
+            scanned += chunk_size
 
         if len(selected_configs) < n and finite_configs is not None:
             for config in finite_configs:
@@ -333,3 +395,8 @@ class SobolBackend(_BaselineBackend):
             if active:
                 config[parameter.name] = self.space._denormalize(parameter, normalized)
         return self.space.decode(tuple(encoded))
+
+
+def _power_of_two_at_least(value: int) -> int:
+    """Return the smallest positive power-of-two Sobol block containing ``value``."""
+    return 1 << (value - 1).bit_length()

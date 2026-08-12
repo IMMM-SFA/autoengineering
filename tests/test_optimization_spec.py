@@ -77,6 +77,14 @@ def test_categorical_parameter_rejects_non_finite_float_categories(category):
         CategoricalParameter("method", ("linear", category))
 
 
+def test_search_space_rejects_null_categories_and_activation_values():
+    """Allowing null values would create configs durable evaluation actions cannot store."""
+    with pytest.raises(ValueError, match="null"):
+        CategoricalParameter("method", (None, "linear"))
+    with pytest.raises(ValueError, match="null"):
+        ContinuousParameter("rate", 0.0, 1.0, active_when={"method": (None,)})
+
+
 @pytest.mark.parametrize(
     ("make_parameter", "message"),
     [

@@ -209,6 +209,85 @@ def test_sobol_first_continuous_point_matches_scrambled_scipy_sequence(study, em
     assert action.config == pytest.approx({"x": expected})
 
 
+def test_sobol_returns_a_batch_larger_than_the_former_fixed_scan_limit(study, empty_ledger):
+    """Capping all Sobol scans at 1,024 points must fail this large-batch request."""
+    continuous_space = SearchSpace(parameters=(ContinuousParameter("x", 0.0, 1.0),))
+
+    actions = SobolBackend(spec=study, space=continuous_space).suggest(empty_ledger, n=1025)
+
+    assert len(actions) == 1025
+    assert len({action.config["x"] for action in actions}) == 1025
+
+
+@pytest.mark.parametrize("backend_type", (RandomBackend, SobolBackend))
+@pytest.mark.parametrize(
+    ("action", "message"),
+    (
+        (
+            EvaluationAction.system("eval-1", {"model": "a"}, seed=1),
+            "canonical action ID",
+        ),
+        (
+            EvaluationAction.component("eval-000001", "routing", {"model": "a"}, seed=1),
+            "system scope",
+        ),
+    ),
+)
+def test_suggest_rejects_ledger_actions_outside_the_system_protocol(
+    backend_type, study, space, empty_ledger, action, message
+):
+    """Accepting malformed IDs or component actions must fail protocol validation."""
+    empty_ledger.append(
+        action,
+        EvaluationResult.success(action.id, {"score": 1.0, "bias": 1.0}, {}, 1.0, "cpu_hour"),
+    )
+
+    with pytest.raises(ValueError, match=message):
+        backend_type(spec=study, space=space).suggest(empty_ledger)
+
+
+@pytest.mark.parametrize("backend_type", (RandomBackend, SobolBackend))
+@pytest.mark.parametrize(
+    ("config", "message"),
+    (
+        ({"routing": "linear", "subreaches": 2}, "inactive parameter"),
+        ({"routing": "storage", "subreaches": 2, "unknown": 1}, "unknown configuration"),
+    ),
+)
+def test_suggest_rejects_ledger_configs_outside_its_search_space(
+    backend_type, study, empty_ledger, config, message
+):
+    """Using invalid observed configs for duplicate tracking must fail fast."""
+    conditional_space = SearchSpace(
+        parameters=(
+            CategoricalParameter("routing", ("linear", "storage")),
+            IntegerParameter("subreaches", 1, 3, active_when={"routing": ("storage",)}),
+        )
+    )
+    action = EvaluationAction.system("eval-000001", config, seed=1)
+    empty_ledger.append(
+        action,
+        EvaluationResult.success(action.id, {"score": 1.0, "bias": 1.0}, {}, 1.0, "cpu_hour"),
+    )
+
+    with pytest.raises(ValueError, match=message):
+        backend_type(spec=study, space=conditional_space).suggest(empty_ledger)
+
+
+@pytest.mark.parametrize("backend_type", (RandomBackend, SobolBackend))
+def test_large_finite_integer_space_is_sampled_without_materializing_every_value(
+    backend_type, study, empty_ledger
+):
+    """Enumerating a billion integer values must fail this prompt sampling contract."""
+    large_space = SearchSpace(parameters=(IntegerParameter("count", 1, 1_000_000_000),))
+
+    first = backend_type(spec=study, space=large_space).suggest(empty_ledger)
+    second = backend_type(spec=study, space=large_space).suggest(empty_ledger)
+
+    assert first == second
+    assert 1 <= first[0].config["count"] <= 1_000_000_000
+
+
 def _append_observation(ledger, action_id, config, outcomes, *, cost=1.0, status=None):
     action = EvaluationAction.system(action_id, config, seed=1)
     result = (
@@ -294,6 +373,9 @@ def test_diagnostics_and_state_are_truthful_stable_json(backend_type, study, spa
     assert diagnostics.details["ledger_entries"] == 0
     assert json.loads(json.dumps(state, sort_keys=True)) == state
     assert state["sequence_state"] == "derived_from_ledger"
+    assert state["finite_enumeration_limit"] == 100_000
+    if backend_type is SobolBackend:
+        assert state["scan_retries_per_candidate"] == 64
 
 
 def test_base_optimization_import_has_no_bayesian_or_smac_dependencies():

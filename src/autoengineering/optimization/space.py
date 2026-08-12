@@ -15,12 +15,12 @@ from types import MappingProxyType
 from typing import Literal, Mapping, Sequence, TypeAlias
 
 
-Scalar: TypeAlias = str | int | float | bool | None
+Scalar: TypeAlias = str | int | float | bool
 ActiveWhen: TypeAlias = Mapping[str, tuple[Scalar, ...]]
 
 
 def _is_scalar(value: object) -> bool:
-    return value is None or isinstance(value, str | int | float | bool)
+    return isinstance(value, str | int | float | bool)
 
 
 def _same_scalar(left: Scalar, right: Scalar) -> bool:
@@ -55,7 +55,7 @@ def _freeze_conditions(active_when: ActiveWhen) -> Mapping[str, tuple[Scalar, ..
         if not values_tuple:
             raise ValueError("condition values must be non-empty")
         if not all(_is_scalar(value) for value in values_tuple):
-            raise ValueError("condition values must be YAML/JSON scalars")
+            raise ValueError("condition values must be non-null YAML/JSON scalars")
         frozen[condition_name] = values_tuple
     return MappingProxyType(frozen)
 
@@ -73,7 +73,7 @@ class CategoricalParameter:
         if not categories:
             raise ValueError("categories must be non-empty")
         if not all(_is_scalar(category) for category in categories):
-            raise ValueError("categories must contain YAML/JSON scalars")
+            raise ValueError("categories must contain non-null YAML/JSON scalars")
         if any(
             isinstance(category, float) and not math.isfinite(category) for category in categories
         ):
