@@ -198,9 +198,18 @@ class EvaluationContext:
             raise ValueError("outcome_functions must not be empty")
         object.__setattr__(self, "outcome_functions", MappingProxyType(outcomes))
         if self.artifact_dir is not None:
-            object.__setattr__(
-                self, "artifact_dir", Path(self.artifact_dir).expanduser().absolute()
+            if not isinstance(self.artifact_dir, (str, Path)):
+                raise TypeError("artifact_dir must be a string or Path")
+            artifact_dir = (
+                self.artifact_dir.expanduser()
+                if isinstance(self.artifact_dir, Path)
+                else os.path.expanduser(self.artifact_dir)
             )
+            if not artifact_dir:
+                raise ValueError("artifact_dir must not be empty")
+            # Preserve lexical components for the POSIX descriptor walk.  In
+            # particular, normalizing here would erase forbidden `.`/`..`.
+            object.__setattr__(self, "artifact_dir", artifact_dir)
         parents: dict[str, ParentArtifactReference] = {}
         for artifact_id, reference in self.parent_artifacts.items():
             if not isinstance(artifact_id, str) or not artifact_id:
@@ -877,7 +886,7 @@ def _replicate_artifact_id(action_id: str, replicate: int, count: int) -> str:
 
 
 def _write_artifact(
-    directory: Path, artifact_id: str, outputs: Mapping[str, np.ndarray]
+    directory: str | Path, artifact_id: str, outputs: Mapping[str, np.ndarray]
 ) -> tuple[Path, str]:
     """Persist one artifact using a retained POSIX root directory descriptor."""
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
@@ -983,28 +992,63 @@ def _create_temp_at(root_fd: int) -> tuple[int, str]:
     raise _ArtifactStorageError("could not allocate artifact temporary file")
 
 
-def _open_artifact_root(directory: Path) -> _ArtifactRoot:
-    raw = Path(directory).absolute()
+def _open_artifact_root(directory: str | Path) -> _ArtifactRoot:
+    raw, anchor, components = _lexical_absolute_artifact_path(directory)
     flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = os.open(raw.anchor, flags)
+    descriptor = os.open(anchor, flags)
     try:
-        for part in raw.parts[1:]:
+        _validate_artifact_dir(os.fstat(descriptor), final=not components)
+        for index, part in enumerate(components):
+            final = index == len(components) - 1
             try:
                 metadata = os.stat(part, dir_fd=descriptor, follow_symlinks=False)
             except FileNotFoundError:
                 os.mkdir(part, 0o700, dir_fd=descriptor)
                 metadata = os.stat(part, dir_fd=descriptor, follow_symlinks=False)
-            _validate_artifact_dir(metadata, final=False)
-            next_descriptor = os.open(part, flags, dir_fd=descriptor)
+            _validate_artifact_dir(metadata, final=final)
+            next_descriptor: int | None = None
+            try:
+                next_descriptor = os.open(part, flags, dir_fd=descriptor)
+                opened_metadata = os.fstat(next_descriptor)
+                _validate_artifact_dir(opened_metadata, final=final)
+                if (
+                    opened_metadata.st_dev != metadata.st_dev
+                    or opened_metadata.st_ino != metadata.st_ino
+                ):
+                    raise _ArtifactStorageError(
+                        "artifact root directory changed between stat and open"
+                    )
+            except Exception:
+                _close_fd(next_descriptor, suppress=True)
+                raise
             previous_descriptor = descriptor
             descriptor = None
-            _close_fd(previous_descriptor)
+            try:
+                _close_fd(previous_descriptor)
+            except Exception:
+                _close_fd(next_descriptor, suppress=True)
+                raise
             descriptor = next_descriptor
-        _validate_artifact_dir(os.fstat(descriptor), final=True)
         return _ArtifactRoot(raw, descriptor)
     except Exception:
         _close_fd(descriptor, suppress=True)
         raise
+
+
+def _lexical_absolute_artifact_path(directory: str | Path) -> tuple[Path, str, tuple[str, ...]]:
+    """Return an absolute artifact path without normalizing lexical components."""
+    path = os.fspath(directory)
+    if not isinstance(path, str):
+        raise TypeError("artifact_dir must be a string or Path")
+    absolute = path if os.path.isabs(path) else os.path.join(os.getcwd(), path)
+    anchor = Path(absolute).anchor
+    if not anchor:
+        raise _ArtifactStorageError("artifact directory must be absolute")
+    suffix = absolute[len(anchor) :]
+    components = tuple(suffix.split(os.sep)) if suffix else ()
+    if any(not part or part in {".", ".."} for part in components):
+        raise _ArtifactStorageError("artifact directory contains unsafe lexical components")
+    return Path(anchor, *components), anchor, components
 
 
 def _validate_artifact_dir(metadata: os.stat_result, *, final: bool) -> None:

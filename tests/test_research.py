@@ -1074,6 +1074,78 @@ def test_artifact_root_rejects_unsafe_writable_ancestor(models_dir, tmp_path):
     assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
 
 
+@pytest.mark.parametrize(
+    "artifact_dir",
+    (
+        lambda tmp_path: tmp_path / "child" / ".." / "escape",
+        lambda tmp_path: f"{tmp_path}/child/./escape",
+    ),
+)
+def test_artifact_root_rejects_lexical_dot_components(models_dir, tmp_path, artifact_dir):
+    """Dot components must not normalize into a writable artifact destination."""
+    escaped = tmp_path / "escape"
+    context = EvaluationContext(
+        **{
+            **_evaluator_context(models_dir).__dict__,
+            "artifact_dir": artifact_dir(tmp_path),
+        }
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000034", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (escaped / "eval-000034.npz").exists()
+
+
+def test_artifact_root_rejects_directory_replaced_after_preopen_stat(
+    models_dir, tmp_path, monkeypatch
+):
+    """A directory replaced after pre-open stat must never become the retained root."""
+    if os.name == "nt":
+        pytest.skip("POSIX directory descriptor")
+    parent = tmp_path / "parent"
+    parent.mkdir()
+    root = parent / "artifacts"
+    opened = []
+    closed = []
+    replaced = False
+    original_open = runner_module.os.open
+    original_close = runner_module.os.close
+
+    def replace_between_stat_and_open(path, flags, *args, **kwargs):
+        nonlocal replaced
+        if path == "parent" and kwargs.get("dir_fd") is not None and not replaced:
+            replaced = True
+            parent.rename(tmp_path / "parent-original")
+            parent.mkdir()
+        descriptor = original_open(path, flags, *args, **kwargs)
+        opened.append(descriptor)
+        return descriptor
+
+    def tracked_close(descriptor):
+        closed.append(descriptor)
+        return original_close(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "open", replace_between_stat_and_open)
+    monkeypatch.setattr(runner_module.os, "close", tracked_close)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000035", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert replaced
+    assert set(opened) <= set(closed)
+    assert not (parent / "artifacts" / "eval-000035.npz").exists()
+
+
 def test_posix_artifact_publication_uses_retained_directory_fd(models_dir, tmp_path, monkeypatch):
     """Removing dir_fd bindings must make this link-observation test fail."""
     if os.name == "nt":
