@@ -197,7 +197,9 @@ class EvaluationContext:
             raise ValueError("outcome_functions must not be empty")
         object.__setattr__(self, "outcome_functions", MappingProxyType(outcomes))
         if self.artifact_dir is not None:
-            object.__setattr__(self, "artifact_dir", Path(self.artifact_dir).expanduser().resolve())
+            object.__setattr__(
+                self, "artifact_dir", Path(self.artifact_dir).expanduser().absolute()
+            )
         parents: dict[str, ParentArtifactReference] = {}
         for artifact_id, reference in self.parent_artifacts.items():
             if not isinstance(artifact_id, str) or not artifact_id:
@@ -825,7 +827,13 @@ def _validate_outputs(outputs: Mapping[str, np.ndarray]) -> None:
 
 
 def _safe_output_name(name: str) -> bool:
-    return bool(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", name))
+    if not isinstance(name, str) or not name or name in {".", ".."}:
+        return False
+    try:
+        encoded = name.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return len(encoded) <= 255 and "\x00" not in name and "/" not in name and "\\" not in name
 
 
 def _validate_declared_outputs(component: Component, outputs: Mapping[str, np.ndarray]) -> None:
@@ -873,6 +881,7 @@ def _write_artifact(
     handle = None
     temporary: Path | None = None
     temporary_stat = None
+    descriptor: int | None = None
     try:
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
             raise _ArtifactStorageError("artifact action ID must be a safe filename")
@@ -883,8 +892,10 @@ def _write_artifact(
         _require_contained(root, temporary)
         try:
             handle = os.fdopen(descriptor, "w+b")
+            descriptor = None
         except OSError:
             os.close(descriptor)
+            descriptor = None
             raise
         np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
         handle.flush()
@@ -892,7 +903,7 @@ def _write_artifact(
         temporary_stat = os.fstat(handle.fileno())
         if not stat.S_ISREG(temporary_stat.st_mode):
             raise _ArtifactStorageError("artifact temporary file is not regular")
-        handle.close()
+        _close_artifact_handle(handle)
         handle = None
         _assert_temp_matches_descriptor(temporary, temporary_stat)
         digest = _regular_file_sha256(
@@ -901,7 +912,7 @@ def _write_artifact(
         try:
             os.link(temporary, destination, follow_symlinks=False)
         except FileExistsError:
-            if _regular_file_sha256(destination) != digest:
+            if _bound_destination_digest(destination) != digest:
                 raise _ArtifactStorageError(
                     f"artifact {destination} exists with different bytes; refusing overwrite"
                 )
@@ -917,9 +928,24 @@ def _write_artifact(
         ) from error
     finally:
         if handle is not None:
-            handle.close()
+            try:
+                handle.close()
+            except OSError:
+                pass
+        if descriptor is not None:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
         if temporary is not None:
             _cleanup_artifact_temp(temporary, temporary_stat)
+
+
+def _close_artifact_handle(handle) -> None:
+    try:
+        handle.close()
+    except OSError as error:
+        raise _ArtifactStorageError(f"could not close artifact temporary file: {error}") from error
 
 
 def _create_artifact_temp(root: Path, artifact_id: str) -> tuple[int, Path]:
@@ -965,6 +991,24 @@ def _regular_file_sha256(
         os.close(descriptor)
 
 
+def _bound_destination_digest(path: Path) -> str:
+    """Hash a replay destination and bind its pathname to the opened inode."""
+    before = os.lstat(path)
+    if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+        raise _ArtifactStorageError(
+            "existing artifact target is not a safe single-link regular file"
+        )
+    digest = _regular_file_sha256(path, expected_stat=before, require_single_link=True)
+    after = os.lstat(path)
+    if (
+        after.st_dev != before.st_dev
+        or after.st_ino != before.st_ino
+        or after.st_nlink != before.st_nlink
+    ):
+        raise _ArtifactStorageError("existing artifact target changed during replay verification")
+    return digest
+
+
 def _cleanup_artifact_temp(path: Path, descriptor_stat: os.stat_result | None) -> None:
     try:
         if descriptor_stat is None:
@@ -972,7 +1016,6 @@ def _cleanup_artifact_temp(path: Path, descriptor_stat: os.stat_result | None) -
             return
         path_stat = os.lstat(path)
         if path_stat.st_dev != descriptor_stat.st_dev or path_stat.st_ino != descriptor_stat.st_ino:
-            path.unlink()
             return
         path.unlink()
     except OSError:
@@ -980,19 +1023,36 @@ def _cleanup_artifact_temp(path: Path, descriptor_stat: os.stat_result | None) -
 
 
 def _prepare_artifact_root(directory: Path) -> Path:
-    raw = Path(directory)
-    if raw.exists() or raw.is_symlink():
-        metadata = os.lstat(raw)
-        if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
-            raise _ArtifactStorageError("artifact root must be a real directory")
-    else:
-        raw.mkdir(parents=True, mode=0o700)
-    root = raw.resolve()
+    raw = Path(directory).absolute()
+    components = raw.parts
+    current = Path(components[0])
+    for part in components[1:]:
+        current = current / part
+        if current.exists() or current.is_symlink():
+            metadata = os.lstat(current)
+            if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
+                raise _ArtifactStorageError("artifact root ancestry must contain real directories")
+            _validate_artifact_ancestor(current, metadata)
+        else:
+            current.mkdir(mode=0o700)
+    root = raw
     if os.name != "nt":
         metadata = os.stat(root)
         if metadata.st_uid != os.getuid() or metadata.st_mode & 0o077:
             raise _ArtifactStorageError("artifact root must be owner-private")
     return root
+
+
+def _validate_artifact_ancestor(path: Path, metadata: os.stat_result) -> None:
+    if os.name == "nt":
+        return
+    mode = stat.S_IMODE(metadata.st_mode)
+    writable = mode & 0o022
+    sticky = metadata.st_mode & stat.S_ISVTX
+    if writable and not sticky and metadata.st_uid != os.getuid():
+        raise _ArtifactStorageError(f"artifact root ancestor {path} is writable by another owner")
+    if writable and not sticky and path.name not in {"private", "var", "folders"}:
+        raise _ArtifactStorageError(f"artifact root ancestor {path} is group/world writable")
 
 
 def _assert_final_artifact(path: Path, temporary_stat: os.stat_result, digest: str) -> None:

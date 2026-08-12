@@ -950,7 +950,6 @@ def _write_parent_member_archive(path, member_names):
         ("nested/x.npy",),
         ("nested\\x.npy",),
         ("x.txt",),
-        ("bad-name.npy",),
     ),
 )
 def test_parent_artifact_rejects_ambiguous_or_unsafe_member_names(
@@ -977,6 +976,100 @@ def test_produced_artifact_rejects_unsafe_output_name(models_dir, tmp_path):
     )
 
     assert result.status is EvaluationStatus.MODEL_FAILURE
+
+
+def test_artifact_replay_rechecks_replaced_destination_after_hash(
+    models_dir, tmp_path, monkeypatch
+):
+    """Replacing a replay target after its digest read must be detected before return."""
+    root = tmp_path / "artifacts"
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+    action = EvaluationAction.component("eval-000027", "transform", {})
+
+    def runner(component, inputs):
+        return {"y": inputs["x"]}
+
+    assert execute_action(action, context, runner=runner).status is EvaluationStatus.SUCCESS
+    original = runner_module._regular_file_sha256
+
+    def replace_after_digest(path, **kwargs):
+        digest = original(path, **kwargs)
+        if path.name == "eval-000027.npz" and kwargs.get("require_single_link", True):
+            replacement = root / "replacement.npz"
+            np.savez(replacement, y=np.array([99.0]))
+            os.replace(replacement, path)
+        return digest
+
+    monkeypatch.setattr(runner_module, "_regular_file_sha256", replace_after_digest)
+    result = execute_action(action, context, runner=runner)
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+@pytest.mark.parametrize("logical_name", ("soil-moisture", "flow rate", "Δflow"))
+def test_artifact_preserves_flat_compatible_logical_names(models_dir, tmp_path, logical_name):
+    """Safe existing port-style names must round-trip through a durable NPZ."""
+    system = _system(models_dir)
+    system.get_component("transform").metadata["runnable"]["outputs"] = [logical_name]
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"source.x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs[logical_name][0])},
+        cost_unit="cpu_second",
+        artifact_dir=tmp_path / "artifacts",
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000028", "transform", {}),
+        context,
+        runner=lambda component, inputs: {logical_name: inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    with np.load(result.artifacts["eval-000028"], allow_pickle=False) as artifact:
+        assert logical_name in artifact.files
+
+
+def test_artifact_root_rejects_symlink_ancestor(models_dir, tmp_path):
+    """A symlink in the artifact-root ancestry must prevent any output write."""
+    real = tmp_path / "real"
+    real.mkdir()
+    linked = tmp_path / "linked"
+    linked.symlink_to(real, target_is_directory=True)
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": linked / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000029", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (real / "artifacts").exists()
+
+
+def test_artifact_root_rejects_unsafe_writable_ancestor(models_dir, tmp_path):
+    """A group/world-writable non-sticky ancestor must fail closed on POSIX."""
+    if os.name == "nt":
+        pytest.skip("POSIX permission semantics")
+    unsafe = tmp_path / "unsafe"
+    unsafe.mkdir(mode=0o777)
+    unsafe.chmod(0o777)
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": unsafe / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000030", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
 
 
 @pytest.mark.parametrize(
