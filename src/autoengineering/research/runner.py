@@ -34,8 +34,10 @@ import copy
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 import hashlib
+import io
 import math
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -60,6 +62,10 @@ class ScientificInfeasibleError(Exception):
     """Raise only for a valid evaluation that violates a scientific condition."""
 
 
+class InfrastructureFailure(Exception):
+    """Explicit runner signal for scheduler, transport, or storage failure."""
+
+
 class _ModelContractError(Exception):
     """A runnable or outcome callable did not meet the evaluator contract."""
 
@@ -77,7 +83,11 @@ class _ModelExecutionError(Exception):
 
 
 class _InfrastructureExecutionError(Exception):
-    """A runner failed because of an operating-system service or filesystem error."""
+    """A runner explicitly reported scheduler, transport, or storage failure."""
+
+
+class _ClockError(Exception):
+    """The evaluator's monotonic clock could not provide a valid timestamp."""
 
 
 @dataclass(frozen=True)
@@ -104,12 +114,13 @@ class EvaluationContext:
     Source arrays override parent-artifact arrays on matching names.  If two parent
     artifacts define a name, the later ID in ``action.parent_artifact_ids`` wins.
     ``cost_per_evaluator_second`` explicitly converts monotonic elapsed seconds to
-    ``cost_unit``; successful calls have a one-machine-epsilon minimum charge so a
-    completed attempt is never recorded as free when a test clock has zero ticks.
+    ``cost_unit`` exactly; a successful completed attempt requires a finite,
+    strictly increasing clock interval and therefore has a positive measured cost.
 
     The action seed is durable provenance.  The runner protocol has no seed
     argument, so runners that use randomness must consume an explicitly configured
-    seed; this evaluator never mutates NumPy's global random state.
+    seed; this evaluator never mutates NumPy's global random state. Callable
+    references are retained, so closure state owned by a callable cannot be frozen.
     """
 
     system: System
@@ -125,6 +136,7 @@ class EvaluationContext:
     def __post_init__(self) -> None:
         if not isinstance(self.system, System):
             raise TypeError("system must be a System")
+        object.__setattr__(self, "system", copy.deepcopy(self.system))
         if not isinstance(self.cost_unit, str) or not self.cost_unit.strip():
             raise ValueError("cost_unit must be a non-empty string")
         if (
@@ -150,7 +162,7 @@ class EvaluationContext:
                     or not isinstance(component, Component)
                 ):
                     raise TypeError("alternative choices must map names to Components")
-                frozen_choices[choice] = component
+                frozen_choices[choice] = copy.deepcopy(component)
             alternatives[component_name] = MappingProxyType(frozen_choices)
         object.__setattr__(self, "alternatives", MappingProxyType(alternatives))
         object.__setattr__(
@@ -420,10 +432,11 @@ def execute_action(
         raise TypeError("runner must satisfy the Runner protocol")
 
     system = _configured_system(action, context)
-    started = clock()
+    timer = _EvaluationTimer(clock)
     artifacts: dict[str, str] = {}
     digests: dict[str, str] = {}
     try:
+        timer.start()
         replicate_outcomes: dict[str, list[float]] = {
             name: [] for name in context.outcome_functions
         }
@@ -458,7 +471,7 @@ def execute_action(
                 path, digest = _write_artifact(context.artifact_dir, artifact_id, outputs)
                 artifacts[artifact_id] = str(path)
                 digests[artifact_id] = digest
-        elapsed = _elapsed(started, clock)
+        elapsed = timer.finish()
         outcomes = {name: float(np.mean(values)) for name, values in replicate_outcomes.items()}
         errors = {
             name: 0.0
@@ -470,52 +483,53 @@ def execute_action(
             action.id,
             outcomes,
             errors,
-            _cost(elapsed, context, completed=True),
+            _cost(elapsed, context),
             context.cost_unit,
             artifacts=artifacts,
             artifact_sha256=digests,
             evaluator_seconds=elapsed,
         )
-    except ScientificInfeasibleError as error:
+    except _ClockError as error:
         return _failure_result(
+            EvaluationResult.infrastructure_failure,
+            action,
+            context,
+            error,
+            artifacts,
+            digests,
+            elapsed=0.0,
+        )
+    except ScientificInfeasibleError as error:
+        return _timed_failure(
             EvaluationResult.scientific_infeasible,
             action,
             context,
-            started,
-            clock,
+            timer,
             error,
             artifacts,
             digests,
         )
     except (TimeoutError, subprocess.TimeoutExpired) as error:
-        return _failure_result(
-            EvaluationResult.timeout, action, context, started, clock, error, artifacts, digests
+        return _timed_failure(
+            EvaluationResult.timeout, action, context, timer, error, artifacts, digests
         )
     except (
         _ArtifactVerificationError,
         _ArtifactStorageError,
         _InfrastructureExecutionError,
     ) as error:
-        return _failure_result(
+        return _timed_failure(
             EvaluationResult.infrastructure_failure,
             action,
             context,
-            started,
-            clock,
+            timer,
             error,
             artifacts,
             digests,
         )
     except Exception as error:
-        return _failure_result(
-            EvaluationResult.model_failure,
-            action,
-            context,
-            started,
-            clock,
-            error,
-            artifacts,
-            digests,
+        return _timed_failure(
+            EvaluationResult.model_failure, action, context, timer, error, artifacts, digests
         )
 
 
@@ -543,6 +557,13 @@ def _configured_system(action: EvaluationAction, context: EvaluationContext) -> 
         else:
             _validate_scalar_binding(value, key)
             parameters.setdefault(component_name, {})[binding] = value
+
+    unselected_parameters = set(parameters) - set(choices)
+    if unselected_parameters:
+        raise ValueError(
+            "parameter bindings require an explicit '<component>.choice' for: "
+            f"{sorted(unselected_parameters)}"
+        )
 
     configured = copy.deepcopy(context.system)
     for component_name, choice in choices.items():
@@ -639,9 +660,9 @@ def _safe_runner(runner: Runner) -> Runner:
             return runner(component, inputs)
         except (ScientificInfeasibleError, TimeoutError, subprocess.TimeoutExpired):
             raise
-        except OSError as error:
+        except InfrastructureFailure as error:
             raise _InfrastructureExecutionError(
-                f"runner infrastructure failure: {error}"
+                f"runner explicitly reported infrastructure failure: {error}"
             ) from error
         except Exception as error:
             raise _ModelExecutionError(f"runner execution failed: {error}") from error
@@ -657,14 +678,18 @@ def _component_inputs(
         reference = context.parent_artifacts.get(artifact_id)
         if reference is None:
             raise _ArtifactVerificationError(f"parent artifact {artifact_id!r} is not registered")
-        if not reference.path.is_file():
-            raise _ArtifactVerificationError(f"parent artifact {artifact_id!r} does not exist")
-        if _sha256(reference.path) != reference.sha256:
+        try:
+            data = _read_parent_artifact_bytes(reference.path)
+        except OSError as error:
+            raise _ArtifactVerificationError(
+                f"parent artifact {artifact_id!r} does not exist or cannot be read"
+            ) from error
+        if hashlib.sha256(data).hexdigest() != reference.sha256:
             raise _ArtifactVerificationError(
                 f"parent artifact {artifact_id!r} SHA-256 does not match"
             )
         try:
-            with np.load(reference.path, allow_pickle=False) as parent:
+            with np.load(io.BytesIO(data), allow_pickle=False) as parent:
                 for name in parent.files:
                     merged[name] = np.array(parent[name], copy=True)
         except (OSError, ValueError) as error:
@@ -678,6 +703,11 @@ def _component_inputs(
         if "." in name:
             merged[name.rsplit(".", 1)[1]] = np.array(value, copy=True)
     return merged
+
+
+def _read_parent_artifact_bytes(path: Path) -> bytes:
+    """Read one parent artifact exactly once for hash verification and loading."""
+    return path.read_bytes()
 
 
 def _validate_outputs(outputs: Mapping[str, np.ndarray]) -> None:
@@ -700,10 +730,22 @@ def _validate_declared_outputs(component: Component, outputs: Mapping[str, np.nd
     output_names = runnable.get("outputs", [])
     if not isinstance(output_names, list):
         raise _ModelContractError(f"component {component.name!r} runnable outputs must be a list")
-    missing = [name for name in output_names if name not in outputs]
-    if missing:
+    if any(not isinstance(name, str) or not name for name in output_names):
         raise _ModelContractError(
-            f"component {component.name!r} did not produce declared output(s): {missing}"
+            f"component {component.name!r} runnable output names must be non-empty strings"
+        )
+    if len(set(output_names)) != len(output_names):
+        raise _ModelContractError(
+            f"component {component.name!r} runnable output names must be unique"
+        )
+    expected = set(output_names)
+    actual = set(outputs)
+    if actual != expected:
+        missing = sorted(expected - actual)
+        extra = sorted(str(name) for name in actual - expected)
+        raise _ModelContractError(
+            f"component {component.name!r} outputs differ from declaration; "
+            f"missing={missing}, extra={extra}"
         )
 
 
@@ -724,9 +766,18 @@ def _write_artifact(
     directory: Path, artifact_id: str, outputs: Mapping[str, np.ndarray]
 ) -> tuple[Path, str]:
     try:
-        directory.mkdir(parents=True, exist_ok=True)
-        destination = (directory / f"{artifact_id}.npz").resolve()
-        temporary = directory / f".{artifact_id}.tmp"
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
+            raise _ArtifactStorageError("artifact action ID must be a safe filename")
+        root = directory.resolve()
+        root.mkdir(parents=True, exist_ok=True)
+        destination = root / f"{artifact_id}.npz"
+        temporary = root / f".{artifact_id}.tmp"
+        _require_contained(root, destination)
+        _require_contained(root, temporary)
+        if destination.is_symlink() or temporary.is_symlink():
+            raise _ArtifactStorageError(
+                "artifact destination or temporary path must not be a symlink"
+            )
         with temporary.open("wb") as handle:
             np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
             handle.flush()
@@ -749,6 +800,15 @@ def _write_artifact(
         ) from error
 
 
+def _require_contained(root: Path, path: Path) -> None:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError as error:
+        raise _ArtifactStorageError(
+            "artifact path escapes configured artifact directory"
+        ) from error
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -757,32 +817,90 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _elapsed(started: float, clock: Callable[[], float]) -> float:
-    return max(0.0, float(clock()) - float(started))
+@dataclass
+class _EvaluationTimer:
+    """One-shot timer that never retries a clock after it reports a bad value."""
+
+    clock: Callable[[], float]
+    started: float | None = None
+
+    def start(self) -> None:
+        self.started = _clock_value(self.clock)
+
+    def finish(self) -> float:
+        if self.started is None:
+            raise _ClockError("clock did not provide a valid start timestamp")
+        ended = _clock_value(self.clock)
+        if ended <= self.started:
+            raise _ClockError("clock timestamps must be strictly increasing")
+        return ended - self.started
 
 
-def _cost(elapsed: float, context: EvaluationContext, *, completed: bool) -> float:
-    measured = elapsed * float(context.cost_per_evaluator_second)
-    return max(measured, np.finfo(float).eps) if completed else measured
+def _clock_value(clock: Callable[[], float]) -> float:
+    try:
+        value = clock()
+    except Exception as error:
+        raise _ClockError(f"clock failed: {error}") from error
+    if isinstance(value, bool) or not isinstance(value, (int, float, np.number)):
+        raise _ClockError("clock must return a finite scalar number")
+    numeric = float(value)
+    if not math.isfinite(numeric):
+        raise _ClockError("clock must return a finite scalar number")
+    return numeric
+
+
+def _cost(elapsed: float, context: EvaluationContext) -> float:
+    return elapsed * float(context.cost_per_evaluator_second)
 
 
 def _failure_result(
     factory: Callable[..., EvaluationResult],
     action: EvaluationAction,
     context: EvaluationContext,
-    started: float,
-    clock: Callable[[], float],
     error: Exception,
     artifacts: Mapping[str, str],
     digests: Mapping[str, str],
+    *,
+    elapsed: float,
 ) -> EvaluationResult:
-    elapsed = _elapsed(started, clock)
     return factory(
         action.id,
         str(error),
-        cost=_cost(elapsed, context, completed=False),
+        cost=_cost(elapsed, context),
         cost_unit=context.cost_unit,
         artifacts=artifacts,
         artifact_sha256=digests,
         evaluator_seconds=elapsed,
+    )
+
+
+def _timed_failure(
+    factory: Callable[..., EvaluationResult],
+    action: EvaluationAction,
+    context: EvaluationContext,
+    timer: _EvaluationTimer,
+    error: Exception,
+    artifacts: Mapping[str, str],
+    digests: Mapping[str, str],
+) -> EvaluationResult:
+    try:
+        elapsed = timer.finish()
+    except _ClockError as clock_error:
+        return _failure_result(
+            EvaluationResult.infrastructure_failure,
+            action,
+            context,
+            clock_error,
+            artifacts,
+            digests,
+            elapsed=0.0,
+        )
+    return _failure_result(
+        factory,
+        action,
+        context,
+        error,
+        artifacts,
+        digests,
+        elapsed=elapsed,
     )

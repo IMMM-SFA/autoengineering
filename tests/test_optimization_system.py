@@ -419,8 +419,8 @@ def test_base_optimization_import_has_no_bayesian_or_smac_dependencies():
     assert completed.returncode == 0, completed.stderr
 
 
-def test_evaluator_infrastructure_failure_is_durable_ledger_observation(tmp_path):
-    """Discarding timed infrastructure failures must make this ledger entry disappear."""
+def test_evaluator_model_failure_from_runner_is_durable_ledger_observation(tmp_path):
+    """Misclassifying a runner OSError as infrastructure must fail this observation check."""
     system = System("empty")
     component = system.add_component("model", metadata={"runnable": {"outputs": ["y"]}})
     component.add_input("x")
@@ -447,6 +447,6 @@ def test_evaluator_infrastructure_failure_is_durable_ledger_observation(tmp_path
 
     stored_action, stored_result = ledger.entries()[0]
     assert stored_action == action
-    assert stored_result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert stored_result.status is EvaluationStatus.MODEL_FAILURE
     assert stored_result.evaluator_seconds == pytest.approx(4.0)
     assert stored_result.cost == pytest.approx(4.0)

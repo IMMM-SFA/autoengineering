@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import autoengineering.research.runner as runner_module
 
 from autoengineering.research.candidates import (
     Candidate,
@@ -23,6 +24,7 @@ from autoengineering.research.experiment import ExperimentNode, ExperimentTree
 from autoengineering.research.loop import auto_improve
 from autoengineering.research.runner import (
     EvaluationContext,
+    InfrastructureFailure,
     ParentArtifactReference,
     ScientificInfeasibleError,
     build_feedforward_runner,
@@ -229,6 +231,31 @@ def test_execute_system_action_applies_choice_without_mutating_inputs(models_dir
     assert context.alternatives["transform"]["identity"].metadata == alternative_metadata
 
 
+def test_evaluation_context_snapshots_caller_owned_system_alternatives_and_arrays(models_dir):
+    """Mutating source objects after construction must not change an evaluation."""
+    system = _system(models_dir)
+    identity = _transform("tmodels:identity", str(models_dir))
+    source_arrays = {"source.x": np.array([1.0, 2.0, 3.0])}
+    context = EvaluationContext(
+        system=system,
+        alternatives={"transform": {"identity": identity}},
+        source_arrays=source_arrays,
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["transform.y"][0])},
+        cost_unit="cpu_second",
+    )
+    system.get_component("transform").metadata["runnable"]["entry"] = "tmodels:identity"
+    identity.metadata["runnable"]["entry"] = "tmodels:scale_two"
+    source_arrays["source.x"][0] = 99.0
+
+    result = execute_action(
+        EvaluationAction.system("eval-000011", {"transform.choice": "identity"}), context
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes == {"value": 1.0}
+
+
 def test_execute_action_applies_parameter_to_a_copy(models_dir):
     """Ignoring a configured parameter must leave the runner output at its default."""
     context = _evaluator_context(models_dir)
@@ -249,6 +276,24 @@ def test_execute_action_applies_parameter_to_a_copy(models_dir):
 
     assert result.outcomes["rmse"] == pytest.approx(2.0)
     assert alternative.metadata["runnable"]["params"] == {"offset": 0.0}
+
+
+def test_parameter_binding_requires_an_explicit_choice(models_dir):
+    """Applying a parameter to the implicit baseline must be rejected."""
+    system = _system(models_dir)
+    alternative = _transform("tmodels:identity", str(models_dir))
+    alternative.metadata["runnable"]["params"] = {"offset": 0.0}
+    context = EvaluationContext(
+        system=system,
+        alternatives={"transform": {"identity": alternative}},
+        source_arrays={"source.x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["transform.y"][0])},
+        cost_unit="cpu_second",
+    )
+
+    with pytest.raises(ValueError, match="explicit.*choice"):
+        execute_action(EvaluationAction.system("eval-000012", {"transform.offset": 2.0}), context)
 
 
 @pytest.mark.parametrize(
@@ -369,7 +414,7 @@ def test_replicates_report_mean_standard_error_and_measured_time(models_dir):
         (TimeoutError("late"), EvaluationStatus.TIMEOUT),
         (ImportError("missing"), EvaluationStatus.MODEL_FAILURE),
         (RuntimeError("model exploded"), EvaluationStatus.MODEL_FAILURE),
-        (OSError("disk unavailable"), EvaluationStatus.INFRASTRUCTURE_FAILURE),
+        (OSError("disk unavailable"), EvaluationStatus.MODEL_FAILURE),
         (ScientificInfeasibleError("outside domain"), EvaluationStatus.SCIENTIFIC_INFEASIBLE),
     ),
 )
@@ -388,6 +433,20 @@ def test_execute_action_classifies_runner_failures(models_dir, error, status):
     assert result.status is status
     assert result.evaluator_seconds == pytest.approx(3.0)
     assert result.cost == pytest.approx(3.0)
+
+
+def test_runner_can_explicitly_report_infrastructure_failure(models_dir):
+    """Only a runner's explicit infrastructure signal may produce that status."""
+    clock_values = iter((0.0, 3.0))
+
+    result = execute_action(
+        EvaluationAction.component("eval-000013", "transform", {}),
+        _evaluator_context(models_dir),
+        runner=lambda component, inputs: (_ for _ in ()).throw(InfrastructureFailure("queue down")),
+        clock=lambda: next(clock_values),
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
 
 
 def test_all_outcomes_run_and_nonfinite_values_are_scientifically_infeasible(models_dir):
@@ -519,6 +578,151 @@ def test_verified_parent_arrays_load_but_explicit_sources_win_collisions(models_
     )
 
     assert result.outcomes == {"value": 2.0}
+
+
+def test_parent_artifact_is_loaded_from_the_verified_bytes_snapshot(
+    models_dir, tmp_path, monkeypatch
+):
+    """Replacing a file after its bytes are read must not change runner inputs."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([4.0]))
+    original = parent.read_bytes()
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **base.__dict__,
+            "source_arrays": {},
+            "outcome_functions": {"value": lambda outputs: float(outputs["y"][0])},
+            "parent_artifacts": {
+                "parent": ParentArtifactReference(parent, hashlib.sha256(original).hexdigest())
+            },
+        }
+    )
+
+    def replace_after_read(path):
+        np.savez(path, x=np.array([99.0]))
+        return original
+
+    monkeypatch.setattr(runner_module, "_read_parent_artifact_bytes", replace_after_read)
+    result = execute_action(
+        EvaluationAction.component("eval-000014", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes == {"value": 4.0}
+
+
+def test_artifact_action_id_cannot_escape_configured_directory(models_dir, tmp_path):
+    """A traversal action ID must not create an artifact beside the configured root."""
+    root = tmp_path / "artifacts"
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("../escaped", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (tmp_path / "escaped.npz").exists()
+
+
+def test_artifact_writer_rejects_existing_symlink_target(models_dir, tmp_path):
+    """Replacing a symlink target must not write outside the artifact root."""
+    root = tmp_path / "artifacts"
+    root.mkdir()
+    outside = tmp_path / "outside.npz"
+    outside.write_bytes(b"unchanged")
+    (root / "eval-000015.npz").symlink_to(outside)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000015", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert outside.read_bytes() == b"unchanged"
+
+
+@pytest.mark.parametrize(
+    "clock",
+    (
+        lambda: (_ for _ in ()).throw(RuntimeError("clock unavailable")),
+        lambda: float("nan"),
+        lambda: 1.0 + 0.0j,
+    ),
+)
+def test_clock_start_failures_return_infrastructure_results(models_dir, clock):
+    """A clock exception or nonfinite start value must not escape execute_action."""
+    result = execute_action(
+        EvaluationAction.component("eval-000016", "transform", {}),
+        _evaluator_context(models_dir),
+        runner=lambda component, inputs: {"y": inputs["x"]},
+        clock=clock,
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert result.evaluator_seconds == 0.0
+    assert result.cost == 0.0
+
+
+def test_invalid_completion_clock_is_not_called_again_during_failure_construction(models_dir):
+    """Retrying a broken completion clock would call this test clock a third time."""
+    values = iter((1.0, 1.0))
+    calls = 0
+
+    def clock():
+        nonlocal calls
+        calls += 1
+        if calls > 2:
+            raise AssertionError("clock retried")
+        return next(values)
+
+    result = execute_action(
+        EvaluationAction.component("eval-000017", "transform", {}),
+        _evaluator_context(models_dir),
+        runner=lambda component, inputs: {"y": inputs["x"]},
+        clock=clock,
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert result.evaluator_seconds == 0.0
+    assert result.cost == 0.0
+    assert calls == 2
+
+
+@pytest.mark.parametrize(
+    ("declared", "returned"),
+    (
+        (["y", "y"], {"y": np.array([1.0])}),
+        ([""], {"": np.array([1.0])}),
+        (["y"], {"y": np.array([1.0]), "extra": np.array([1.0])}),
+    ),
+)
+def test_declared_outputs_must_be_unique_nonempty_and_exact(models_dir, declared, returned):
+    """Malformed declarations or extra model outputs must not be accepted."""
+    system = _system(models_dir)
+    system.get_component("transform").metadata["runnable"]["outputs"] = declared
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"source.x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: 1.0},
+        cost_unit="cpu_second",
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000018", "transform", {}),
+        context,
+        runner=lambda component, inputs: returned,
+    )
+
+    assert result.status is EvaluationStatus.MODEL_FAILURE
 
 
 # --------------------------------------------------------------------------- #
