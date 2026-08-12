@@ -39,6 +39,8 @@ class ExperimentNode:
     metrics: dict = field(default_factory=dict)  # metric_name -> value
     sources: list[str] = field(default_factory=list)
     notes: str = ""
+    action_id: str | None = None
+    result_status: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -53,6 +55,8 @@ class ExperimentNode:
             "metrics": {k: _round(v) for k, v in self.metrics.items()},
             "sources": list(self.sources),
             "notes": self.notes,
+            "action_id": self.action_id,
+            "result_status": self.result_status,
         }
 
     @classmethod
@@ -69,6 +73,8 @@ class ExperimentNode:
             metrics=data.get("metrics", {}) or {},
             sources=list(data.get("sources", []) or []),
             notes=data.get("notes", ""),
+            action_id=data.get("action_id"),
+            result_status=data.get("result_status"),
         )
 
 
@@ -133,11 +139,7 @@ class ExperimentTree:
 
     @classmethod
     def from_jsonl(cls, path: str | Path) -> ExperimentTree:
-        rows = [
-            json.loads(line)
-            for line in Path(path).read_text().splitlines()
-            if line.strip()
-        ]
+        rows = [json.loads(line) for line in Path(path).read_text().splitlines() if line.strip()]
         nodes = [ExperimentNode.from_dict(r) for r in rows]
         roots = [n for n in nodes if n.parent_id is None]
         if not roots:
@@ -181,9 +183,7 @@ class ExperimentTree:
             indent = "  " * depth
             mark = icon.get(n.status, "•")
             label = n.candidate or n.component or n.id
-            metric_str = ", ".join(
-                f"{k}={_round(v)}" for k, v in n.metrics.items()
-            )
+            metric_str = ", ".join(f"{k}={_round(v)}" for k, v in n.metrics.items())
             best_tag = " (best)" if nid == self.best().id else ""
             lines.append(
                 f"{indent}{mark} {label}  [score={round(n.score, 3)}"

@@ -27,6 +27,8 @@ from autoengineering.optimization import (
     SobolBackend,
     StudySpec,
 )
+from autoengineering.research.runner import EvaluationContext, execute_action
+from autoengineering.system.graph import System
 
 
 @pytest.fixture
@@ -415,3 +417,36 @@ def test_base_optimization_import_has_no_bayesian_or_smac_dependencies():
     completed = subprocess.run(command, check=False, capture_output=True, text=True)
 
     assert completed.returncode == 0, completed.stderr
+
+
+def test_evaluator_infrastructure_failure_is_durable_ledger_observation(tmp_path):
+    """Discarding timed infrastructure failures must make this ledger entry disappear."""
+    system = System("empty")
+    component = system.add_component("model", metadata={"runnable": {"outputs": ["y"]}})
+    component.add_input("x")
+    component.add_output("y")
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["y"][0])},
+        cost_unit="cpu_second",
+    )
+    action = EvaluationAction.component("eval-000001", "model", {})
+    clock = iter((0.0, 4.0))
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(OSError("storage down")),
+        clock=lambda: next(clock),
+    )
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    ledger.append(action, result)
+
+    stored_action, stored_result = ledger.entries()[0]
+    assert stored_action == action
+    assert stored_result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert stored_result.evaluator_seconds == pytest.approx(4.0)
+    assert stored_result.cost == pytest.approx(4.0)

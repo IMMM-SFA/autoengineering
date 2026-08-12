@@ -8,6 +8,7 @@ a temp module so the python runnable path exercises a real import.
 from __future__ import annotations
 
 import textwrap
+import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -21,9 +22,14 @@ from autoengineering.research.candidates import (
 from autoengineering.research.experiment import ExperimentNode, ExperimentTree
 from autoengineering.research.loop import auto_improve
 from autoengineering.research.runner import (
+    EvaluationContext,
+    ParentArtifactReference,
+    ScientificInfeasibleError,
     build_feedforward_runner,
+    execute_action,
     run_component,
 )
+from autoengineering.optimization import EvaluationAction, EvaluationStatus
 from autoengineering.system.component import Component
 from autoengineering.system.graph import System
 
@@ -84,6 +90,24 @@ def _system(models_dir: Path) -> System:
     s._graph.add_node("transform", component=poor)
     s.connect("source", "transform", port_from="x", port_to="x")
     return s
+
+
+def _evaluator_context(models_dir: Path) -> EvaluationContext:
+    """Create the independent evaluator fixture used by action tests."""
+    system = _system(models_dir)
+    identity = _transform("tmodels:identity", str(models_dir))
+    return EvaluationContext(
+        system=system,
+        alternatives={"transform": {"identity": identity}},
+        source_arrays={"source.x": np.array([1.0, 2.0, 3.0])},
+        observed={"y": np.array([1.0, 2.0, 3.0])},
+        outcome_functions={
+            "rmse": lambda outputs: float(
+                np.sqrt(np.mean((outputs["transform.y"] - np.array([1.0, 2.0, 3.0])) ** 2))
+            )
+        },
+        cost_unit="cpu_second",
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -181,6 +205,323 @@ class TestFeedforwardRunner:
 
 
 # --------------------------------------------------------------------------- #
+# Evaluation actions
+# --------------------------------------------------------------------------- #
+
+
+def test_execute_system_action_applies_choice_without_mutating_inputs(models_dir):
+    """Removing action configuration application must return the doubled baseline."""
+    context = _evaluator_context(models_dir)
+    baseline_metadata = context.system.get_component("transform").metadata.copy()
+    alternative_metadata = context.alternatives["transform"]["identity"].metadata.copy()
+    action = EvaluationAction.system(
+        "eval-000001",
+        {"transform.choice": "identity"},
+        seed=1,
+    )
+
+    result = execute_action(action, context)
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes["rmse"] == pytest.approx(0.0)
+    assert result.cost > 0.0
+    assert context.system.get_component("transform").metadata == baseline_metadata
+    assert context.alternatives["transform"]["identity"].metadata == alternative_metadata
+
+
+def test_execute_action_applies_parameter_to_a_copy(models_dir):
+    """Ignoring a configured parameter must leave the runner output at its default."""
+    context = _evaluator_context(models_dir)
+    alternative = context.alternatives["transform"]["identity"]
+    alternative.metadata["runnable"]["params"] = {"offset": 0.0}
+    action = EvaluationAction.system(
+        "eval-000002",
+        {"transform.choice": "identity", "transform.offset": 2.0},
+    )
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: {
+            "y": inputs["x"] + component.metadata["runnable"]["params"]["offset"]
+        },
+    )
+
+    assert result.outcomes["rmse"] == pytest.approx(2.0)
+    assert alternative.metadata["runnable"]["params"] == {"offset": 0.0}
+
+
+@pytest.mark.parametrize(
+    "config",
+    (
+        {"transform": "identity"},
+        {"missing.choice": "identity"},
+        {"transform.choice": "missing"},
+        {"transform.unknown": 1.0},
+        {"transform.offset.extra": 1.0},
+    ),
+)
+def test_execute_action_rejects_malformed_or_unknown_bindings(models_dir, config):
+    """Silently ignoring an invalid optimizer binding must be impossible."""
+    with pytest.raises(ValueError):
+        execute_action(
+            EvaluationAction.system("eval-000003", config), _evaluator_context(models_dir)
+        )
+
+
+def test_component_action_rejects_an_unknown_target_before_execution(models_dir):
+    """A missing target must not be converted into an ambiguous model result."""
+    with pytest.raises(ValueError, match="unknown component"):
+        execute_action(
+            EvaluationAction.component("eval-000031", "missing", {}), _evaluator_context(models_dir)
+        )
+
+
+def test_component_action_uses_only_target_component_and_source_inputs(models_dir):
+    """Executing the full graph for a component action must make this call fail."""
+    context = _evaluator_context(models_dir)
+    action = EvaluationAction.component("eval-000004", "transform", {})
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: {
+            "y": inputs["x"]
+            if component.name == "transform"
+            else (_ for _ in ()).throw(AssertionError())
+        },
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes["rmse"] == pytest.approx(0.0)
+
+
+def test_system_action_wires_multiple_components_and_source_arrays(models_dir):
+    """Skipping an edge or an unconnected source input changes the final output."""
+    system = System("three-stage")
+    source = system.add_component("source")
+    source.add_output("x")
+    first = system.add_component(
+        "first", metadata={"runnable": {"inputs": ["x"], "outputs": ["y"]}}
+    )
+    first.add_input("x")
+    first.add_output("y")
+    second = system.add_component(
+        "second", metadata={"runnable": {"inputs": ["y", "offset"], "outputs": ["z"]}}
+    )
+    second.add_input("y")
+    second.add_input("offset")
+    second.add_output("z")
+    system.connect("source", "first", "x", "x")
+    system.connect("first", "second", "y", "y")
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"source.x": np.array([1.0]), "second.offset": np.array([3.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["second.z"][0])},
+        cost_unit="cpu_second",
+    )
+
+    result = execute_action(
+        EvaluationAction.system("eval-000041", {}),
+        context,
+        runner=lambda component, inputs: (
+            {"y": inputs["x"] + 1.0}
+            if component.name == "first"
+            else {"z": inputs["y"] + inputs["offset"]}
+        ),
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes == {"value": 5.0}
+
+
+def test_replicates_report_mean_standard_error_and_measured_time(models_dir):
+    """Collapsing replicate results to the last run must break both statistics."""
+    values = iter((1.0, 3.0))
+    times = iter((5.0, 7.5))
+    context = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **context.__dict__,
+            "outcome_functions": {"value": lambda outputs: float(outputs["y"][0])},
+        }
+    )
+    action = EvaluationAction.component("eval-000005", "transform", {}, replicates=2)
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: {"y": np.array([next(values)])},
+        clock=lambda: next(times),
+    )
+
+    assert result.outcomes == {"value": 2.0}
+    assert result.standard_errors == {"value": pytest.approx(1.0)}
+    assert result.evaluator_seconds == pytest.approx(2.5)
+    assert result.cost == pytest.approx(2.5)
+
+
+@pytest.mark.parametrize(
+    ("error", "status"),
+    (
+        (TimeoutError("late"), EvaluationStatus.TIMEOUT),
+        (ImportError("missing"), EvaluationStatus.MODEL_FAILURE),
+        (RuntimeError("model exploded"), EvaluationStatus.MODEL_FAILURE),
+        (OSError("disk unavailable"), EvaluationStatus.INFRASTRUCTURE_FAILURE),
+        (ScientificInfeasibleError("outside domain"), EvaluationStatus.SCIENTIFIC_INFEASIBLE),
+    ),
+)
+def test_execute_action_classifies_runner_failures(models_dir, error, status):
+    """Changing a narrow evaluator failure boundary must change this status."""
+    context = _evaluator_context(models_dir)
+    clock_values = iter((0.0, 3.0))
+
+    result = execute_action(
+        EvaluationAction.component("eval-000006", "transform", {}),
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(error),
+        clock=lambda: next(clock_values),
+    )
+
+    assert result.status is status
+    assert result.evaluator_seconds == pytest.approx(3.0)
+    assert result.cost == pytest.approx(3.0)
+
+
+def test_all_outcomes_run_and_nonfinite_values_are_scientifically_infeasible(models_dir):
+    """Returning after the first invalid outcome must skip the required second check."""
+    called = []
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **base.__dict__,
+            "outcome_functions": {
+                "invalid": lambda outputs: float("nan"),
+                "also_called": lambda outputs: called.append(True) or 1.0,
+            },
+        }
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000007", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SCIENTIFIC_INFEASIBLE
+    assert called == [True]
+
+
+def test_missing_declared_runner_output_is_a_model_failure(models_dir):
+    """Accepting an undeclared output would hide a broken runnable contract."""
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{**base.__dict__, "outcome_functions": {"value": lambda outputs: float(outputs["z"][0])}}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000071", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"z": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.MODEL_FAILURE
+
+
+def test_artifacts_are_hashed_and_identical_replays_reuse_them(models_dir, tmp_path):
+    """Overwriting an existing artifact without comparing bytes must fail this test."""
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(**{**base.__dict__, "artifact_dir": tmp_path / "artifacts"})
+    action = EvaluationAction.component("eval-000008", "transform", {})
+
+    def runner(component, inputs):
+        return {"y": inputs["x"]}
+
+    first = execute_action(action, context, runner=runner)
+    second = execute_action(action, context, runner=runner)
+
+    artifact = Path(first.artifacts[action.id])
+    assert artifact.is_absolute() and artifact.exists()
+    assert first.artifact_sha256[action.id] == hashlib.sha256(artifact.read_bytes()).hexdigest()
+    assert second.artifact_sha256 == first.artifact_sha256
+
+
+def test_artifact_replay_refuses_to_overwrite_different_bytes(models_dir, tmp_path):
+    """Replacing a durable action artifact with changed model output must fail closed."""
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(**{**base.__dict__, "artifact_dir": tmp_path / "artifacts"})
+    action = EvaluationAction.component("eval-000081", "transform", {})
+    values = iter((1.0, 2.0))
+
+    def changing_runner(component, inputs):
+        return {"y": np.array([next(values)])}
+
+    first = execute_action(action, context, runner=changing_runner)
+    second = execute_action(action, context, runner=changing_runner)
+
+    assert first.status is EvaluationStatus.SUCCESS
+    assert second.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+@pytest.mark.parametrize("state", ("unregistered", "missing", "mismatched"))
+def test_unverified_parent_artifact_never_calls_component_runner(models_dir, tmp_path, state):
+    """Calling a component before parent verification must trigger the assertion runner."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([9.0]))
+    digest = hashlib.sha256(parent.read_bytes()).hexdigest()
+    registry = (
+        {}
+        if state == "unregistered"
+        else {
+            "parent": ParentArtifactReference(
+                tmp_path / "missing.npz" if state == "missing" else parent,
+                "0" * 64 if state == "mismatched" else digest,
+            )
+        }
+    )
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(**{**base.__dict__, "parent_artifacts": registry})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000009", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(AssertionError("runner was called")),
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_verified_parent_arrays_load_but_explicit_sources_win_collisions(models_dir, tmp_path):
+    """Reversing the documented source-over-parent collision rule changes this outcome."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([99.0]))
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **base.__dict__,
+            "source_arrays": {"x": np.array([2.0])},
+            "observed": {"y": np.array([2.0])},
+            "outcome_functions": {"value": lambda outputs: float(outputs["y"][0])},
+            "parent_artifacts": {
+                "parent": ParentArtifactReference(
+                    parent, hashlib.sha256(parent.read_bytes()).hexdigest()
+                )
+            },
+        }
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000010", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.outcomes == {"value": 2.0}
+
+
+# --------------------------------------------------------------------------- #
 # Candidate round-trip
 # --------------------------------------------------------------------------- #
 
@@ -219,9 +560,7 @@ class TestCandidates:
 
 class TestExperimentTree:
     def _tree(self):
-        tree = ExperimentTree(
-            ExperimentNode(id="baseline", score=0.2, status="baseline")
-        )
+        tree = ExperimentTree(ExperimentNode(id="baseline", score=0.2, status="baseline"))
         tree.add_child(
             "baseline",
             ExperimentNode(id="e1", score=0.5, status="kept", candidate="c1"),
@@ -248,6 +587,28 @@ class TestExperimentTree:
         restored = ExperimentTree.from_jsonl(path)
         assert restored.best().id == "e1"
         assert set(restored.nodes) == {"baseline", "e1", "e2"}
+
+    def test_jsonl_preserves_optional_evaluation_links_and_defaults_old_rows(self, tmp_path):
+        """Dropping action/result links or requiring them in old logs must fail this test."""
+        path = tmp_path / "tree.jsonl"
+        path.write_text(
+            "\n".join(
+                (
+                    '{"id": "baseline", "status": "baseline"}',
+                    '{"id": "child", "parent_id": "baseline", "action_id": "eval-000001", '
+                    '"result_status": "success"}',
+                )
+            )
+            + "\n"
+        )
+
+        restored = ExperimentTree.from_jsonl(path)
+
+        assert restored.nodes["baseline"].action_id is None
+        assert restored.nodes["baseline"].result_status is None
+        assert restored.nodes["child"].action_id == "eval-000001"
+        assert restored.nodes["child"].result_status == "success"
+        assert "action_id" in restored.nodes["child"].to_dict()
 
     def test_root_requires_no_parent(self):
         with pytest.raises(ValueError):
