@@ -1,6 +1,7 @@
 """Behavioral contracts for deterministic optimization baseline policies."""
 
 import json
+import importlib.util
 import subprocess
 import sys
 
@@ -29,6 +30,11 @@ from autoengineering.optimization import (
 )
 from autoengineering.research.runner import EvaluationContext, execute_action
 from autoengineering.system.graph import System
+
+if importlib.util.find_spec("botorch") is not None:
+    from autoengineering.optimization.system_backend import SystemBayesBackend
+else:
+    SystemBayesBackend = None
 
 
 @pytest.fixture
@@ -450,3 +456,83 @@ def test_evaluator_model_failure_from_runner_is_durable_ledger_observation(tmp_p
     assert stored_result.status is EvaluationStatus.MODEL_FAILURE
     assert stored_result.evaluator_seconds == pytest.approx(4.0)
     assert stored_result.cost == pytest.approx(4.0)
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_uses_replayable_sobol_cold_start(study, space, empty_ledger):
+    """Replacing the cold-start Sobol policy with uncontrolled sampling must fail this test."""
+    first = SystemBayesBackend(study, space, min_initial=6).suggest(empty_ledger, n=2)
+    second = SystemBayesBackend(study, space, min_initial=6).suggest(empty_ledger, n=2)
+
+    assert first == second
+    assert all(action.suggested_by == "system:sobol" for action in first)
+    assert all(action.id.startswith("eval-") for action in first)
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fits_double_precision_constraint_models(empty_ledger):
+    """Dropping a constraint model or fitting float32 data must fail this integration test."""
+    local_study = StudySpec(
+        name="bayes-fit",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(ConstraintSpec(outcome="limit", operator=">=", threshold=0.0),),
+        budget=BudgetSpec(max_cost=20.0, cost_unit="cpu_hour"),
+        noise=NoiseSpec(mode="deterministic", noise_floor=1e-5),
+        backend="system",
+        seed=7,
+    )
+    local_space = SearchSpace(parameters=(ContinuousParameter("x", 0.0, 1.0),))
+    for index, x in enumerate((0.05, 0.25, 0.55, 0.85), start=1):
+        _append_observation(
+            empty_ledger,
+            f"eval-{index:06d}",
+            {"x": x},
+            {"score": 1.0 - (x - 0.7) ** 2, "limit": x - 0.2},
+        )
+
+    backend = SystemBayesBackend(local_study, local_space, min_initial=2, raw_samples=16)
+    action = backend.suggest(empty_ledger)[0]
+    diagnostics = backend.diagnostics(empty_ledger)
+
+    assert action.suggested_by == "system:bayes"
+    assert diagnostics.fit_state == "fitted"
+    assert diagnostics.details["dtype"] == "torch.float64"
+    assert diagnostics.details["outcome_order"] == ("score", "limit")
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_projects_conditional_mixed_candidates(empty_ledger):
+    """Allowing nonbinary masks or inactive values through decode must fail this test."""
+    local_study = StudySpec(
+        name="mixed-bayes",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=20.0, cost_unit="cpu_hour"),
+        noise=NoiseSpec(),
+        backend="system",
+        seed=11,
+    )
+    local_space = SearchSpace(
+        parameters=(
+            CategoricalParameter("routing", ("linear", "storage")),
+            IntegerParameter("steps", 1, 5, active_when={"routing": ("storage",)}),
+            ContinuousParameter("rate", 0.1, 10.0, scale="log"),
+        )
+    )
+    for index, config in enumerate(
+        (
+            {"routing": "linear", "rate": 0.2},
+            {"routing": "storage", "steps": 2, "rate": 0.8},
+            {"routing": "storage", "steps": 4, "rate": 2.0},
+        ),
+        start=1,
+    ):
+        _append_observation(empty_ledger, f"eval-{index:06d}", config, {"score": float(index)})
+
+    action = SystemBayesBackend(local_study, local_space, min_initial=2, raw_samples=16).suggest(
+        empty_ledger
+    )[0]
+
+    assert local_space.decode(local_space.encode(action.config)) == action.config
+    if action.config["routing"] == "linear":
+        assert "steps" not in action.config
