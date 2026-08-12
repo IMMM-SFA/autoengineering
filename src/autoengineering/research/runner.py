@@ -38,10 +38,12 @@ import io
 import math
 import os
 import re
+import stat
 import subprocess
 import sys
 import tempfile
 import time
+import zipfile
 from types import MappingProxyType
 from pathlib import Path
 from typing import Callable, Protocol, runtime_checkable
@@ -90,6 +92,10 @@ class _ClockError(Exception):
     """The evaluator's monotonic clock could not provide a valid timestamp."""
 
 
+class _CostError(Exception):
+    """Measured elapsed time cannot be represented in the configured cost unit."""
+
+
 @dataclass(frozen=True)
 class ParentArtifactReference:
     """Immutable location and digest of a reusable parent artifact."""
@@ -132,6 +138,10 @@ class EvaluationContext:
     artifact_dir: str | Path | None = None
     parent_artifacts: Mapping[str, ParentArtifactReference] = field(default_factory=dict)
     cost_per_evaluator_second: float = 1.0
+    max_parent_artifact_bytes: int = 64 * 1024 * 1024
+    max_parent_artifact_members: int = 128
+    max_parent_artifact_member_bytes: int = 64 * 1024 * 1024
+    max_parent_artifact_total_bytes: int = 128 * 1024 * 1024
 
     def __post_init__(self) -> None:
         if not isinstance(self.system, System):
@@ -146,6 +156,15 @@ class EvaluationContext:
             or self.cost_per_evaluator_second <= 0
         ):
             raise ValueError("cost_per_evaluator_second must be a positive finite number")
+        for name in (
+            "max_parent_artifact_bytes",
+            "max_parent_artifact_members",
+            "max_parent_artifact_member_bytes",
+            "max_parent_artifact_total_bytes",
+        ):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
         alternatives: dict[str, Mapping[str, Component]] = {}
         for component_name, choices in self.alternatives.items():
             if (
@@ -489,7 +508,7 @@ def execute_action(
             artifact_sha256=digests,
             evaluator_seconds=elapsed,
         )
-    except _ClockError as error:
+    except (_ClockError, _CostError) as error:
         return _failure_result(
             EvaluationResult.infrastructure_failure,
             action,
@@ -497,7 +516,7 @@ def execute_action(
             error,
             artifacts,
             digests,
-            elapsed=0.0,
+            elapsed=timer.elapsed or 0.0,
         )
     except ScientificInfeasibleError as error:
         return _timed_failure(
@@ -679,7 +698,9 @@ def _component_inputs(
         if reference is None:
             raise _ArtifactVerificationError(f"parent artifact {artifact_id!r} is not registered")
         try:
-            data = _read_parent_artifact_bytes(reference.path)
+            data = _read_parent_artifact_bytes(
+                reference.path, max_bytes=context.max_parent_artifact_bytes
+            )
         except OSError as error:
             raise _ArtifactVerificationError(
                 f"parent artifact {artifact_id!r} does not exist or cannot be read"
@@ -689,6 +710,7 @@ def _component_inputs(
                 f"parent artifact {artifact_id!r} SHA-256 does not match"
             )
         try:
+            _validate_parent_npz(data, context)
             with np.load(io.BytesIO(data), allow_pickle=False) as parent:
                 for name in parent.files:
                     merged[name] = np.array(parent[name], copy=True)
@@ -705,9 +727,72 @@ def _component_inputs(
     return merged
 
 
-def _read_parent_artifact_bytes(path: Path) -> bytes:
+def _read_parent_artifact_bytes(path: Path, *, max_bytes: int) -> bytes:
     """Read one parent artifact exactly once for hash verification and loading."""
-    return path.read_bytes()
+    descriptor = os.open(path, os.O_RDONLY)
+    try:
+        metadata = os.fstat(descriptor)
+        if not stat.S_ISREG(metadata.st_mode):
+            raise OSError("parent artifact is not a regular file")
+        if metadata.st_size > max_bytes:
+            raise OSError("parent artifact exceeds compressed byte limit")
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            data = handle.read(max_bytes + 1)
+        if len(data) > max_bytes:
+            raise OSError("parent artifact exceeds compressed byte limit")
+        return data
+    finally:
+        os.close(descriptor)
+
+
+def _validate_parent_npz(data: bytes, context: EvaluationContext) -> None:
+    """Reject unsafe NPZ metadata before NumPy can allocate an array."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            members = archive.infolist()
+            if len(members) > context.max_parent_artifact_members:
+                raise _ArtifactVerificationError("parent artifact exceeds member-count limit")
+            total = 0
+            for member in members:
+                total += member.file_size
+                if member.file_size > context.max_parent_artifact_member_bytes:
+                    raise _ArtifactVerificationError("parent artifact member exceeds byte limit")
+                if total > context.max_parent_artifact_total_bytes:
+                    raise _ArtifactVerificationError("parent artifact exceeds total byte limit")
+                if not member.filename.endswith(".npy"):
+                    raise _ArtifactVerificationError("parent artifact contains a non-NPY member")
+                _validate_npy_member(archive, member, context)
+    except _ArtifactVerificationError:
+        raise
+    except (OSError, ValueError, zipfile.BadZipFile) as error:
+        raise _ArtifactVerificationError("parent artifact is not a safe NPZ archive") from error
+
+
+def _validate_npy_member(
+    archive: zipfile.ZipFile, member: zipfile.ZipInfo, context: EvaluationContext
+) -> None:
+    with archive.open(member) as handle:
+        version = np.lib.format.read_magic(handle)
+        if version == (1, 0):
+            shape, _, dtype = np.lib.format.read_array_header_1_0(handle)
+        elif version == (2, 0):
+            shape, _, dtype = np.lib.format.read_array_header_2_0(handle)
+        elif version == (3, 0):
+            shape, _, dtype = np.lib.format.read_array_header_2_0(handle)
+        else:
+            raise _ArtifactVerificationError("parent artifact has an unsupported NPY version")
+    if dtype.hasobject:
+        raise _ArtifactVerificationError("parent artifact object arrays are not allowed")
+    elements = 1
+    for dimension in shape:
+        if not isinstance(dimension, int) or dimension < 0:
+            raise _ArtifactVerificationError("parent artifact has an invalid array shape")
+        elements *= dimension
+        if elements > context.max_parent_artifact_total_bytes:
+            raise _ArtifactVerificationError("parent artifact declared array is too large")
+    nbytes = elements * dtype.itemsize
+    if nbytes > context.max_parent_artifact_member_bytes:
+        raise _ArtifactVerificationError("parent artifact declared array exceeds byte limit")
 
 
 def _validate_outputs(outputs: Mapping[str, np.ndarray]) -> None:
@@ -765,32 +850,35 @@ def _replicate_artifact_id(action_id: str, replicate: int, count: int) -> str:
 def _write_artifact(
     directory: Path, artifact_id: str, outputs: Mapping[str, np.ndarray]
 ) -> tuple[Path, str]:
+    handle = None
+    temporary: Path | None = None
+    temporary_stat = None
     try:
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
             raise _ArtifactStorageError("artifact action ID must be a safe filename")
         root = directory.resolve()
         root.mkdir(parents=True, exist_ok=True)
         destination = root / f"{artifact_id}.npz"
-        temporary = root / f".{artifact_id}.tmp"
         _require_contained(root, destination)
+        descriptor, temporary = _create_artifact_temp(root, artifact_id)
         _require_contained(root, temporary)
-        if destination.is_symlink() or temporary.is_symlink():
-            raise _ArtifactStorageError(
-                "artifact destination or temporary path must not be a symlink"
-            )
-        with temporary.open("wb") as handle:
-            np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
-            handle.flush()
-            os.fsync(handle.fileno())
-        digest = _sha256(temporary)
-        if destination.exists():
-            if _sha256(destination) != digest:
+        handle = os.fdopen(descriptor, "w+b")
+        np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
+        handle.flush()
+        os.fsync(handle.fileno())
+        temporary_stat = os.fstat(handle.fileno())
+        if not stat.S_ISREG(temporary_stat.st_mode):
+            raise _ArtifactStorageError("artifact temporary file is not regular")
+        handle.seek(0)
+        digest = _sha256_handle(handle)
+        _assert_temp_matches_descriptor(temporary, temporary_stat)
+        try:
+            os.link(temporary, destination, follow_symlinks=False)
+        except FileExistsError:
+            if _regular_file_sha256(destination) != digest:
                 raise _ArtifactStorageError(
                     f"artifact {destination} exists with different bytes; refusing overwrite"
                 )
-            temporary.unlink()
-        else:
-            os.replace(temporary, destination)
         return destination, digest
     except _ArtifactStorageError:
         raise
@@ -798,6 +886,54 @@ def _write_artifact(
         raise _ArtifactStorageError(
             f"could not persist artifact {artifact_id!r}: {error}"
         ) from error
+    finally:
+        if handle is not None:
+            handle.close()
+        if temporary is not None:
+            _cleanup_artifact_temp(temporary, temporary_stat)
+
+
+def _create_artifact_temp(root: Path, artifact_id: str) -> tuple[int, Path]:
+    descriptor, path = tempfile.mkstemp(prefix=f".{artifact_id}.", suffix=".tmp", dir=root)
+    return descriptor, Path(path)
+
+
+def _assert_temp_matches_descriptor(path: Path, descriptor_stat: os.stat_result) -> None:
+    path_stat = os.lstat(path)
+    if (
+        not stat.S_ISREG(path_stat.st_mode)
+        or path_stat.st_dev != descriptor_stat.st_dev
+        or path_stat.st_ino != descriptor_stat.st_ino
+    ):
+        raise _ArtifactStorageError("artifact temporary path changed before finalization")
+
+
+def _regular_file_sha256(path: Path) -> str:
+    path_stat = os.lstat(path)
+    if not stat.S_ISREG(path_stat.st_mode):
+        raise _ArtifactStorageError("existing artifact target is not a regular file")
+    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise _ArtifactStorageError("existing artifact target is not a regular file")
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            return _sha256_handle(handle)
+    finally:
+        os.close(descriptor)
+
+
+def _cleanup_artifact_temp(path: Path, descriptor_stat: os.stat_result | None) -> None:
+    try:
+        if descriptor_stat is None:
+            path.unlink(missing_ok=True)
+            return
+        path_stat = os.lstat(path)
+        if path_stat.st_dev != descriptor_stat.st_dev or path_stat.st_ino != descriptor_stat.st_ino:
+            path.unlink()
+            return
+        path.unlink()
+    except OSError:
+        pass
 
 
 def _require_contained(root: Path, path: Path) -> None:
@@ -817,23 +953,43 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _sha256_handle(handle) -> str:
+    digest = hashlib.sha256()
+    while chunk := handle.read(1024 * 1024):
+        digest.update(chunk)
+    return digest.hexdigest()
+
+
 @dataclass
 class _EvaluationTimer:
     """One-shot timer that never retries a clock after it reports a bad value."""
 
     clock: Callable[[], float]
     started: float | None = None
+    elapsed: float | None = None
+    finish_error: _ClockError | None = None
 
     def start(self) -> None:
         self.started = _clock_value(self.clock)
 
     def finish(self) -> float:
+        if self.elapsed is not None:
+            return self.elapsed
+        if self.finish_error is not None:
+            raise self.finish_error
         if self.started is None:
-            raise _ClockError("clock did not provide a valid start timestamp")
-        ended = _clock_value(self.clock)
-        if ended <= self.started:
-            raise _ClockError("clock timestamps must be strictly increasing")
-        return ended - self.started
+            self.finish_error = _ClockError("clock did not provide a valid start timestamp")
+            raise self.finish_error
+        try:
+            ended = _clock_value(self.clock)
+            elapsed = ended - self.started
+            if not math.isfinite(elapsed) or elapsed <= 0:
+                raise _ClockError("clock timestamps must be strictly increasing")
+            self.elapsed = elapsed
+            return elapsed
+        except _ClockError as error:
+            self.finish_error = error
+            raise
 
 
 def _clock_value(clock: Callable[[], float]) -> float:
@@ -850,7 +1006,10 @@ def _clock_value(clock: Callable[[], float]) -> float:
 
 
 def _cost(elapsed: float, context: EvaluationContext) -> float:
-    return elapsed * float(context.cost_per_evaluator_second)
+    value = elapsed * float(context.cost_per_evaluator_second)
+    if not math.isfinite(value) or value < 0:
+        raise _CostError("measured evaluator cost is not finite")
+    return value
 
 
 def _failure_result(
@@ -863,15 +1022,30 @@ def _failure_result(
     *,
     elapsed: float,
 ) -> EvaluationResult:
-    return factory(
-        action.id,
-        str(error),
-        cost=_cost(elapsed, context),
-        cost_unit=context.cost_unit,
-        artifacts=artifacts,
-        artifact_sha256=digests,
-        evaluator_seconds=elapsed,
-    )
+    try:
+        cost = _cost(elapsed, context)
+    except _CostError as cost_error:
+        factory = EvaluationResult.infrastructure_failure
+        error = cost_error
+        cost = 0.0
+    try:
+        return factory(
+            action.id,
+            str(error),
+            cost=cost,
+            cost_unit=context.cost_unit,
+            artifacts=artifacts,
+            artifact_sha256=digests,
+            evaluator_seconds=elapsed,
+        )
+    except Exception:
+        return EvaluationResult.infrastructure_failure(
+            action.id,
+            "could not construct evaluator failure result",
+            cost=0.0,
+            cost_unit=context.cost_unit,
+            evaluator_seconds=0.0,
+        )
 
 
 def _timed_failure(
@@ -893,7 +1067,7 @@ def _timed_failure(
             clock_error,
             artifacts,
             digests,
-            elapsed=0.0,
+            elapsed=timer.elapsed or 0.0,
         )
     return _failure_result(
         factory,

@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import textwrap
 import hashlib
+import io
+import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -599,7 +601,7 @@ def test_parent_artifact_is_loaded_from_the_verified_bytes_snapshot(
         }
     )
 
-    def replace_after_read(path):
+    def replace_after_read(path, *, max_bytes):
         np.savez(path, x=np.array([99.0]))
         return original
 
@@ -648,6 +650,52 @@ def test_artifact_writer_rejects_existing_symlink_target(models_dir, tmp_path):
     assert outside.read_bytes() == b"unchanged"
 
 
+def test_artifact_temp_symlink_substitution_cannot_write_outside_root(
+    models_dir, tmp_path, monkeypatch
+):
+    """Replacing the generated temp name with a symlink must abort finalization."""
+    root = tmp_path / "artifacts"
+    outside = tmp_path / "outside.npz"
+    outside.write_bytes(b"unchanged")
+    create_temp = runner_module._create_artifact_temp
+
+    def substituted_temp(directory, artifact_id):
+        descriptor, path = create_temp(directory, artifact_id)
+        path.unlink()
+        path.symlink_to(outside)
+        return descriptor, path
+
+    monkeypatch.setattr(runner_module, "_create_artifact_temp", substituted_temp)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000019", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert outside.read_bytes() == b"unchanged"
+    assert not list(root.glob("*.tmp"))
+
+
+def test_artifact_collision_cleans_secure_temporary_file(models_dir, tmp_path):
+    """A different existing artifact must fail without leaving a temporary file behind."""
+    root = tmp_path / "artifacts"
+    root.mkdir()
+    (root / "eval-000020.npz").write_bytes(b"different bytes")
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000020", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not list(root.glob("*.tmp"))
+
+
 @pytest.mark.parametrize(
     "clock",
     (
@@ -693,6 +741,121 @@ def test_invalid_completion_clock_is_not_called_again_during_failure_constructio
     assert result.evaluator_seconds == 0.0
     assert result.cost == 0.0
     assert calls == 2
+
+
+def test_finished_clock_interval_is_cached_when_cost_overflows(models_dir):
+    """A cost overflow must retain timing and never request a third clock value."""
+    calls = 0
+
+    def clock():
+        nonlocal calls
+        calls += 1
+        if calls > 2:
+            raise AssertionError("clock retried")
+        return (1.0, 3.0)[calls - 1]
+
+    context = EvaluationContext(
+        **{
+            **_evaluator_context(models_dir).__dict__,
+            "cost_per_evaluator_second": float.fromhex("0x1.fffffffffffffp+1023"),
+        }
+    )
+    result = execute_action(
+        EvaluationAction.component("eval-000021", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+        clock=clock,
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert result.evaluator_seconds == 2.0
+    assert result.cost == 0.0
+    assert calls == 2
+
+
+def _parent_context(models_dir, parent, digest, **limits):
+    base = _evaluator_context(models_dir)
+    return EvaluationContext(
+        **{
+            **base.__dict__,
+            "source_arrays": {},
+            "parent_artifacts": {"parent": ParentArtifactReference(parent, digest)},
+            **limits,
+        }
+    )
+
+
+def _assert_parent_limit_rejects_before_runner(models_dir, context):
+    result = execute_action(
+        EvaluationAction.component("eval-000022", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(AssertionError("runner was called")),
+    )
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_parent_artifact_compressed_byte_limit_rejects_before_reading_arrays(models_dir, tmp_path):
+    """Oversized parent bytes must be rejected before any runner invocation."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.arange(20.0))
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_bytes=10,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_parent_artifact_member_count_limit_rejects_before_runner(models_dir, tmp_path):
+    """An archive with too many members must not reach the runner."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([1.0]), extra=np.array([2.0]))
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_members=1,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_parent_artifact_uncompressed_member_limit_rejects_zip_bomb(models_dir, tmp_path):
+    """A highly compressed large member must be rejected from ZIP metadata."""
+    parent = tmp_path / "parent.npz"
+    np.savez_compressed(parent, x=np.zeros(10_000))
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_bytes=10_000,
+        max_parent_artifact_member_bytes=100,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_parent_artifact_declared_huge_shape_rejects_before_allocation(models_dir, tmp_path):
+    """A tiny NPY header declaring a huge array must never allocate that array."""
+    header = io.BytesIO()
+    np.lib.format.write_array_header_1_0(
+        header,
+        {"descr": "<f8", "fortran_order": False, "shape": (1_000_000_000,)},
+    )
+    parent = tmp_path / "parent.npz"
+    with zipfile.ZipFile(parent, "w") as archive:
+        archive.writestr("x.npy", header.getvalue())
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_member_bytes=1_000,
+        max_parent_artifact_total_bytes=1_000,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
 
 
 @pytest.mark.parametrize(
