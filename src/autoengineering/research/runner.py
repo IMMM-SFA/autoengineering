@@ -38,6 +38,7 @@ import io
 import math
 import os
 import re
+import secrets
 import stat
 import subprocess
 import sys
@@ -878,48 +879,81 @@ def _replicate_artifact_id(action_id: str, replicate: int, count: int) -> str:
 def _write_artifact(
     directory: Path, artifact_id: str, outputs: Mapping[str, np.ndarray]
 ) -> tuple[Path, str]:
-    handle = None
-    temporary: Path | None = None
-    temporary_stat = None
-    descriptor: int | None = None
+    """Persist one artifact using a retained POSIX root directory descriptor."""
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
+        raise _ArtifactStorageError("artifact action ID must be a safe filename")
+    if os.name == "nt":
+        return _write_artifact_windows_fallback(directory, artifact_id, outputs)
     try:
-        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
-            raise _ArtifactStorageError("artifact action ID must be a safe filename")
-        root = _prepare_artifact_root(directory)
-        destination = root / f"{artifact_id}.npz"
-        _require_contained(root, destination)
-        descriptor, temporary = _create_artifact_temp(root, artifact_id)
-        _require_contained(root, temporary)
+        root = _open_artifact_root(directory)
+    except OSError as error:
+        raise _ArtifactStorageError(f"could not open artifact root: {error}") from error
+    try:
+        return _write_artifact_at(root, artifact_id, outputs)
+    finally:
+        _close_fd(root.fd)
+
+
+@dataclass(frozen=True)
+class _ArtifactRoot:
+    """Display path plus descriptor retained through the complete POSIX operation."""
+
+    path: Path
+    fd: int
+
+
+def _write_artifact_at(
+    root: _ArtifactRoot, artifact_id: str, outputs: Mapping[str, np.ndarray]
+) -> tuple[Path, str]:
+    destination = f"{artifact_id}.npz"
+    raw_fd: int | None = None
+    handle = None
+    temporary: str | None = None
+    temporary_stat: os.stat_result | None = None
+    try:
+        raw_fd, temporary = _create_temp_at(root.fd)
+        temporary_stat = os.fstat(raw_fd)
+        _assert_inode(temporary_stat, temporary_stat, nlink=1)
         try:
-            handle = os.fdopen(descriptor, "w+b")
-            descriptor = None
+            handle = os.fdopen(raw_fd, "w+b")
+            raw_fd = None
         except OSError:
-            os.close(descriptor)
-            descriptor = None
+            descriptor = raw_fd
+            raw_fd = None
+            _close_fd(descriptor)
             raise
         np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
         handle.flush()
         os.fsync(handle.fileno())
-        temporary_stat = os.fstat(handle.fileno())
-        if not stat.S_ISREG(temporary_stat.st_mode):
-            raise _ArtifactStorageError("artifact temporary file is not regular")
-        _close_artifact_handle(handle)
+        finished_handle = handle
         handle = None
-        _assert_temp_matches_descriptor(temporary, temporary_stat)
-        digest = _regular_file_sha256(
-            temporary, expected_stat=temporary_stat, require_single_link=True
-        )
+        _close_artifact_handle(finished_handle)
+        _assert_at(root.fd, temporary, temporary_stat, nlink=1)
+        digest = _hash_at(root.fd, temporary, temporary_stat, single_link=True)
         try:
-            os.link(temporary, destination, follow_symlinks=False)
+            os.link(
+                temporary,
+                destination,
+                src_dir_fd=root.fd,
+                dst_dir_fd=root.fd,
+                follow_symlinks=False,
+            )
         except FileExistsError:
-            if _bound_destination_digest(destination) != digest:
+            if _replay_digest_at(root.fd, destination) != digest:
                 raise _ArtifactStorageError(
-                    f"artifact {destination} exists with different bytes; refusing overwrite"
+                    "existing artifact has different bytes; refusing overwrite"
                 )
         else:
-            _assert_final_artifact(destination, temporary_stat, digest)
-            _fsync_artifact_directory(root)
-        return destination, digest
+            _assert_at(root.fd, destination, temporary_stat, nlink=2)
+            if _hash_at(root.fd, destination, temporary_stat, single_link=False) != digest:
+                raise _ArtifactStorageError("published artifact digest changed")
+            _unlink_at(root.fd, temporary, temporary_stat, nlink=2)
+            temporary = None
+            _assert_at(root.fd, destination, temporary_stat, nlink=1)
+            if _hash_at(root.fd, destination, temporary_stat, single_link=True) != digest:
+                raise _ArtifactStorageError("published artifact changed after cleanup")
+            os.fsync(root.fd)
+        return root.path / destination, digest
     except _ArtifactStorageError:
         raise
     except OSError as error:
@@ -929,16 +963,106 @@ def _write_artifact(
     finally:
         if handle is not None:
             try:
-                handle.close()
-            except OSError:
+                _close_artifact_handle(handle)
+            except _ArtifactStorageError:
                 pass
-        if descriptor is not None:
+        if raw_fd is not None:
+            _close_fd(raw_fd)
+        if temporary is not None and temporary_stat is not None:
+            _cleanup_at(root.fd, temporary, temporary_stat)
+
+
+def _create_temp_at(root_fd: int) -> tuple[int, str]:
+    flags = os.O_RDWR | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    for _ in range(32):
+        name = f".{secrets.token_hex(16)}.tmp"
+        try:
+            return os.open(name, flags, 0o600, dir_fd=root_fd), name
+        except FileExistsError:
+            continue
+    raise _ArtifactStorageError("could not allocate artifact temporary file")
+
+
+def _open_artifact_root(directory: Path) -> _ArtifactRoot:
+    raw = Path(directory).absolute()
+    flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(raw.anchor, flags)
+    try:
+        for part in raw.parts[1:]:
             try:
-                os.close(descriptor)
-            except OSError:
-                pass
-        if temporary is not None:
-            _cleanup_artifact_temp(temporary, temporary_stat)
+                metadata = os.stat(part, dir_fd=descriptor, follow_symlinks=False)
+            except FileNotFoundError:
+                os.mkdir(part, 0o700, dir_fd=descriptor)
+                metadata = os.stat(part, dir_fd=descriptor, follow_symlinks=False)
+            _validate_artifact_dir(metadata, final=False)
+            next_descriptor = os.open(part, flags, dir_fd=descriptor)
+            previous_descriptor = descriptor
+            descriptor = None
+            _close_fd(previous_descriptor)
+            descriptor = next_descriptor
+        _validate_artifact_dir(os.fstat(descriptor), final=True)
+        return _ArtifactRoot(raw, descriptor)
+    except Exception:
+        _close_fd(descriptor, suppress=True)
+        raise
+
+
+def _validate_artifact_dir(metadata: os.stat_result, *, final: bool) -> None:
+    if not stat.S_ISDIR(metadata.st_mode):
+        raise _ArtifactStorageError("artifact root ancestry must contain real directories")
+    mode = stat.S_IMODE(metadata.st_mode)
+    if not final and mode & 0o022 and not metadata.st_mode & stat.S_ISVTX:
+        raise _ArtifactStorageError("artifact root ancestor is group/world writable and non-sticky")
+    if final and (metadata.st_uid != os.getuid() or mode & 0o077):
+        raise _ArtifactStorageError("artifact root must be owner-private")
+
+
+def _assert_inode(actual: os.stat_result, expected: os.stat_result, *, nlink: int) -> None:
+    if (
+        not stat.S_ISREG(actual.st_mode)
+        or actual.st_dev != expected.st_dev
+        or actual.st_ino != expected.st_ino
+        or actual.st_nlink != nlink
+    ):
+        raise _ArtifactStorageError("artifact path identity changed")
+
+
+def _assert_at(root_fd: int, name: str, expected: os.stat_result, *, nlink: int) -> None:
+    _assert_inode(os.stat(name, dir_fd=root_fd, follow_symlinks=False), expected, nlink=nlink)
+
+
+def _hash_at(root_fd: int, name: str, expected: os.stat_result, *, single_link: bool) -> str:
+    descriptor = os.open(name, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=root_fd)
+    try:
+        metadata = os.fstat(descriptor)
+        _assert_inode(metadata, expected, nlink=1 if single_link else metadata.st_nlink)
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            digest = _sha256_handle(handle)
+        _assert_at(root_fd, name, expected, nlink=metadata.st_nlink)
+        return digest
+    finally:
+        _close_fd(descriptor)
+
+
+def _replay_digest_at(root_fd: int, name: str) -> str:
+    metadata = os.stat(name, dir_fd=root_fd, follow_symlinks=False)
+    _assert_inode(metadata, metadata, nlink=1)
+    digest = _hash_at(root_fd, name, metadata, single_link=True)
+    _assert_at(root_fd, name, metadata, nlink=1)
+    return digest
+
+
+def _unlink_at(root_fd: int, name: str, expected: os.stat_result, *, nlink: int) -> None:
+    _assert_at(root_fd, name, expected, nlink=nlink)
+    os.unlink(name, dir_fd=root_fd)
+
+
+def _cleanup_at(root_fd: int, name: str, expected: os.stat_result) -> None:
+    try:
+        _assert_at(root_fd, name, expected, nlink=1)
+        os.unlink(name, dir_fd=root_fd)
+    except (OSError, _ArtifactStorageError):
+        pass
 
 
 def _close_artifact_handle(handle) -> None:
@@ -948,143 +1072,43 @@ def _close_artifact_handle(handle) -> None:
         raise _ArtifactStorageError(f"could not close artifact temporary file: {error}") from error
 
 
-def _create_artifact_temp(root: Path, artifact_id: str) -> tuple[int, Path]:
-    descriptor, path = tempfile.mkstemp(prefix=f".{artifact_id}.", suffix=".tmp", dir=root)
-    return descriptor, Path(path)
+def _close_fd(descriptor: int | None, *, suppress: bool = False) -> None:
+    if descriptor is not None:
+        try:
+            os.close(descriptor)
+        except OSError as error:
+            if not suppress:
+                raise _ArtifactStorageError(
+                    f"could not close artifact descriptor: {error}"
+                ) from error
 
 
-def _assert_temp_matches_descriptor(path: Path, descriptor_stat: os.stat_result) -> None:
-    path_stat = os.lstat(path)
-    if (
-        not stat.S_ISREG(path_stat.st_mode)
-        or path_stat.st_dev != descriptor_stat.st_dev
-        or path_stat.st_ino != descriptor_stat.st_ino
-        or path_stat.st_nlink != 1
-    ):
-        raise _ArtifactStorageError("artifact temporary path changed before finalization")
-
-
-def _regular_file_sha256(
-    path: Path,
-    *,
-    expected_stat: os.stat_result | None = None,
-    require_single_link: bool = True,
-) -> str:
-    path_stat = os.lstat(path)
-    if not stat.S_ISREG(path_stat.st_mode):
-        raise _ArtifactStorageError("existing artifact target is not a regular file")
-    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+def _write_artifact_windows_fallback(
+    directory: Path, artifact_id: str, outputs: Mapping[str, np.ndarray]
+) -> tuple[Path, str]:
+    """Safe absolute-path fallback; Windows lacks the POSIX retained-dirfd guarantee."""
+    root = Path(directory).absolute()
+    root.mkdir(parents=True, exist_ok=True)
+    descriptor, raw_temporary = tempfile.mkstemp(prefix=".", suffix=".tmp", dir=root)
+    temporary = Path(raw_temporary)
+    destination = root / f"{artifact_id}.npz"
     try:
-        descriptor_stat = os.fstat(descriptor)
-        if not stat.S_ISREG(descriptor_stat.st_mode):
-            raise _ArtifactStorageError("existing artifact target is not a regular file")
-        if require_single_link and descriptor_stat.st_nlink != 1:
-            raise _ArtifactStorageError("existing artifact target has unsafe hard links")
-        if expected_stat is not None and (
-            descriptor_stat.st_dev != expected_stat.st_dev
-            or descriptor_stat.st_ino != expected_stat.st_ino
-        ):
-            raise _ArtifactStorageError("artifact path changed before hashing")
-        with os.fdopen(descriptor, "rb", closefd=False) as handle:
-            return _sha256_handle(handle)
-    finally:
-        os.close(descriptor)
-
-
-def _bound_destination_digest(path: Path) -> str:
-    """Hash a replay destination and bind its pathname to the opened inode."""
-    before = os.lstat(path)
-    if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+        with os.fdopen(descriptor, "w+b") as handle:
+            np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
+            handle.flush()
+            os.fsync(handle.fileno())
+        digest = _sha256(temporary)
+        if destination.exists() and _sha256(destination) != digest:
+            raise _ArtifactStorageError("existing artifact has different bytes; refusing overwrite")
+        if not destination.exists():
+            os.link(temporary, destination)
+        return destination, digest
+    except OSError as error:
         raise _ArtifactStorageError(
-            "existing artifact target is not a safe single-link regular file"
-        )
-    digest = _regular_file_sha256(path, expected_stat=before, require_single_link=True)
-    after = os.lstat(path)
-    if (
-        after.st_dev != before.st_dev
-        or after.st_ino != before.st_ino
-        or after.st_nlink != before.st_nlink
-    ):
-        raise _ArtifactStorageError("existing artifact target changed during replay verification")
-    return digest
-
-
-def _cleanup_artifact_temp(path: Path, descriptor_stat: os.stat_result | None) -> None:
-    try:
-        if descriptor_stat is None:
-            path.unlink(missing_ok=True)
-            return
-        path_stat = os.lstat(path)
-        if path_stat.st_dev != descriptor_stat.st_dev or path_stat.st_ino != descriptor_stat.st_ino:
-            return
-        path.unlink()
-    except OSError:
-        pass
-
-
-def _prepare_artifact_root(directory: Path) -> Path:
-    raw = Path(directory).absolute()
-    components = raw.parts
-    current = Path(components[0])
-    for part in components[1:]:
-        current = current / part
-        if current.exists() or current.is_symlink():
-            metadata = os.lstat(current)
-            if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
-                raise _ArtifactStorageError("artifact root ancestry must contain real directories")
-            _validate_artifact_ancestor(current, metadata)
-        else:
-            current.mkdir(mode=0o700)
-    root = raw
-    if os.name != "nt":
-        metadata = os.stat(root)
-        if metadata.st_uid != os.getuid() or metadata.st_mode & 0o077:
-            raise _ArtifactStorageError("artifact root must be owner-private")
-    return root
-
-
-def _validate_artifact_ancestor(path: Path, metadata: os.stat_result) -> None:
-    if os.name == "nt":
-        return
-    mode = stat.S_IMODE(metadata.st_mode)
-    writable = mode & 0o022
-    sticky = metadata.st_mode & stat.S_ISVTX
-    if writable and not sticky and metadata.st_uid != os.getuid():
-        raise _ArtifactStorageError(f"artifact root ancestor {path} is writable by another owner")
-    if writable and not sticky and path.name not in {"private", "var", "folders"}:
-        raise _ArtifactStorageError(f"artifact root ancestor {path} is group/world writable")
-
-
-def _assert_final_artifact(path: Path, temporary_stat: os.stat_result, digest: str) -> None:
-    metadata = os.lstat(path)
-    if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 2:
-        raise _ArtifactStorageError("final artifact has unsafe inode links")
-    if metadata.st_dev != temporary_stat.st_dev or metadata.st_ino != temporary_stat.st_ino:
-        raise _ArtifactStorageError("final artifact inode differs from temporary inode")
-    if (
-        _regular_file_sha256(path, expected_stat=temporary_stat, require_single_link=False)
-        != digest
-    ):
-        raise _ArtifactStorageError("final artifact digest changed during publication")
-
-
-def _fsync_artifact_directory(root: Path) -> None:
-    if os.name == "nt":
-        return
-    descriptor = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-    try:
-        os.fsync(descriptor)
-    finally:
-        os.close(descriptor)
-
-
-def _require_contained(root: Path, path: Path) -> None:
-    try:
-        path.resolve().relative_to(root.resolve())
-    except ValueError as error:
-        raise _ArtifactStorageError(
-            "artifact path escapes configured artifact directory"
+            f"could not persist artifact {artifact_id!r}: {error}"
         ) from error
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _sha256(path: Path) -> str:

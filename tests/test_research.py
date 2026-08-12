@@ -659,15 +659,16 @@ def test_artifact_temp_symlink_substitution_cannot_write_outside_root(
     root = tmp_path / "artifacts"
     outside = tmp_path / "outside.npz"
     outside.write_bytes(b"unchanged")
-    create_temp = runner_module._create_artifact_temp
+    create_temp = runner_module._create_temp_at
 
-    def substituted_temp(directory, artifact_id):
-        descriptor, path = create_temp(directory, artifact_id)
-        path.unlink()
-        path.symlink_to(outside)
-        return descriptor, path
+    def substituted_temp(root_fd):
+        descriptor, name = create_temp(root_fd)
+        artifact_path = root / name
+        artifact_path.unlink()
+        artifact_path.symlink_to(outside)
+        return descriptor, name
 
-    monkeypatch.setattr(runner_module, "_create_artifact_temp", substituted_temp)
+    monkeypatch.setattr(runner_module, "_create_temp_at", substituted_temp)
     context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
 
     result = execute_action(
@@ -678,7 +679,7 @@ def test_artifact_temp_symlink_substitution_cannot_write_outside_root(
 
     assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
     assert outside.read_bytes() == b"unchanged"
-    assert not list(root.glob("*.tmp"))
+    assert list(root.glob("*.tmp"))[0].is_symlink()
 
 
 def test_artifact_collision_cleans_secure_temporary_file(models_dir, tmp_path):
@@ -702,13 +703,14 @@ def test_artifact_finalization_rejects_hardlinked_temp_inode(models_dir, tmp_pat
     """A second link to the temporary inode must prevent publication."""
     root = tmp_path / "artifacts"
     root.mkdir(mode=0o700)
-    original = runner_module._assert_temp_matches_descriptor
+    original = runner_module._assert_at
 
-    def inject_hard_link(path, descriptor_stat):
-        os.link(path, root / "injected-link")
-        original(path, descriptor_stat)
+    def inject_hard_link(root_fd, name, descriptor_stat, *, nlink):
+        if name.endswith(".tmp") and nlink == 1:
+            os.link(name, "injected-link", src_dir_fd=root_fd, dst_dir_fd=root_fd)
+        original(root_fd, name, descriptor_stat, nlink=nlink)
 
-    monkeypatch.setattr(runner_module, "_assert_temp_matches_descriptor", inject_hard_link)
+    monkeypatch.setattr(runner_module, "_assert_at", inject_hard_link)
     context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
 
     result = execute_action(
@@ -990,17 +992,17 @@ def test_artifact_replay_rechecks_replaced_destination_after_hash(
         return {"y": inputs["x"]}
 
     assert execute_action(action, context, runner=runner).status is EvaluationStatus.SUCCESS
-    original = runner_module._regular_file_sha256
+    original = runner_module._hash_at
 
-    def replace_after_digest(path, **kwargs):
-        digest = original(path, **kwargs)
-        if path.name == "eval-000027.npz" and kwargs.get("require_single_link", True):
+    def replace_after_digest(root_fd, name, expected, *, single_link):
+        digest = original(root_fd, name, expected, single_link=single_link)
+        if name == "eval-000027.npz" and single_link:
             replacement = root / "replacement.npz"
             np.savez(replacement, y=np.array([99.0]))
-            os.replace(replacement, path)
+            os.replace(replacement, root / name)
         return digest
 
-    monkeypatch.setattr(runner_module, "_regular_file_sha256", replace_after_digest)
+    monkeypatch.setattr(runner_module, "_hash_at", replace_after_digest)
     result = execute_action(action, context, runner=runner)
 
     assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
@@ -1065,6 +1067,91 @@ def test_artifact_root_rejects_unsafe_writable_ancestor(models_dir, tmp_path):
 
     result = execute_action(
         EvaluationAction.component("eval-000030", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_posix_artifact_publication_uses_retained_directory_fd(models_dir, tmp_path, monkeypatch):
+    """Removing dir_fd bindings must make this link-observation test fail."""
+    if os.name == "nt":
+        pytest.skip("POSIX dir_fd contract")
+    observed = []
+    original_link = runner_module.os.link
+
+    def tracked_link(source, target, *args, **kwargs):
+        observed.append((kwargs.get("src_dir_fd"), kwargs.get("dst_dir_fd")))
+        return original_link(source, target, *args, **kwargs)
+
+    monkeypatch.setattr(runner_module.os, "link", tracked_link)
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": tmp_path / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000031", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert observed and observed[0][0] is not None and observed[0][1] is not None
+
+
+def test_posix_artifact_directory_fd_closes_when_directory_fsync_fails(
+    models_dir, tmp_path, monkeypatch
+):
+    """A directory fsync error must still close the retained root descriptor."""
+    if os.name == "nt":
+        pytest.skip("POSIX directory fsync")
+    root = tmp_path / "artifacts"
+    closed = []
+    original_close = runner_module.os.close
+    original_fsync = runner_module.os.fsync
+
+    def tracked_close(descriptor):
+        closed.append(descriptor)
+        return original_close(descriptor)
+
+    def failing_fsync(descriptor):
+        if root.exists() and os.fstat(descriptor).st_ino == os.stat(root).st_ino:
+            raise OSError("directory fsync")
+        return original_fsync(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "close", tracked_close)
+    monkeypatch.setattr(runner_module.os, "fsync", failing_fsync)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000032", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert closed
+
+
+def test_posix_artifact_root_close_failure_is_infrastructure(models_dir, tmp_path, monkeypatch):
+    """The retained root descriptor is closed and close failure cannot become model failure."""
+    if os.name == "nt":
+        pytest.skip("POSIX directory descriptor")
+    root = tmp_path / "artifacts"
+    original_close = runner_module.os.close
+
+    def fail_root_close(descriptor):
+        if root.exists() and os.fstat(descriptor).st_ino == os.stat(root).st_ino:
+            original_close(descriptor)
+            raise OSError("root close")
+        return original_close(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "close", fail_root_close)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000033", "transform", {}),
         context,
         runner=lambda component, inputs: {"y": inputs["x"]},
     )
