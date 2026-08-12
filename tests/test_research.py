@@ -10,6 +10,8 @@ from __future__ import annotations
 import textwrap
 import hashlib
 import io
+import os
+import warnings
 import zipfile
 from pathlib import Path
 
@@ -696,6 +698,78 @@ def test_artifact_collision_cleans_secure_temporary_file(models_dir, tmp_path):
     assert not list(root.glob("*.tmp"))
 
 
+def test_artifact_finalization_rejects_hardlinked_temp_inode(models_dir, tmp_path, monkeypatch):
+    """A second link to the temporary inode must prevent publication."""
+    root = tmp_path / "artifacts"
+    root.mkdir(mode=0o700)
+    original = runner_module._assert_temp_matches_descriptor
+
+    def inject_hard_link(path, descriptor_stat):
+        os.link(path, root / "injected-link")
+        original(path, descriptor_stat)
+
+    monkeypatch.setattr(runner_module, "_assert_temp_matches_descriptor", inject_hard_link)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000023", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (root / "eval-000023.npz").exists()
+
+
+def test_artifact_replay_rejects_existing_hardlinked_target(models_dir, tmp_path):
+    """An identical artifact with another hard link is not safe to reuse."""
+    root = tmp_path / "artifacts"
+    root.mkdir(mode=0o700)
+    target = root / "eval-000024.npz"
+    np.savez(target, y=np.array([1.0]))
+    os.link(target, tmp_path / "other-link.npz")
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000024", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": np.array([1.0])},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_artifact_fdopen_failure_closes_temp_descriptor_and_cleans_path(
+    models_dir, tmp_path, monkeypatch
+):
+    """A failed fdopen must not leak its mkstemp descriptor or temporary file."""
+    root = tmp_path / "artifacts"
+    closed = []
+    original_close = runner_module.os.close
+    original_fdopen = runner_module.os.fdopen
+
+    def tracked_close(descriptor):
+        closed.append(descriptor)
+        return original_close(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "close", tracked_close)
+    monkeypatch.setattr(
+        runner_module.os, "fdopen", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("fdopen"))
+    )
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000025", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert closed
+    assert not list(root.glob("*.tmp"))
+    monkeypatch.setattr(runner_module.os, "fdopen", original_fdopen)
+
+
 @pytest.mark.parametrize(
     "clock",
     (
@@ -856,6 +930,53 @@ def test_parent_artifact_declared_huge_shape_rejects_before_allocation(models_di
     )
 
     _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def _write_parent_member_archive(path, member_names):
+    array = io.BytesIO()
+    np.save(array, np.array([1.0]))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Duplicate name")
+        with zipfile.ZipFile(path, "w") as archive:
+            for member_name in member_names:
+                archive.writestr(member_name, array.getvalue())
+
+
+@pytest.mark.parametrize(
+    "member_names",
+    (
+        ("x.npy", "x.npy"),
+        ("../x.npy",),
+        ("nested/x.npy",),
+        ("nested\\x.npy",),
+        ("x.txt",),
+        ("bad-name.npy",),
+    ),
+)
+def test_parent_artifact_rejects_ambiguous_or_unsafe_member_names(
+    models_dir, tmp_path, member_names
+):
+    """Unsafe ZIP member names must fail before parent arrays reach the runner."""
+    parent = tmp_path / "parent.npz"
+    _write_parent_member_archive(parent, member_names)
+    context = _parent_context(models_dir, parent, hashlib.sha256(parent.read_bytes()).hexdigest())
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_produced_artifact_rejects_unsafe_output_name(models_dir, tmp_path):
+    """An unsafe runner output key must never be written into an NPZ artifact."""
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": tmp_path / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000026", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"../unsafe": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.MODEL_FAILURE
 
 
 @pytest.mark.parametrize(

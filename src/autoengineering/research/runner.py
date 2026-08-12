@@ -753,19 +753,33 @@ def _validate_parent_npz(data: bytes, context: EvaluationContext) -> None:
             if len(members) > context.max_parent_artifact_members:
                 raise _ArtifactVerificationError("parent artifact exceeds member-count limit")
             total = 0
+            seen_names: set[str] = set()
             for member in members:
+                logical_name = _logical_npz_name(member.filename)
+                if logical_name in seen_names:
+                    raise _ArtifactVerificationError("parent artifact has duplicate member names")
+                seen_names.add(logical_name)
                 total += member.file_size
                 if member.file_size > context.max_parent_artifact_member_bytes:
                     raise _ArtifactVerificationError("parent artifact member exceeds byte limit")
                 if total > context.max_parent_artifact_total_bytes:
                     raise _ArtifactVerificationError("parent artifact exceeds total byte limit")
-                if not member.filename.endswith(".npy"):
-                    raise _ArtifactVerificationError("parent artifact contains a non-NPY member")
                 _validate_npy_member(archive, member, context)
     except _ArtifactVerificationError:
         raise
     except (OSError, ValueError, zipfile.BadZipFile) as error:
         raise _ArtifactVerificationError("parent artifact is not a safe NPZ archive") from error
+
+
+def _logical_npz_name(filename: str) -> str:
+    if not isinstance(filename, str) or not filename.endswith(".npy"):
+        raise _ArtifactVerificationError("parent artifact contains a non-NPY member")
+    logical = filename.removesuffix(".npy")
+    if "/" in logical or "\\" in logical or logical in {"", ".", ".."}:
+        raise _ArtifactVerificationError("parent artifact member path is unsafe")
+    if not _safe_output_name(logical):
+        raise _ArtifactVerificationError("parent artifact member name is unsafe")
+    return logical
 
 
 def _validate_npy_member(
@@ -801,11 +815,17 @@ def _validate_outputs(outputs: Mapping[str, np.ndarray]) -> None:
     for name, value in outputs.items():
         if not isinstance(name, str) or not name:
             raise _ModelContractError("runner output names must be non-empty strings")
+        if not _safe_output_name(name):
+            raise _ModelContractError("runner output names must be safe NPZ logical names")
         array = np.asarray(value)
         if not np.issubdtype(array.dtype, np.number) or not np.all(np.isfinite(array)):
             raise ScientificInfeasibleError(
                 f"runner output {name!r} must contain finite numeric values"
             )
+
+
+def _safe_output_name(name: str) -> bool:
+    return bool(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", name))
 
 
 def _validate_declared_outputs(component: Component, outputs: Mapping[str, np.ndarray]) -> None:
@@ -856,22 +876,28 @@ def _write_artifact(
     try:
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", artifact_id):
             raise _ArtifactStorageError("artifact action ID must be a safe filename")
-        root = directory.resolve()
-        root.mkdir(parents=True, exist_ok=True)
+        root = _prepare_artifact_root(directory)
         destination = root / f"{artifact_id}.npz"
         _require_contained(root, destination)
         descriptor, temporary = _create_artifact_temp(root, artifact_id)
         _require_contained(root, temporary)
-        handle = os.fdopen(descriptor, "w+b")
+        try:
+            handle = os.fdopen(descriptor, "w+b")
+        except OSError:
+            os.close(descriptor)
+            raise
         np.savez(handle, **{name: np.asarray(value) for name, value in outputs.items()})
         handle.flush()
         os.fsync(handle.fileno())
         temporary_stat = os.fstat(handle.fileno())
         if not stat.S_ISREG(temporary_stat.st_mode):
             raise _ArtifactStorageError("artifact temporary file is not regular")
-        handle.seek(0)
-        digest = _sha256_handle(handle)
+        handle.close()
+        handle = None
         _assert_temp_matches_descriptor(temporary, temporary_stat)
+        digest = _regular_file_sha256(
+            temporary, expected_stat=temporary_stat, require_single_link=True
+        )
         try:
             os.link(temporary, destination, follow_symlinks=False)
         except FileExistsError:
@@ -879,6 +905,9 @@ def _write_artifact(
                 raise _ArtifactStorageError(
                     f"artifact {destination} exists with different bytes; refusing overwrite"
                 )
+        else:
+            _assert_final_artifact(destination, temporary_stat, digest)
+            _fsync_artifact_directory(root)
         return destination, digest
     except _ArtifactStorageError:
         raise
@@ -904,18 +933,32 @@ def _assert_temp_matches_descriptor(path: Path, descriptor_stat: os.stat_result)
         not stat.S_ISREG(path_stat.st_mode)
         or path_stat.st_dev != descriptor_stat.st_dev
         or path_stat.st_ino != descriptor_stat.st_ino
+        or path_stat.st_nlink != 1
     ):
         raise _ArtifactStorageError("artifact temporary path changed before finalization")
 
 
-def _regular_file_sha256(path: Path) -> str:
+def _regular_file_sha256(
+    path: Path,
+    *,
+    expected_stat: os.stat_result | None = None,
+    require_single_link: bool = True,
+) -> str:
     path_stat = os.lstat(path)
     if not stat.S_ISREG(path_stat.st_mode):
         raise _ArtifactStorageError("existing artifact target is not a regular file")
     descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
     try:
-        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+        descriptor_stat = os.fstat(descriptor)
+        if not stat.S_ISREG(descriptor_stat.st_mode):
             raise _ArtifactStorageError("existing artifact target is not a regular file")
+        if require_single_link and descriptor_stat.st_nlink != 1:
+            raise _ArtifactStorageError("existing artifact target has unsafe hard links")
+        if expected_stat is not None and (
+            descriptor_stat.st_dev != expected_stat.st_dev
+            or descriptor_stat.st_ino != expected_stat.st_ino
+        ):
+            raise _ArtifactStorageError("artifact path changed before hashing")
         with os.fdopen(descriptor, "rb", closefd=False) as handle:
             return _sha256_handle(handle)
     finally:
@@ -934,6 +977,45 @@ def _cleanup_artifact_temp(path: Path, descriptor_stat: os.stat_result | None) -
         path.unlink()
     except OSError:
         pass
+
+
+def _prepare_artifact_root(directory: Path) -> Path:
+    raw = Path(directory)
+    if raw.exists() or raw.is_symlink():
+        metadata = os.lstat(raw)
+        if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
+            raise _ArtifactStorageError("artifact root must be a real directory")
+    else:
+        raw.mkdir(parents=True, mode=0o700)
+    root = raw.resolve()
+    if os.name != "nt":
+        metadata = os.stat(root)
+        if metadata.st_uid != os.getuid() or metadata.st_mode & 0o077:
+            raise _ArtifactStorageError("artifact root must be owner-private")
+    return root
+
+
+def _assert_final_artifact(path: Path, temporary_stat: os.stat_result, digest: str) -> None:
+    metadata = os.lstat(path)
+    if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 2:
+        raise _ArtifactStorageError("final artifact has unsafe inode links")
+    if metadata.st_dev != temporary_stat.st_dev or metadata.st_ino != temporary_stat.st_ino:
+        raise _ArtifactStorageError("final artifact inode differs from temporary inode")
+    if (
+        _regular_file_sha256(path, expected_stat=temporary_stat, require_single_link=False)
+        != digest
+    ):
+        raise _ArtifactStorageError("final artifact digest changed during publication")
+
+
+def _fsync_artifact_directory(root: Path) -> None:
+    if os.name == "nt":
+        return
+    descriptor = os.open(root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
 
 
 def _require_contained(root: Path, path: Path) -> None:
