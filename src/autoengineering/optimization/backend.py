@@ -53,7 +53,7 @@ class OptimizerBackend(Protocol):
         """Return canonical JSON-compatible local policy state."""
 
 
-_ACTION_ID = re.compile(r"^eval-\d{6}$")
+_ACTION_ID = re.compile(r"^eval-([0-9]+)$")
 _RETRY_LIMIT = 1024
 _FINITE_ENUMERATION_LIMIT = 100_000
 _SOBOL_RETRIES_PER_CANDIDATE = 64
@@ -148,8 +148,7 @@ class _BaselineBackend:
     ) -> tuple[int, set[tuple[tuple[str, str, Scalar], ...]]]:
         entries = ledger.entries()
         for action, _ in entries:
-            if _ACTION_ID.fullmatch(action.id) is None:
-                raise ValueError(f"ledger action has noncanonical action ID: {action.id!r}")
+            _parse_action_index(action.id)
             if action.scope is not EvaluationScope.SYSTEM:
                 raise ValueError(f"ledger action must have system scope: {action.id!r}")
             try:
@@ -159,7 +158,7 @@ class _BaselineBackend:
                     f"ledger action has invalid search-space config: {action.id!r}: {error}"
                 ) from error
         ids = {action.id for action, _ in entries}
-        indices = [int(action_id.removeprefix("eval-")) for action_id in ids]
+        indices = [_parse_action_index(action_id) for action_id in ids]
         next_index = max(indices, default=-1) + 1
         while f"eval-{next_index:06d}" in ids:
             next_index += 1
@@ -400,3 +399,14 @@ class SobolBackend(_BaselineBackend):
 def _power_of_two_at_least(value: int) -> int:
     """Return the smallest positive power-of-two Sobol block containing ``value``."""
     return 1 << (value - 1).bit_length()
+
+
+def _parse_action_index(action_id: str) -> int:
+    """Parse an ASCII decimal action ID and reject noncanonical zero padding."""
+    match = _ACTION_ID.fullmatch(action_id)
+    if match is None:
+        raise ValueError(f"ledger action has noncanonical action ID: {action_id!r}")
+    index = int(match.group(1))
+    if f"eval-{index:06d}" != action_id:
+        raise ValueError(f"ledger action has noncanonical action ID: {action_id!r}")
+    return index

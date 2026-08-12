@@ -228,6 +228,14 @@ def test_sobol_returns_a_batch_larger_than_the_former_fixed_scan_limit(study, em
             "canonical action ID",
         ),
         (
+            EvaluationAction.system("eval-０００００１", {"model": "a"}, seed=1),
+            "canonical action ID",
+        ),
+        (
+            EvaluationAction.system("eval-0000000", {"model": "a"}, seed=1),
+            "canonical action ID",
+        ),
+        (
             EvaluationAction.component("eval-000001", "routing", {"model": "a"}, seed=1),
             "system scope",
         ),
@@ -244,6 +252,22 @@ def test_suggest_rejects_ledger_actions_outside_the_system_protocol(
 
     with pytest.raises(ValueError, match=message):
         backend_type(spec=study, space=space).suggest(empty_ledger)
+
+
+@pytest.mark.parametrize("backend_type", (RandomBackend, SobolBackend))
+def test_suggest_continues_from_a_canonical_id_beyond_six_digits(
+    backend_type, study, space, empty_ledger
+):
+    """Rejecting minimum-width IDs above 999,999 must fail resumed suggestion replay."""
+    action = EvaluationAction.system("eval-1000000", {"model": "a"}, seed=1)
+    empty_ledger.append(
+        action,
+        EvaluationResult.success(action.id, {"score": 1.0, "bias": 1.0}, {}, 1.0, "cpu_hour"),
+    )
+
+    suggestion = backend_type(spec=study, space=space).suggest(empty_ledger)
+
+    assert suggestion[0].id == "eval-1000001"
 
 
 @pytest.mark.parametrize("backend_type", (RandomBackend, SobolBackend))
