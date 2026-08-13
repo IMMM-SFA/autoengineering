@@ -50,6 +50,10 @@ _SCHEMA_VERSION = "1.0"
 _MACHINE_NOISE_FLOOR = float(np.finfo(np.float64).eps)
 
 
+class _OptimizationWarningError(RuntimeError):
+    """Convert a classified optimizer warning into a bounded retry event."""
+
+
 class SystemBayesBackend(_BaselineBackend):
     """Fresh, deterministic BoTorch fits over completed system evaluations.
 
@@ -93,6 +97,19 @@ class SystemBayesBackend(_BaselineBackend):
     def suggest(self, ledger: ObservationLedger, n: int = 1) -> tuple[EvaluationAction, ...]:
         """Suggest ``n`` valid points, falling back to replayable Sobol when needed."""
         self._validate_n(n)
+        previous_enabled = torch.are_deterministic_algorithms_enabled()
+        previous_warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+        # `fork_rng` restores CPU generator state even when fitting, acquisition,
+        # or a Sobol fallback raises. The backend only supports CPU double tensors.
+        with torch.random.fork_rng(devices=[]):
+            try:
+                torch.use_deterministic_algorithms(True, warn_only=True)
+                return self._suggest(ledger, n)
+            finally:
+                torch.use_deterministic_algorithms(previous_enabled, warn_only=previous_warn_only)
+
+    def _suggest(self, ledger: ObservationLedger, n: int) -> tuple[EvaluationAction, ...]:
+        """Perform one isolated policy evaluation after global Torch state is prepared."""
         started = time.perf_counter()
         entries = ledger.entries()
         # Reuse baseline validation exactly, including canonical action IDs and configs.
@@ -101,7 +118,6 @@ class SystemBayesBackend(_BaselineBackend):
         prepared, excluded, noise_gap = self._observations(entries)
         seed = self.spec.seed + len(entries)
         torch.manual_seed(seed)
-        torch.use_deterministic_algorithms(True, warn_only=True)
         fallback: list[str] = []
         warning_text: list[str] = []
 
@@ -117,6 +133,7 @@ class SystemBayesBackend(_BaselineBackend):
                 seed,
                 started,
                 warning_text,
+                usable_count=len(prepared[0]),
             )
         if len(prepared[0]) < self.min_initial:
             fallback.append("cold_start_insufficient_usable_observations")
@@ -130,9 +147,10 @@ class SystemBayesBackend(_BaselineBackend):
                 seed,
                 started,
                 warning_text,
+                usable_count=len(prepared[0]),
             )
-        assignments = self._fixed_assignments()
-        if len(assignments) > self.max_categorical_assignments:
+        assignments, assignments_exceeded = self._fixed_assignments()
+        if assignments_exceeded:
             fallback.append("categorical_assignment_limit")
             return self._sobol(
                 ledger,
@@ -144,56 +162,16 @@ class SystemBayesBackend(_BaselineBackend):
                 seed,
                 started,
                 warning_text,
+                usable_count=len(prepared[0]),
             )
 
-        try:
-            with warnings.catch_warnings(record=True) as captured:
-                warnings.simplefilter("always")
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter("always")
+            try:
                 model, outcome_order, fit_details = self._fit(*prepared)
-                warning_text.extend(str(item.message) for item in captured)
-        except Exception as error:  # fitting and numerical routines must never leak stale state
-            fallback.append(f"fit_failure: {type(error).__name__}: {error}")
-            return self._sobol(
-                ledger,
-                n,
-                fallback,
-                fingerprint,
-                len(entries),
-                excluded,
-                seed,
-                started,
-                warning_text,
-            )
-        selected = set(observed)
-        actions: list[EvaluationAction] = []
-        for offset in range(n):
-            invalid_reason = ""
-            for attempt in range(self.candidate_retry_limit):
-                try:
-                    candidate = self._candidate(
-                        model,
-                        prepared[0],
-                        outcome_order,
-                        assignments,
-                        seed + offset * self.candidate_retry_limit + attempt,
-                    )
-                    config = self._decode_candidate(candidate)
-                    key = _canonical_config(config)
-                    if key in selected:
-                        raise ValueError("candidate_duplicate")
-                    selected.add(key)
-                    actions.append(
-                        replace(
-                            self._action(next_index + offset, config), suggested_by="system:bayes"
-                        )
-                    )
-                    break
-                except Exception as error:
-                    invalid_reason = f"{type(error).__name__}: {error}"
-            else:
-                fallback.append(
-                    f"candidate_invalidation_after_{self.candidate_retry_limit}_retries: {invalid_reason}"
-                )
+            except Exception as error:  # fitting must never leak a stale model
+                warning_text.extend(self._warning_text(captured))
+                fallback.append(f"fit_failure: {type(error).__name__}: {error}")
                 return self._sobol(
                     ledger,
                     n,
@@ -204,7 +182,74 @@ class SystemBayesBackend(_BaselineBackend):
                     seed,
                     started,
                     warning_text,
+                    usable_count=len(prepared[0]),
                 )
+            warning_text.extend(self._warning_text(captured))
+            if self._has_fatal_warning(captured):
+                fallback.append("fit_warning_indicates_failure")
+                return self._sobol(
+                    ledger,
+                    n,
+                    fallback,
+                    fingerprint,
+                    len(entries),
+                    excluded,
+                    seed,
+                    started,
+                    warning_text,
+                    usable_count=len(prepared[0]),
+                )
+            selected = set(observed)
+            actions: list[EvaluationAction] = []
+            for offset in range(n):
+                invalid_reason = ""
+                for attempt in range(self.candidate_retry_limit):
+                    warning_start = len(captured)
+                    try:
+                        candidate = self._candidate(
+                            model,
+                            prepared[0],
+                            outcome_order,
+                            assignments,
+                            seed + offset * self.candidate_retry_limit + attempt,
+                        )
+                        new_warnings = captured[warning_start:]
+                        warning_text.extend(self._warning_text(new_warnings))
+                        if self._has_fatal_warning(new_warnings):
+                            raise _OptimizationWarningError(
+                                "optimization_warning_indicates_failure"
+                            )
+                        config = self._decode_candidate(candidate)
+                        key = _canonical_config(config)
+                        if key in selected:
+                            raise ValueError("candidate_duplicate")
+                        selected.add(key)
+                        actions.append(
+                            replace(
+                                self._action(next_index + offset, config),
+                                suggested_by="system:bayes",
+                            )
+                        )
+                        break
+                    except Exception as error:
+                        invalid_reason = f"{type(error).__name__}: {error}"
+                else:
+                    fallback.append(
+                        f"candidate_invalidation_after_{self.candidate_retry_limit}_retries: "
+                        f"{invalid_reason}"
+                    )
+                    return self._sobol(
+                        ledger,
+                        n,
+                        fallback,
+                        fingerprint,
+                        len(entries),
+                        excluded,
+                        seed,
+                        started,
+                        warning_text,
+                        usable_count=len(prepared[0]),
+                    )
 
         details: dict[str, JSONValue] = {
             "ledger_entries": len(entries),
@@ -275,26 +320,36 @@ class SystemBayesBackend(_BaselineBackend):
         )
         # Duplicate outcome names would otherwise cause an ambiguous ModelList output index.
         required = tuple(dict.fromkeys(required))
-        excluded = {"non_success": 0, "incomplete_success": 0, "scientific_infeasible": 0}
+        excluded = {
+            "wrong_scope": 0,
+            "scientific_infeasible": 0,
+            "other_failures": 0,
+            "incomplete_success": 0,
+            "known_noise_exclusions": 0,
+            "duplicate_aggregations": 0,
+            "successful_complete": 0,
+        }
         rows: list[tuple[tuple[float, ...], tuple[float, ...], tuple[float, ...] | None]] = []
         known_gap = False
         for action, result in entries:
             if action.scope is not EvaluationScope.SYSTEM:
+                excluded["wrong_scope"] += 1
                 raise ValueError(f"ledger action must have system scope: {action.id!r}")
             if result.status is EvaluationStatus.SCIENTIFIC_INFEASIBLE:
                 excluded["scientific_infeasible"] += 1
                 continue
             if result.status is not EvaluationStatus.SUCCESS:
-                excluded["non_success"] += 1
+                excluded["other_failures"] += 1
                 continue
             if any(name not in result.outcomes for name in required):
                 excluded["incomplete_success"] += 1
                 continue
+            excluded["successful_complete"] += 1
             errors = None
             if self.spec.noise.mode == "known":
                 if any(name not in result.standard_errors for name in required):
                     known_gap = True
-                    excluded["incomplete_success"] += 1
+                    excluded["known_noise_exclusions"] += 1
                     continue
                 errors = tuple(float(result.standard_errors[name]) for name in required)
             rows.append(
@@ -314,6 +369,7 @@ class SystemBayesBackend(_BaselineBackend):
         floor = max(self.spec.noise.noise_floor, _MACHINE_NOISE_FLOOR)
         for x in sorted(grouped):
             group = grouped[x]
+            excluded["duplicate_aggregations"] += len(group) - 1
             y_rows.append(
                 tuple(
                     float(np.mean([row[0][index] for row in group]))
@@ -410,15 +466,22 @@ class SystemBayesBackend(_BaselineBackend):
             raise ValueError("nonfinite_candidate")
         return candidate.detach().reshape(-1).to(dtype=torch.double)
 
-    def _fixed_assignments(self) -> list[dict[int, float]]:
+    def _fixed_assignments(self) -> tuple[tuple[dict[int, float], ...], bool]:
+        """Stream mixed assignments and stop at the configured safety cap.
+
+        The boolean is true only after observing assignment ``cap + 1``. This
+        avoids allocating an exponential product merely to decide to fall back.
+        """
         categorical = [
             (index, parameter)
             for index, parameter in self._parameter_positions()
             if isinstance(parameter, CategoricalParameter)
         ]
         choices = [parameter.categories for _, parameter in categorical]
-        assignments = []
+        assignments: list[dict[int, float]] = []
         for values in product(*choices) if choices else [()]:
+            if len(assignments) >= self.max_categorical_assignments:
+                return (), True
             config = {
                 parameter.name: value
                 for (_, parameter), value in zip(categorical, values, strict=True)
@@ -439,7 +502,7 @@ class SystemBayesBackend(_BaselineBackend):
                     if not active:
                         fixed[position] = 0.5
             assignments.append(fixed)
-        return assignments
+        return tuple(assignments), False
 
     def _parameter_positions(self):
         position = 0
@@ -472,7 +535,20 @@ class SystemBayesBackend(_BaselineBackend):
         # This final round trip is the authoritative validation and integer projection.
         return self.space.decode(tuple(float(item) for item in values))
 
-    def _sobol(self, ledger, n, reasons, fingerprint, count, excluded, seed, started, warning_text):
+    def _sobol(
+        self,
+        ledger,
+        n,
+        reasons,
+        fingerprint,
+        count,
+        excluded,
+        seed,
+        started,
+        warning_text,
+        *,
+        usable_count,
+    ):
         actions = SobolBackend(self.spec, self.space).suggest(ledger, n)
         actions = tuple(replace(action, suggested_by="system:sobol") for action in actions)
         self._remember(
@@ -486,7 +562,7 @@ class SystemBayesBackend(_BaselineBackend):
                 optimizer_seconds=time.perf_counter() - started,
                 details={
                     "ledger_entries": count,
-                    "usable_observations": 0,
+                    "usable_observations": usable_count,
                     "excluded": excluded,
                     "deterministic_seed": seed,
                     "noise_mode": self.spec.noise.mode,
@@ -495,6 +571,31 @@ class SystemBayesBackend(_BaselineBackend):
             ),
         )
         return actions
+
+    @staticmethod
+    def _warning_text(records) -> list[str]:
+        return [f"{item.category.__name__}: {item.message}" for item in records]
+
+    @staticmethod
+    def _has_fatal_warning(records) -> bool:
+        """Classify only warnings that say numerical optimization failed.
+
+        The BoTorch ``Very small noise values detected`` warning is explicitly
+        benign here: the model rounds a fixed variance internally and we retain
+        the requested, finite observation model in provenance. Other warnings
+        stay in diagnostics but do not invalidate a finite decoded candidate
+        unless they state an optimization or numerical failure.
+        """
+        markers = ("fail", "converg", "optimiz", "numerical", "nonfinite", "nan")
+        for item in records:
+            message = str(item.message).lower()
+            if "very small noise values detected" in message:
+                continue
+            if issubclass(item.category, RuntimeWarning) and any(
+                marker in message for marker in markers
+            ):
+                return True
+        return False
 
     def _model_summary(self, model) -> dict[str, JSONValue]:
         parameters = {

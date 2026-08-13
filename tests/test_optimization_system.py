@@ -2,8 +2,10 @@
 
 import json
 import importlib.util
+from itertools import product
 import subprocess
 import sys
+import warnings
 
 import numpy as np
 import pytest
@@ -425,6 +427,23 @@ def test_base_optimization_import_has_no_bayesian_or_smac_dependencies():
     assert completed.returncode == 0, completed.stderr
 
 
+def test_optional_system_backend_has_a_concise_missing_dependency_boundary():
+    """Leaking a partial optional-stack traceback must fail this import-boundary test."""
+    command = [
+        sys.executable,
+        "-c",
+        "import importlib.util\n"
+        "available = importlib.util.find_spec('botorch') is not None\n"
+        "try:\n import autoengineering.optimization.system_backend\n"
+        "except ImportError as error:\n assert not available and 'install autoengineering[bayes]' in str(error)\n"
+        "else:\n assert available",
+    ]
+
+    completed = subprocess.run(command, check=False, capture_output=True, text=True)
+
+    assert completed.returncode == 0, completed.stderr
+
+
 def test_evaluator_model_failure_from_runner_is_durable_ledger_observation(tmp_path):
     """Misclassifying a runner OSError as infrastructure must fail this observation check."""
     system = System("empty")
@@ -536,3 +555,361 @@ def test_system_backend_projects_conditional_mixed_candidates(empty_ledger):
     assert local_space.decode(local_space.encode(action.config)) == action.config
     if action.config["routing"] == "linear":
         assert "steps" not in action.config
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_caps_categorical_enumeration_before_materializing(monkeypatch, study):
+    """Iterating every assignment before applying the safety cap must fail this test."""
+    from autoengineering.optimization import system_backend
+
+    local_space = SearchSpace(
+        parameters=(CategoricalParameter("choice", tuple(f"c{index}" for index in range(1000))),)
+    )
+    yielded = 0
+
+    def counted_product(*choices):
+        nonlocal yielded
+        for values in product(*choices):
+            yielded += 1
+            yield values
+
+    monkeypatch.setattr(system_backend, "product", counted_product)
+    backend = SystemBayesBackend(study, local_space, max_categorical_assignments=3)
+
+    assignments, exceeded = backend._fixed_assignments()
+
+    assert assignments == ()
+    assert exceeded is True
+    assert yielded == 4
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_optimization_warning_falls_back_with_captured_warning(
+    monkeypatch, empty_ledger
+):
+    """Accepting a RuntimeWarning from acquisition optimization must fail this test."""
+    from autoengineering.optimization import system_backend
+
+    local_study = StudySpec(
+        name="warning",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=20.0, cost_unit="cpu_hour"),
+        noise=NoiseSpec(),
+        backend="system",
+        seed=4,
+    )
+    local_space = SearchSpace(parameters=(ContinuousParameter("x", 0.0, 1.0),))
+    for index, x in enumerate((0.1, 0.4, 0.8), start=1):
+        _append_observation(empty_ledger, f"eval-{index:06d}", {"x": x}, {"score": x})
+
+    def warned_optimizer(**kwargs):
+        import torch
+
+        warnings.warn("optimization did not converge", RuntimeWarning)
+        return torch.tensor([[0.6]], dtype=torch.double), torch.tensor(0.0, dtype=torch.double)
+
+    monkeypatch.setattr(system_backend, "optimize_acqf_mixed", warned_optimizer)
+    backend = SystemBayesBackend(local_study, local_space, min_initial=2, raw_samples=4)
+
+    action = backend.suggest(empty_ledger)[0]
+    diagnostics = backend.diagnostics(empty_ledger)
+
+    assert action.suggested_by == "system:sobol"
+    assert "optimization_warning" in diagnostics.fallback_reasons[0]
+    assert any("did not converge" in warning for warning in diagnostics.warnings)
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+@pytest.mark.parametrize("enabled,warn_only", ((False, False), (True, False), (True, True)))
+def test_system_backend_restores_torch_global_state_after_cold_start(
+    study, space, empty_ledger, enabled, warn_only
+):
+    """Leaving deterministic mode or the global RNG changed after suggest must fail this test."""
+    import torch
+
+    original_enabled = torch.are_deterministic_algorithms_enabled()
+    original_warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+    try:
+        torch.use_deterministic_algorithms(enabled, warn_only=warn_only)
+        torch.manual_seed(918)
+        expected = torch.rand(3)
+        torch.manual_seed(918)
+
+        SystemBayesBackend(study, space, min_initial=6).suggest(empty_ledger)
+
+        assert torch.equal(torch.rand(3), expected)
+        assert torch.are_deterministic_algorithms_enabled() is enabled
+        assert torch.is_deterministic_algorithms_warn_only_enabled() is warn_only
+    finally:
+        torch.use_deterministic_algorithms(original_enabled, warn_only=original_warn_only)
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fallback_reports_usable_and_excluded_counts(study, space, empty_ledger):
+    """Replacing observed usable counts with zero in fallback diagnostics must fail this test."""
+    _append_observation(empty_ledger, "eval-000001", {"model": "a"}, {"score": 1.0, "bias": 1.0})
+    _append_observation(empty_ledger, "eval-000002", {"model": "b"}, {"score": 2.0})
+
+    diagnostics = SystemBayesBackend(study, space, min_initial=6).diagnostics(empty_ledger)
+    assert diagnostics.fit_state == "not_fit_for_ledger"
+    SystemBayesBackend(study, space, min_initial=6).suggest(empty_ledger)
+    diagnostics = SystemBayesBackend(study, space, min_initial=6).diagnostics(empty_ledger)
+
+    # The fresh object intentionally has no stale diagnostics; inspect the fitting instance instead.
+    backend = SystemBayesBackend(study, space, min_initial=6)
+    backend.suggest(empty_ledger)
+    diagnostics = backend.diagnostics(empty_ledger)
+    assert diagnostics.details["usable_observations"] == 1
+    assert diagnostics.details["excluded"]["incomplete_success"] == 1
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_implements_protocol_and_stable_constructor_state(study, space):
+    """Removing backend protocol methods or replay controls from state must fail this test."""
+    backend = SystemBayesBackend(study, space, min_initial=2, raw_samples=4, num_restarts=1)
+
+    assert isinstance(backend, OptimizerBackend)
+    assert json.loads(json.dumps(backend.state_dict(), sort_keys=True)) == backend.state_dict()
+    assert backend.state_dict()["constructor"]["min_initial"] == 2
+    with pytest.raises(ValueError, match="raw_samples"):
+        SystemBayesBackend(study, space, raw_samples=1)
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_noise_modes_aggregate_replicates_and_reject_known_noise_gaps(empty_ledger):
+    """Dropping replicate aggregation or learning missing known noise must fail this test."""
+    local_space = SearchSpace(parameters=(ContinuousParameter("x", 0.0, 1.0),))
+    for index, outcome in enumerate((1.0, 3.0), start=1):
+        action = EvaluationAction.system(f"eval-{index:06d}", {"x": 0.5}, seed=index)
+        empty_ledger.append(
+            action,
+            EvaluationResult.success(
+                action.id, {"score": outcome}, {"score": 0.2}, 1.0, "cpu_hour"
+            ),
+        )
+    deterministic = StudySpec(
+        "noise",
+        ObjectiveSpec("score", "maximize"),
+        (),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec("deterministic", 1e-4),
+        "system",
+        2,
+    )
+    known = StudySpec(
+        "noise",
+        ObjectiveSpec("score", "maximize"),
+        (),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec("known", 1e-6),
+        "system",
+        2,
+    )
+    learned = StudySpec(
+        "noise",
+        ObjectiveSpec("score", "maximize"),
+        (),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec("learned", 1e-6),
+        "system",
+        2,
+    )
+
+    prepared, excluded, gap = SystemBayesBackend(deterministic, local_space)._observations(
+        empty_ledger.entries()
+    )
+    assert prepared[0].shape == (1, 1)
+    assert prepared[1].item() == pytest.approx(2.0)
+    assert prepared[2].item() == pytest.approx(1e-8)
+    assert excluded["duplicate_aggregations"] == 1
+    assert gap is False
+    assert (
+        SystemBayesBackend(learned, local_space)._observations(empty_ledger.entries())[0][2] is None
+    )
+
+    missing_error = EvaluationAction.system("eval-000003", {"x": 0.8}, seed=3)
+    empty_ledger.append(
+        missing_error,
+        EvaluationResult.success(missing_error.id, {"score": 0.0}, {}, 1.0, "cpu_hour"),
+    )
+    backend = SystemBayesBackend(known, local_space, min_initial=1, raw_samples=4)
+    assert backend.suggest(empty_ledger)[0].suggested_by == "system:sobol"
+    assert backend.diagnostics(empty_ledger).fallback_reasons == (
+        "known_noise_missing_standard_error",
+    )
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fixed_assignments_project_categories_and_conditions(study):
+    """Leaving categories, masks, or inactive values free must fail this projection test."""
+    local_space = SearchSpace(
+        parameters=(
+            CategoricalParameter("kind", ("off", "on")),
+            ContinuousParameter("gain", 0.1, 1.0, active_when={"kind": ("on",)}),
+        )
+    )
+    assignments, exceeded = SystemBayesBackend(study, local_space)._fixed_assignments()
+
+    assert exceeded is False
+    assert assignments == ({0: 0.0, 1: 0.5, 2: 0.0}, {0: 1.0, 2: 1.0})
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_candidate_decode_rounds_integer_and_preserves_log_bounds(study):
+    """Bypassing SearchSpace decode must fail integer rounding and log-bound projection."""
+    import torch
+
+    local_space = SearchSpace(
+        parameters=(IntegerParameter("count", 1, 5), ContinuousParameter("rate", 0.1, 10, "log"))
+    )
+    backend = SystemBayesBackend(study, local_space)
+
+    config = backend._decode_candidate(torch.tensor([0.62, 0.5], dtype=torch.double))
+
+    assert config == {"count": 3, "rate": pytest.approx(1.0)}
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fit_and_invalid_candidate_fallbacks_are_explicit(
+    monkeypatch, study, empty_ledger
+):
+    """Leaking fit errors or stale invalid candidates must fail these fallback contracts."""
+    import torch
+
+    local_space = SearchSpace(parameters=(ContinuousParameter("x", 0.0, 1.0),))
+    for index, x in enumerate((0.1, 0.5, 0.9), start=1):
+        _append_observation(empty_ledger, f"eval-{index:06d}", {"x": x}, {"score": x, "bias": 1.0})
+    backend = SystemBayesBackend(study, local_space, min_initial=2, raw_samples=4, num_restarts=1)
+    monkeypatch.setattr(
+        backend, "_fit", lambda *args: (_ for _ in ()).throw(RuntimeError("fit broke"))
+    )
+    assert backend.suggest(empty_ledger)[0].suggested_by == "system:sobol"
+    assert "fit_failure" in backend.diagnostics(empty_ledger).fallback_reasons[0]
+
+    backend = SystemBayesBackend(
+        study, local_space, min_initial=2, raw_samples=4, num_restarts=1, candidate_retry_limit=1
+    )
+    monkeypatch.setattr(backend, "_candidate", lambda *args: torch.tensor([float("nan")]))
+    assert backend.suggest(empty_ledger)[0].suggested_by == "system:sobol"
+    assert "candidate_invalidation" in backend.diagnostics(empty_ledger).fallback_reasons[0]
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_passes_correct_objective_sign_and_constraint_convention(monkeypatch):
+    """Reversing minimize or either threshold constraint must fail this acquisition boundary test."""
+    import torch
+    from autoengineering.optimization import system_backend
+
+    captured = {}
+
+    class CapturedAcquisition:
+        pass
+
+    def capture_acquisition(**kwargs):
+        captured.update(kwargs)
+        return CapturedAcquisition()
+
+    monkeypatch.setattr(system_backend, "qLogNoisyExpectedImprovement", capture_acquisition)
+    monkeypatch.setattr(
+        system_backend,
+        "optimize_acqf_mixed",
+        lambda **kwargs: (torch.tensor([[0.5]], dtype=torch.double), torch.tensor(0.0)),
+    )
+    spec = StudySpec(
+        "signs",
+        ObjectiveSpec("loss", "minimize"),
+        (ConstraintSpec("lower", ">=", 2.0), ConstraintSpec("upper", "<=", 5.0)),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec(),
+        "system",
+        3,
+    )
+    backend = SystemBayesBackend(
+        spec,
+        SearchSpace((ContinuousParameter("x", 0.0, 1.0),)),
+        num_restarts=1,
+        raw_samples=4,
+    )
+    backend._candidate(
+        None,
+        torch.tensor([[0.2]], dtype=torch.double),
+        ("loss", "lower", "upper"),
+        ({},),
+        1,
+    )
+    samples = torch.tensor([[[3.0, 1.5, 4.0]]], dtype=torch.double)
+
+    assert captured["objective"](samples).item() == -3.0
+    assert captured["constraints"][0](samples).item() == pytest.approx(0.5)
+    assert captured["constraints"][1](samples).item() == pytest.approx(-1.0)
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_diagnostics_are_not_reused_for_changed_ledger(study, space, empty_ledger):
+    """Returning a prior-ledger fit after append must fail this stale-state test."""
+    backend = SystemBayesBackend(study, space, min_initial=6)
+    backend.suggest(empty_ledger)
+    action = EvaluationAction.system("eval-000000", {"model": "a"}, seed=1)
+    empty_ledger.append(
+        action,
+        EvaluationResult.success(action.id, {"score": 1.0, "bias": 1.0}, {}, 1.0, "cpu_hour"),
+    )
+
+    assert backend.diagnostics(empty_ledger).fit_state == "not_fit_for_ledger"
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fixed_seed_closed_loop_improves_feasible_regret(empty_ledger):
+    """A policy that never improves a constrained mixed initial design must fail this test."""
+    local_space = SearchSpace(
+        parameters=(
+            CategoricalParameter("family", ("wide", "narrow")),
+            ContinuousParameter("x", 0.0, 1.0),
+            IntegerParameter("steps", 1, 4, active_when={"family": ("narrow",)}),
+        )
+    )
+    spec = StudySpec(
+        "closed-loop",
+        ObjectiveSpec("score", "maximize"),
+        (ConstraintSpec("feasible_x", ">=", 0.25),),
+        BudgetSpec(20, "cpu_hour"),
+        NoiseSpec(),
+        "system",
+        29,
+    )
+
+    def outcomes(config):
+        x = config["x"]
+        offset = 0.0 if config["family"] == "wide" else 0.08 * (config["steps"] - 3) ** 2
+        return {"score": 1.0 - (x - 0.72) ** 2 - offset, "feasible_x": x - 0.25}
+
+    initial = (
+        {"family": "wide", "x": 0.3},
+        {"family": "wide", "x": 0.4},
+        {"family": "narrow", "x": 0.3, "steps": 1},
+        {"family": "narrow", "x": 0.45, "steps": 4},
+    )
+    for index, config in enumerate(initial):
+        _append_observation(empty_ledger, f"eval-{index:06d}", config, outcomes(config))
+    initial_best = max(outcomes(config)["score"] for config in initial)
+    backend = SystemBayesBackend(
+        spec,
+        local_space,
+        min_initial=4,
+        num_restarts=1,
+        raw_samples=8,
+        candidate_retry_limit=2,
+    )
+    for _ in range(8):
+        action = backend.suggest(empty_ledger)[0]
+        empty_ledger.append(
+            action,
+            EvaluationResult.success(action.id, outcomes(action.config), {}, 1.0, "cpu_hour"),
+        )
+
+    recommendation = backend.recommend(empty_ledger)
+
+    assert len(empty_ledger.entries()) == 12
+    assert recommendation.feasible is True
+    assert recommendation.outcomes["score"] > initial_best
