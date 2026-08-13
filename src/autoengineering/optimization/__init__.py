@@ -1,6 +1,7 @@
 """Optimization study contracts and search-space definitions."""
 
 from .backend import OptimizerBackend, RandomBackend, SearchSpaceExhausted, SobolBackend
+from .controller import OptimizationStudy, StudyLockError, StudyRecoveryError
 from .ledger import LedgerCorruptionError, ObservationLedger
 from .records import (
     BackendDiagnostics,
@@ -29,6 +30,7 @@ __all__ = [
     "JSONValue",
     "LedgerCorruptionError",
     "NoiseSpec",
+    "OptimizationStudy",
     "ObjectiveSpec",
     "ObservationLedger",
     "OptimizerBackend",
@@ -38,5 +40,7 @@ __all__ = [
     "SearchSpaceExhausted",
     "Scalar",
     "StudySpec",
+    "StudyLockError",
+    "StudyRecoveryError",
     "SobolBackend",
 ]

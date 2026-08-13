@@ -30,6 +30,7 @@ from autoengineering.optimization import (
     SobolBackend,
     StudySpec,
 )
+from autoengineering.optimization.controller import OptimizationStudy, StudyLockError
 from autoengineering.research.runner import EvaluationContext, execute_action
 from autoengineering.system.graph import System
 
@@ -68,6 +69,117 @@ def test_sobol_suggestions_replay_from_seed(study, space, empty_ledger):
     second = SobolBackend(spec=study, space=space).suggest(empty_ledger, n=3)
 
     assert first == second
+
+
+def test_controller_never_starts_an_action_beyond_remaining_budget(tmp_path):
+    """Starting work when the conservative estimate exceeds the balance must fail."""
+    spec = StudySpec(
+        name="budgeted",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=5.0, cost_unit="cpu_hour", initial_cost_estimate=3.0),
+        noise=NoiseSpec(),
+        backend="system",
+    )
+    space = SearchSpace(parameters=(CategoricalParameter("model", ("a", "b")),))
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    first = EvaluationAction.system("eval-000000", {"model": "a"})
+    ledger.append(first, EvaluationResult.success(first.id, {"score": 1.0}, {}, 3.0, "cpu_hour"))
+    study = OptimizationStudy(
+        spec,
+        space,
+        SobolBackend(spec, space),
+        ledger,
+        lambda action: EvaluationResult.success(action.id, {"score": 2.0}, {}, 3.0, "cpu_hour"),
+        tmp_path,
+    )
+
+    study.run()
+
+    assert len(ledger.entries()) == 1
+    assert study.stop_reason == "insufficient_remaining_budget"
+
+
+def test_controller_resume_replays_an_interrupted_action_once(tmp_path):
+    """Losing a process after ask must record precisely one interruption result on resume."""
+    spec = StudySpec(
+        name="resume",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=3.0, cost_unit="run", initial_cost_estimate=1.0),
+        noise=NoiseSpec(),
+        backend="system",
+        seed=9,
+    )
+    space = SearchSpace(parameters=(CategoricalParameter("model", ("a", "b", "c")),))
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    first = OptimizationStudy(
+        spec, space, SobolBackend(spec, space), ledger, lambda _: None, tmp_path
+    )
+    action = first.ask()[0]
+    del first  # Simulate process exit: the OS releases its advisory writer lock.
+
+    resumed = OptimizationStudy(
+        spec,
+        space,
+        SobolBackend(spec, space),
+        ledger,
+        lambda evaluated: EvaluationResult.success(evaluated.id, {"score": 1.0}, {}, 1.0, "run"),
+        tmp_path,
+    )
+
+    entries = ledger.entries()
+    assert entries[0][0] == action
+    assert entries[0][1].status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (tmp_path / "pending-actions.json").exists()
+    resumed.run(max_new_evaluations=1)
+    assert len(ledger.entries()) == 2
+
+
+def test_controller_rejects_non_digest_input_provenance(tmp_path, study, space):
+    """Accepting arbitrary provenance labels would make manifest input hashes unverifiable."""
+    with pytest.raises(ValueError, match="input artifact hash"):
+        OptimizationStudy(
+            study,
+            space,
+            SobolBackend(study, space),
+            ObservationLedger(tmp_path / "observations.jsonl"),
+            lambda _: None,
+            tmp_path,
+            input_artifact_hashes={"system": "not-a-sha256"},
+        )
+
+
+def test_unresolved_ask_keeps_the_study_writer_lock(tmp_path, study, space):
+    """A second live controller must not recover an action owned by the first writer."""
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    first = OptimizationStudy(
+        study, space, SobolBackend(study, space), ledger, lambda _: None, tmp_path
+    )
+    first.ask()
+
+    with pytest.raises(StudyLockError, match="another writer"):
+        OptimizationStudy(
+            study, space, SobolBackend(study, space), ledger, lambda _: None, tmp_path
+        )
+
+
+def test_rejected_tell_does_not_release_the_pending_writer_lock(tmp_path, study, space):
+    """A bad caller result must not let another process recover live evaluator work."""
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    first = OptimizationStudy(
+        study, space, SobolBackend(study, space), ledger, lambda _: None, tmp_path
+    )
+    action = first.ask()[0]
+    wrong = EvaluationAction.system(action.id, {"model": "b"}, seed=action.seed)
+    result = EvaluationResult.success(action.id, {"score": 1.0, "bias": 1.0}, {}, 1.0, "cpu_hour")
+    with pytest.raises(ValueError, match="exactly match"):
+        first.tell(wrong, result)
+
+    with pytest.raises(StudyLockError, match="another writer"):
+        OptimizationStudy(
+            study, space, SobolBackend(study, space), ledger, lambda _: None, tmp_path
+        )
 
 
 def test_recommendation_is_best_feasible_observation(study, space, empty_ledger):
