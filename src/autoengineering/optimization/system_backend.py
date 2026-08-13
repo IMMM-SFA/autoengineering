@@ -22,6 +22,7 @@ try:
     import torch
     from botorch.acquisition import qLogNoisyExpectedImprovement
     from botorch.acquisition.objective import GenericMCObjective
+    from botorch.exceptions.warnings import NumericsWarning, OptimizationWarning
     from botorch.fit import fit_gpytorch_mll
     from botorch.models import ModelListGP, SingleTaskGP
     from botorch.models.transforms.outcome import Standardize
@@ -203,39 +204,55 @@ class SystemBayesBackend(_BaselineBackend):
             actions: list[EvaluationAction] = []
             for offset in range(n):
                 invalid_reason = ""
+                warning_exhausted = False
                 for attempt in range(self.candidate_retry_limit):
-                    warning_start = len(captured)
+                    attempt_warnings = []
                     try:
-                        candidate = self._candidate(
-                            model,
-                            prepared[0],
-                            outcome_order,
-                            assignments,
-                            seed + offset * self.candidate_retry_limit + attempt,
-                        )
-                        new_warnings = captured[warning_start:]
-                        warning_text.extend(self._warning_text(new_warnings))
-                        if self._has_fatal_warning(new_warnings):
-                            raise _OptimizationWarningError(
-                                "optimization_warning_indicates_failure"
+                        with warnings.catch_warnings(record=True) as attempt_warnings:
+                            warnings.simplefilter("always")
+                            candidate = self._candidate(
+                                model,
+                                prepared[0],
+                                outcome_order,
+                                assignments,
+                                seed + offset * self.candidate_retry_limit + attempt,
                             )
-                        config = self._decode_candidate(candidate)
-                        key = _canonical_config(config)
-                        if key in selected:
-                            raise ValueError("candidate_duplicate")
-                        selected.add(key)
-                        actions.append(
-                            replace(
-                                self._action(next_index + offset, config),
-                                suggested_by="system:bayes",
+                            if self._has_fatal_warning(attempt_warnings):
+                                warning_exhausted = True
+                                raise _OptimizationWarningError(
+                                    "optimization_warning_indicates_failure"
+                                )
+                            config = self._decode_candidate(candidate)
+                            key = _canonical_config(config)
+                            if key in selected:
+                                raise ValueError("candidate_duplicate")
+                            selected.add(key)
+                            actions.append(
+                                replace(
+                                    self._action(next_index + offset, config),
+                                    suggested_by="system:bayes",
+                                )
                             )
-                        )
                         break
                     except Exception as error:
+                        if self._has_fatal_warning(attempt_warnings):
+                            warning_exhausted = True
                         invalid_reason = f"{type(error).__name__}: {error}"
+                    finally:
+                        warning_text.extend(self._warning_text(attempt_warnings))
                 else:
+                    if warning_exhausted:
+                        fallback_kind = "warning_exhaustion"
+                    elif (
+                        "nonfinite_candidate" in invalid_reason
+                        or "candidate_duplicate" in invalid_reason
+                        or "finite number" in invalid_reason
+                    ):
+                        fallback_kind = "candidate_invalidation"
+                    else:
+                        fallback_kind = "acquisition_failure"
                     fallback.append(
-                        f"candidate_invalidation_after_{self.candidate_retry_limit}_retries: "
+                        f"{fallback_kind}_after_{self.candidate_retry_limit}_retries: "
                         f"{invalid_reason}"
                     )
                     return self._sobol(
@@ -586,11 +603,17 @@ class SystemBayesBackend(_BaselineBackend):
         stay in diagnostics but do not invalidate a finite decoded candidate
         unless they state an optimization or numerical failure.
         """
-        markers = ("fail", "converg", "optimiz", "numerical", "nonfinite", "nan")
+        markers = ("fail", "converg", "optimiz", "numerical", "nonfinite", "nan", "invalid")
         for item in records:
             message = str(item.message).lower()
+            if issubclass(item.category, OptimizationWarning):
+                return True
             if "very small noise values detected" in message:
                 continue
+            if issubclass(item.category, NumericsWarning) and any(
+                marker in message for marker in markers
+            ):
+                return True
             if issubclass(item.category, RuntimeWarning) and any(
                 marker in message for marker in markers
             ):

@@ -901,8 +901,10 @@ def test_system_backend_fixed_seed_closed_loop_improves_feasible_regret(empty_le
         raw_samples=8,
         candidate_retry_limit=2,
     )
+    post_initial_actions = []
     for _ in range(8):
         action = backend.suggest(empty_ledger)[0]
+        post_initial_actions.append(action)
         empty_ledger.append(
             action,
             EvaluationResult.success(action.id, outcomes(action.config), {}, 1.0, "cpu_hour"),
@@ -911,5 +913,141 @@ def test_system_backend_fixed_seed_closed_loop_improves_feasible_regret(empty_le
     recommendation = backend.recommend(empty_ledger)
 
     assert len(empty_ledger.entries()) == 12
+    assert all(action.suggested_by == "system:bayes" for action in post_initial_actions)
     assert recommendation.feasible is True
     assert recommendation.outcomes["score"] > initial_best
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_optimization_warning_then_raise_is_preserved(monkeypatch, empty_ledger):
+    """Dropping warnings emitted before acquisition exceptions must fail this test."""
+    from botorch.exceptions.warnings import OptimizationWarning
+    from autoengineering.optimization import system_backend
+
+    spec = StudySpec(
+        "warning-raise",
+        ObjectiveSpec("score", "maximize"),
+        (),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec(),
+        "system",
+        4,
+    )
+    space = SearchSpace((ContinuousParameter("x", 0.0, 1.0),))
+    for index, x in enumerate((0.1, 0.4, 0.8), start=1):
+        _append_observation(empty_ledger, f"eval-{index:06d}", {"x": x}, {"score": x})
+
+    def warned_then_failed(**kwargs):
+        warnings.warn("optimizer stopped", OptimizationWarning)
+        raise RuntimeError("solver crashed")
+
+    monkeypatch.setattr(system_backend, "optimize_acqf_mixed", warned_then_failed)
+    backend = SystemBayesBackend(spec, space, min_initial=2, raw_samples=4, candidate_retry_limit=1)
+
+    assert backend.suggest(empty_ledger)[0].suggested_by == "system:sobol"
+    diagnostics = backend.diagnostics(empty_ledger)
+    assert any("OptimizationWarning: optimizer stopped" == item for item in diagnostics.warnings)
+    assert "warning_exhaustion" in diagnostics.fallback_reasons[0]
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_botorch_warning_classes_have_distinct_acquisition_policy(
+    monkeypatch, empty_ledger
+):
+    """Treating installed OptimizationWarning and benign NumericsWarning alike must fail."""
+    import torch
+    from botorch.exceptions.warnings import NumericsWarning, OptimizationWarning
+    from autoengineering.optimization import system_backend
+
+    spec = StudySpec(
+        "warning-classes",
+        ObjectiveSpec("score", "maximize"),
+        (),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec(),
+        "system",
+        5,
+    )
+    space = SearchSpace((ContinuousParameter("x", 0.0, 1.0),))
+    for index, x in enumerate((0.1, 0.4, 0.8), start=1):
+        _append_observation(empty_ledger, f"eval-{index:06d}", {"x": x}, {"score": x})
+
+    def benign_optimizer(**kwargs):
+        warnings.warn("Very small noise values detected. Rounding", NumericsWarning)
+        return torch.tensor([[0.6]], dtype=torch.double), torch.tensor(0.0, dtype=torch.double)
+
+    monkeypatch.setattr(system_backend, "optimize_acqf_mixed", benign_optimizer)
+    backend = SystemBayesBackend(spec, space, min_initial=2, raw_samples=4)
+    assert backend.suggest(empty_ledger)[0].suggested_by == "system:bayes"
+    assert any("NumericsWarning" in item for item in backend.diagnostics(empty_ledger).warnings)
+
+    def fatal_optimizer(**kwargs):
+        warnings.warn("line search did not converge", OptimizationWarning)
+        return torch.tensor([[0.6]], dtype=torch.double), torch.tensor(0.0, dtype=torch.double)
+
+    monkeypatch.setattr(system_backend, "optimize_acqf_mixed", fatal_optimizer)
+    backend = SystemBayesBackend(spec, space, min_initial=2, raw_samples=4, candidate_retry_limit=2)
+    assert backend.suggest(empty_ledger)[0].suggested_by == "system:sobol"
+    diagnostics = backend.diagnostics(empty_ledger)
+    assert diagnostics.fallback_reasons[0].startswith("warning_exhaustion")
+    assert sum("OptimizationWarning" in item for item in diagnostics.warnings) == 2
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fitted_suggestion_replays_from_fresh_instances(empty_ledger):
+    """Using hidden fitted-model state instead of the ledger must fail this replay test."""
+    spec = StudySpec(
+        "fresh-replay",
+        ObjectiveSpec("score", "maximize"),
+        (),
+        BudgetSpec(5, "cpu_hour"),
+        NoiseSpec(),
+        "system",
+        19,
+    )
+    space = SearchSpace((ContinuousParameter("x", 0.0, 1.0),))
+    for index, x in enumerate((0.1, 0.4, 0.8), start=1):
+        _append_observation(
+            empty_ledger, f"eval-{index:06d}", {"x": x}, {"score": 1.0 - (x - 0.7) ** 2}
+        )
+
+    first = SystemBayesBackend(spec, space, min_initial=2, num_restarts=1, raw_samples=8).suggest(
+        empty_ledger
+    )[0]
+    second = SystemBayesBackend(spec, space, min_initial=2, num_restarts=1, raw_samples=8).suggest(
+        empty_ledger
+    )[0]
+
+    assert first.to_dict() == second.to_dict()
+    assert first.suggested_by == "system:bayes"
+
+
+@pytest.mark.skipif(SystemBayesBackend is None, reason="whole-system backend is unavailable")
+def test_system_backend_fitted_suggestion_replays_across_processes(empty_ledger):
+    """Process-local Torch state changing a fitted suggestion must fail this replay test."""
+    for index, x in enumerate((0.1, 0.4, 0.8), start=1):
+        _append_observation(
+            empty_ledger, f"eval-{index:06d}", {"x": x}, {"score": 1.0 - (x - 0.7) ** 2}
+        )
+    program = "\n".join(
+        (
+            "import json",
+            "from autoengineering.optimization import BudgetSpec, ContinuousParameter, NoiseSpec, ObjectiveSpec, ObservationLedger, SearchSpace, StudySpec",
+            "from autoengineering.optimization.system_backend import SystemBayesBackend",
+            f"ledger = ObservationLedger({str(empty_ledger.path)!r})",
+            "spec = StudySpec('process-replay', ObjectiveSpec('score', 'maximize'), (), BudgetSpec(5, 'cpu_hour'), NoiseSpec(), 'system', 31)",
+            "space = SearchSpace((ContinuousParameter('x', 0.0, 1.0),))",
+            "action = SystemBayesBackend(spec, space, min_initial=2, num_restarts=1, raw_samples=8).suggest(ledger)[0]",
+            "assert action.suggested_by == 'system:bayes'",
+            "print(json.dumps(action.to_dict(), sort_keys=True, separators=(',', ':')))",
+        )
+    )
+
+    first = subprocess.run(
+        [sys.executable, "-c", program], check=True, capture_output=True, text=True
+    )
+    second = subprocess.run(
+        [sys.executable, "-c", program], check=True, capture_output=True, text=True
+    )
+
+    assert json.loads(first.stdout) == json.loads(second.stdout)
