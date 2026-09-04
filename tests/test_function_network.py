@@ -634,3 +634,20 @@ def test_function_network_imports_do_not_load_bayesian_dependencies():
     ]
     completed = subprocess.run(command, check=False, capture_output=True, text=True)
     assert completed.returncode == 0, completed.stderr
+
+
+@pytest.mark.parametrize(
+    "imports",
+    (
+        "import autoengineering.optimization; import autoengineering.research",
+        "import autoengineering.research; import autoengineering.optimization",
+    ),
+)
+def test_function_network_public_exports_do_not_create_import_cycles(imports):
+    completed = subprocess.run(
+        [sys.executable, "-c", imports],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr

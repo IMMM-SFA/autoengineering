@@ -12,11 +12,11 @@ from pathlib import Path
 import stat
 import time
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 import zipfile
 
 import numpy as np
 
-from autoengineering.research.runner import EvaluationContext, Runner, execute_action, run_component
 from autoengineering.system.graph import System
 
 from .function_network import (
@@ -34,6 +34,9 @@ from .records import (
     EvaluationStatus,
     Scalar,
 )
+
+if TYPE_CHECKING:
+    from autoengineering.research.runner import EvaluationContext, Runner
 
 
 _DEFAULT_MAX_COMPRESSED_BYTES = 64 * 1024 * 1024
@@ -171,15 +174,17 @@ class FunctionNetworkEvaluator:
 
     spec: FunctionNetworkSpec
     context: EvaluationContext
-    runner: Runner = field(default=run_component, compare=False, repr=False)
+    runner: Runner | None = field(default=None, compare=False, repr=False)
     clock: Callable[[], float] = field(default=time.perf_counter, compare=False, repr=False)
 
     def __post_init__(self) -> None:
+        from autoengineering.research.runner import EvaluationContext, Runner
+
         if not isinstance(self.spec, FunctionNetworkSpec):
             raise TypeError("spec must be a FunctionNetworkSpec")
         if not isinstance(self.context, EvaluationContext):
             raise TypeError("context must be an EvaluationContext")
-        if not isinstance(self.runner, Runner):
+        if self.runner is not None and not isinstance(self.runner, Runner):
             raise TypeError("runner must satisfy the Runner protocol")
         if not callable(self.clock):
             raise TypeError("clock must be callable")
@@ -187,6 +192,8 @@ class FunctionNetworkEvaluator:
 
     def evaluate(self, action: EvaluationAction) -> EvaluationResult:
         """Evaluate one declared action and record only scalar features plus NPZ references."""
+        from autoengineering.research.runner import execute_action, run_component
+
         if not isinstance(action, EvaluationAction):
             raise TypeError("action must be an EvaluationAction")
         if action.scope not in self.spec.evaluation_scopes:
@@ -210,7 +217,8 @@ class FunctionNetworkEvaluator:
         if not functions:
             raise ValueError("action has no declared observable scalar output")
         evaluation_context = replace(self.context, outcome_functions=functions)
-        return execute_action(action, evaluation_context, runner=self.runner, clock=self.clock)
+        runner = run_component if self.runner is None else self.runner
+        return execute_action(action, evaluation_context, runner=runner, clock=self.clock)
 
     def _validate_action_config(
         self,
