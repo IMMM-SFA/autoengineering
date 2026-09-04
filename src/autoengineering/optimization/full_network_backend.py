@@ -84,9 +84,7 @@ class NetworkPosteriorSamples:
         if objective.shape != (self.sample_count,) or not np.all(np.isfinite(objective)):
             raise ValueError("objective samples must be finite and match sample_count")
         object.__setattr__(self, "objective", objective)
-        constraints = {
-            name: _read_only(values) for name, values in self.constraints.items()
-        }
+        constraints = {name: _read_only(values) for name, values in self.constraints.items()}
         if any(values.shape != (self.sample_count,) for values in constraints.values()):
             raise ValueError("constraint samples must match sample_count")
         object.__setattr__(self, "constraints", MappingProxyType(constraints))
@@ -95,7 +93,9 @@ class NetworkPosteriorSamples:
             outputs[component] = MappingProxyType(
                 {name: _read_only(samples) for name, samples in values.items()}
             )
-            if any(samples.shape != (self.sample_count,) for samples in outputs[component].values()):
+            if any(
+                samples.shape != (self.sample_count,) for samples in outputs[component].values()
+            ):
                 raise ValueError("component samples must match sample_count")
         object.__setattr__(self, "component_outputs", MappingProxyType(outputs))
 
@@ -205,9 +205,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 "global search space must exactly match qualified function network parameters"
             )
 
-    def suggest(
-        self, ledger: ObservationLedgerReader, n: int = 1
-    ) -> tuple[EvaluationAction, ...]:
+    def suggest(self, ledger: ObservationLedgerReader, n: int = 1) -> tuple[EvaluationAction, ...]:
         """Suggest globally valid system actions from propagated expected improvement."""
         self._validate_n(n)
         previous_enabled = torch.are_deterministic_algorithms_enabled()
@@ -219,9 +217,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
             finally:
                 torch.use_deterministic_algorithms(previous_enabled, warn_only=previous_warn_only)
 
-    def _suggest(
-        self, ledger: ObservationLedgerReader, n: int
-    ) -> tuple[EvaluationAction, ...]:
+    def _suggest(self, ledger: ObservationLedgerReader, n: int) -> tuple[EvaluationAction, ...]:
         started = time.perf_counter()
         entries = ledger.entries()
         next_index, observed = self._next_index_and_observed(ledger)
@@ -237,9 +233,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 successful,
             )
 
-        tables = reconstruct_component_training_tables(
-            self.network, self.system, ledger
-        )
+        tables = reconstruct_component_training_tables(self.network, self.system, ledger)
         if any(row.scope is not EvaluationScope.SYSTEM for rows in tables.values() for row in rows):
             raise ValueError("full-observability training rows must have system scope")
         captured: list[warnings.WarningMessage] = []
@@ -366,11 +360,25 @@ class FullNetworkBayesBackend(_BaselineBackend):
         sample_count: int | None = None,
     ) -> NetworkPosteriorSamples:
         """Fit from ``ledger`` and propagate deterministic samples for ``config``."""
+        return self.posterior_samples_many(ledger, (config,), sample_count=sample_count)[0]
+
+    def posterior_samples_many(
+        self,
+        ledger: ObservationLedgerReader,
+        configs: tuple[Mapping[str, Scalar], ...],
+        *,
+        sample_count: int | None = None,
+    ) -> tuple[NetworkPosteriorSamples, ...]:
+        """Fit once and propagate deterministic samples for several configurations."""
+        configs = tuple(configs)
+        if not configs:
+            raise ValueError("configs must not be empty")
         if sample_count is None:
             sample_count = self.posterior_sample_count
         if isinstance(sample_count, bool) or not isinstance(sample_count, int) or sample_count < 1:
             raise ValueError("sample_count must be a positive integer")
-        self.space.encode(config)
+        for config in configs:
+            self.space.encode(config)
         entries = ledger.entries()
         for action, _ in entries:
             if action.scope is not EvaluationScope.SYSTEM:
@@ -383,7 +391,9 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 "posterior prediction requires the minimum successful system observations"
             )
         prepared = self._fit_components(tables, fingerprint)
-        return self._propagate(prepared, config, fingerprint, sample_count)
+        return tuple(
+            self._propagate(prepared, config, fingerprint, sample_count) for config in configs
+        )
 
     def _fit_components(
         self,
@@ -393,7 +403,9 @@ class FullNetworkBayesBackend(_BaselineBackend):
         prepared: dict[str, _PreparedComponent] = {}
         for component_name in self.order:
             component = self.network.component_map[component_name]
-            rows = tuple(row for row in tables[component_name] if row.scope is EvaluationScope.SYSTEM)
+            rows = tuple(
+                row for row in tables[component_name] if row.scope is EvaluationScope.SYSTEM
+            )
             if not rows:
                 raise ValueError(f"component {component_name!r} has no successful system rows")
             feature_names = tuple(rows[0].inputs)
@@ -407,8 +419,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 if name not in {parameter.name for parameter in component.parameters}
             )
             center = {
-                name: float(np.mean([float(row.inputs[name]) for row in rows]))
-                for name in upstream
+                name: float(np.mean([float(row.inputs[name]) for row in rows])) for name in upstream
             }
             scale = {
                 name: max(
@@ -417,7 +428,10 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 )
                 for name in upstream
             }
-            scale = {name: 1.0 if value <= _MACHINE_NOISE_FLOOR else value for name, value in scale.items()}
+            scale = {
+                name: 1.0 if value <= _MACHINE_NOISE_FLOOR else value
+                for name, value in scale.items()
+            }
             models: dict[str, object] = {}
             constants: dict[str, tuple[float, float]] = {}
             fit_attempts: dict[str, int] = {}
@@ -430,7 +444,10 @@ class FullNetworkBayesBackend(_BaselineBackend):
                     )
             else:
                 train_x = torch.tensor(
-                    [self._encode_training_row(component, row, feature_names, center, scale) for row in rows],
+                    [
+                        self._encode_training_row(component, row, feature_names, center, scale)
+                        for row in rows
+                    ],
                     dtype=torch.double,
                 )
                 for output in component.scalar_outputs:
@@ -470,7 +487,9 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 raise ValueError(
                     f"known noise requires standard error for {row.component}.{output_name}"
                 )
-            error = 0.0 if self.spec.noise.mode == "deterministic" else row.standard_errors[output_name]
+            error = (
+                0.0 if self.spec.noise.mode == "deterministic" else row.standard_errors[output_name]
+            )
             values.append([max(float(error), floor) ** 2])
         return torch.tensor(values, dtype=torch.double)
 
@@ -487,7 +506,9 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 raise ValueError(
                     f"known noise requires standard error for {rows[0].component}.{output_name}"
                 )
-            return max(float(np.mean([row.standard_errors[output_name] ** 2 for row in rows])), floor**2)
+            return max(
+                float(np.mean([row.standard_errors[output_name] ** 2 for row in rows])), floor**2
+            )
         if self.spec.noise.mode == "learned" and len(values) > 1:
             return max(float(np.var(values, ddof=1)), floor**2)
         return floor**2
@@ -578,7 +599,9 @@ class FullNetworkBayesBackend(_BaselineBackend):
             if item.constants:
                 for output_name, (mean, variance) in item.constants.items():
                     generator = np.random.default_rng(
-                        self._seed(fingerprint, component_name, output_name, self._config_json(config))
+                        self._seed(
+                            fingerprint, component_name, output_name, self._config_json(config)
+                        )
                     )
                     if variance <= _MACHINE_NOISE_FLOOR**2:
                         samples = np.full(sample_count, mean, dtype=float)
@@ -612,12 +635,12 @@ class FullNetworkBayesBackend(_BaselineBackend):
                     outputs[output.name] = np.asarray(samples, dtype=float)
             for name, values in outputs.items():
                 if values.shape != (sample_count,) or not np.all(np.isfinite(values)):
-                    raise ValueError(f"component {component_name!r} produced invalid posterior samples")
+                    raise ValueError(
+                        f"component {component_name!r} produced invalid posterior samples"
+                    )
                 propagated[f"{component_name}.{name}"] = values
             component_outputs[component_name] = MappingProxyType(outputs)
-        objective_key = (
-            f"{self.network.objective.component}.{self.network.objective.scalar_output}"
-        )
+        objective_key = f"{self.network.objective.component}.{self.network.objective.scalar_output}"
         constraints = {
             item.outcome: propagated[f"{item.component}.{item.scalar_output}"]
             for item in self.network.constraints
@@ -659,9 +682,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 )
         return np.column_stack(columns)
 
-    def _acquisition_value(
-        self, posterior: NetworkPosteriorSamples, best: float | None
-    ) -> float:
+    def _acquisition_value(self, posterior: NetworkPosteriorSamples, best: float | None) -> float:
         feasible = np.ones(posterior.sample_count, dtype=bool)
         for constraint in self.spec.constraints:
             values = posterior.constraints[constraint.outcome]
@@ -789,8 +810,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
     @staticmethod
     def _fingerprint(entries) -> str:
         payload = [
-            {"action": action.to_dict(), "result": result.to_dict()}
-            for action, result in entries
+            {"action": action.to_dict(), "result": result.to_dict()} for action, result in entries
         ]
         return hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
@@ -801,7 +821,5 @@ class FullNetworkBayesBackend(_BaselineBackend):
         return json.dumps(dict(config), sort_keys=True, separators=(",", ":"))
 
     def _seed(self, *parts: str) -> int:
-        digest = hashlib.sha256(
-            "\0".join((str(self.spec.seed), *parts)).encode("utf-8")
-        ).digest()
+        digest = hashlib.sha256("\0".join((str(self.spec.seed), *parts)).encode("utf-8")).digest()
         return int.from_bytes(digest[:8], "big") % (2**31 - 1)

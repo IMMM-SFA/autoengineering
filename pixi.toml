@@ -10,6 +10,7 @@ test = "python -m pytest tests -q -p no:cacheprovider"
 lint = "ruff check --no-cache src tests examples"
 test-bayes = "python -m pytest tests -q -p no:cacheprovider"
 benchmark-release-a = "python -m autoengineering.benchmarks.release_a --output benchmarks/release_a/results"
+benchmark-full-network = "python -m autoengineering.benchmarks.full_network --output benchmarks/full_network/results"
 
 [dependencies]
 python = "3.12.*"

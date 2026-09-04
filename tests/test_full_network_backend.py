@@ -178,9 +178,10 @@ def test_full_network_cold_start_returns_only_replayable_system_actions(
     assert first == second
     assert all(action.scope is EvaluationScope.SYSTEM for action in first)
     assert all(action.suggested_by == "function_network_full:sobol" for action in first)
-    assert FullNetworkBayesBackend(study, space, network, system).diagnostics(
-        ledger
-    ).fit_state == "not_fit_for_ledger"
+    assert (
+        FullNetworkBayesBackend(study, space, network, system).diagnostics(ledger).fit_state
+        == "not_fit_for_ledger"
+    )
 
 
 @pytest.mark.skipif(FullNetworkBayesBackend is None, reason="optional Bayesian dependencies")
