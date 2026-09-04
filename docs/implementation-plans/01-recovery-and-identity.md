@@ -76,3 +76,11 @@ The item is complete only when all of the following pass after the final edit:
   resume case.
 
 The status document will be updated only after this evidence exists.
+
+## Completion evidence
+
+Item 1 was implemented in signed commit `b3dcdd4`. The post-review gate passed with 253 tests and
+21 optional dependency skips in the default environment, and 274 tests in the Bayesian
+environment. The Bayesian run reported two dependency deprecation warnings from
+`torch.jit.script`. Lint, `git diff --check`, and all seven Waterology constraints passed. The
+independent review found no remaining implementation defect.

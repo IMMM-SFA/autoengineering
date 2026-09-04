@@ -1,6 +1,6 @@
 # Bayesian optimization implementation plan
 
-_Status: Draft_
+_Status: In progress; item 1 complete_
 
 _Branch point: `262a984`_
 
@@ -455,4 +455,3 @@ Use four review checkpoints:
 
 Each checkpoint should identify the exact revision, commands, environment lock, raw evidence paths,
 and unresolved limitations.
-

@@ -13,11 +13,9 @@ final broad completion gates still need evidence from the saved post-review stat
 
 No implementation findings remain.
 
-Before item 1 is marked complete, refresh the broad gate evidence required by
-`docs/bayesian-optimization-plan.md:305-307` and the same-revision rule at lines 315-317. The
-default suite, full Bayesian suite, and Waterology results in the review brief predate the recovery
-fixes made during this review. This is a verification blocker, not a code finding. Run the existing
-project tasks and constraints against the final saved diff and record their results.
+The implementer refreshed the broad completion gates after the review. The results are recorded in
+`docs/implementation-plans/01-recovery-and-identity.md` and
+`docs/bayesian-optimization-status.md`.
 
 ## Should fix
 
