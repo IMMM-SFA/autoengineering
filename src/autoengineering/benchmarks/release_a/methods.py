@@ -97,10 +97,12 @@ class NativeAdapter:
 
     def suggest(self, ledger: MemoryLedger) -> Suggestion:
         action = self.backend.suggest(ledger, n=1)[0]
-        diagnostics = self.backend.diagnostics(ledger)
+        fallback_events = ()
+        if self.name == "botorch":
+            fallback_events = self.backend.diagnostics(ledger).fallback_reasons
         if self.name == "fixed":
             action = replace(action, suggested_by="fixed")
-        return Suggestion(action, diagnostics.fallback_reasons)
+        return Suggestion(action, fallback_events)
 
     def observe(
         self,
@@ -178,7 +180,6 @@ class SmacAdapter:
             self._initialize_facade()
         info = self._facade.ask()
         config = _plain_config(dict(info.config), self.problem)
-        self.problem.space.encode(config)
         self._pending = info
         return Suggestion(
             EvaluationAction.system(
@@ -276,18 +277,8 @@ def build_method(
 
 
 def _smac_cost(problem: BenchmarkProblem, result: EvaluationResult) -> float:
-    if result.status is not EvaluationStatus.SUCCESS:
+    if result.status is not EvaluationStatus.SUCCESS or not problem.is_feasible(result):
         return 10.0
-    if not problem.is_feasible(result):
-        violation = 0.0
-        for constraint in problem.constraints:
-            observed = result.outcomes[constraint.outcome]
-            violation += (
-                max(0.0, constraint.threshold - observed)
-                if constraint.operator == ">="
-                else max(0.0, observed - constraint.threshold)
-            )
-        return 5.0 + violation
     return problem.reference_objective - result.outcomes[problem.objective.outcome]
 
 

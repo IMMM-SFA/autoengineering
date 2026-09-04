@@ -6,10 +6,14 @@ from collections import defaultdict
 from collections.abc import Iterable, Mapping
 import csv
 import io
+from itertools import product
 import json
+import math
 from statistics import fmean
 
 import numpy as np
+
+from autoengineering.optimization import EvaluationAction, EvaluationResult
 
 from .methods import METHOD_NAMES, NATIVE_METHODS, WARM_START_COUNT
 from .problems import BENCHMARK_SEEDS, EVALUATIONS_PER_RUN, benchmark_problems, problem_by_name
@@ -152,8 +156,24 @@ def evaluate_gate(
     records = list(records)
     rows = summarize_records(records)
     evaluations = [record for record in records if record["record_type"] == "evaluation"]
-    expected_runs = len(benchmark_problems()) * len(METHOD_NAMES) * len(BENCHMARK_SEEDS)
+    expected_keys = set(
+        product(
+            (problem.name for problem in benchmark_problems()),
+            METHOD_NAMES,
+            BENCHMARK_SEEDS,
+        )
+    )
+    expected_runs = len(expected_keys)
     complete_rows = [row for row in rows if row["completed"] is True]
+    observed_keys = {(row["problem"], row["method"], row["seed"]) for row in rows}
+    indices_by_run: dict[tuple[str, str, int], list[int]] = defaultdict(list)
+    for record in evaluations:
+        indices_by_run[(record["problem"], record["method"], record["seed"])].append(
+            int(record["evaluation_index"])
+        )
+    exact_indices = all(
+        sorted(indices_by_run[key]) == list(range(EVALUATIONS_PER_RUN)) for key in expected_keys
+    )
     criteria = []
 
     def add(name: str, passed: bool, details: Mapping[str, object]) -> None:
@@ -161,17 +181,23 @@ def evaluate_gate(
 
     add(
         "complete_matrix",
-        len(rows) == expected_runs
+        observed_keys == expected_keys
         and len(complete_rows) == expected_runs
-        and len(evaluations) == expected_runs * EVALUATIONS_PER_RUN,
+        and len(evaluations) == expected_runs * EVALUATIONS_PER_RUN
+        and exact_indices,
         {
             "expected_runs": expected_runs,
             "observed_runs": len(rows),
+            "missing_runs": len(expected_keys - observed_keys),
+            "unexpected_runs": len(observed_keys - expected_keys),
             "complete_runs": len(complete_rows),
             "expected_evaluations": expected_runs * EVALUATIONS_PER_RUN,
             "observed_evaluations": len(evaluations),
+            "exact_evaluation_indices": exact_indices,
         },
     )
+    audit = _audit_records(records, expected_keys)
+    add("scientific_record_audit", audit["passed"], audit)
     invalid = sum(int(row["invalid_configurations"]) for row in rows)
     overruns = sum(int(row["budget_overruns"]) for row in rows)
     add(
@@ -257,6 +283,120 @@ def evaluate_gate(
         "passed": all(criterion["passed"] for criterion in criteria),
         "criteria": criteria,
         "provenance": dict(provenance),
+    }
+
+
+def _audit_records(
+    records: list[dict[str, object]],
+    expected_keys: set[tuple[str, str, int]],
+) -> dict[str, object]:
+    """Recompute scientific fields for every exact benchmark run."""
+    issues: list[str] = []
+    issue_count = 0
+
+    def report(message: str) -> None:
+        nonlocal issue_count
+        issue_count += 1
+        if len(issues) < 100:
+            issues.append(message)
+
+    groups: dict[tuple[str, str, int], list[dict[str, object]]] = defaultdict(list)
+    for record in records:
+        key = (record["problem"], record["method"], record["seed"])
+        if key not in expected_keys:
+            report(f"unexpected run {key!r}")
+            continue
+        if record["record_type"] == "run_error":
+            report(
+                f"run error {key!r} at {record['stage']}: {record['error_type']}: {record['error']}"
+            )
+            continue
+        groups[key].append(record)
+
+    for key in sorted(expected_keys):
+        group = groups[key]
+        indices = [int(record["evaluation_index"]) for record in group]
+        if sorted(indices) != list(range(EVALUATIONS_PER_RUN)):
+            report(f"evaluation indices differ for {key!r}: {indices!r}")
+            continue
+        problem_name, method, seed = key
+        problem = problem_by_name(problem_name)
+        cumulative_cost = 0.0
+        best_feasible: float | None = None
+        for record in sorted(group, key=lambda item: int(item["evaluation_index"])):
+            index = int(record["evaluation_index"])
+            label = f"{problem_name}/{method}/{seed}/{index}"
+            try:
+                action = EvaluationAction.from_dict(record["action"])
+                result = EvaluationResult.from_dict(record["result"])
+                problem.space.encode(action.config)
+            except (KeyError, TypeError, ValueError) as error:
+                report(f"invalid action or result at {label}: {error}")
+                continue
+            expected_result = problem.evaluate(
+                action,
+                benchmark_seed=seed,
+                evaluation_index=index,
+            )
+            if result.to_dict() != expected_result.to_dict():
+                report(f"scientific result differs at {label}")
+            preview_cost = problem.preview_cost(dict(action.config))
+            if not math.isclose(result.cost, preview_cost, rel_tol=0.0, abs_tol=1e-12):
+                report(f"evaluator cost differs at {label}")
+            cumulative_cost += result.cost
+            feasible = problem.is_feasible(result)
+            if feasible:
+                objective = result.outcomes[problem.objective.outcome]
+                best_feasible = (
+                    objective if best_feasible is None else max(best_feasible, objective)
+                )
+            expected_fields = {
+                "study_seed": problem.study(seed).seed,
+                "cumulative_cost": cumulative_cost,
+                "cost_budget": problem.cost_budget,
+                "feasible": feasible,
+                "constraint_violation": problem.constraint_violation(result),
+                "best_feasible_objective": best_feasible,
+                "normalized_regret": problem.normalized_regret(best_feasible),
+                "invalid_configuration": False,
+                "budget_overrun": False,
+                "replay_consistent": True if method in NATIVE_METHODS else None,
+            }
+            for field, expected in expected_fields.items():
+                observed = record[field]
+                if isinstance(expected, float):
+                    matches = (
+                        not isinstance(observed, bool)
+                        and isinstance(observed, (int, float))
+                        and math.isclose(float(observed), expected, rel_tol=0.0, abs_tol=1e-12)
+                    )
+                else:
+                    matches = observed == expected
+                if not matches:
+                    report(f"{field} differs at {label}")
+            fallback_events = record["fallback_events"]
+            unresolved = [
+                event
+                for event in fallback_events
+                if index >= WARM_START_COUNT
+                or not event.startswith("cold_start_insufficient_usable_observations")
+            ]
+            if record["unresolved_fallback_events"] != unresolved:
+                report(f"unresolved fallback classification differs at {label}")
+            overhead = record["optimizer_overhead_seconds"]
+            if (
+                isinstance(overhead, bool)
+                or not isinstance(overhead, (int, float))
+                or not math.isfinite(float(overhead))
+                or overhead < 0
+            ):
+                report(f"optimizer overhead differs at {label}")
+        if cumulative_cost > problem.cost_budget + 1e-12:
+            report(f"cumulative budget overrun for {key!r}")
+    return {
+        "passed": issue_count == 0,
+        "issue_count": issue_count,
+        "reported_issues": issues,
     }
 
 
