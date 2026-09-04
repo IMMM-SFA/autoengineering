@@ -6,34 +6,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `autoengineering` is a Python package for AI-assisted systems engineering of **multi-model chains**. It helps identify, validate, rank, and swap components within a system of connected models, then quantify the gain. The package is paired with a Claude Code agent (`.claude/agents/auto-engineer.md`) that drives the workflow interactively. Read `concept.md` for the conceptual framing.
 
-Note: this repo lives at `autoengineering/autoengineering/` — the inner directory is the actual git repo and package root. Run all commands from there.
+Run commands from the repository root.
 
 ## Commands
 
-Environment is managed with **pixi** (osx-arm64 only). All tooling runs through pixi tasks:
+Pixi manages environments on macOS ARM and Linux x86-64:
 
 ```bash
-pixi install          # create the environment
-pixi run install      # pip install -e . (editable)
-pixi run test         # pytest tests/ --junitxml=results.xml
-pixi run lint         # ruff check src/ tests/ examples/
+pixi install
+pixi run lint
+pixi run test
+pixi install -e bayes
+pixi run -e bayes test-bayes
+pixi run -e bayes benchmark-release-a
 ```
 
 Run a single test:
 
 ```bash
-pixi run pytest tests/test_validate.py::test_rmse -v
+pixi run pytest tests/test_validate.py::TestMetrics::test_rmse_perfect -v
 ```
 
-Run an example end-to-end (each prints all four workflow steps):
+Run component workflow examples:
 
 ```bash
 pixi run python examples/signal_chain/run_workflow.py     # synthetic, no domain knowledge
-pixi run python examples/leaf_river/run_workflow.py       # real USGS/NOAA data, cached after first run
+pixi run python examples/leaf_river/run_workflow.py       # real data, checked cache needs no network
+```
+
+Run the no-network optimization example:
+
+```bash
+pixi run autoengineering optimize system.yaml examples/optimization_chain/optimization.yaml \
+  --workdir outputs/optimization-chain --max-new-evaluations 3
+pixi run autoengineering optimize system.yaml examples/optimization_chain/optimization.yaml \
+  --workdir outputs/optimization-chain --resume
 ```
 
 CLI (installed as `autoengineering`, also `pixi run autoengineering <cmd>`):
-`describe`, `graph`, `components`, `validate`, `report`, `candidates`, `improve`, `experiments` — all take a `system.yaml` (or, for `experiments`, an `autoresearch.jsonl`) as the first argument.
+`describe`, `graph`, `components`, `validate`, `report`, `candidates`, `improve`, `experiments`, and
+`optimize`. The optimize command takes a system YAML, optimization YAML, and explicit work
+directory. See `docs/optimization.md` before changing its run or recovery contract.
 
 Run the automated research loop end-to-end:
 
@@ -41,26 +54,41 @@ Run the automated research loop end-to-end:
 pixi run python examples/leaf_river/run_auto_research.py   # reproduces NSE 0.23 -> 0.39 via auto_improve
 ```
 
-## Architecture — the key mental model
+## Architecture and execution boundary
 
-**The package describes and evaluates systems; it does not execute the actual models.** This separation is the central design fact and easy to miss:
+The original component workflow separates structural system descriptions from numeric example
+models:
 
-- A `System` (`system/graph.py`) is a NetworkX `DiGraph` of `Component`s loaded from YAML. Components carry only *metadata* — name, `model_type`, typed input/output `Port`s, and an arbitrary `metadata` dict. There is no numeric computation inside a `Component`.
-- The real numeric models live **in the example scripts**, not in the package. Each `examples/<name>/` has a `models/` package (e.g. `pet_hamon.py`, `rainfall_runoff.py`) with plain functions that take and return numpy arrays. The `run_workflow.py` script wires those functions together, runs the chain, and feeds the resulting arrays into the package's `validate_arrays()`.
+- A `System` (`system/graph.py`) is a NetworkX `DiGraph` of `Component` objects loaded from YAML.
+  Components contain metadata, typed ports, and an arbitrary metadata dictionary.
+- Numeric example models live under `examples/<name>/models/`. Workflow scripts wire them together
+  and pass arrays to `validate_arrays()`.
 
-So the data flow in a workflow script is: **run real models → get arrays → `validate_arrays()` → `rank_opportunities()` → `swap_component()` → re-run → compare.** The YAML/`System` is the structural map; the `models/` functions are the substance.
+The component workflow runs models, validates arrays, ranks opportunities, swaps a component, and
+runs the chain again. The `research/` runner is the package path that executes declared component
+callables.
 
-### The four-step pipeline (mirrors the four `src/autoengineering/` subpackages)
+### Packages
 
-1. **`system/`** — Define. `System.from_yaml()` / `to_yaml()`, graph queries (`topological_order`, `upstream_of`, `downstream_of`), and rendering (`describe()`, `to_mermaid()`).
-2. **`validate/`** — Validate. `validate_arrays(name, observed, simulated, metrics, thresholds)` returns `ValidationResult` dataclasses. Metrics live in the `METRICS` registry in `compare.py`: `rmse`, `bias`, `relative_bias`, `correlation`, `nse`, `kge`.
-3. **`analyze/`** — Analyze. `rank_opportunities()` groups results by component and scores improvement potential (higher = more room to improve); `generate_report()` produces a markdown/JSON report.
-4. **`execute/`** — Improve. `swap_component(system, target, replacement)` returns a **new** `System` with one component replaced and all connections preserved.
-5. **`research/`** — Research + auto-improve. Bridges Analyze to Improve. `runner.run_component` / `build_feedforward_runner` **execute** models (the one place the package runs models, not just describes them); `candidates.Candidate` + `load_candidates` are the deep-research → loop bridge; `experiment.ExperimentTree` records the lineage; `loop.auto_improve` runs the bounded swap→run→validate→decide loop; `provenance.write_report` emits the evidence-first report. No LLM calls — the research half lives in `.claude/skills/`. Adapts feynman.is + openresearch-cli (see `NOTICE`).
+1. **`system/`** - Define. `System.from_yaml()` / `to_yaml()`, graph queries (`topological_order`, `upstream_of`, `downstream_of`), and rendering (`describe()`, `to_mermaid()`).
+2. **`validate/`** - Validate. `validate_arrays(name, observed, simulated, metrics, thresholds)` returns `ValidationResult` dataclasses. Metrics live in the `METRICS` registry in `compare.py`: `rmse`, `bias`, `relative_bias`, `correlation`, `nse`, `kge`.
+3. **`analyze/`** - Analyze. `rank_opportunities()` groups results by component and scores improvement potential (higher = more room to improve); `generate_report()` produces a markdown/JSON report.
+4. **`execute/`** - Improve. `swap_component(system, target, replacement)` returns a **new** `System` with one component replaced and all connections preserved.
+5. **`research/`** - Research and bounded component improvement. `runner.run_component` and
+   `build_feedforward_runner` execute declared models. `ExperimentTree` records lineage, and
+   `auto_improve` runs the swap, execute, validate, and decide loop.
+6. **`optimization/`** - Durable whole-system optimization. Strict run and search-space schemas feed
+   random, scrambled Sobol, or optional BoTorch policies. `OptimizationStudy` owns budgets, the
+   append-only ledger, recovery, recommendations, and reports. Release A evaluates the complete
+   system for every action. It does not implement function-network or component-level Bayesian
+   optimization.
 
 ### The runnable contract (how models get executed)
 
-`research/runner.py` executes a component via `Component.metadata["runnable"]` — a free-form dict, so **no `Component` schema change** was needed and it round-trips through YAML and survives `swap_component`'s deepcopy. Shape: `{kind: python|command, entry: "module:callable" | "cmd {inputs} {outputs}", inputs: [...], outputs: [...], params: {...}, sys_path: "."}`. The `python` kind imports and calls the entry with the named input arrays; the `command` kind uses an `.npz` I/O contract. `build_feedforward_runner` wires a whole feed-forward system; chains with glue arithmetic (e.g. Leaf River's `recharge = precip - aet`) hand-write `run_chain` and call `run_component` on the swappable components (see `examples/leaf_river/run_auto_research.py`).
+`research/runner.py` executes a component through `Component.metadata["runnable"]`. The dictionary
+round-trips through YAML and survives `swap_component` copies. It supports Python callables and
+commands with an `.npz` input/output contract. `build_feedforward_runner` wires a feed-forward
+system. Chains with glue arithmetic can provide a handwritten `run_chain`.
 
 ### Metric direction convention (important when adding metrics or thresholds)
 
@@ -69,10 +97,11 @@ Pass/fail direction is not uniform. In `validate_arrays`, metrics `nse`, `kge`, 
 ## Conventions
 
 - Immutability is enforced by design: `swap_component` and `to_networkx` return copies; never mutate a `System` in place when a transform is expected to be pure.
-- All function signatures use type annotations with `from __future__ import annotations`; dataclasses for result/DTO types.
-- Format with `ruff` (line-length 100). Python 3.11+.
+- Use type annotations with `from __future__ import annotations` for new function signatures. Use
+  dataclasses for result and data-transfer types.
+- Format with `ruff` (line length 100). Python 3.12.
 - New components/metrics should come with tests in `tests/` (mirrors the `system`/`validate`/`analyze` split) and, where it demonstrates the workflow, a worked example under `examples/`.
 
 ## License / attribution
 
-BSD-3-Clause, Battelle Memorial Institute. Personal-laptop git identity (`Cam Bracken <cameron.bracken@pm.me>`) — see the parent `~/projects/CLAUDE.md`.
+BSD-3-Clause, Battelle Memorial Institute. Personal-laptop git identity (`Cam Bracken <cameron.bracken@pm.me>`) - see the parent `~/projects/CLAUDE.md`.

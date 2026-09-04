@@ -1,32 +1,52 @@
 # Autoengineering
 
-AI-assisted systems engineering for complex model chains.
+Systems engineering tools for complex model chains.
 
-Autoengineering helps you systematically identify, evaluate, and improve components within multi-model systems. Define your system as a graph of connected components, validate each against baselines, rank improvement opportunities, research better implementations, and swap them in -- then quantify the gain.
+Autoengineering helps identify, evaluate, and improve components within systems of connected
+models. Define a system graph, validate components against baselines, rank opportunities, research
+replacement implementations, swap them in, and quantify the result.
 
-It adds two research capabilities on top of that loop: **deep research** finds candidate replacement models for a weak component (cited, from the literature), and **auto research** runs a bounded loop that swaps each candidate in, executes the chain, validates it, and keeps what improves. These adapt [feynman.is](https://feynman.is) and alphaXiv's [openresearch-cli](https://github.com/alphaXiv/openresearch-cli) -- see [`NOTICE`](NOTICE).
+It also supports durable whole-system optimization. Random and scrambled Sobol search are available
+in the base environment. BoTorch provides constrained Bayesian optimization in the optional
+Bayesian environment. The [optimization guide](docs/optimization.md) defines the Release A scope,
+run contract, recovery behavior, and checked benchmark evidence.
+
+Two research capabilities extend the component improvement loop. _Deep research_ finds cited
+candidate replacements, and _auto research_ runs a bounded loop that tests each candidate and keeps
+improvements. These adapt [feynman.is](https://feynman.is) and alphaXiv's
+[openresearch-cli](https://github.com/alphaXiv/openresearch-cli). See [`NOTICE`](NOTICE).
 
 ## Installation
 
 Requires [pixi](https://pixi.sh/) for environment management.
 
-```bash
-cd autoengineering/
+```sh
 pixi install
-pixi run install
+```
+
+Install the optional BoTorch and SMAC dependencies when working with Bayesian optimization or its
+benchmark:
+
+```sh
+pixi install -e bayes
+```
+
+Pixi installs this package in editable mode. There is no separate install task.
+
+For a Python environment not managed by Pixi, install the matching package extras:
+
+```sh
+python -m pip install -e .
+python -m pip install -e '.[bayes]'
+python -m pip install -e '.[bayes,benchmark]'
 ```
 
 
 ## Quick Start
 
-1. Install the `autoengineering` package:
-   ```bash
-   cd autoengineering/
-   pixi install
-   pixi run install
-   ```
+1. Install the environment with `pixi install`.
 
-2. Run an example:
+2. Run an example from the repository root:
 
 ```bash
 # Simple 3-component hydrology chain
@@ -38,15 +58,20 @@ pixi run python examples/signal_chain/run_workflow.py
 # Predator-prey ODE system (Lotka-Volterra)
 pixi run python examples/lotka_volterra/run_workflow.py
 
-# Real-data hydrology: Leaf River, MS (fetches USGS/NOAA data)
+# Real-data hydrology: Leaf River, MS (uses checked USGS/NOAA data)
 pixi run python examples/leaf_river/run_workflow.py
+
+# Durable whole-system optimization (synthetic and no network access)
+pixi run autoengineering optimize system.yaml examples/optimization_chain/optimization.yaml \
+  --workdir outputs/optimization-chain
 ```
 
-3. Or invoke the auto-engineer agent in Claude Code to walk through the workflow interactively.
+See the [example index](examples/README.md) for requirements and outputs. You can also invoke the
+auto-engineer agent in Claude Code to walk through either workflow interactively.
 
 ## The Workflow
 
-The autoengineering workflow has four steps:
+The component improvement workflow has five steps:
 
 ### 1. Define
 
@@ -273,6 +298,26 @@ from autoengineering.research import (
 
 **`write_report(tree, system, slug, workdir)`** -- Evidence-first report (`<slug>.report.md`) plus a provenance sidecar (`<slug>.provenance.md`).
 
+### Whole-system optimization
+
+```python
+from autoengineering.optimization import (
+    ObservationLedger,
+    OptimizationRunSpec,
+    OptimizationStudy,
+    SearchSpace,
+)
+from autoengineering.optimization.command import build_backend
+```
+
+`OptimizationRunSpec` loads and validates the strict optimization YAML contract. `SearchSpace`
+represents mixed and conditional parameters. `ObservationLedger` stores append-only actions and
+results. `OptimizationStudy` applies budgets, recovery rules, and artifact commits. `build_backend`
+constructs the selected random, Sobol, or optional BoTorch policy.
+
+See the [optimization guide](docs/optimization.md) for a complete Python workflow and the limits of
+Release A whole-system optimization.
+
 ## CLI Reference
 
 All commands are available via `pixi run autoengineering <command>`.
@@ -287,8 +332,12 @@ All commands are available via `pixi run autoengineering <command>`.
 | `candidates <system.yaml> -c <name> [-o out.yaml]` | Scaffold a `candidates.yaml` for a component |
 | `improve <system.yaml> -C <candidates.yaml> --chain <mod:factory> -b <obs.csv> -O <output>` | Run the auto-research loop |
 | `experiments <autoresearch.jsonl>` | Render a saved experiment tree |
+| `optimize <system.yaml> <optimization.yaml> --workdir <path>` | Start or resume a durable whole-system optimization study |
 
 ## Examples
+
+The [example index](examples/README.md) lists every checked example, its network requirements, and
+the command to run it.
 
 ### `hydro_chain/` -- Simple Hydrology
 
@@ -304,19 +353,27 @@ A coupled ODE system (prey growth, predation, predator dynamics) demonstrating s
 
 ### `leaf_river/` -- Real-Data Hydrology
 
-A 5-component rainfall-runoff model for the Leaf River near Collins, MS (USGS gage 02472000). Uses real USGS streamflow and NOAA weather data fetched via public REST APIs. Demonstrates:
+A 5-component rainfall-runoff model for the Leaf River near Collins, MS (USGS gage 02472000). It
+uses checked USGS streamflow and NOAA weather data. The fetcher can refresh missing cache files
+from the public REST APIs. The example demonstrates:
 
 - Two rounds of improvement (PET method swap + runoff/routing improvements)
 - Both full model replacement and sub-component parameter tuning
 - Cascading improvement quantification (upstream fixes improve downstream metrics)
 - Monotonic improvement: NSE 0.23 -> 0.25 -> 0.39 across rounds
 
-Data is cached locally after first download -- subsequent runs complete in seconds.
+The checked cache lets a fresh checkout run without network access.
 
 `run_workflow.py` does the swaps by hand; **`run_auto_research.py`** does the same
 thing through the bounded `auto_improve` loop, reading `candidates.yaml` and writing
 an experiment tree + evidence-first report (reproducing NSE 0.23 -> 0.39
 automatically).
+
+### `optimization_chain/` -- Whole-system optimization
+
+A deterministic three-component chain with categorical, continuous, integer, and conditional
+parameters. It demonstrates bounded execution, resume, durable artifacts, scientific constraints,
+and reproducibility without network access.
 
 ## Auto-Engineer Agent
 
@@ -350,13 +407,15 @@ See `examples/leaf_river/system.yaml` for a fully specified 5-component example.
 ## Development
 
 ```bash
-pixi run test          # Run tests (51 tests)
-pixi run lint          # Run ruff linter
-pixi run install       # Reinstall package in development mode
+pixi run lint
+pixi run test
+pixi run -e bayes test-bayes
+pixi run -e bayes benchmark-release-a
 ```
 
-Development of the Bayesian optimization layer is tracked in
-[`docs/bayesian-optimization-status.md`](docs/bayesian-optimization-status.md).
+The checked [Release A benchmark report](benchmarks/release_a/results/report.md) records the current
+whole-system evidence. Remaining research is tracked in the
+[Bayesian optimization status](docs/bayesian-optimization-status.md).
 
 ## AI assistance
 

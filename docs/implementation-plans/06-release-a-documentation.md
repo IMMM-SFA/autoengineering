@@ -28,7 +28,7 @@ Add `docs/optimization.md` as the authoritative guide. It will cover:
 2. the whole-system estimand and sequential execution contract;
 3. the complete run YAML schema, path resolution, and declared input provenance;
 4. random, scrambled Sobol, and BoTorch policy selection and options;
-5. known, inferred, and noiseless observation modes;
+5. deterministic, known, and learned observation-noise modes;
 6. scientific constraints, failures, evaluator costs, and budget stop reasons;
 7. bounded starts, required resume intent, text and JSON CLI output;
 8. Python construction with `OptimizationRunSpec`, `ObservationLedger`, policy creation, and
@@ -53,8 +53,9 @@ tests at the final revision.
 - Add optimization imports to the Python API reference and `optimize` to the CLI reference.
 - Link the optimization guide, example index, benchmark report, decisions, and current status.
 - Add `examples/README.md` with dependency, network, purpose, and entry-command notes for every
-  example. Mark `optimization_chain` as the Release A no-network optimization example and Leaf
-  River as networked on first use.
+  example. Mark `optimization_chain` as the Release A no-network optimization example. Record that
+  the checked Leaf River cache avoids network access and its fetcher is used only if that cache is
+  absent.
 - Update `CLAUDE.md` and `.claude/agents/auto-engineer.md` with current commands, supported
   platforms, the optimization workflow, recovery safeguards, and the whole-system versus
   function-network boundary.

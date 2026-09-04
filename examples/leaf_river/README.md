@@ -19,7 +19,8 @@ This example demonstrates the full autoengineering workflow on a real watershed:
 | Streamflow | USGS NWIS Daily Values | 02472000 (Leaf River nr Collins, MS) | 2019-2020 |
 | Weather | NOAA GHCN Daily | USW00003940 (Jackson, MS area) | 2019-2020 |
 
-Both APIs are free, unauthenticated REST endpoints. Data is cached to CSV after first download.
+Both APIs are free, unauthenticated REST endpoints. The fetched CSV files are checked into this
+example.
 
 ## Model Chain
 
@@ -67,7 +68,8 @@ pixi run python examples/leaf_river/run_workflow.py
 pixi run python examples/leaf_river/run_auto_research.py
 ```
 
-First run downloads ~730 days of data from USGS/NOAA (~5 seconds). Subsequent runs use cached data.
+The checked cache contains about 730 days of USGS and NOAA data, so a fresh checkout runs without
+network access. `fetch_data.py` downloads the observations only when the cache files are absent.
 
 The automated run reproduces the improvement (NSE 0.23 -> 0.39) and, because it
 evaluates each candidate against the current best, it surfaces something the manual
