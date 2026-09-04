@@ -1,6 +1,6 @@
 # Bayesian optimization implementation plan
 
-_Status: In progress; items 1 through 7 complete, item 8 experimental with a failed calibration gate_
+_Status: In progress; items 1 through 8 complete_
 
 _Branch point: `262a984`_
 
@@ -405,15 +405,15 @@ it experimental and investigate before partial-observability work.
 ### Evidence and stop state
 
 The backend, posterior propagation, acquisition policy, synthetic suite, raw evidence gate, and
-documentation are implemented. Decisions 0003 through 0005 freeze the comparison and record two
-evidence corrections without changing its problems, seeds, budgets, or thresholds.
+documentation are implemented. Decisions 0003 through 0006 freeze the comparison and record its
+execution and model corrections without changing its problems, seeds, budgets, or thresholds.
 
-The final 40-run matrix at signed execution revision `b287c82` completed all 400 evaluations and
-240 post-warm acquisitions. Raw reconstruction, system scope, action replay, constraint Brier
-score, regret comparisons, and fallback limits passed. Pooled 90 percent objective interval
-coverage was 0.65625, below the frozen minimum of 0.75. Item 8 therefore does not pass its
-completion gate. `FullNetworkBayesBackend` remains experimental, and Item 9 has not started. The
-full audit is in
+The replacement 40-run matrix at signed execution revision `2a6894e` completed all 400 evaluations
+and 240 post-warm acquisitions. Raw reconstruction, system scope, action replay, constraint Brier
+score, calibration, regret comparisons, and fallback limits pass. Pooled 90 percent objective
+interval coverage is 0.828125 against the frozen minimum of 0.75. Item 8 passes its completion
+gate. The valid earlier undercoverage result remains preserved, and Item 9 has not started. The full
+audit is in
 [`reviews/08-full-observability-function-network-bo-review.md`](reviews/08-full-observability-function-network-bo-review.md).
 
 ## 9. Implement partial-observability function-network BO

@@ -2,30 +2,31 @@
 
 _Review date: 2026-09-04_
 
-_Final execution revision: `b287c82`_
+_Passing execution revision: `2a6894e`_
 
-_Evidence revision: `01f1844`_
+_Evidence revision: `4e064ed`_
 
 ## Scope
 
 This review covers the optional full-observability backend, verified component training data,
 posterior propagation, system-only acquisition, deterministic action replay, numerical fixtures,
-the preregistered comparison, invalidated runs, and final evidence. It does not review component
-action selection because Item 9 has not started.
+the preregistered comparison, correction history, and passing evidence. Component action selection
+belongs to Item 9 and is not reviewed here.
 
 ## Backend contract
 
-`FullNetworkBayesBackend` requires an exact match among the study, global search space, function
+`FullNetworkBayesBackend` requires exact agreement among the study, global search space, function
 network, and system. Every scalar component output must be observed during a complete system
-evaluation. Training rows come from digest-verified NPZ traces reconstructed by Item 7. A
-component-scope ledger row is rejected.
+evaluation. Training rows come from digest-verified NPZ traces reconstructed by Item 7. The backend
+rejects component-scope ledger rows.
 
 The backend fits an independent double-precision `SingleTaskGP` for each executable component
-output. Source outputs use empirical constants. Local parameters and sampled upstream coupling
-values form each component input. Posterior propagation draws independent seeded innovations for
-each output and path in topological order. The acquisition is constrained Monte Carlo expected
-improvement over 64 deterministic Sobol candidates with 128 samples. Suggestions have system scope,
-and recommendations always refer to observed feasible system results.
+output. Source outputs use empirical constants. Local parameters use their declared coordinates,
+and upstream features use the component-table standardization. Posterior propagation draws
+independent seeded innovations for each output and path in topological order. The acquisition is
+constrained Monte Carlo expected improvement over 64 deterministic Sobol candidates with 128
+samples. Suggestions have system scope, and recommendations refer only to observed feasible system
+results.
 
 ## Numerical checks
 
@@ -38,26 +39,32 @@ Torch or BoTorch.
 ## Preregistration and corrections
 
 Decision 0003 froze two problems, ten seeds, four shared Sobol observations, ten evaluations per
-run, calibration data, and all numeric limits before the comparison. Two invalidated runs are
-retained:
+run, calibration data, and all numeric limits before the comparison. Later decisions retain the
+original protocol while correcting execution or implementation defects:
 
 1. Revision `34b9984` failed before evaluation because the platform temporary path used a symlinked
    alias that the evaluator correctly rejected. Decision 0004 resolved the temporary root, sorted
    audit output, retained partial records, and strengthened trace checks.
 2. Revision `ed9ac99` exposed collapsed posterior uncertainty. The backend requested one joint
    function draw over repeated propagation rows instead of the independent innovations stated in
-   the plan. Its audit also rejected valid intermediate outcomes and compared process-dependent
-   warning lists. Decision 0005 corrected those defects without changing the scientific protocol.
+   the plan. Decision 0005 corrected the draw and two evidence checks.
+3. Revision `b287c82` produced valid evidence. Every comparison passed except pooled 90 percent
+   coverage, which was 0.65625 against the frozen 0.75 minimum. This adverse iteration remains at
+   `benchmarks/full_network/iterations/b287c82-undercoverage/`.
+4. Investigation found that local and upstream features were transformed twice. Decision 0006
+   removed only the second fitted min-max transform. A calibration-only diagnostic passed the
+   unchanged limits before the replacement closed loop.
 
-Both raw evidence directories remain under `benchmarks/full_network/invalidated/` with their
-reports, gates, and provenance.
+The first two raw directories remain under `benchmarks/full_network/invalidated/`. They do not
+evaluate the declared method. The third directory is scientifically valid and is not labeled
+invalid.
 
-## Final evidence
+## Passing evidence
 
-The final matrix contains 40 complete runs, 400 system evaluations, 240 post-warm acquisition
-records, 320 objective calibration records, and 160 constraint probability records. Raw audit and
-derived-file reconstruction report zero issues. All actions have system scope, every action replay
-matches a fresh backend, and no unresolved full-network fallback occurred.
+The replacement matrix contains 40 complete runs, 400 system evaluations, 240 post-warm
+acquisition records, 320 objective calibration records, and 160 constraint probability records.
+Raw audit and derived-file reconstruction report zero issues. All actions have system scope, every
+action replay matches a fresh backend, and no unresolved full-network fallback occurred.
 
 | Criterion | Result | Value or comparison |
 | --- | --- | --- |
@@ -65,46 +72,29 @@ matches a fresh backend, and no unresolved full-network fallback occurred.
 | Raw reconstruction | Pass | 0 issues |
 | System scope | Pass | 40 of 40 runs |
 | Action replay | Pass | 40 of 40 runs |
-| Constraint Brier score | Pass | 0.134541, maximum 0.20 |
-| Pooled 90 percent coverage | Fail | 0.65625, minimum 0.75 |
+| Constraint Brier score | Pass | 0.198223, maximum 0.20 |
+| Pooled 90 percent coverage | Pass | 0.828125, minimum 0.75 |
+| Smooth-chain coverage | Pass | 0.75 |
+| Constrained-branch coverage | Pass | 0.90625 |
 | Pooled median final regret | Pass | full 0.002048, system 0.002215 |
-| Smooth-chain median final regret | Pass | full 0.002729, system 0.007331 |
+| Smooth-chain median final regret | Pass | full 0.002160, system 0.007331 |
 | Constrained-branch median final regret | Pass | full 0.001889, system 0.001144 |
-| Pooled median regret area | Pass | full 0.176417, system 0.175902 |
+| Pooled median regret area | Pass | full 0.170017, system 0.175902 |
 | Full-network fallbacks | Pass | 0 of 120 post-warm suggestions |
 
-Coverage was 0.63125 on the smooth chain and 0.68125 on the constrained branch. It was not a
-single-problem or bookkeeping failure. Four observations were insufficient for calibrated nominal
-90 percent intervals under the fitted independent Gaussian process assumptions, even though the
-closed-loop decisions matched the whole-system method.
-
-The checked command reconstructs every derived artifact and exits 1 because the coverage criterion
-fails. This is the intended gate behavior, not a command error.
+The calibration correction changed the smooth-chain closed-loop trajectory and pooled regret area,
+but both methods still use identical four-point warm starts, ten-evaluation budgets, and frozen
+comparison limits. The constraint Brier score passes narrowly and remains visible rather than
+being combined with coverage.
 
 ## Result
 
-Item 8 does not pass its completion gate. The implementation provides a reproducible experimental
-backend and a clean null-to-favorable optimization comparison, but its uncertainty intervals are
-undercovered under the frozen protocol. The criterion was not relaxed and no proxy replaced it.
-`FullNetworkBayesBackend` remains experimental. The parent plan forbids Item 9 until the Item 8
-numerical, calibration, replay, and comparison gates all pass, so partial-observability work has not
-started.
+Item 8 passes its completion gate. Component models fit from verified full-observation tables,
+posterior propagation passes each separate numerical criterion, acquisition returns reproducible
+system actions, recommendations remain observed, and the raw comparison reconstructs exactly.
+The method matches the whole-system backend under the two preregistered synthetic problems. This
+does not establish performance for partial observation, correlated component outputs, functional
+outputs, cyclic systems, or other objective classes.
 
-## Repository verification
-
-The final Item 8 source and documentation passed:
-
-| Check | Result |
-| --- | --- |
-| `pixi run lint` | Pass |
-| `pixi run test` | 409 passed, 30 skipped |
-| `pixi run -e bayes test-bayes` | 438 passed, 1 skipped, 9 dependency warnings |
-| `pixi run -e bayes benchmark-release-a` | Pass, 750 runs and 7,500 evaluations |
-| `pixi run -e bayes benchmark-full-network` | Exact reconstruction, then expected exit 1 for coverage |
-| Waterology constraints | 7 of 7 passed on touched files |
-| `git diff --check` | Pass |
-
-The Release A matrix was refreshed from clean revision `6aae2fa` because adding the experimental
-backend changed the optimization source hash. Its timing-excluded 7,500-record scientific signature
-was `7f7274e2b081a9d20be18359d045289764598af27cf7a8ea9790d1fb225bb9e5`, exactly matching the prior
-checked evidence. Signed commit `1cbb143` binds the refreshed Release A records to the Item 8 source.
+`FullNetworkBayesBackend` is a validated research backend, not part of Release A. Item 9 may begin
+under the parent plan after the final repository checks for Item 8 pass.

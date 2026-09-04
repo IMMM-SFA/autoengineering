@@ -72,6 +72,14 @@ process. Shah, Wilson, and Ghahramani describe that model and its use in Bayesia
 - Do not overwrite or relabel scientifically valid adverse evidence as invalid.
 - Do not begin Item 9 unless all Item 8 gates pass at one signed revision.
 
+## Result
+
+Signed execution revision `2a6894e` completed the replacement matrix and passed every frozen
+criterion. Pooled 90 percent coverage is 0.828125, constraint Brier score is 0.19822283, pooled
+median final regret is 0.00204753 for the full-network backend and 0.00221503 for the whole-system
+backend, and no full-network fallback occurred. Evidence revision `4e064ed` preserves the raw and
+derived artifacts. The valid `b287c82` undercoverage iteration remains under `iterations/`.
+
 ## Completion gate
 
 The remediation is complete only when the regression test proves the declared feature coordinates

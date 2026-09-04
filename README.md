@@ -330,11 +330,11 @@ permitted component actions using scalar ledger outcomes and verified NPZ traces
 `reconstruct_component_training_tables` rebuilds deterministic scalar tables from those durable
 observations.
 
-An experimental component-surrogate backend is available from
+The validated full-observability component-surrogate backend is available from
 `autoengineering.optimization.full_network_backend`. It requests only complete system evaluations
-and did not pass its frozen calibration gate, so it is not part of Release A. See the checked
+and passes its frozen research gate, but it is not part of Release A. See the checked
 [`function_network`](examples/function_network/) example, the
-[optimization guide](docs/optimization.md#experimental-full-observability-backend), and the
+[optimization guide](docs/optimization.md#full-observability-research-backend), and the
 [full-network evidence](benchmarks/full_network/results/report.md).
 
 ## CLI Reference
