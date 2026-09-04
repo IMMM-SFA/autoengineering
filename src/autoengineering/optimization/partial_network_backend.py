@@ -806,7 +806,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         )
         draws = {}
         seeds = []
-        for output_name in observable:
+        for output_index, output_name in enumerate(observable):
             model = item.models.get(output_name)
             if model is None:
                 raise ValueError(
@@ -814,20 +814,17 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 )
             seed = self._seed(
                 fingerprint,
-                "fantasy",
-                component_name,
-                output_name,
-                str(candidate.key),
+                "common-antithetic-fantasy",
+                str(output_index),
             )
             seeds.append(seed)
             with torch.no_grad():
                 posterior = model.posterior(x)
                 mean = float(posterior.mean.squeeze())
                 variance = float(posterior.variance.squeeze().clamp_min(0.0))
-            generator = np.random.default_rng(seed)
-            draws[output_name] = mean + math.sqrt(variance) * generator.standard_normal(
-                self.fantasy_sample_count
-            )
+            draws[output_name] = mean + math.sqrt(
+                variance
+            ) * self._fantasy_standard_normals(seed, self.fantasy_sample_count)
         fantasies = []
         noise = max(self.spec.noise.noise_floor, np.finfo(np.float64).eps) ** 2
         for index in range(self.fantasy_sample_count):
@@ -845,6 +842,15 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             fantasy[component_name] = conditioned_item
             fantasies.append(MappingProxyType(fantasy))
         return tuple(fantasies), tuple(seeds)
+
+    @staticmethod
+    def _fantasy_standard_normals(seed: int, count: int) -> np.ndarray:
+        generator = np.random.default_rng(seed)
+        positive = generator.standard_normal(count // 2)
+        draws = np.concatenate((positive, -positive))
+        if count % 2:
+            draws = np.concatenate((draws, np.zeros(1, dtype=float)))
+        return draws
 
     def _acquisition_stats(self, posterior, best: float) -> tuple[float, float]:
         feasible = np.ones(posterior.sample_count, dtype=bool)
@@ -994,6 +1000,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 "minimum_value_per_cost": self.minimum_value_per_cost,
                 "cost_quantile": self.cost_quantile,
                 "reserve_system_refresh_budget": True,
+                "fantasy_sampler": "common_antithetic_normal",
             }
         )
         identity["constructor"] = constructor
@@ -1001,6 +1008,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "component_parents": "earlier_successful_system_artifacts",
             "component_chaining": False,
             "system_refresh_budget": "reserved_after_component_action",
+            "fantasy_sampler": "common_antithetic_normal",
             "score": "finite_pool_one_step_value_of_information_per_cost",
         }
         return identity
@@ -1015,6 +1023,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "minimum_value_per_cost": self.minimum_value_per_cost,
             "cost_quantile": self.cost_quantile,
             "reserve_system_refresh_budget": True,
+            "fantasy_sampler": "common_antithetic_normal",
         }
         return state
 

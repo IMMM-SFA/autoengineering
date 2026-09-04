@@ -311,7 +311,13 @@ def test_partial_value_suggestion_replays_with_fantasy_diagnostics(
     )
     assert first.identity_dict()["constructor"]["fantasy_samples"] == 2
     assert first.identity_dict()["constructor"]["reserve_system_refresh_budget"] is True
+    assert first.identity_dict()["constructor"]["fantasy_sampler"] == (
+        "common_antithetic_normal"
+    )
     assert first.state_dict()["partial_policy"]["reserve_system_refresh_budget"] is True
+    assert first.state_dict()["partial_policy"]["fantasy_sampler"] == (
+        "common_antithetic_normal"
+    )
 
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
@@ -358,6 +364,50 @@ def test_partial_exact_gaussian_conditioning_matches_closed_form(
         torch.tensor(expected_variance, dtype=torch.double),
         atol=1e-6,
     )
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_fantasies_use_common_antithetic_draws(tmp_path, partial_contract):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        study,
+        space,
+        network,
+        system,
+        candidate_pool_size=4,
+        decision_pool_size=4,
+        posterior_samples=8,
+        fantasy_samples=4,
+    )
+    tables = reconstruct_component_training_tables(network, system, ledger)
+    fingerprint = backend._fingerprint(ledger.entries())
+    prepared = backend._fit_components(tables, fingerprint)
+    candidates = [
+        item
+        for item in backend._candidate_pools(ledger).component
+        if item.component == "score"
+    ][:2]
+
+    _, first_seeds = backend._conditioned_fantasies(
+        prepared,
+        "score",
+        backend._component_candidate_input(ledger, candidates[0], prepared["score"]),
+        fingerprint,
+        candidates[0],
+    )
+    _, second_seeds = backend._conditioned_fantasies(
+        prepared,
+        "score",
+        backend._component_candidate_input(ledger, candidates[1], prepared["score"]),
+        fingerprint,
+        candidates[1],
+    )
+    draws = backend._fantasy_standard_normals(123, 4)
+
+    assert first_seeds == second_seeds
+    assert np.array_equal(draws[:2], -draws[2:])
+    assert np.array_equal(draws, backend._fantasy_standard_normals(123, 4))
 
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
