@@ -22,6 +22,7 @@ from .ledger import ObservationLedgerReader
 from .records import (
     BackendDiagnostics,
     EvaluationAction,
+    EvaluationResult,
     EvaluationScope,
     EvaluationStatus,
     JSONValue,
@@ -34,6 +35,10 @@ from .spec import StudySpec
 
 class SearchSpaceExhausted(RuntimeError):
     """Raised when a policy cannot produce the requested distinct configurations."""
+
+
+class MarginalValueExhausted(RuntimeError):
+    """Raised when every affordable action is worth no more than its configured cost."""
 
 
 @runtime_checkable
@@ -58,6 +63,35 @@ class OptimizerBackend(Protocol):
 
     def state_dict(self) -> dict[str, JSONValue]:
         """Return canonical JSON-compatible local policy state."""
+
+
+@runtime_checkable
+class ScopedActionBackend(Protocol):
+    """Extra controller hooks required only for partial function-network mode."""
+
+    def validate_entries(
+        self, entries: tuple[tuple[EvaluationAction, EvaluationResult], ...]
+    ) -> None:
+        """Validate mixed-scope ledger actions in durable order."""
+
+    def validate_action(
+        self,
+        action: EvaluationAction,
+        entries: tuple[tuple[EvaluationAction, EvaluationResult], ...],
+    ) -> None:
+        """Validate one proposed action against committed earlier entries."""
+
+    def estimated_action_cost(
+        self,
+        action: EvaluationAction,
+        entries: tuple[tuple[EvaluationAction, EvaluationResult], ...],
+    ) -> float:
+        """Return a conservative cost estimate for one proposed action."""
+
+    def minimum_action_cost(
+        self, entries: tuple[tuple[EvaluationAction, EvaluationResult], ...]
+    ) -> float:
+        """Return the least conservative cost estimate among eligible actions."""
 
 
 _ACTION_ID = re.compile(r"^eval-([0-9]+)$")

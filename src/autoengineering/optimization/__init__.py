@@ -1,6 +1,13 @@
 """Optimization study contracts and search-space definitions."""
 
-from .backend import OptimizerBackend, RandomBackend, SearchSpaceExhausted, SobolBackend
+from .backend import (
+    MarginalValueExhausted,
+    OptimizerBackend,
+    RandomBackend,
+    ScopedActionBackend,
+    SearchSpaceExhausted,
+    SobolBackend,
+)
 from .controller import OptimizationStudy, StudyLockError, StudyRecoveryError, StudyRunResult
 from .function_network import (
     CouplingSpec,
@@ -57,6 +64,7 @@ __all__ = [
     "IntegerParameter",
     "JSONValue",
     "LedgerCorruptionError",
+    "MarginalValueExhausted",
     "NoiseSpec",
     "NpzReadLimits",
     "OptimizationStudy",
@@ -72,6 +80,7 @@ __all__ = [
     "SearchSpace",
     "SearchSpaceExhausted",
     "Scalar",
+    "ScopedActionBackend",
     "StudySpec",
     "StudyLockError",
     "StudyRecoveryError",

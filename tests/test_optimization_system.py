@@ -18,6 +18,7 @@ from autoengineering.optimization import (
     ContinuousParameter,
     EvaluationAction,
     EvaluationResult,
+    EvaluationScope,
     EvaluationStatus,
     IntegerParameter,
     NoiseSpec,
@@ -30,7 +31,11 @@ from autoengineering.optimization import (
     SobolBackend,
     StudySpec,
 )
-from autoengineering.optimization.controller import OptimizationStudy, StudyLockError
+from autoengineering.optimization.controller import (
+    OptimizationStudy,
+    StudyLockError,
+    StudyRecoveryError,
+)
 from autoengineering.research.runner import EvaluationContext, execute_action
 from autoengineering.system.graph import System
 
@@ -167,6 +172,152 @@ def test_controller_accepts_a_backend_implementing_the_original_public_protocol(
 
     assert result.new_evaluation_count == 1
     assert len(result.entries) == 1
+
+
+def test_partial_controller_requires_scoped_backend_hooks(tmp_path):
+    spec = StudySpec(
+        name="partial-hooks",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=1.0, cost_unit="run"),
+        noise=NoiseSpec(),
+        backend="function_network_partial",
+    )
+    space = SearchSpace((CategoricalParameter("model.choice", ("base",)),))
+
+    with pytest.raises(TypeError, match="requires scoped action"):
+        OptimizationStudy(
+            spec,
+            space,
+            RandomBackend(spec, space),
+            ObservationLedger(tmp_path / "observations.jsonl"),
+            lambda _: None,
+            tmp_path,
+        )
+
+
+def test_partial_controller_commits_validated_component_action_with_scoped_cost(tmp_path):
+    spec = StudySpec(
+        name="partial-component",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=0.3, cost_unit="run", initial_cost_estimate=1.0),
+        noise=NoiseSpec(),
+        backend="function_network_partial",
+    )
+    space = SearchSpace((CategoricalParameter("model.choice", ("base",)),))
+    delegate = RandomBackend(spec, space)
+
+    class ComponentBackend:
+        name = "function_network_partial"
+
+        def __init__(self):
+            self.spec = spec
+            self.space = space
+
+        def suggest(self, ledger, n=1):
+            return (
+                EvaluationAction.component(
+                    "eval-000000",
+                    "model",
+                    {"model.choice": "base"},
+                    suggested_by=self.name,
+                ),
+            )
+
+        recommend = delegate.recommend
+        diagnostics = delegate.diagnostics
+        identity_dict = delegate.identity_dict
+        state_dict = delegate.state_dict
+
+        def validate_entries(self, entries):
+            for action, _ in entries:
+                self.validate_action(action, entries[:0])
+
+        def validate_action(self, action, entries):
+            assert action.scope is EvaluationScope.COMPONENT
+            assert action.component == "model"
+            assert action.config == {"model.choice": "base"}
+
+        def estimated_action_cost(self, action, entries):
+            return 0.25
+
+        def minimum_action_cost(self, entries):
+            return 0.25
+
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    controller = OptimizationStudy(
+        spec,
+        space,
+        ComponentBackend(),
+        ledger,
+        lambda action: EvaluationResult.success(
+            action.id, {"model.value": 1.0}, {}, 0.25, "run"
+        ),
+        tmp_path,
+    )
+
+    result = controller.run_result(max_new_evaluations=1)
+
+    assert result.new_evaluation_count == 1
+    assert result.entries[0][0].scope is EvaluationScope.COMPONENT
+    assert result.entries[0][1].cost == 0.25
+
+
+def test_partial_controller_rejects_unaffordable_suggestion_before_pending_write(tmp_path):
+    spec = StudySpec(
+        name="partial-unaffordable",
+        objective=ObjectiveSpec(outcome="score", direction="maximize"),
+        constraints=(),
+        budget=BudgetSpec(max_cost=0.2, cost_unit="run", initial_cost_estimate=1.0),
+        noise=NoiseSpec(),
+        backend="function_network_partial",
+    )
+    space = SearchSpace((CategoricalParameter("model.choice", ("base",)),))
+    delegate = RandomBackend(spec, space)
+
+    class UnaffordableBackend:
+        name = "function_network_partial"
+        recommend = delegate.recommend
+        diagnostics = delegate.diagnostics
+        identity_dict = delegate.identity_dict
+        state_dict = delegate.state_dict
+
+        def __init__(self):
+            self.spec = spec
+            self.space = space
+
+        def suggest(self, ledger, n=1):
+            return (
+                EvaluationAction.component(
+                    "eval-000000", "model", {"model.choice": "base"}
+                ),
+            )
+
+        def validate_entries(self, entries):
+            return None
+
+        def validate_action(self, action, entries):
+            return None
+
+        def estimated_action_cost(self, action, entries):
+            return 0.3
+
+        def minimum_action_cost(self, entries):
+            return 0.1
+
+    controller = OptimizationStudy(
+        spec,
+        space,
+        UnaffordableBackend(),
+        ObservationLedger(tmp_path / "observations.jsonl"),
+        lambda _: None,
+        tmp_path,
+    )
+
+    with pytest.raises(StudyRecoveryError, match="beyond the remaining budget"):
+        controller.ask()
+    assert not (tmp_path / "pending-actions.json").exists()
 
 
 def test_controller_resume_replays_an_interrupted_action_once(tmp_path):

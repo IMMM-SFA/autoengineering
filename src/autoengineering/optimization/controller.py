@@ -13,7 +13,12 @@ import time
 
 import numpy as np
 
-from .backend import OptimizerBackend, SearchSpaceExhausted
+from .backend import (
+    MarginalValueExhausted,
+    OptimizerBackend,
+    ScopedActionBackend,
+    SearchSpaceExhausted,
+)
 from .ledger import ObservationLedger
 from .provenance import (
     RunIdentity,
@@ -57,6 +62,7 @@ _RESERVED_STUDY_NAMES = {
 _TERMINAL_REASONS = {
     "finite_space_exhausted",
     "insufficient_remaining_budget",
+    "marginal_value_below_cost",
     "max_cost",
     "max_evaluations",
     "target_attained",
@@ -271,6 +277,13 @@ class OptimizationStudy:
             raise TypeError("backend and ledger must implement their public protocols")
         if backend.spec != spec or backend.space != space:
             raise ValueError("backend spec and search space must match the controller")
+        scoped_backend = None
+        if spec.backend == "function_network_partial":
+            if not isinstance(backend, ScopedActionBackend):
+                raise TypeError(
+                    "partial function-network mode requires scoped action validation and cost hooks"
+                )
+            scoped_backend = backend
         if not callable(evaluator):
             raise TypeError("evaluator must be callable")
         if target_value is not None:
@@ -315,6 +328,7 @@ class OptimizationStudy:
         self.spec = spec
         self.space = space
         self.backend = backend
+        self._scoped_backend = scoped_backend
         self.ledger = ledger
         self.evaluator = evaluator
         self.work_directory = directory
@@ -359,13 +373,29 @@ class OptimizationStudy:
             except SearchSpaceExhausted:
                 self._commit_terminal("finite_space_exhausted")
                 return ()
+            except MarginalValueExhausted:
+                self._commit_terminal("marginal_value_below_cost")
+                return ()
             elapsed = self.monotonic_clock() - started
             if len(actions) != 1 or not isinstance(actions[0], EvaluationAction):
                 raise StudyRecoveryError("backend must return exactly one EvaluationAction")
             action = actions[0]
-            if action.scope is not EvaluationScope.SYSTEM:
-                raise ValueError("Release A controller accepts only system-scope actions")
-            self.space.encode(action.config)
+            entries = self._validate_ledger()
+            if self._scoped_backend is None:
+                if action.scope is not EvaluationScope.SYSTEM:
+                    raise ValueError("system controller accepts only system-scope actions")
+                self.space.encode(action.config)
+            else:
+                self._scoped_backend.validate_action(action, entries)
+                estimate = self._validated_scoped_cost(
+                    self._scoped_backend.estimated_action_cost(action, entries),
+                    "estimated action cost",
+                )
+                spent = sum(result.cost for _, result in entries)
+                if estimate > self.spec.budget.max_cost - spent:
+                    raise StudyRecoveryError(
+                        "partial backend proposed an action beyond the remaining budget"
+                    )
             self._write_pending(action, None, optimizer_seconds=max(0.0, elapsed))
             self._pending_lock = lock
             keep_lock = True
@@ -1313,16 +1343,19 @@ class OptimizationStudy:
     ) -> None:
         total = 0.0
         for action, result in entries:
-            if action.scope is not EvaluationScope.SYSTEM:
-                raise ValueError(f"ledger action must have system scope: {action.id!r}")
-            try:
-                self.space.encode(action.config)
-            except (TypeError, ValueError) as error:
-                raise ValueError(
-                    f"ledger action has invalid configuration: {action.id!r}"
-                ) from error
+            if self._scoped_backend is None:
+                if action.scope is not EvaluationScope.SYSTEM:
+                    raise ValueError(f"ledger action must have system scope: {action.id!r}")
+                try:
+                    self.space.encode(action.config)
+                except (TypeError, ValueError) as error:
+                    raise ValueError(
+                        f"ledger action has invalid configuration: {action.id!r}"
+                    ) from error
             self._validate_result(result)
             total += result.cost
+        if self._scoped_backend is not None:
+            self._scoped_backend.validate_entries(entries)
         if not math.isfinite(total) or total < 0:
             raise ValueError("ledger total evaluator cost must be finite and nonnegative")
 
@@ -1340,6 +1373,12 @@ class OptimizationStudy:
             raise StudyRecoveryError("ledger differs from the committed study identity")
 
     def _cost_estimate(self) -> float:
+        if self._scoped_backend is not None:
+            entries = self._validate_ledger()
+            return self._validated_scoped_cost(
+                self._scoped_backend.minimum_action_cost(entries),
+                "minimum action cost",
+            )
         costs = [
             result.cost
             for action, result in self._validate_ledger()
@@ -1349,6 +1388,15 @@ class OptimizationStudy:
         ]
         observed = 0.0 if not costs else float(np.quantile(costs, 0.9, method="linear"))
         return max(self.spec.budget.initial_cost_estimate, observed)
+
+    @staticmethod
+    def _validated_scoped_cost(value: object, label: str) -> float:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise TypeError(f"{label} must be a finite nonnegative number")
+        result = float(value)
+        if not math.isfinite(result) or result < 0:
+            raise ValueError(f"{label} must be a finite nonnegative number")
+        return result
 
     def _target_attained(self, recommendation: Recommendation) -> bool:
         if not recommendation.feasible:
