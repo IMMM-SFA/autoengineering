@@ -17,6 +17,7 @@ from autoengineering.optimization import (
     FunctionNetworkEvaluator,
     FunctionNetworkSpec,
     LedgerBackedFunctionNetworkEvaluator,
+    MarginalValueExhausted,
     NoiseSpec,
     ObjectiveSpec,
     ObservationLedger,
@@ -30,7 +31,10 @@ from autoengineering.research.runner import EvaluationContext
 from autoengineering.system.graph import System
 
 if importlib.util.find_spec("botorch") is not None:
+    import torch
+
     from autoengineering.optimization.partial_network_backend import (
+        _ScoredCandidate,
         PartialNetworkBayesBackend,
     )
 else:
@@ -202,6 +206,116 @@ def test_partial_fit_uses_component_rows_without_summing_system_costs(
     assert prepared["score"].row_count == 5
     assert sum(result.cost for _, result in ledger.entries()) == 4.25
     assert backend.recommend(ledger).action_id in {f"eval-{index:06d}" for index in range(4)}
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_value_suggestion_replays_with_fantasy_diagnostics(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    settings = {
+        "candidate_pool_size": 2,
+        "decision_pool_size": 2,
+        "posterior_samples": 8,
+        "fantasy_samples": 2,
+    }
+    first = PartialNetworkBayesBackend(study, space, network, system, **settings)
+    second = PartialNetworkBayesBackend(study, space, network, system, **settings)
+
+    first_action = first.suggest(ledger)[0]
+    second_action = second.suggest(ObservationLedger(ledger.path))[0]
+    assert first_action == second_action
+    first.validate_action(first_action, ledger.entries())
+    diagnostics = first.diagnostics(ledger)
+    assert diagnostics.fit_state == "fitted"
+    assert diagnostics.details["fantasy_samples"] == 2
+    assert diagnostics.details["candidate_scores"]
+    assert any(
+        record["scope"] == "component"
+        for record in diagnostics.details["candidate_scores"]
+    )
+    assert all(
+        record["estimated_cost"] > 0
+        and record["monte_carlo_standard_error"] >= 0
+        for record in diagnostics.details["candidate_scores"]
+    )
+    assert first.identity_dict()["constructor"]["fantasy_samples"] == 2
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_exact_gaussian_conditioning_matches_closed_form(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        study,
+        space,
+        network,
+        system,
+        candidate_pool_size=2,
+        decision_pool_size=2,
+        posterior_samples=8,
+        fantasy_samples=2,
+    )
+    tables = reconstruct_component_training_tables(network, system, ledger)
+    fingerprint = backend._fingerprint(ledger.entries())
+    prepared = backend._fit_components(tables, fingerprint)
+    candidate = next(
+        item for item in backend._candidate_pools(ledger).component if item.component == "score"
+    )
+    x = backend._component_candidate_input(ledger, candidate, prepared["score"])
+    model = prepared["score"].models["utility_last"]
+    posterior = model.posterior(x)
+    mean = float(posterior.mean.squeeze().detach())
+    variance = float(posterior.variance.squeeze().detach())
+    conditioned, seeds = backend._conditioned_fantasies(
+        prepared, "score", x, fingerprint, candidate
+    )
+    draw = mean + variance**0.5 * np.random.default_rng(seeds[0]).standard_normal(2)[0]
+    noise = max(study.noise.noise_floor, np.finfo(np.float64).eps) ** 2
+    expected_mean = mean + variance / (variance + noise) * (draw - mean)
+    expected_variance = variance - variance**2 / (variance + noise)
+    actual = conditioned[0]["score"].models["utility_last"].posterior(x)
+
+    assert torch.isclose(
+        actual.mean.squeeze(), torch.tensor(expected_mean, dtype=torch.double), atol=1e-6
+    )
+    assert torch.isclose(
+        actual.variance.squeeze(),
+        torch.tensor(expected_variance, dtype=torch.double),
+        atol=1e-6,
+    )
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_zero_value_triggers_distinct_marginal_stop(
+    tmp_path, partial_contract, monkeypatch
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        study,
+        space,
+        network,
+        system,
+        candidate_pool_size=2,
+        decision_pool_size=2,
+        posterior_samples=8,
+        fantasy_samples=2,
+        minimum_value_per_cost=0.0,
+    )
+    candidate = backend._candidate_pools(ledger).system[0]
+    monkeypatch.setattr(
+        backend,
+        "_score_candidates",
+        lambda *args, **kwargs: (_ScoredCandidate(candidate, 0.0, 0.0, 0.0, 0.0, ()),),
+    )
+
+    with pytest.raises(MarginalValueExhausted):
+        backend.suggest(ledger)
+    assert backend.diagnostics(ledger).details["maximum_value_per_cost_bound"] == 0.0
 
 
 def test_partial_network_optional_dependency_boundary_is_concise():

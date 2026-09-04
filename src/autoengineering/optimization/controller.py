@@ -1175,9 +1175,12 @@ class OptimizationStudy:
         committed_bytes: bytes,
     ) -> None:
         try:
-            if pending.action.scope is not EvaluationScope.SYSTEM:
-                raise ValueError("scope must be system")
-            self.space.encode(pending.action.config)
+            if self._scoped_backend is None:
+                if pending.action.scope is not EvaluationScope.SYSTEM:
+                    raise ValueError("scope must be system")
+                self.space.encode(pending.action.config)
+            else:
+                self._scoped_backend.validate_action(pending.action, committed_entries)
             if pending.result is not None:
                 self._validate_result(pending.result)
             expected = self.backend.suggest(_LedgerReplay(committed_entries, committed_bytes), n=1)
