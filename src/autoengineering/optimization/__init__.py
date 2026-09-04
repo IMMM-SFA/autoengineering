@@ -24,9 +24,11 @@ from .function_network_evaluator import (
     ComponentTrainingRow,
     FunctionNetworkArtifactError,
     FunctionNetworkEvaluator,
+    LedgerBackedFunctionNetworkEvaluator,
     NpzReadLimits,
     read_verified_npz,
     reconstruct_component_training_tables,
+    reconstruct_parent_artifact_registry,
 )
 from .ledger import LedgerCorruptionError, ObservationLedger, ObservationLedgerReader
 from .provenance import RunIdentity
@@ -59,6 +61,7 @@ __all__ = [
     "FunctionComponentSpec",
     "FunctionNetworkArtifactError",
     "FunctionNetworkEvaluator",
+    "LedgerBackedFunctionNetworkEvaluator",
     "FunctionNetworkSpec",
     "FunctionPortSpec",
     "IntegerParameter",
@@ -90,6 +93,7 @@ __all__ = [
     "TerminalObjectiveSpec",
     "read_verified_npz",
     "reconstruct_component_training_tables",
+    "reconstruct_parent_artifact_registry",
     "reduce_scalar",
     "scalar_observation_name",
 ]

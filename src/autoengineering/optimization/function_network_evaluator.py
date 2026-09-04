@@ -37,7 +37,11 @@ from .records import (
 )
 
 if TYPE_CHECKING:
-    from autoengineering.research.runner import EvaluationContext, Runner
+    from autoengineering.research.runner import (
+        EvaluationContext,
+        ParentArtifactReference,
+        Runner,
+    )
 
 
 _DEFAULT_MAX_COMPRESSED_BYTES = 64 * 1024 * 1024
@@ -292,6 +296,38 @@ class FunctionNetworkEvaluator:
         return MappingProxyType(functions)
 
 
+@dataclass(frozen=True)
+class LedgerBackedFunctionNetworkEvaluator:
+    """Evaluate actions with parent artifacts reconstructed from the durable ledger."""
+
+    spec: FunctionNetworkSpec
+    context: EvaluationContext
+    ledger: ObservationLedgerReader
+    runner: Runner | None = field(default=None, compare=False, repr=False)
+    clock: Callable[[], float] = field(default=time.perf_counter, compare=False, repr=False)
+
+    def __post_init__(self) -> None:
+        if not callable(getattr(self.ledger, "entries", None)):
+            raise TypeError("ledger must provide an entries() method")
+        FunctionNetworkEvaluator(
+            self.spec,
+            self.context,
+            runner=self.runner,
+            clock=self.clock,
+        )
+
+    def evaluate(self, action: EvaluationAction) -> EvaluationResult:
+        """Evaluate without mutating the ledger or retaining a stale parent registry."""
+        registry = reconstruct_parent_artifact_registry(self.ledger)
+        context = replace(self.context, parent_artifacts=registry)
+        return FunctionNetworkEvaluator(
+            self.spec,
+            context,
+            runner=self.runner,
+            clock=self.clock,
+        ).evaluate(action)
+
+
 def _reducer_function(
     component_name: str, output: ScalarOutputSpec
 ) -> Callable[[dict[str, np.ndarray]], float]:
@@ -503,6 +539,33 @@ def reconstruct_component_training_tables(
                 )
             )
     return MappingProxyType({name: tuple(tables[name]) for name in order})
+
+
+def reconstruct_parent_artifact_registry(
+    ledger: ObservationLedgerReader,
+) -> Mapping[str, ParentArtifactReference]:
+    """Rebuild the reusable artifact registry from ordered successful results."""
+    from autoengineering.research.runner import ParentArtifactReference
+
+    if not callable(getattr(ledger, "entries", None)):
+        raise TypeError("ledger must provide an entries() method")
+    registry: dict[str, tuple[Path, str]] = {}
+    seen_artifact_ids: set[str] = set()
+    ledger_path = getattr(ledger, "path", None)
+    base = None if ledger_path is None else Path(ledger_path).parent
+    for action, result in ledger.entries():
+        for parent_id in action.parent_artifact_ids:
+            if parent_id not in registry:
+                raise FunctionNetworkArtifactError(
+                    f"parent artifact {parent_id!r} is unknown or not from an earlier success"
+                )
+        _register_artifacts(result, registry, seen_artifact_ids, base)
+    return MappingProxyType(
+        {
+            artifact_id: ParentArtifactReference(path, digest)
+            for artifact_id, (path, digest) in registry.items()
+        }
+    )
 
 
 def _register_artifacts(

@@ -15,9 +15,11 @@ import pytest
 from autoengineering.optimization.function_network_evaluator import (
     FunctionNetworkArtifactError,
     FunctionNetworkEvaluator,
+    LedgerBackedFunctionNetworkEvaluator,
     NpzReadLimits,
     read_verified_npz,
     reconstruct_component_training_tables,
+    reconstruct_parent_artifact_registry,
 )
 from autoengineering.optimization.function_network import (
     CouplingSpec,
@@ -470,6 +472,105 @@ def test_function_network_evaluates_system_and_component_actions_and_replays_tab
     record = json.loads(ledger.path.read_text(encoding="utf-8").splitlines()[0])
     assert all(isinstance(value, (int, float)) for value in record["result"]["outcomes"].values())
     assert record["result"]["artifacts"] == dict(system_result.artifacts)
+
+
+def test_ledger_backed_evaluator_reconstructs_parents_across_restart(
+    tmp_path, network_system, network_spec
+):
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    system_action = EvaluationAction.system(
+        "eval-000001",
+        {
+            "transform.choice": "base",
+            "transform.gain": 2.0,
+            "score.choice": "base",
+            "score.offset": 1.0,
+        },
+        seed=11,
+    )
+    context = _evaluation_context(tmp_path, network_system)
+    system_result = FunctionNetworkEvaluator(
+        network_spec, context, runner=_synthetic_runner, clock=_clock()
+    ).evaluate(system_action)
+    ledger.append(system_action, system_result)
+    parent_id = next(iter(system_result.artifacts))
+
+    component_action = EvaluationAction.component(
+        "eval-000002",
+        "score",
+        {"score.choice": "base", "score.offset": 0.5},
+        parent_artifact_ids=(parent_id,),
+        seed=12,
+    )
+    evaluator = LedgerBackedFunctionNetworkEvaluator(
+        network_spec,
+        context,
+        ledger,
+        runner=_synthetic_runner,
+        clock=_clock(2.0, 2.5),
+    )
+    first = evaluator.evaluate(component_action)
+    assert first.status is EvaluationStatus.SUCCESS
+    assert first.outcomes == {"score.utility_last": 6.5}
+    assert len(ledger.entries()) == 1
+    ledger.append(component_action, first)
+
+    restarted = LedgerBackedFunctionNetworkEvaluator(
+        network_spec,
+        _evaluation_context(tmp_path, network_system),
+        ObservationLedger(ledger.path),
+        runner=_synthetic_runner,
+        clock=_clock(3.0, 3.5),
+    )
+    second_action = replace(component_action, id="eval-000003")
+    second = restarted.evaluate(second_action)
+    assert second.status is EvaluationStatus.SUCCESS
+    assert second.outcomes == first.outcomes
+    assert tuple(reconstruct_parent_artifact_registry(ledger)) == (
+        parent_id,
+        next(iter(first.artifacts)),
+    )
+
+
+def test_ledger_backed_evaluator_reports_changed_selected_parent(
+    tmp_path, network_system, network_spec
+):
+    system_action = EvaluationAction.system(
+        "eval-000001",
+        {
+            "transform.choice": "base",
+            "transform.gain": 2.0,
+            "score.choice": "base",
+            "score.offset": 1.0,
+        },
+    )
+    context = _evaluation_context(tmp_path, network_system)
+    system_result = FunctionNetworkEvaluator(
+        network_spec, context, runner=_synthetic_runner, clock=_clock()
+    ).evaluate(system_action)
+    parent_id = next(iter(system_result.artifacts))
+    artifact = Path(system_result.artifacts[parent_id])
+
+    class EntriesOnly:
+        def entries(self):
+            return ((system_action, system_result),)
+
+    artifact.write_bytes(b"changed")
+    action = EvaluationAction.component(
+        "eval-000002",
+        "score",
+        {"score.choice": "base", "score.offset": 0.5},
+        parent_artifact_ids=(parent_id,),
+    )
+    result = LedgerBackedFunctionNetworkEvaluator(
+        network_spec,
+        context,
+        EntriesOnly(),
+        runner=_synthetic_runner,
+        clock=_clock(2.0, 2.5),
+    ).evaluate(action)
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert "SHA-256 does not match" in result.message
 
 
 def test_function_network_component_scope_requires_permission_parents_and_observations(
