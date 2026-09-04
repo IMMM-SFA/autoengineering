@@ -362,6 +362,15 @@ features, outcomes, and costs in the ledger. Do not embed large model output arr
 A function network can be validated, serialized, evaluated, and replayed without a surrogate
 backend. The same durable observations reconstruct the same component training tables.
 
+### Completion evidence
+
+Item 7 is complete at signed evidence revision `1eccf3c`. The immutable representation validates
+against `System`, system and component actions publish scalar observations plus verified NPZ
+traces, and fresh ledger readers reconstruct equal component training tables. The default and
+Bayesian suites, import isolation, checked example, and refreshed Release A benchmark gate pass.
+The full record is in
+[`reviews/07-function-network-representation-review.md`](reviews/07-function-network-representation-review.md).
+
 ## 8. Implement full-observability function-network BO
 
 The full-observability backend receives declared intermediate observations from every complete

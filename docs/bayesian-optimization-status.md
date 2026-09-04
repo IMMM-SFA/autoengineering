@@ -6,7 +6,7 @@ The branch `codex/bayesian-optimization-implementation` contains the optimizatio
 reproducible baselines, evaluator integration, whole-system BoTorch backend, sequential budget
 controller, hardened recovery layer, public run configuration, command, example, approved Release
 A benchmark gate, and complete Release A documentation. It does not yet provide function-network
-optimization.
+Bayesian optimization.
 
 ## Recovery context
 
@@ -31,7 +31,7 @@ commit `b3dcdd4`.
 | 6. Whole-system BoTorch backend | Complete | The backend supports constrained mixed-variable optimization, conditional projection, noise modes, deterministic replay, diagnostics, and bounded fallbacks. |
 | 7. Budget controller and provenance | Complete | Canonical identity, exact transition replay, manifest-last commits, and bootstrap, action, and terminal recovery passed independent review. |
 | 8. CLI and Release A benchmark gate | Complete | The run specification, command, example, SMAC comparison, raw scientific audit, and frozen release criteria pass. |
-| 9. Function-network representation | Not implemented | Represent component functions, couplings, observations, costs, and graph evaluation scopes. |
+| 9. Function-network representation | Complete | Immutable functions, local parameters, couplings, scalar observations, costs, scopes, verified NPZ traces, and deterministic training-table replay are implemented. |
 | 10. Full-observability function-network BO | Not implemented | Fit component surrogates and propagate intermediate observations through the system graph. |
 | 11. Partial-observability function-network BO | Not implemented | Select the configuration and component evaluation using cost-aware value of information or knowledge gradient methods. |
 | 12. Documentation and research provenance | In progress | Release A API, CLI, assumptions, limitations, examples, and benchmark interpretation are complete. Function-network literature correspondence remains for item 10. |
@@ -99,8 +99,8 @@ evaluation records and 750 complete runs with no run errors, invalid configurati
 overruns.
 
 All 600 native runs replay exactly, all 150 SMAC runs complete, and the raw scientific audit reports
-zero issues. BoTorch met every pooled and per-problem regret criterion. Three of 750 post-warm
-suggestions used unresolved fallbacks, below the aggregate and per-run limits. The independent
+zero issues. BoTorch met every pooled and problem-specific regret criterion. Three of 750 post-warm
+suggestions used unresolved fallbacks, below the aggregate and run-specific limits. The independent
 review in [`reviews/05-release-a-benchmark-review.md`](reviews/05-release-a-benchmark-review.md)
 found no remaining implementation defect.
 
@@ -115,6 +115,19 @@ Ruff, BoTorch, SMAC, and Torch versions. The Linux gate found and fixed a cross-
 difference, floating-point reconstruction at about 1e-16, and a test fixture that inherited the
 host umask. The [item 6 review](reviews/06-release-a-documentation-review.md) records the exact
 revisions, corrections, and platform results.
+
+### Item 7: function-network representation
+
+Signed evidence revision `1eccf3c` adds the immutable function-network schema without changing the
+core `System` classes. It validates components, entry points, local parameter domains, ports,
+couplings, scalar reducers, observation scopes, costs, terminal outcomes, and DAG order. System and
+component actions publish arrays to verified NPZ traces and scalar values to the ledger.
+
+Fresh ledger readers reconstruct equal component training tables from current and parent artifact
+hashes. Review corrected an import cycle, incomplete parameter validation, missing scalar coupling
+requirements, and incorrect inference of component inputs when source arrays override parent
+artifacts. The [item 7 review](reviews/07-function-network-representation-review.md) records the
+contracts, corrections, evidence, and retained limits.
 
 ## Work required for Release A
 
@@ -138,9 +151,10 @@ review, and two-platform archive gate are complete.
 
 ## Research layer after Release A
 
-The current `SystemBayesBackend` models the complete chain as one black-box function. It cannot
-yet use intermediate component outputs or decide which subsystem to query. Stages 9 through 11
-would add that capability.
+The current `SystemBayesBackend` models the complete chain as one black-box function. The new
+function-network representation can record intermediate component outputs and evaluate a declared
+component, but it does not fit component surrogates or decide which subsystem to query. Stages 10
+and 11 remain to add those methods.
 
 The research sequence should start with a graph representation that separates design variables,
 coupling variables, component outputs, observation availability, and evaluation cost. A
@@ -155,19 +169,20 @@ and multi-fidelity evaluation remain outside Release A.
 
 ## Verification evidence
 
-The latest post-review gate was verified on 2026-09-04 from fresh Git archives of signed revision
-`6661004`. The checked benchmark gate records clean execution revision `afc66b8`, whose source hash
-also applies to `6661004` because the latter changes only checked benchmark results.
+The latest Item 7 worktree gate was verified on 2026-09-04 at signed evidence revision `1eccf3c`.
+The checked benchmark gate records clean execution revision `63cbdca`, whose source hash also
+applies to `1eccf3c` because the latter changes only checked benchmark results.
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 380 passed, 23 skipped on macOS and Linux |
-| `pixi run -e bayes test-bayes` | 402 passed, 1 skipped, 6 dependency warnings on macOS and Linux |
+| `pixi run test` | 404 passed, 23 skipped |
+| `pixi run -e bayes test-bayes` | 426 passed, 1 skipped, 5 dependency warnings |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
 | `pixi run -e bayes benchmark-release-a` | Passed, including raw reconstruction |
-| Optional dependency isolation | Passed on macOS and Linux |
-| Waterology constraints | 7 of 7 passed on the touched item 6 files |
+| Optional dependency isolation | Passed, including both public import orders |
+| Function-network focused checks | 107 passed |
+| Waterology constraints | 7 of 7 passed on the touched documentation |
 
 The Bayesian warnings are Torch, Pyro, SMAC, and ConfigSpace notices from dependencies.
 
