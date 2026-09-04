@@ -37,8 +37,14 @@ if importlib.util.find_spec("botorch") is not None:
         _ScoredCandidate,
         PartialNetworkBayesBackend,
     )
+    from autoengineering.optimization.partial_network_baselines import (
+        CheapestInformativePartialNetworkBackend,
+        RandomPartialNetworkBackend,
+    )
 else:
     PartialNetworkBayesBackend = None
+    CheapestInformativePartialNetworkBackend = None
+    RandomPartialNetworkBackend = None
 
 
 @pytest.fixture
@@ -316,6 +322,39 @@ def test_partial_zero_value_triggers_distinct_marginal_stop(
     with pytest.raises(MarginalValueExhausted):
         backend.suggest(ledger)
     assert backend.diagnostics(ledger).details["maximum_value_per_cost_bound"] == 0.0
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_benchmark_baselines_replay_and_keep_observed_recommendations(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    settings = {
+        "candidate_pool_size": 2,
+        "decision_pool_size": 2,
+        "posterior_samples": 8,
+        "fantasy_samples": 2,
+    }
+    for backend_type in (
+        RandomPartialNetworkBackend,
+        CheapestInformativePartialNetworkBackend,
+    ):
+        first = backend_type(study, space, network, system, **settings)
+        second = backend_type(study, space, network, system, **settings)
+        first_action = first.suggest(ledger)[0]
+        second_action = second.suggest(ObservationLedger(ledger.path))[0]
+        assert first_action == second_action
+        first.validate_action(first_action, ledger.entries())
+        assert first.recommend(ledger).action_id in {
+            f"eval-{index:06d}" for index in range(4)
+        }
+        assert first.identity_dict()["name"] == first.name
+
+    informative = CheapestInformativePartialNetworkBackend(
+        study, space, network, system, **settings
+    ).suggest(ledger)[0]
+    assert informative.scope is EvaluationScope.COMPONENT
 
 
 def test_partial_network_optional_dependency_boundary_is_concise():
