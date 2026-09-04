@@ -9,6 +9,7 @@ version = "0.1.0"
 test = "python -m pytest tests -q -p no:cacheprovider"
 lint = "ruff check --no-cache src tests examples"
 test-bayes = "python -m pytest tests -q -p no:cacheprovider"
+benchmark-release-a = "python -m autoengineering.benchmarks.release_a --output benchmarks/release_a/results"
 
 [dependencies]
 python = "3.12.*"
