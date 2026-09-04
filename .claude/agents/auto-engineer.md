@@ -49,7 +49,9 @@ from autoengineering.research import (
     Candidate, load_candidates, build_feedforward_runner, auto_improve, write_report,
 )
 from autoengineering.optimization import (
-    ObservationLedger, OptimizationRunSpec, OptimizationStudy, SearchSpace,
+    FunctionNetworkEvaluator, FunctionNetworkSpec, ObservationLedger,
+    OptimizationRunSpec, OptimizationStudy, SearchSpace,
+    reconstruct_component_training_tables,
 )
 ```
 
@@ -72,6 +74,17 @@ function-network, component-level, multi-fidelity, or partial-observability opti
 
 Never reuse or replace a nonempty work directory without an explicit compatible resume. Do not
 change an estimand, constraint, failure status, noise mode, or budget to make a run pass.
+
+### Function-network representation
+
+Use `FunctionNetworkSpec` only when component functions, local parameters, couplings, scalar
+observations, costs, terminal outcomes, and evaluation scopes are explicitly declared. Validate it
+against the `System` before evaluating. Keep arrays in verified NPZ artifacts and scalars in the
+ledger. Reconstruct component tables with `reconstruct_component_training_tables` rather than
+trusting an unverified artifact.
+
+This representation does not provide a component-surrogate Bayesian backend. Do not label its
+system or component evaluation helpers as function-network Bayesian optimization.
 
 ### Workflow Steps
 

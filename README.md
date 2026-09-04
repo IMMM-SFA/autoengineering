@@ -302,10 +302,13 @@ from autoengineering.research import (
 
 ```python
 from autoengineering.optimization import (
+    FunctionNetworkEvaluator,
+    FunctionNetworkSpec,
     ObservationLedger,
     OptimizationRunSpec,
     OptimizationStudy,
     SearchSpace,
+    reconstruct_component_training_tables,
 )
 from autoengineering.optimization.command import build_backend
 ```
@@ -317,6 +320,19 @@ constructs the selected random, Sobol, or optional BoTorch policy.
 
 See the [optimization guide](docs/optimization.md) for a complete Python workflow and the limits of
 Release A whole-system optimization.
+
+### Function-network representation
+
+`FunctionNetworkSpec` is an immutable description of component functions, local parameters,
+couplings, scalar observations, costs, terminal outcomes, and evaluation scopes. It validates
+against a `System` without changing the core schema. `FunctionNetworkEvaluator` records system or
+permitted component actions using scalar ledger outcomes and verified NPZ traces.
+`reconstruct_component_training_tables` rebuilds deterministic scalar tables from those durable
+observations.
+
+This experimental layer does not yet include a component-surrogate Bayesian backend. See the
+checked [`function_network`](examples/function_network/) example and the
+[optimization guide](docs/optimization.md#function-network-boundary).
 
 ## CLI Reference
 

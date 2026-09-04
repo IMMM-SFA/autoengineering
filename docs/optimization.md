@@ -292,12 +292,20 @@ observability.
 
 ## Function-network boundary
 
-The planned function-network research layer will represent local design parameters, coupling
-inputs and outputs, scalar surrogate features, component observation availability, and component
-evaluation costs. It will test complete-system runs with intermediate observations before it can
-choose component-scoped evaluations.
+The experimental function-network layer now represents local design parameters, coupling inputs
+and outputs, scalar surrogate features, observation availability, evaluation costs, terminal
+outcomes, and permitted scopes. It validates these immutable records against a `System` without
+changing the core schema. System and permitted component actions write arrays to digest-bound NPZ
+artifacts and scalars to the observation ledger. Fresh ledger readers can reconstruct deterministic
+component training tables from those files.
 
-None of those capabilities are implemented in Release A. Do not describe a whole-system BoTorch
-run as function-network optimization, component-level Bayesian optimization, multi-fidelity
-optimization, or partial-observability optimization. The remaining research work is tracked in the
-[`Bayesian optimization plan`](bayesian-optimization-plan.md).
+The checked [function-network example](../examples/function_network/) demonstrates representation,
+evaluation, parent artifact reuse, and replay in the default environment. The public records are
+available from `autoengineering.optimization`, including `FunctionNetworkSpec`,
+`FunctionNetworkEvaluator`, and `reconstruct_component_training_tables`.
+
+This layer does not yet fit component surrogates or provide a function-network Bayesian policy.
+The Release A command still accepts only whole-system optimization. Do not describe a
+`SystemBayesBackend` run as function-network optimization, component Bayesian optimization,
+multi-fidelity optimization, or partial-observability optimization. The remaining research work is
+tracked in the [`Bayesian optimization plan`](bayesian-optimization-plan.md).
