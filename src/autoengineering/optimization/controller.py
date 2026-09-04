@@ -391,7 +391,7 @@ class OptimizationStudy:
                     self._scoped_backend.estimated_action_cost(action, entries),
                     "estimated action cost",
                 )
-                spent = sum(result.cost for _, result in entries)
+                spent = math.fsum(result.cost for _, result in entries)
                 if estimate > self.spec.budget.max_cost - spent:
                     raise StudyRecoveryError(
                         "partial backend proposed an action beyond the remaining budget"
@@ -1422,7 +1422,7 @@ class OptimizationStudy:
 
     def _stop_before_suggest(self, *, check_budget: bool = True) -> str | None:
         entries = self._validate_ledger()
-        total = sum(result.cost for _, result in entries)
+        total = math.fsum(result.cost for _, result in entries)
         if total >= self.spec.budget.max_cost:
             return "max_cost"
         if (

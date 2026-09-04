@@ -1011,7 +1011,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         decisions = self._sobol_configs(
             self.decision_pool_size, fingerprint, "decision-pool"
         )
-        spent = sum(result.cost for _, result in entries)
+        spent = math.fsum(result.cost for _, result in entries)
         remaining = self.spec.budget.max_cost - spent
         observed_system = {
             _canonical_config(action.config)
