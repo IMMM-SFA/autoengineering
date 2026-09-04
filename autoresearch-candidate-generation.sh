@@ -13,19 +13,23 @@ case "$role" in
     ;;
 esac
 
-if test -n "$(git status --porcelain --untracked-files=all)"; then
+evidence_root="benchmarks/partial_network/candidate-generation"
+output="$evidence_root/$role"
+manifest="$evidence_root/$role-manifest.json"
+resume_finalization=false
+if test -d "$output" && ! test -L "$output" && ! test -e "$manifest" && ! test -L "$manifest"; then
+  resume_finalization=true
+elif test -e "$output" || test -L "$output" || test -e "$manifest" || test -L "$manifest"; then
+  echo "candidate-generation $role evidence already exists" >&2
+  exit 2
+fi
+
+if test "$resume_finalization" = false \
+  && test -n "$(git status --porcelain --untracked-files=all)"; then
   echo "candidate-generation benchmark requires a clean signed revision" >&2
   exit 2
 fi
 git verify-commit HEAD >/dev/null
-
-evidence_root="benchmarks/partial_network/candidate-generation"
-output="$evidence_root/$role"
-manifest="$evidence_root/$role-manifest.json"
-if test -e "$output" || test -L "$output" || test -e "$manifest" || test -L "$manifest"; then
-  echo "candidate-generation $role evidence already exists" >&2
-  exit 2
-fi
 
 if test "$role" = "replacement"; then
   development_manifest="$evidence_root/development-manifest.json"
@@ -55,6 +59,9 @@ echo "candidate-generation role: $role"
 echo "output: $output"
 
 set +e
+if test "$resume_finalization" = true; then
+  echo "resuming companion-manifest finalization without rerunning the matrix"
+fi
 python -m autoengineering.benchmarks.partial_network --output "$output"
 benchmark_status=$?
 set -e
@@ -67,10 +74,8 @@ python - "$role" "$output" "$manifest" <<'PY'
 from __future__ import annotations
 
 import hashlib
-from importlib import metadata
 import json
 from pathlib import Path
-import platform
 import subprocess
 import sys
 
@@ -93,27 +98,30 @@ def directory_sha256(root: Path, repository: Path) -> str:
     return hashlib.sha256("".join(lines).encode()).hexdigest()
 
 
-def git_output(repository: Path, *arguments: str) -> str:
-    return subprocess.run(
-        ["git", *arguments],
-        cwd=repository,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-
-
 role = sys.argv[1]
-output = Path(sys.argv[2])
-manifest_path = Path(sys.argv[3])
 root = repository_root()
+output_argument = Path(sys.argv[2])
+manifest_argument = Path(sys.argv[3])
+output = (root / output_argument).resolve() if not output_argument.is_absolute() else output_argument
+manifest_path = (
+    (root / manifest_argument).resolve()
+    if not manifest_argument.is_absolute()
+    else manifest_argument
+)
 gate = json.loads((output / "gate.json").read_text(encoding="utf-8"))
-versions = {}
-for package in ("autoengineering", "numpy", "scipy", "torch", "botorch", "gpytorch"):
-    try:
-        versions[package] = metadata.version(package)
-    except metadata.PackageNotFoundError:
-        versions[package] = "not_installed"
+provenance = gate["provenance"]
+execution_head = provenance["git_head_at_execution"]
+subprocess.run(
+    ["git", "verify-commit", execution_head],
+    cwd=root,
+    check=True,
+    capture_output=True,
+    text=True,
+)
+if provenance["source_sha256"] != source_hash(root):
+    raise SystemExit("current benchmark source differs from the completed matrix")
+if provenance["source_file_sha256"] != source_file_hashes(root):
+    raise SystemExit("current benchmark source-file inventory differs from the completed matrix")
 
 payload = {
     "schema_version": "1.0",
@@ -122,12 +130,12 @@ payload = {
     "decision_0008_sha256": sha256(
         root / "docs/decisions/0008-partial-network-candidate-generation.md"
     ),
-    "git_head_at_execution": git_output(root, "rev-parse", "HEAD"),
+    "git_head_at_execution": execution_head,
     "git_commit_signed": True,
-    "git_tree_clean_at_start": True,
+    "git_tree_clean_at_start": bool(provenance["git_tree_clean"]),
     "command": f"pixi run -e bayes bash autoresearch-candidate-generation.sh {role}",
-    "source_sha256": source_hash(root),
-    "source_file_sha256": source_file_hashes(root),
+    "source_sha256": provenance["source_sha256"],
+    "source_file_sha256": provenance["source_file_sha256"],
     "raw_sha256": sha256(output / "raw-records.jsonl"),
     "evidence_directory_sha256": directory_sha256(output, root),
     "evidence_file_sha256": {
@@ -138,12 +146,10 @@ payload = {
     "failed_criteria": [
         criterion["name"] for criterion in gate["criteria"] if not criterion["passed"]
     ],
-    "python": platform.python_version(),
-    "platform": platform.platform(),
-    "packages": versions,
-    "lock_file_sha256": {
-        name: sha256(root / name) for name in ("pixi.lock", "pixi.toml", "pyproject.toml")
-    },
+    "python": provenance["python"],
+    "platform": provenance["platform"],
+    "packages": provenance["packages"],
+    "lock_file_sha256": provenance["lock_file_sha256"],
 }
 if role == "replacement":
     development = json.loads(
@@ -167,8 +173,8 @@ event = {
     "schema_version": "1.0",
     "event": "result",
     "role": role,
-    "evidence": output.as_posix(),
-    "manifest": manifest_path.as_posix(),
+    "evidence": output.relative_to(root).as_posix(),
+    "manifest": manifest_path.relative_to(root).as_posix(),
     "revision": payload["git_head_at_execution"],
     "source_sha256": payload["source_sha256"],
     "raw_sha256": payload["raw_sha256"],
