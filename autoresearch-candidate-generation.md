@@ -61,9 +61,34 @@ all partial controls preserves action availability across the comparison.
 
 ## Current state
 
-- Full matrices used: 0 of at most 2
-- Development matrix: pending
-- Replacement matrix: not authorized unless development passes
+- Full matrices used: 1
+- Development matrix: complete with an adverse result
+- Replacement matrix: not authorized because development failed
+- Extension: stopped by the Decision 0008 decision rule
 - Item 9: experimental
 - Item 10: blocked by Item 9
 
+## Development outcome
+
+The 40-run development matrix fails `controlled_informative_component` and
+`random_component_control`. The other 10 criteria pass. All runs complete, all raw records
+reconstruct, replay is deterministic, every lineage and cost check passes, all 40 recommendations
+reference observed complete-system results, and no value-policy fit or scoring fallback occurs.
+
+The value policy selects no component action on either problem. On `informative_branch`, this gives
+zero controlled `left` selections and zero `right` selections, so the required `left > right`
+comparison fails.
+
+The value policy improves median regret area over the random control by `0.0014498890245697449` on
+`informative_chain` and `0.00029282913842992864` on `informative_branch`. Neither reaches the frozen
+`0.005` improvement. Candidate coverage therefore does not support the preregistered hypothesis.
+
+- Evidence: `benchmarks/partial_network/candidate-generation/development/`
+- Companion manifest: `benchmarks/partial_network/candidate-generation/development-manifest.json`
+- Signed execution revision: `280d18d37404b545c41c7fcd78ea3f544ca183ee`
+- Source SHA-256: `dba69119ec36a50422c443d11e8ec498327e455d86056c4f062d13de8fff6146`
+- Raw SHA-256: `198dafa67de72e8936d1d47a13b5dab7735e30d242693aa2855a15ce426d359a`
+- Evidence directory SHA-256: `0331414f043e17b27543faf8ca343e185ead066a4f4edccd4df4ce91363937e6`
+
+Decision 0008 forbids the replacement matrix after this result. Item 9 remains experimental, and
+Item 10 does not begin.

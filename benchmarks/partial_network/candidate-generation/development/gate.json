@@ -1,0 +1,174 @@
+{
+  "criteria": [
+    {
+      "details": {
+        "complete_runs": 40,
+        "expected_runs": 40,
+        "maximum_cost": 8.0,
+        "observed_runs": 40,
+        "run_errors": 0
+      },
+      "name": "complete_matrix",
+      "passed": true
+    },
+    {
+      "details": {
+        "issue_count": 0,
+        "passed": true,
+        "reported_issues": []
+      },
+      "name": "raw_reconstruction",
+      "passed": true
+    },
+    {
+      "details": {
+        "consistent_runs": 40
+      },
+      "name": "deterministic_action_and_result_replay",
+      "passed": true
+    },
+    {
+      "details": {
+        "checked_component_actions": 79,
+        "issue_count": 0,
+        "passed": true,
+        "reported_issues": []
+      },
+      "name": "verified_system_parent_lineage",
+      "passed": true
+    },
+    {
+      "details": {
+        "observed_system_recommendations": 40,
+        "runs_with_refresh": 40
+      },
+      "name": "system_refresh_and_observed_recommendation",
+      "passed": true
+    },
+    {
+      "details": {
+        "left_selections": 0,
+        "right_selections": 0
+      },
+      "name": "controlled_informative_component",
+      "passed": false
+    },
+    {
+      "details": {
+        "pooled_area_difference": 0.002443989598868851,
+        "pooled_difference_limit": 0.15,
+        "pooled_final_difference": -0.00047604784386290344,
+        "problem_difference_limit": 0.25,
+        "problem_final_differences": {
+          "informative_branch": 0.012115326985288832,
+          "informative_chain": 0.0012220977911332476
+        },
+        "random_area_differences": {
+          "informative_branch": -0.00029282913842992864,
+          "informative_chain": -0.0014498890245697449
+        }
+      },
+      "name": "final_regret_tolerance",
+      "passed": true
+    },
+    {
+      "details": {
+        "difference_limit": 0.15,
+        "pooled_area_difference": 0.002443989598868851
+      },
+      "name": "regret_area_tolerance",
+      "passed": true
+    },
+    {
+      "details": {
+        "maximum_other_problem_difference": 0.1,
+        "required_improvement": -0.005,
+        "voi_minus_random_by_problem": {
+          "informative_branch": -0.00029282913842992864,
+          "informative_chain": -0.0014498890245697449
+        }
+      },
+      "name": "random_component_control",
+      "passed": false
+    },
+    {
+      "details": {
+        "conservative_runs": 40
+      },
+      "name": "conservative_component_costs",
+      "passed": true
+    },
+    {
+      "details": {
+        "decision_count": 39,
+        "fallback_count": 0,
+        "pooled_limit": 0.1,
+        "pooled_rate": 0.0,
+        "problem_limit": 0.2,
+        "problem_rates": {
+          "informative_branch": 0.0,
+          "informative_chain": 0.0
+        }
+      },
+      "name": "bounded_fit_and_scoring_fallbacks",
+      "passed": true
+    },
+    {
+      "details": {
+        "checked_component_actions": 79,
+        "issue_count": 0,
+        "passed": true,
+        "reported_issues": []
+      },
+      "name": "terminal_observation_separation",
+      "passed": true
+    }
+  ],
+  "passed": false,
+  "provenance": {
+    "command": "pixi run -e bayes benchmark-partial-network --output benchmarks/partial_network/candidate-generation/development",
+    "decision_sha256": "b6e408302a4a9ab7f03f468152eb4ba3720f831e00723c1d62995ef551fbd86f",
+    "git_commit_signed": true,
+    "git_head_at_execution": "280d18d37404b545c41c7fcd78ea3f544ca183ee",
+    "git_tree_clean": true,
+    "lock_file_sha256": {
+      "pixi.lock": "2a14a7a6c4c74870ee2820028f69140151e80efb897a825c8e3359c4e2d82fd5",
+      "pixi.toml": "580cda494db2678fa08ef08b3d383a0911f0696535e3a3b04dc25a90ad6241af",
+      "pyproject.toml": "50367045d7d43a42adb4a2d4ca90b5c9d642ed7babe512ac6a62800c194a2ca9"
+    },
+    "packages": {
+      "autoengineering": "0.1.0",
+      "botorch": "0.17.2",
+      "gpytorch": "1.15.2",
+      "numpy": "2.5.2",
+      "scipy": "1.18.0",
+      "torch": "2.13.0"
+    },
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "python": "3.12.13",
+    "source_file_sha256": {
+      "pixi.lock": "2a14a7a6c4c74870ee2820028f69140151e80efb897a825c8e3359c4e2d82fd5",
+      "pixi.toml": "580cda494db2678fa08ef08b3d383a0911f0696535e3a3b04dc25a90ad6241af",
+      "pyproject.toml": "50367045d7d43a42adb4a2d4ca90b5c9d642ed7babe512ac6a62800c194a2ca9",
+      "src/autoengineering/benchmarks/partial_network/__init__.py": "d9d515b2f1eda223057a4bbe9885c573de033ae63fd3d3b9b5bbb19dbc318d98",
+      "src/autoengineering/benchmarks/partial_network/__main__.py": "7431325523fdea9e8dae0e4c6c6149dc89d6db41f00775055d558b39aeae2f98",
+      "src/autoengineering/benchmarks/partial_network/problems.py": "a86e7e515fc6e8eec791ef46b7c5e8c813e8da90f9e1becfbf96da56ce117228",
+      "src/autoengineering/benchmarks/partial_network/runner.py": "fa9c5e98031423e4b90fe071777aad3b2e025dddc03a1a127cd3d17c1c2e4394",
+      "src/autoengineering/benchmarks/partial_network/summary.py": "efb059ec576d108bc940238965eb465ca79f9185ac2d603d29b70829c0e25bf9",
+      "src/autoengineering/optimization/backend.py": "db127fa7ae4a11adb3ee0bead65df198d74a1c445c707c0f89a00642b75f6d13",
+      "src/autoengineering/optimization/controller.py": "25f4b079cc6b52550a6d8f68c36f99dddf87b07ee1f486e0b632f8c2525de83c",
+      "src/autoengineering/optimization/full_network_backend.py": "54a18de88064d3d28666b11d33d2d1e9814a6f215e98f963dbdf062f90279a5e",
+      "src/autoengineering/optimization/function_network.py": "b076160c472aa6aeb9ddd33d06aa53badbf115764c27d57825463b1ca50f4376",
+      "src/autoengineering/optimization/function_network_evaluator.py": "ca31c606c62173c96cc28ae3768a422c002c0aea6603cdeae47706ddfb4c9ef4",
+      "src/autoengineering/optimization/ledger.py": "e137064014cc337a0643cc76b3cf7f4adc5772ca920ed5cd8c078310b3dbda63",
+      "src/autoengineering/optimization/partial_network_backend.py": "c44fca67a208578d4d1b2b07b0a257dc142fe1f516135b639003f43bf816adab",
+      "src/autoengineering/optimization/partial_network_baselines.py": "5080a99bf13cbaefb79a8f86fdb2a82906df2fd73bfa53d018be20ab8b867c15",
+      "src/autoengineering/optimization/records.py": "47f92d0c169c4026f813b5a8b58522e550eb4510c43f767351b6cd1de0ed8425",
+      "src/autoengineering/optimization/space.py": "7b8ebfb55ae072ea2e82f57a3f8ff00c6895be4bd4adc9d8bbc6ef4fc7e54652",
+      "src/autoengineering/optimization/spec.py": "87df5c77ed379718fa547add64233c02ff9551cde21426be23c7a7a6d46a597e",
+      "src/autoengineering/research/runner.py": "3c56db99d10bb90f5230e5c197a82721df00a4a454830755e8d9598735821fec"
+    },
+    "source_sha256": "dba69119ec36a50422c443d11e8ec498327e455d86056c4f062d13de8fff6146"
+  },
+  "schema_version": "1.0"
+}
