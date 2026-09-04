@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from typing import Protocol
 
 from .records import EvaluationAction, EvaluationResult, EvaluationStatus
 
@@ -21,6 +22,28 @@ class LedgerCorruptionError(ValueError):
 
 class LedgerLockError(RuntimeError):
     """Raised when the interprocess ledger lock cannot be acquired or released."""
+
+
+class ObservationLedgerReader(Protocol):
+    """Read-only observation surface available to optimization backends."""
+
+    def entries(self) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]: ...
+
+    def snapshot(
+        self,
+    ) -> tuple[tuple[tuple[EvaluationAction, EvaluationResult], ...], bytes]: ...
+
+    def scientific_training_entries(
+        self,
+    ) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]: ...
+
+    def constraint_training_entries(
+        self,
+    ) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]: ...
+
+    def objective_training_entries(
+        self,
+    ) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]: ...
 
 
 class _LedgerLock:
@@ -91,22 +114,34 @@ class ObservationLedger:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
 
+    def initialize(self) -> None:
+        """Durably create an empty ledger without replacing an existing file."""
+        with _LedgerLock(self.path):
+            if self.path.is_symlink():
+                raise ValueError("ledger path must be a regular nonsymlink file")
+            if self.path.exists():
+                if not self.path.is_file():
+                    raise ValueError("ledger path must be a regular nonsymlink file")
+                return
+            descriptor = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            try:
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
+            if os.name != "nt":
+                parent_descriptor = os.open(self.path.parent, os.O_RDONLY)
+                try:
+                    os.fsync(parent_descriptor)
+                finally:
+                    os.close(parent_descriptor)
+
     def append(self, action: EvaluationAction, result: EvaluationResult) -> None:
         """Append one verified observation and durably synchronize it to disk."""
         if not isinstance(action, EvaluationAction) or not isinstance(result, EvaluationResult):
             raise TypeError("append requires an EvaluationAction and EvaluationResult")
         if action.id != result.action_id:
             raise ValueError("action and result IDs must match")
-        line = (
-            json.dumps(
-                {"action": action.to_dict(), "result": result.to_dict()},
-                allow_nan=False,
-                ensure_ascii=False,
-                separators=(",", ":"),
-                sort_keys=True,
-            ).encode("utf-8")
-            + b"\n"
-        )
+        line = self.record_bytes(action, result)
         with _LedgerLock(self.path):
             entries = self._entries()
             if any(existing_action.id == action.id for existing_action, _ in entries):
@@ -124,10 +159,35 @@ class ObservationLedger:
                 stream.flush()
                 os.fsync(stream.fileno())
 
+    @staticmethod
+    def record_bytes(action: EvaluationAction, result: EvaluationResult) -> bytes:
+        """Return the exact canonical bytes appended for one observation."""
+        if not isinstance(action, EvaluationAction) or not isinstance(result, EvaluationResult):
+            raise TypeError("record_bytes requires an EvaluationAction and EvaluationResult")
+        if action.id != result.action_id:
+            raise ValueError("action and result IDs must match")
+        return (
+            json.dumps(
+                {"action": action.to_dict(), "result": result.to_dict()},
+                allow_nan=False,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+            + b"\n"
+        )
+
     def entries(self) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]:
         """Read and validate every persisted observation without modifying the ledger."""
         with _LedgerLock(self.path):
             return self._entries()
+
+    def snapshot(self) -> tuple[tuple[tuple[EvaluationAction, EvaluationResult], ...], bytes]:
+        """Return validated entries and their exact bytes under one ledger lock."""
+        with _LedgerLock(self.path):
+            entries = self._entries()
+            contents = b"" if not self.path.exists() else self.path.read_bytes()
+            return entries, contents
 
     def _entries(self) -> tuple[tuple[EvaluationAction, EvaluationResult], ...]:
         """Read every entry while the caller holds the exclusive ledger lock."""

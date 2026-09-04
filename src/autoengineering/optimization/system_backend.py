@@ -35,7 +35,7 @@ except ImportError as error:  # pragma: no cover - exercised in a no-extra subpr
     ) from error
 
 from .backend import SobolBackend, _BaselineBackend, _canonical_config
-from .ledger import ObservationLedger
+from .ledger import ObservationLedgerReader
 from .records import (
     BackendDiagnostics,
     EvaluationAction,
@@ -95,7 +95,7 @@ class SystemBayesBackend(_BaselineBackend):
         self._last_count = 0
         self._last_diagnostics: BackendDiagnostics | None = None
 
-    def suggest(self, ledger: ObservationLedger, n: int = 1) -> tuple[EvaluationAction, ...]:
+    def suggest(self, ledger: ObservationLedgerReader, n: int = 1) -> tuple[EvaluationAction, ...]:
         """Suggest ``n`` valid points, falling back to replayable Sobol when needed."""
         self._validate_n(n)
         previous_enabled = torch.are_deterministic_algorithms_enabled()
@@ -109,7 +109,7 @@ class SystemBayesBackend(_BaselineBackend):
             finally:
                 torch.use_deterministic_algorithms(previous_enabled, warn_only=previous_warn_only)
 
-    def _suggest(self, ledger: ObservationLedger, n: int) -> tuple[EvaluationAction, ...]:
+    def _suggest(self, ledger: ObservationLedgerReader, n: int) -> tuple[EvaluationAction, ...]:
         """Perform one isolated policy evaluation after global Torch state is prepared."""
         started = time.perf_counter()
         entries = ledger.entries()
@@ -294,7 +294,7 @@ class SystemBayesBackend(_BaselineBackend):
         )
         return tuple(actions)
 
-    def diagnostics(self, ledger: ObservationLedger) -> BackendDiagnostics:
+    def diagnostics(self, ledger: ObservationLedgerReader) -> BackendDiagnostics:
         """Return fit information only if it belongs to this precise ledger snapshot."""
         entries = ledger.entries()
         fingerprint = self._fingerprint(entries)
@@ -306,10 +306,25 @@ class SystemBayesBackend(_BaselineBackend):
             details={"ledger_entries": len(entries), "ledger_fingerprint": fingerprint},
         )
 
-    def recommend(self, ledger: ObservationLedger):
+    def recommend(self, ledger: ObservationLedgerReader):
         """Validate the replay boundary before ranking observed feasible points."""
         self._next_index_and_observed(ledger)
         return super().recommend(ledger)
+
+    def identity_dict(self) -> dict[str, JSONValue]:
+        """Return constructor choices without mutable fit diagnostics."""
+        return {
+            "schema_version": _SCHEMA_VERSION,
+            "name": self.name,
+            "constructor": {
+                "min_initial": self.min_initial,
+                "num_restarts": self.num_restarts,
+                "raw_samples": self.raw_samples,
+                "max_categorical_assignments": self.max_categorical_assignments,
+                "candidate_retry_limit": self.candidate_retry_limit,
+            },
+            "fallback_policy": SobolBackend(self.spec, self.space).identity_dict(),
+        }
 
     def state_dict(self) -> dict[str, JSONValue]:
         """Return stable JSON state; models are intentionally replayed from the ledger."""

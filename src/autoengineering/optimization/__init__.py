@@ -2,7 +2,8 @@
 
 from .backend import OptimizerBackend, RandomBackend, SearchSpaceExhausted, SobolBackend
 from .controller import OptimizationStudy, StudyLockError, StudyRecoveryError
-from .ledger import LedgerCorruptionError, ObservationLedger
+from .ledger import LedgerCorruptionError, ObservationLedger, ObservationLedgerReader
+from .provenance import RunIdentity
 from .records import (
     BackendDiagnostics,
     EvaluationAction,
@@ -33,9 +34,11 @@ __all__ = [
     "OptimizationStudy",
     "ObjectiveSpec",
     "ObservationLedger",
+    "ObservationLedgerReader",
     "OptimizerBackend",
     "Recommendation",
     "RandomBackend",
+    "RunIdentity",
     "SearchSpace",
     "SearchSpaceExhausted",
     "Scalar",

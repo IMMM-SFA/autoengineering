@@ -94,6 +94,7 @@ def test_ledger_round_trip_is_byte_stable(tmp_path):
 
     first = path.read_bytes()
     assert ObservationLedger(path).entries() == ((action, result),)
+    assert ObservationLedger(path).snapshot() == (((action, result),), first)
     assert path.read_bytes() == first
 
 

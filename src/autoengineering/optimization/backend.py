@@ -6,6 +6,8 @@ ledger supplied to each call, so a resumed process can replay a suggestion
 without restoring mutable optimizer state.
 """
 
+# Random draws use explicit StudySpec seeds through SeedSequence.  # waterology: allow-unseeded
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -16,7 +18,7 @@ from typing import Protocol, runtime_checkable
 import numpy as np
 from scipy.stats import qmc
 
-from .ledger import ObservationLedger
+from .ledger import ObservationLedgerReader
 from .records import (
     BackendDiagnostics,
     EvaluationAction,
@@ -39,15 +41,20 @@ class OptimizerBackend(Protocol):
     """Public protocol shared by baseline and model-based optimization policies."""
 
     name: str
+    spec: StudySpec
+    space: SearchSpace
 
-    def suggest(self, ledger: ObservationLedger, n: int = 1) -> tuple[EvaluationAction, ...]:
+    def suggest(self, ledger: ObservationLedgerReader, n: int = 1) -> tuple[EvaluationAction, ...]:
         """Return valid, distinct system actions or raise ``SearchSpaceExhausted``."""
 
-    def recommend(self, ledger: ObservationLedger) -> Recommendation:
+    def recommend(self, ledger: ObservationLedgerReader) -> Recommendation:
         """Return the best feasible successful observation in ``ledger``."""
 
-    def diagnostics(self, ledger: ObservationLedger) -> BackendDiagnostics:
+    def diagnostics(self, ledger: ObservationLedgerReader) -> BackendDiagnostics:
         """Return truthful policy diagnostics for ``ledger``."""
+
+    def identity_dict(self) -> dict[str, JSONValue]:
+        """Return stable constructor identity without fitted or diagnostic state."""
 
     def state_dict(self) -> dict[str, JSONValue]:
         """Return canonical JSON-compatible local policy state."""
@@ -77,7 +84,7 @@ class _BaselineBackend:
         self.spec = spec
         self.space = space
 
-    def recommend(self, ledger: ObservationLedger) -> Recommendation:
+    def recommend(self, ledger: ObservationLedgerReader) -> Recommendation:
         """Rank successful feasible observations by objective, cost, then action ID."""
         candidates: list[tuple[float, float, str, EvaluationAction, Mapping[str, float]]] = []
         for action, result in ledger.entries():
@@ -117,7 +124,7 @@ class _BaselineBackend:
             message="best feasible observed configuration",
         )
 
-    def diagnostics(self, ledger: ObservationLedger) -> BackendDiagnostics:
+    def diagnostics(self, ledger: ObservationLedgerReader) -> BackendDiagnostics:
         """Report baseline sampling facts without claiming a fitted surrogate."""
         entries = ledger.entries()
         return BackendDiagnostics(
@@ -133,6 +140,17 @@ class _BaselineBackend:
             },
         )
 
+    def identity_dict(self) -> dict[str, JSONValue]:
+        """Return the policy choices that must match across process resumes."""
+        return {
+            "schema_version": "1.0",
+            "name": self.name,
+            "constructor": {
+                "retry_limit": _RETRY_LIMIT,
+                "finite_enumeration_limit": _FINITE_ENUMERATION_LIMIT,
+            },
+        }
+
     def state_dict(self) -> dict[str, JSONValue]:
         """Return JSON data for a policy whose sequence state lives in the ledger."""
         return {
@@ -144,7 +162,7 @@ class _BaselineBackend:
         }
 
     def _next_index_and_observed(
-        self, ledger: ObservationLedger
+        self, ledger: ObservationLedgerReader
     ) -> tuple[int, set[tuple[tuple[str, str, Scalar], ...]]]:
         entries = ledger.entries()
         for action, _ in entries:
@@ -252,7 +270,7 @@ class RandomBackend(_BaselineBackend):
 
     name = "random"
 
-    def suggest(self, ledger: ObservationLedger, n: int = 1) -> tuple[EvaluationAction, ...]:
+    def suggest(self, ledger: ObservationLedgerReader, n: int = 1) -> tuple[EvaluationAction, ...]:
         self._validate_n(n)
         next_index, observed = self._next_index_and_observed(ledger)
         finite_configs = self._finite_configs()
@@ -319,13 +337,21 @@ class SobolBackend(_BaselineBackend):
 
     name = "sobol"
 
+    def identity_dict(self) -> dict[str, JSONValue]:
+        """Include the bounded scan behavior in durable constructor identity."""
+        identity = super().identity_dict()
+        constructor = dict(identity["constructor"])
+        constructor["scan_retries_per_candidate"] = _SOBOL_RETRIES_PER_CANDIDATE
+        identity["constructor"] = constructor
+        return identity
+
     def state_dict(self) -> dict[str, JSONValue]:
         """Include the bounded Sobol scan choice needed for policy replay."""
         state = super().state_dict()
         state["scan_retries_per_candidate"] = _SOBOL_RETRIES_PER_CANDIDATE
         return state
 
-    def suggest(self, ledger: ObservationLedger, n: int = 1) -> tuple[EvaluationAction, ...]:
+    def suggest(self, ledger: ObservationLedgerReader, n: int = 1) -> tuple[EvaluationAction, ...]:
         self._validate_n(n)
         next_index, observed = self._next_index_and_observed(ledger)
         finite_configs = self._finite_configs()

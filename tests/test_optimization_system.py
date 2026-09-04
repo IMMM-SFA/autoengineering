@@ -83,8 +83,6 @@ def test_controller_never_starts_an_action_beyond_remaining_budget(tmp_path):
     )
     space = SearchSpace(parameters=(CategoricalParameter("model", ("a", "b")),))
     ledger = ObservationLedger(tmp_path / "observations.jsonl")
-    first = EvaluationAction.system("eval-000000", {"model": "a"})
-    ledger.append(first, EvaluationResult.success(first.id, {"score": 1.0}, {}, 3.0, "cpu_hour"))
     study = OptimizationStudy(
         spec,
         space,
@@ -94,6 +92,7 @@ def test_controller_never_starts_an_action_beyond_remaining_budget(tmp_path):
         tmp_path,
     )
 
+    study.run(max_new_evaluations=1)
     study.run()
 
     assert len(ledger.entries()) == 1
@@ -512,16 +511,21 @@ def test_diagnostics_and_state_are_truthful_stable_json(backend_type, study, spa
     backend = backend_type(spec=study, space=space)
 
     diagnostics = backend.diagnostics(empty_ledger)
+    identity = backend.identity_dict()
     state = backend.state_dict()
 
     assert diagnostics.backend == backend.name
     assert diagnostics.fit_state == "stateless_baseline"
     assert diagnostics.details["ledger_entries"] == 0
+    assert json.loads(json.dumps(identity, sort_keys=True)) == identity
+    assert identity["name"] == backend.name
+    assert "study_seed" not in identity
     assert json.loads(json.dumps(state, sort_keys=True)) == state
     assert state["sequence_state"] == "derived_from_ledger"
     assert state["finite_enumeration_limit"] == 100_000
     if backend_type is SobolBackend:
         assert state["scan_retries_per_candidate"] == 64
+        assert identity["constructor"]["scan_retries_per_candidate"] == 64
 
 
 def test_base_optimization_import_has_no_bayesian_or_smac_dependencies():
@@ -546,9 +550,12 @@ def test_optional_system_backend_has_a_concise_missing_dependency_boundary():
         "-c",
         "import importlib.util\n"
         "available = importlib.util.find_spec('botorch') is not None\n"
-        "try:\n import autoengineering.optimization.system_backend\n"
-        "except ImportError as error:\n assert not available and 'install autoengineering[bayes]' in str(error)\n"
-        "else:\n assert available",
+        "try:"
+        "\n import autoengineering.optimization.system_backend\n"
+        "except ImportError as error:"
+        "\n assert not available and 'install autoengineering[bayes]' in str(error)\n"
+        "else:"
+        "\n assert available",
     ]
 
     completed = subprocess.run(command, check=False, capture_output=True, text=True)
@@ -782,6 +789,11 @@ def test_system_backend_implements_protocol_and_stable_constructor_state(study, 
     backend = SystemBayesBackend(study, space, min_initial=2, raw_samples=4, num_restarts=1)
 
     assert isinstance(backend, OptimizerBackend)
+    identity = backend.identity_dict()
+    assert json.loads(json.dumps(identity, sort_keys=True)) == identity
+    assert identity["constructor"]["min_initial"] == 2
+    assert identity["fallback_policy"]["name"] == "sobol"
+    assert "last_fit" not in identity
     assert json.loads(json.dumps(backend.state_dict(), sort_keys=True)) == backend.state_dict()
     assert backend.state_dict()["constructor"]["min_initial"] == 2
     with pytest.raises(ValueError, match="raw_samples"):

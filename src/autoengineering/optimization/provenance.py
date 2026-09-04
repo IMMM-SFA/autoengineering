@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 import hashlib
 import importlib.metadata
 import json
@@ -17,7 +18,7 @@ from .records import BackendDiagnostics, Recommendation
 from .space import CategoricalParameter, IntegerParameter, SearchSpace
 from .spec import StudySpec
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "2.0"
 
 
 def canonical_json(value: Any) -> str:
@@ -30,6 +31,162 @@ def canonical_json(value: Any) -> str:
 def sha256_json(value: Any) -> str:
     """Return the SHA-256 digest of canonical JSON data."""
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def _is_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+@dataclass(frozen=True)
+class RunIdentity:
+    """Immutable canonical identity for one committed study ledger snapshot."""
+
+    _study_json: str
+    _search_space_json: str
+    _backend_json: str
+    ledger_path: str
+    committed_ledger_sha256: str
+    input_artifact_hashes: tuple[tuple[str, str], ...]
+    seed: int
+    start_timestamp: str
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        spec: StudySpec,
+        space: SearchSpace,
+        backend_name: str,
+        backend_configuration: Mapping[str, object],
+        ledger_path: str,
+        committed_ledger_sha256: str,
+        input_artifact_hashes: Mapping[str, str],
+        start_timestamp: str,
+    ) -> "RunIdentity":
+        """Build an identity after validating each canonical field."""
+        payload = {
+            "schema_version": SCHEMA_VERSION,
+            "study": study_dict(spec),
+            "study_sha256": sha256_json(study_dict(spec)),
+            "search_space": search_space_dict(space),
+            "search_space_sha256": sha256_json(search_space_dict(space)),
+            "backend": {
+                "name": backend_name,
+                "configuration": dict(backend_configuration),
+                "configuration_sha256": sha256_json(dict(backend_configuration)),
+            },
+            "ledger": {
+                "path": ledger_path,
+                "committed_sha256": committed_ledger_sha256,
+            },
+            "input_artifact_hashes": dict(input_artifact_hashes),
+            "seed": spec.seed,
+            "start_timestamp": start_timestamp,
+        }
+        return cls.from_dict(payload)
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, object]) -> "RunIdentity":
+        """Validate and freeze a serialized run identity."""
+        required = {
+            "schema_version",
+            "study",
+            "study_sha256",
+            "search_space",
+            "search_space_sha256",
+            "backend",
+            "ledger",
+            "input_artifact_hashes",
+            "seed",
+            "start_timestamp",
+        }
+        if not isinstance(data, Mapping) or set(data) != required:
+            raise ValueError("run identity has invalid keys")
+        if data["schema_version"] != SCHEMA_VERSION:
+            raise ValueError("run identity schema version differs")
+        study = data["study"]
+        search_space = data["search_space"]
+        backend = data["backend"]
+        ledger = data["ledger"]
+        input_hashes = data["input_artifact_hashes"]
+        if not all(
+            isinstance(value, Mapping)
+            for value in (study, search_space, backend, ledger, input_hashes)
+        ):
+            raise TypeError("run identity object fields must be mappings")
+        if sha256_json(study) != data["study_sha256"]:
+            raise ValueError("run identity study hash differs")
+        if sha256_json(search_space) != data["search_space_sha256"]:
+            raise ValueError("run identity search-space hash differs")
+        if set(backend) != {"name", "configuration", "configuration_sha256"}:
+            raise ValueError("run identity backend has invalid keys")
+        if not isinstance(backend["name"], str) or not backend["name"].strip():
+            raise ValueError("run identity backend name is invalid")
+        if not isinstance(backend["configuration"], Mapping):
+            raise TypeError("run identity backend configuration must be a mapping")
+        if sha256_json(backend["configuration"]) != backend["configuration_sha256"]:
+            raise ValueError("run identity backend configuration hash differs")
+        if set(ledger) != {"path", "committed_sha256"}:
+            raise ValueError("run identity ledger has invalid keys")
+        if (
+            not isinstance(ledger["path"], str)
+            or not ledger["path"].strip()
+            or Path(ledger["path"]).name != ledger["path"]
+        ):
+            raise ValueError("run identity ledger path is invalid")
+        if not _is_sha256(ledger["committed_sha256"]):
+            raise ValueError("run identity committed ledger hash is invalid")
+        if any(
+            not isinstance(name, str) or not name or not _is_sha256(digest)
+            for name, digest in input_hashes.items()
+        ):
+            raise ValueError("run identity input artifact hashes are invalid")
+        if isinstance(data["seed"], bool) or not isinstance(data["seed"], int):
+            raise ValueError("run identity seed must be an integer")
+        if data["seed"] != study.get("seed"):
+            raise ValueError("run identity seed differs from the study")
+        if not isinstance(data["start_timestamp"], str) or not data["start_timestamp"].strip():
+            raise ValueError("run identity start timestamp is invalid")
+        return cls(
+            _study_json=canonical_json(study),
+            _search_space_json=canonical_json(search_space),
+            _backend_json=canonical_json(backend),
+            ledger_path=ledger["path"],
+            committed_ledger_sha256=ledger["committed_sha256"],
+            input_artifact_hashes=tuple(sorted(input_hashes.items())),
+            seed=data["seed"],
+            start_timestamp=data["start_timestamp"],
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        """Return the canonical JSON-compatible identity representation."""
+        study = json.loads(self._study_json)
+        search_space = json.loads(self._search_space_json)
+        backend = json.loads(self._backend_json)
+        return {
+            "schema_version": SCHEMA_VERSION,
+            "study": study,
+            "study_sha256": sha256_json(study),
+            "search_space": search_space,
+            "search_space_sha256": sha256_json(search_space),
+            "backend": backend,
+            "ledger": {
+                "path": self.ledger_path,
+                "committed_sha256": self.committed_ledger_sha256,
+            },
+            "input_artifact_hashes": dict(self.input_artifact_hashes),
+            "seed": self.seed,
+            "start_timestamp": self.start_timestamp,
+        }
+
+    @property
+    def sha256(self) -> str:
+        """Return the canonical digest of this committed identity."""
+        return sha256_json(self.to_dict())
 
 
 def _typed_scalar(value: str | int | float | bool) -> dict[str, object]:
@@ -138,6 +295,27 @@ def atomic_write_text(directory: Path, name: str, text: str) -> Path:
     return path
 
 
+def read_json_artifact(directory: Path, name: str) -> dict[str, object]:
+    """Read one required nonsymlink JSON object without changing study state."""
+    path = _safe_file(Path(directory), name)
+    if not path.is_file():
+        raise ValueError(f"required study artifact is missing: {name}")
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"study artifact is malformed: {name}: {error}") from error
+    if not isinstance(value, dict):
+        raise ValueError(f"study artifact must contain a JSON object: {name}")
+    return value
+
+
+def artifact_sha256(path: Path) -> str:
+    """Hash the exact bytes of one regular nonsymlink artifact."""
+    if path.is_symlink() or not path.is_file():
+        raise ValueError(f"required study artifact is missing or symlinked: {path.name}")
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def remove_artifact(directory: Path, name: str) -> None:
     """Durably remove a controller artifact without following symlinks."""
     path = _safe_file(directory, name)
@@ -197,63 +375,39 @@ def ledger_sha256(ledger: ObservationLedger) -> str:
 def write_study_artifacts(
     *,
     directory: Path,
-    spec: StudySpec,
-    space: SearchSpace,
     ledger: ObservationLedger,
+    run_identity: RunIdentity,
     backend_name: str,
     backend_state: Mapping[str, object],
     diagnostics: BackendDiagnostics,
     recommendation: Recommendation,
-    start_timestamp: str,
     end_timestamp: str | None,
     stop_reason: str | None,
-    input_artifact_hashes: Mapping[str, str],
-    pending_count: int,
+    committed_pending_sha256: str | None,
+    committed_control_sha256: str | None,
+    committed_bootstrap_sha256: str | None,
 ) -> None:
-    """Write the four replaceable study artifacts from one durable ledger snapshot."""
-    spec_json = study_dict(spec)
-    space_json = search_space_dict(space)
-    entries = ledger.entries()
+    """Write replaceable artifacts first and atomically commit the manifest last."""
+    entries, ledger_bytes = ledger.snapshot()
     total_cost = sum(result.cost for _, result in entries)
     evaluator_seconds = sum(result.evaluator_seconds for _, result in entries)
     result_optimizer_seconds = sum(result.optimizer_seconds for _, result in entries)
     state = dict(backend_state)
-    snapshot = ledger_sha256(ledger)
-    manifest = {
-        "schema_version": SCHEMA_VERSION,
-        "study": spec_json,
-        "study_sha256": sha256_json(spec_json),
-        "search_space": space_json,
-        "search_space_sha256": sha256_json(space_json),
-        **runtime_provenance(),
-        "input_artifact_hashes": dict(input_artifact_hashes),
-        "backend": backend_name,
-        "seed": spec.seed,
-        "start_timestamp": start_timestamp,
-        "end_timestamp": end_timestamp,
-        "stop_reason": stop_reason,
-        "ledger_path": ledger.path.name,
-        "ledger_sha256": snapshot,
-        "total_evaluator_cost": total_cost,
-        "optimizer_overhead_seconds": result_optimizer_seconds + diagnostics.optimizer_seconds,
-        "total_evaluator_seconds": evaluator_seconds,
-        "evaluation_count": len(entries),
-        "status_counts": {
-            status: sum(result.status.value == status for _, result in entries)
-            for status in sorted({result.status.value for _, result in entries})
-        },
-        "pending_count": pending_count,
-        "verification_commands": [
-            "python -m pytest tests -q -p no:cacheprovider",
-            "ruff check src tests",
-        ],
-    }
+    snapshot = hashlib.sha256(ledger_bytes).hexdigest()
+    if snapshot != run_identity.committed_ledger_sha256:
+        raise ValueError("run identity does not match the ledger snapshot")
+    if backend_name != json.loads(run_identity._backend_json)["name"]:
+        raise ValueError("run identity does not match the backend name")
+    identity_json = run_identity.to_dict()
+    identity_hash = run_identity.sha256
     backend_snapshot = {
         "schema_version": SCHEMA_VERSION,
         "backend": backend_name,
+        "run_identity_sha256": identity_hash,
         "ledger_sha256": snapshot,
         "state": state,
     }
+    recommendation_json = recommendation.to_dict()
     report = _report(
         recommendation,
         entries,
@@ -262,14 +416,45 @@ def write_study_artifacts(
         result_optimizer_seconds + diagnostics.optimizer_seconds,
         evaluator_seconds,
         stop_reason,
-        pending_count,
-        manifest["study_sha256"],
+        0,
+        identity_json["study_sha256"],
         snapshot,
     )
-    atomic_write_json(directory, "manifest.json", manifest)
+    backend_text = canonical_json(backend_snapshot) + "\n"
+    recommendation_text = canonical_json(recommendation_json) + "\n"
+    manifest = {
+        "schema_version": SCHEMA_VERSION,
+        "run_identity": identity_json,
+        "run_identity_sha256": identity_hash,
+        "runtime": runtime_provenance(),
+        "end_timestamp": end_timestamp,
+        "stop_reason": stop_reason,
+        "total_evaluator_cost": total_cost,
+        "optimizer_overhead_seconds": result_optimizer_seconds + diagnostics.optimizer_seconds,
+        "total_evaluator_seconds": evaluator_seconds,
+        "evaluation_count": len(entries),
+        "status_counts": {
+            status: sum(result.status.value == status for _, result in entries)
+            for status in sorted({result.status.value for _, result in entries})
+        },
+        "pending_count": 0,
+        "committed_pending_sha256": committed_pending_sha256,
+        "committed_control_sha256": committed_control_sha256,
+        "committed_bootstrap_sha256": committed_bootstrap_sha256,
+        "artifact_sha256": {
+            "backend-state.json": hashlib.sha256(backend_text.encode("utf-8")).hexdigest(),
+            "recommendation.json": hashlib.sha256(recommendation_text.encode("utf-8")).hexdigest(),
+            "optimization-report.md": hashlib.sha256(report.encode("utf-8")).hexdigest(),
+        },
+        "verification_commands": [
+            "python -m pytest tests -q -p no:cacheprovider",
+            "ruff check src tests",
+        ],
+    }
     atomic_write_json(directory, "backend-state.json", backend_snapshot)
-    atomic_write_json(directory, "recommendation.json", recommendation.to_dict())
+    atomic_write_json(directory, "recommendation.json", recommendation_json)
     atomic_write_text(directory, "optimization-report.md", report)
+    atomic_write_json(directory, "manifest.json", manifest)
 
 
 def _report(
