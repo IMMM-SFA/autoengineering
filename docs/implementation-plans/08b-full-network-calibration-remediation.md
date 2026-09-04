@@ -47,14 +47,14 @@ process. Shah, Wilson, and Ghahramani describe that model and its use in Bayesia
 2. Remove `Normalize` from `_fit_one`. Retain `SingleTaskGP`, `Standardize`, double precision,
    deterministic fit seeds, noise handling, retry limits, and independent posterior innovations.
 3. Run focused backend and benchmark tests, then the Bayesian test suite and lint.
-4. Add decision 0006 after the corrected source commit. Record the diagnosis, the calibration-only
-   diagnostics, unchanged protocol, source revision, and exact source hashes before any replacement
-   closed-loop run.
-5. Preserve `benchmarks/full_network/results/` as a valid undercoverage iteration. Move it to
+4. Preserve `benchmarks/full_network/results/` as a valid undercoverage iteration. Move it to
    `benchmarks/full_network/iterations/b287c82-undercoverage/` with a README that distinguishes it
    from the two invalidated runs.
-6. Update evidence provenance to bind decision 0006. Test exact reconstruction and rejection of a
+5. Update evidence provenance to bind decision 0006. Test exact reconstruction and rejection of a
    changed decision or source hash.
+6. Add decision 0006 after the corrected source and provenance commit. Record the diagnosis, the
+   calibration-only diagnostics, unchanged protocol, source revision, and exact source hashes
+   before any replacement closed-loop run.
 7. Run the full 40-run comparison once from the clean signed source revision. Publish only to the
    now absent canonical result directory and retain the evidence regardless of outcome.
 8. If every frozen criterion passes, update the Item 8 review, status, optimization guide, and

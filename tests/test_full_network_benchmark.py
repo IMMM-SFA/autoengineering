@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from autoengineering.benchmarks.full_network import __main__ as benchmark_main
 from autoengineering.benchmarks.full_network import runner as benchmark_runner
 from autoengineering.optimization import EvaluationAction, EvaluationResult
 from autoengineering.benchmarks.full_network.problems import (
@@ -204,3 +205,16 @@ def test_run_uses_real_temporary_ancestry_and_retains_completed_records(monkeypa
     assert len(info.value.records) == 1
     assert info.value.records[0]["record_type"] == "evaluation"
     assert info.value.records[0]["result"]["artifacts"] == {"eval-000000": "trace:eval-000000"}
+
+
+def test_provenance_binds_every_full_network_decision(tmp_path, monkeypatch):
+    root = benchmark_main.repository_root()
+    monkeypatch.setattr(
+        benchmark_main,
+        "_git_output",
+        lambda _root, *arguments: "" if arguments[0] == "status" else "source-revision",
+    )
+    provenance = benchmark_main._provenance(root, tmp_path / "results")
+
+    decision = root / "docs/decisions/0006-full-network-calibration-correction.md"
+    assert provenance["calibration_correction_sha256"] == benchmark_main.sha256(decision)
