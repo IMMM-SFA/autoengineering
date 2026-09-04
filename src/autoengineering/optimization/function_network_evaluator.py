@@ -428,7 +428,10 @@ def reconstruct_component_training_tables(
                     raise FunctionNetworkArtifactError(
                         f"scalar observation {ledger_name!r} differs from verified trace"
                     )
-            artifact_ids = tuple(artifact_id for artifact_id, _, _ in current)
+            artifact_ids = (
+                *action.parent_artifact_ids,
+                *(artifact_id for artifact_id, _, _ in current),
+            )
             tables[component.component].append(
                 ComponentTrainingRow(
                     action_id=action.id,
@@ -437,9 +440,7 @@ def reconstruct_component_training_tables(
                     inputs=averaged_inputs,
                     outputs=averaged_outputs,
                     artifact_ids=artifact_ids,
-                    artifact_sha256={
-                        artifact_id: digest for artifact_id, _, digest in current
-                    },
+                    artifact_sha256={artifact_id: registry[artifact_id][1] for artifact_id in artifact_ids},
                     cost=result.cost,
                     cost_unit=result.cost_unit,
                 )

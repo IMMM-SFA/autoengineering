@@ -1,0 +1,73 @@
+system:
+  name: function-network-chain
+  description: Deterministic two-function chain with one source.
+  components:
+    - name: source
+      model_type: source
+      description: Fixed driver array.
+      inputs: []
+      outputs:
+        - name: driver
+          direction: out
+          data_type: timeseries
+          units: unit
+          description: Fixed source values.
+      metadata: {}
+    - name: transform
+      model_type: transform
+      description: Scales the driver.
+      inputs:
+        - name: driver
+          direction: in
+          data_type: timeseries
+          units: unit
+          description: Driver values.
+      outputs:
+        - name: flow
+          direction: out
+          data_type: timeseries
+          units: unit
+          description: Scaled values.
+      metadata:
+        runnable:
+          kind: python
+          entry: models:transform
+          inputs: [driver]
+          outputs: [flow]
+          params:
+            gain: 1.0
+    - name: score
+      model_type: score
+      description: Scores flow relative to a target.
+      inputs:
+        - name: flow
+          direction: in
+          data_type: timeseries
+          units: unit
+          description: Scaled values.
+      outputs:
+        - name: utility_series
+          direction: out
+          data_type: timeseries
+          units: point
+          description: Utility values.
+      metadata:
+        runnable:
+          kind: python
+          entry: models:score
+          inputs: [flow]
+          outputs: [utility_series]
+          params:
+            target: 4.0
+            offset: 0.0
+  connections:
+    - source: source
+      target: transform
+      port_from: driver
+      port_to: driver
+      description: Source driver to transform.
+    - source: transform
+      target: score
+      port_from: flow
+      port_to: flow
+      description: Transformed flow to score.

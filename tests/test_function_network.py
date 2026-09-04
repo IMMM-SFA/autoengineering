@@ -2,7 +2,12 @@
 
 from dataclasses import FrozenInstanceError, replace
 import hashlib
+import io
 import json
+from pathlib import Path
+import subprocess
+import sys
+import zipfile
 
 import numpy as np
 import pytest
@@ -210,10 +215,21 @@ def test_validation_rejects_unknown_and_missing_components(network_system, netwo
 
 
 def test_validation_rejects_system_cycles(network_system, network_spec):
-    network_system.connect("score", "transform", "utility", "driver")
-    cycle = CouplingSpec("score", "utility", "transform", "driver")
-    with pytest.raises(ValueError, match="acyclic|only one owner"):
-        replace(network_spec, couplings=(*network_spec.couplings, cycle)).validate(network_system)
+    source = network_system.get_component("source")
+    source.add_input("feedback", data_type="timeseries", units="point")
+    network_system.connect("score", "source", "utility", "feedback")
+    represented_source = replace(
+        network_spec.components[0],
+        inputs=(FunctionPortSpec("feedback", "in", "timeseries", "point"),),
+    )
+    cycle = CouplingSpec("score", "utility", "source", "feedback")
+    cyclic_spec = replace(
+        network_spec,
+        components=(represented_source, *network_spec.components[1:]),
+        couplings=(*network_spec.couplings, cycle),
+    )
+    with pytest.raises(ValueError, match="acyclic"):
+        cyclic_spec.validate(network_system)
 
 
 def test_validation_rejects_dangling_and_incomplete_couplings(network_system, network_spec):
@@ -422,6 +438,10 @@ def test_function_network_evaluates_system_and_component_actions_and_replays_tab
         "source.driver_mean": 2.0,
     }
     assert first["transform"][1].outputs == {"flow_mean": 3.0}
+    assert first["transform"][1].artifact_ids == (
+        parent_id,
+        next(iter(component_result.artifacts)),
+    )
     assert first["score"][0].inputs["transform.flow_mean"] == 4.0
 
     record = json.loads(ledger.path.read_text(encoding="utf-8").splitlines()[0])
@@ -470,6 +490,18 @@ def test_verified_npz_rejects_digest_object_arrays_and_resource_excess(tmp_path)
     with pytest.raises(FunctionNetworkArtifactError, match="object arrays"):
         read_verified_npz(objects, object_digest)
 
+    member = io.BytesIO()
+    np.lib.format.write_array(member, np.array([1.0]), allow_pickle=False)
+    unsafe = tmp_path / "unsafe.npz"
+    with zipfile.ZipFile(unsafe, "w") as archive:
+        archive.writestr("../values.npy", member.getvalue())
+    unsafe_digest = hashlib.sha256(unsafe.read_bytes()).hexdigest()
+    with pytest.raises(FunctionNetworkArtifactError, match="member name is unsafe"):
+        read_verified_npz(unsafe, unsafe_digest)
+
+    with pytest.raises(FunctionNetworkArtifactError, match="cannot be opened"):
+        read_verified_npz(tmp_path / "missing.npz", "0" * 64)
+
 
 def test_training_reconstruction_rejects_changed_and_unknown_parent_artifacts(
     tmp_path, network_system, network_spec
@@ -510,3 +542,95 @@ def test_training_reconstruction_rejects_changed_and_unknown_parent_artifacts(
     artifact.write_bytes(b"changed")
     with pytest.raises(FunctionNetworkArtifactError, match="SHA-256"):
         read_verified_npz(artifact, digest)
+
+
+def test_training_reconstruction_rejects_duplicate_artifact_ids(
+    tmp_path, network_system, network_spec
+):
+    artifact = tmp_path / "trace.npz"
+    np.savez(
+        artifact,
+        **{
+            "source.driver": np.array([1.0]),
+            "transform.flow": np.array([2.0]),
+            "score.utility": np.array([3.0]),
+        },
+    )
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    actions = tuple(
+        EvaluationAction.system(
+            f"eval-{index:06d}",
+            {
+                "transform.choice": "base",
+                "transform.gain": 2.0,
+                "score.choice": "base",
+                "score.offset": 0.0,
+            },
+        )
+        for index in (1, 2)
+    )
+    outcomes = {
+        "source.driver_mean": 1.0,
+        "transform.flow_mean": 2.0,
+        "score.utility_last": 3.0,
+        "utility": 3.0,
+        "minimum_flow": 2.0,
+    }
+    results = tuple(
+        EvaluationResult.success(
+            action.id,
+            outcomes,
+            {},
+            1.0,
+            "second",
+            artifacts={"same": str(artifact)},
+            artifact_sha256={"same": digest},
+        )
+        for action in actions
+    )
+
+    class EntriesOnly:
+        def entries(self):
+            return tuple(zip(actions, results, strict=True))
+
+    with pytest.raises(FunctionNetworkArtifactError, match="duplicate artifact ID"):
+        reconstruct_component_training_tables(network_spec, network_system, EntriesOnly())
+
+
+def test_checked_function_network_example_replays_scientific_tables(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    script = root / "examples" / "function_network" / "run_example.py"
+    expected = json.loads(
+        (script.parent / "expected-result.json").read_text(encoding="utf-8")
+    )
+    results = []
+    for name in ("first", "second"):
+        output = tmp_path / name
+        completed = subprocess.run(
+            [sys.executable, str(script), "--output", str(output)],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert "reconstructed 4 component rows" in completed.stdout
+        result = json.loads((output / "training-tables.json").read_text(encoding="utf-8"))
+        for rows in result["training_tables"].values():
+            for row in rows:
+                row.pop("artifact_ids")
+                row.pop("artifact_sha256")
+        results.append(result)
+    assert results == [expected, expected]
+
+
+def test_function_network_imports_do_not_load_bayesian_dependencies():
+    command = [
+        sys.executable,
+        "-c",
+        "import autoengineering.optimization.function_network; "
+        "import autoengineering.optimization.function_network_evaluator; "
+        "import sys; blocked={'torch','botorch','gpytorch','smac'}; "
+        "assert not (blocked & {name.split('.')[0] for name in sys.modules})",
+    ]
+    completed = subprocess.run(command, check=False, capture_output=True, text=True)
+    assert completed.returncode == 0, completed.stderr

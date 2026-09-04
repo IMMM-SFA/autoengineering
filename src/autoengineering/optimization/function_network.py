@@ -387,6 +387,8 @@ class FunctionNetworkSpec:
         component_names = [item.component for item in components]
         if len(set(component_names)) != len(component_names):
             raise ValueError("function network has duplicate component names")
+        if len({item.cost_unit for item in components}) != 1:
+            raise ValueError("function network component cost units must match")
         object.__setattr__(self, "components", components)
         couplings = tuple(self.couplings)
         if not all(isinstance(item, CouplingSpec) for item in couplings):
@@ -600,6 +602,11 @@ def _validate_ports(
         raise ValueError(f"component {component_name!r} {direction} ports differ from System")
     for name, port in represented_by_name.items():
         system_port = actual_by_name[name]
+        expected_direction = "in" if direction == "input" else "out"
+        if system_port.direction != expected_direction:
+            raise ValueError(
+                f"System component {component_name!r} port {name!r} has invalid direction"
+            )
         if port.data_type != "any" and system_port.data_type != "any":
             if port.data_type != system_port.data_type:
                 raise ValueError(
