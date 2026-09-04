@@ -25,6 +25,7 @@ from .function_network import (
     ScalarOutputSpec,
     reduce_scalar,
     scalar_observation_name,
+    validate_local_parameter_values,
 )
 from .ledger import ObservationLedgerReader
 from .records import (
@@ -189,6 +190,23 @@ class FunctionNetworkEvaluator:
         if not callable(self.clock):
             raise TypeError("clock must be callable")
         self.spec.validate(self.context.system)
+        if any(component.cost_unit != self.context.cost_unit for component in self.spec.components):
+            raise ValueError("function network and evaluator cost units must match")
+        for component in self.spec.components:
+            choices = next(
+                (item for item in component.parameters if item.name == "choice"), None
+            )
+            alternatives = self.context.alternatives.get(component.component)
+            if choices is None:
+                if alternatives:
+                    raise ValueError(
+                        f"component {component.component!r} has undeclared evaluator alternatives"
+                    )
+            elif alternatives is None or set(choices.categories) != set(alternatives):
+                raise ValueError(
+                    f"component {component.component!r} choice categories differ from evaluator "
+                    "alternatives"
+                )
 
     def evaluate(self, action: EvaluationAction) -> EvaluationResult:
         """Evaluate one declared action and record only scalar features plus NPZ references."""
@@ -233,6 +251,14 @@ class FunctionNetworkEvaluator:
         unknown = set(action.config) - declared
         if unknown:
             raise ValueError(f"action configuration contains undeclared parameters: {sorted(unknown)}")
+        for component in selected:
+            prefix = f"{component.component}."
+            local = {
+                name.removeprefix(prefix): value
+                for name, value in action.config.items()
+                if name.startswith(prefix)
+            }
+            validate_local_parameter_values(component, local)
 
     def _observation_functions(
         self,
@@ -413,6 +439,15 @@ def reconstruct_component_training_tables(
         else:
             selected = [spec.component_map[action.component or ""]]
         for component in selected:
+            prefix = f"{component.component}."
+            validate_local_parameter_values(
+                component,
+                {
+                    name.removeprefix(prefix): value
+                    for name, value in action.config.items()
+                    if name.startswith(prefix)
+                },
+            )
             observable = tuple(
                 output for output in component.scalar_outputs if action.scope in output.observed_in
             )

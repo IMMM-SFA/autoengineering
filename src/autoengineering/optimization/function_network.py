@@ -175,6 +175,14 @@ class FunctionComponentSpec:
         parameter_names = [item.name for item in parameters]
         if len(set(parameter_names)) != len(parameter_names):
             raise ValueError(f"component {self.component!r} has duplicate parameter names")
+        choices = [item for item in parameters if item.name == "choice"]
+        if choices and (
+            not isinstance(choices[0], CategoricalParameter)
+            or not all(isinstance(value, str) and value for value in choices[0].categories)
+        ):
+            raise ValueError("component choice must be a categorical parameter of non-empty strings")
+        if any(item.name != "choice" for item in parameters) and not choices:
+            raise ValueError("component design parameters require a categorical choice parameter")
         object.__setattr__(self, "parameters", parameters)
 
         inputs = tuple(self.inputs)
@@ -661,6 +669,79 @@ def scalar_observation_name(component: str, scalar_output: str) -> str:
     _require_name(component, "component")
     _require_name(scalar_output, "scalar output")
     return f"{component}.{scalar_output}"
+
+
+def validate_local_parameter_values(
+    component: FunctionComponentSpec,
+    values: Mapping[str, object],
+) -> None:
+    """Require one valid value for every active local design parameter."""
+    if not isinstance(component, FunctionComponentSpec):
+        raise TypeError("component must be a FunctionComponentSpec")
+    if not isinstance(values, Mapping):
+        raise TypeError("local parameter values must be a mapping")
+    declared = {item.name for item in component.parameters}
+    unknown = set(values) - declared
+    if unknown:
+        raise ValueError(
+            f"component {component.component!r} has undeclared parameter values: {sorted(unknown)}"
+        )
+    known: dict[str, object] = {}
+    for parameter in component.parameters:
+        active = True
+        if isinstance(parameter, (ContinuousParameter, IntegerParameter)):
+            active = all(
+                condition in known
+                and any(
+                    type(known[condition]) is type(allowed) and known[condition] == allowed
+                    for allowed in allowed_values
+                )
+                for condition, allowed_values in parameter.active_when.items()
+            )
+        present = parameter.name in values
+        if active and not present:
+            raise ValueError(
+                f"component {component.component!r} is missing active parameter {parameter.name!r}"
+            )
+        if not active and present:
+            raise ValueError(
+                f"component {component.component!r} supplies inactive parameter {parameter.name!r}"
+            )
+        if not active:
+            continue
+        value = values[parameter.name]
+        if isinstance(parameter, CategoricalParameter):
+            if not any(
+                type(value) is type(category) and value == category
+                for category in parameter.categories
+            ):
+                raise ValueError(
+                    f"component {component.component!r} parameter {parameter.name!r} "
+                    "is outside its categories"
+                )
+        elif isinstance(parameter, IntegerParameter):
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value < parameter.lower
+                or value > parameter.upper
+            ):
+                raise ValueError(
+                    f"component {component.component!r} parameter {parameter.name!r} "
+                    "is outside its integer bounds"
+                )
+        elif (
+            isinstance(value, bool)
+            or not isinstance(value, Real)
+            or not math.isfinite(value)
+            or value < parameter.lower
+            or value > parameter.upper
+        ):
+            raise ValueError(
+                f"component {component.component!r} parameter {parameter.name!r} "
+                "is outside its continuous bounds"
+            )
+        known[parameter.name] = value
 
 
 def reduce_scalar(values: object, reducer: ScalarReducer) -> float:

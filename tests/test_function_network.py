@@ -197,6 +197,9 @@ def test_function_network_rejects_duplicate_components_parameters_ports_and_outp
     with pytest.raises(ValueError, match="duplicate scalar output"):
         replace(transform, scalar_outputs=(*transform.scalar_outputs, transform.scalar_outputs[0]))
 
+    with pytest.raises(ValueError, match="require a categorical choice"):
+        replace(transform, parameters=(ContinuousParameter("gain", 0.5, 2.0),))
+
 
 def test_function_network_rejects_duplicate_coupling_input_ownership(network_spec):
     conflicting = CouplingSpec("score", "utility", "transform", "driver")
@@ -469,6 +472,47 @@ def test_function_network_component_scope_requires_permission_parents_and_observ
     undeclared = EvaluationAction.system("eval-000003", {"score.absent": 1.0})
     with pytest.raises(ValueError, match="undeclared parameters"):
         evaluator.evaluate(undeclared)
+
+    missing = EvaluationAction.system(
+        "eval-000004",
+        {
+            "transform.choice": "base",
+            "transform.gain": 1.0,
+            "score.choice": "base",
+        },
+    )
+    with pytest.raises(ValueError, match="missing active parameter 'offset'"):
+        evaluator.evaluate(missing)
+
+    outside = EvaluationAction.system(
+        "eval-000005",
+        {
+            "transform.choice": "base",
+            "transform.gain": 9.0,
+            "score.choice": "base",
+            "score.offset": 0.0,
+        },
+    )
+    with pytest.raises(ValueError, match="continuous bounds"):
+        evaluator.evaluate(outside)
+
+
+def test_function_network_evaluator_binds_cost_units_and_choice_alternatives(
+    tmp_path, network_system, network_spec
+):
+    context = _evaluation_context(tmp_path, network_system)
+    with pytest.raises(ValueError, match="choice categories"):
+        FunctionNetworkEvaluator(
+            network_spec,
+            replace(context, alternatives={"transform": {"other": network_system.components[1]}}),
+            runner=_synthetic_runner,
+        )
+    with pytest.raises(ValueError, match="cost units"):
+        FunctionNetworkEvaluator(
+            network_spec,
+            replace(context, cost_unit="cpu_hour"),
+            runner=_synthetic_runner,
+        )
 
 
 def test_verified_npz_rejects_digest_object_arrays_and_resource_excess(tmp_path):
