@@ -312,11 +312,11 @@ def test_partial_value_suggestion_replays_with_fantasy_diagnostics(
     assert first.identity_dict()["constructor"]["fantasy_samples"] == 2
     assert first.identity_dict()["constructor"]["reserve_system_refresh_budget"] is True
     assert first.identity_dict()["constructor"]["fantasy_sampler"] == (
-        "common_pseudorandom_normal"
+        "common_antithetic_normal"
     )
     assert first.state_dict()["partial_policy"]["reserve_system_refresh_budget"] is True
     assert first.state_dict()["partial_policy"]["fantasy_sampler"] == (
-        "common_pseudorandom_normal"
+        "common_antithetic_normal"
     )
 
 
@@ -367,7 +367,7 @@ def test_partial_exact_gaussian_conditioning_matches_closed_form(
 
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
-def test_partial_fantasies_use_common_pseudorandom_draws(tmp_path, partial_contract):
+def test_partial_fantasies_use_common_antithetic_draws(tmp_path, partial_contract):
     system, network, study, space = partial_contract
     ledger = _observed_ledger(tmp_path, partial_contract)
     backend = PartialNetworkBayesBackend(
@@ -406,7 +406,7 @@ def test_partial_fantasies_use_common_pseudorandom_draws(tmp_path, partial_contr
     draws = backend._fantasy_standard_normals(123, 4)
 
     assert first_seeds == second_seeds
-    assert np.array_equal(draws, np.random.default_rng(123).standard_normal(4))
+    assert np.array_equal(draws[:2], -draws[2:])
     assert np.array_equal(draws, backend._fantasy_standard_normals(123, 4))
 
 
