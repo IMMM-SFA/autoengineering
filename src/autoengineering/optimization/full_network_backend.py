@@ -141,8 +141,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
         ):
             if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
                 raise ValueError(f"{name} must be an integer >= {minimum}")
-        if spec.backend != self.name:
-            raise ValueError("study backend must be 'function_network_full'")
+        self._validate_backend_name()
         order = network.validate(system)
         self._validate_contract(network)
         self._validate_search_space(network)
@@ -155,6 +154,10 @@ class FullNetworkBayesBackend(_BaselineBackend):
         self.fit_retry_limit = fit_retry_limit
         self._last_fingerprint: str | None = None
         self._last_diagnostics: BackendDiagnostics | None = None
+
+    def _validate_backend_name(self) -> None:
+        if self.spec.backend != self.name:
+            raise ValueError(f"study backend must be {self.name!r}")
 
     def _validate_contract(self, network: FunctionNetworkSpec) -> None:
         if (
@@ -174,6 +177,9 @@ class FullNetworkBayesBackend(_BaselineBackend):
             component.cost_unit != self.spec.budget.cost_unit for component in network.components
         ):
             raise ValueError("study and function network cost units must match")
+        self._validate_observability_contract(network)
+
+    def _validate_observability_contract(self, network: FunctionNetworkSpec) -> None:
         unavailable = [
             f"{component.component}.{output.name}"
             for component in network.components
@@ -219,9 +225,10 @@ class FullNetworkBayesBackend(_BaselineBackend):
     def _suggest(self, ledger: ObservationLedgerReader, n: int) -> tuple[EvaluationAction, ...]:
         started = time.perf_counter()
         entries = ledger.entries()
+        self._validate_training_entries(entries)
         next_index, observed = self._next_index_and_observed(ledger)
         fingerprint = self._fingerprint(entries)
-        successful = sum(result.status is EvaluationStatus.SUCCESS for _, result in entries)
+        successful = self._count_initial_observations(entries)
         if successful < self.min_initial:
             return self._sobol(
                 ledger,
@@ -233,8 +240,6 @@ class FullNetworkBayesBackend(_BaselineBackend):
             )
 
         tables = reconstruct_component_training_tables(self.network, self.system, ledger)
-        if any(row.scope is not EvaluationScope.SYSTEM for rows in tables.values() for row in rows):
-            raise ValueError("full-observability training rows must have system scope")
         captured: list[warnings.WarningMessage] = []
         try:
             with warnings.catch_warnings(record=True) as captured:
@@ -380,12 +385,10 @@ class FullNetworkBayesBackend(_BaselineBackend):
         for config in configs:
             self.space.encode(config)
         entries = ledger.entries()
-        for action, _ in entries:
-            if action.scope is not EvaluationScope.SYSTEM:
-                raise ValueError("full-observability backend requires only system observations")
+        self._validate_training_entries(entries)
         fingerprint = self._fingerprint(entries)
         tables = reconstruct_component_training_tables(self.network, self.system, ledger)
-        successful = sum(result.status is EvaluationStatus.SUCCESS for _, result in entries)
+        successful = self._count_initial_observations(entries)
         if successful < self.min_initial:
             raise ValueError(
                 "posterior prediction requires the minimum successful system observations"
@@ -393,6 +396,25 @@ class FullNetworkBayesBackend(_BaselineBackend):
         prepared = self._fit_components(tables, fingerprint)
         return tuple(
             self._propagate(prepared, config, fingerprint, sample_count) for config in configs
+        )
+
+    def _validate_training_entries(self, entries) -> None:
+        if any(action.scope is not EvaluationScope.SYSTEM for action, _ in entries):
+            raise ValueError("full-observability backend requires only system scope observations")
+
+    def _count_initial_observations(self, entries) -> int:
+        return sum(
+            action.scope is EvaluationScope.SYSTEM and result.status is EvaluationStatus.SUCCESS
+            for action, result in entries
+        )
+
+    def _select_component_training_rows(
+        self,
+        component_name: str,
+        tables: Mapping[str, tuple[ComponentTrainingRow, ...]],
+    ) -> tuple[ComponentTrainingRow, ...]:
+        return tuple(
+            row for row in tables[component_name] if row.scope is EvaluationScope.SYSTEM
         )
 
     def _fit_components(
@@ -403,9 +425,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
         prepared: dict[str, _PreparedComponent] = {}
         for component_name in self.order:
             component = self.network.component_map[component_name]
-            rows = tuple(
-                row for row in tables[component_name] if row.scope is EvaluationScope.SYSTEM
-            )
+            rows = self._select_component_training_rows(component_name, tables)
             if not rows:
                 raise ValueError(f"component {component_name!r} has no successful system rows")
             feature_names = tuple(rows[0].inputs)

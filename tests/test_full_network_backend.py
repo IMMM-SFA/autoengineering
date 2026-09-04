@@ -171,6 +171,37 @@ def test_full_network_constructor_binds_study_space_network_and_cost(
 
 
 @pytest.mark.skipif(FullNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_full_network_reusable_seams_follow_concrete_backend_and_scope_hooks(
+    full_network_contract,
+):
+    system, network, study, space = full_network_contract
+
+    class MixedScopeBackend(FullNetworkBayesBackend):
+        name = "function_network_partial"
+
+        def _validate_observability_contract(self, network):
+            return None
+
+        def _validate_training_entries(self, entries):
+            return None
+
+        def _select_component_training_rows(self, component_name, tables):
+            return tables[component_name]
+
+    backend = MixedScopeBackend(
+        replace(study, backend="function_network_partial"),
+        space,
+        network,
+        system,
+    )
+    assert backend.name == "function_network_partial"
+    assert backend._select_component_training_rows("source", {"source": (1, 2)}) == (1, 2)
+
+    with pytest.raises(ValueError, match="function_network_partial"):
+        MixedScopeBackend(study, space, network, system)
+
+
+@pytest.mark.skipif(FullNetworkBayesBackend is None, reason="optional Bayesian dependencies")
 def test_full_network_cold_start_returns_only_replayable_system_actions(
     tmp_path, full_network_contract
 ):
