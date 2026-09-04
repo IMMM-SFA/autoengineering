@@ -14,6 +14,7 @@ from .records import (
     Recommendation,
     Scalar,
 )
+from .run_spec import OptimizationRunSpec
 from .space import CategoricalParameter, ContinuousParameter, IntegerParameter, SearchSpace
 from .spec import BudgetSpec, ConstraintSpec, NoiseSpec, ObjectiveSpec, StudySpec
 
@@ -32,6 +33,7 @@ __all__ = [
     "LedgerCorruptionError",
     "NoiseSpec",
     "OptimizationStudy",
+    "OptimizationRunSpec",
     "ObjectiveSpec",
     "ObservationLedger",
     "ObservationLedgerReader",

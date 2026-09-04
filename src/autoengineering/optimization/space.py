@@ -11,12 +11,48 @@ supported because their inactive state would require a separate mask.
 from dataclasses import dataclass, field
 import math
 from numbers import Real
+from pathlib import Path
 from types import MappingProxyType
-from typing import Literal, Mapping, Sequence, TypeAlias
+from typing import Any, Literal, Mapping, Sequence, TypeAlias
+
+import yaml
+
+from .yaml_utils import safe_load_unique
 
 
 Scalar: TypeAlias = str | int | float | bool
 ActiveWhen: TypeAlias = Mapping[str, tuple[Scalar, ...]]
+SEARCH_SPACE_SCHEMA_VERSION = "1.0"
+
+
+def _write_yaml(path: str | Path, value: Mapping[str, object]) -> None:
+    Path(path).write_text(yaml.safe_dump(dict(value), sort_keys=False), encoding="utf-8")
+
+
+def _read_yaml(path: str | Path) -> object:
+    return safe_load_unique(Path(path).read_text(encoding="utf-8"))
+
+
+def _require_exact_keys(data: Mapping[str, Any], required: set[str], label: str) -> None:
+    if not isinstance(data, Mapping):
+        raise TypeError(f"{label} must be a mapping")
+    if set(data) != required:
+        raise ValueError(f"{label} keys must be exactly {sorted(required)}")
+
+
+def _conditions_dict(active_when: ActiveWhen) -> dict[str, list[Scalar]]:
+    return {name: list(values) for name, values in active_when.items()}
+
+
+def _conditions_from_dict(value: object) -> dict[str, tuple[Scalar, ...]]:
+    if not isinstance(value, Mapping):
+        raise TypeError("active_when must be a mapping")
+    conditions: dict[str, tuple[Scalar, ...]] = {}
+    for name, values in value.items():
+        if not isinstance(name, str) or not isinstance(values, list):
+            raise TypeError("active_when must map names to lists")
+        conditions[name] = tuple(values)
+    return conditions
 
 
 def _is_scalar(value: object) -> bool:
@@ -86,6 +122,29 @@ class CategoricalParameter:
             raise ValueError("categories must not contain duplicates")
         object.__setattr__(self, "categories", categories)
 
+    def to_dict(self) -> dict[str, object]:
+        """Return the ordered public representation of this parameter."""
+        return {"type": "categorical", "name": self.name, "categories": list(self.categories)}
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "CategoricalParameter":
+        """Load a categorical parameter from its exact public schema."""
+        _require_exact_keys(data, {"type", "name", "categories"}, "categorical parameter")
+        if data["type"] != "categorical":
+            raise ValueError("categorical parameter type must be 'categorical'")
+        if not isinstance(data["categories"], list):
+            raise TypeError("categorical parameter categories must be a list")
+        return cls(name=data["name"], categories=tuple(data["categories"]))
+
+    def to_yaml(self, path: str | Path) -> None:
+        """Write this parameter as stable safe YAML."""
+        _write_yaml(path, self.to_dict())
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "CategoricalParameter":
+        """Load this parameter from YAML."""
+        return cls.from_dict(_read_yaml(path))
+
 
 @dataclass(frozen=True)
 class ContinuousParameter:
@@ -110,6 +169,41 @@ class ContinuousParameter:
         object.__setattr__(self, "lower", lower)
         object.__setattr__(self, "upper", upper)
         object.__setattr__(self, "active_when", _freeze_conditions(self.active_when))
+
+    def to_dict(self) -> dict[str, object]:
+        """Return the ordered public representation of this parameter."""
+        return {
+            "type": "continuous",
+            "name": self.name,
+            "lower": self.lower,
+            "upper": self.upper,
+            "scale": self.scale,
+            "active_when": _conditions_dict(self.active_when),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "ContinuousParameter":
+        """Load a continuous parameter from its exact public schema."""
+        required = {"type", "name", "lower", "upper", "scale", "active_when"}
+        _require_exact_keys(data, required, "continuous parameter")
+        if data["type"] != "continuous":
+            raise ValueError("continuous parameter type must be 'continuous'")
+        return cls(
+            name=data["name"],
+            lower=data["lower"],
+            upper=data["upper"],
+            scale=data["scale"],
+            active_when=_conditions_from_dict(data["active_when"]),
+        )
+
+    def to_yaml(self, path: str | Path) -> None:
+        """Write this parameter as stable safe YAML."""
+        _write_yaml(path, self.to_dict())
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "ContinuousParameter":
+        """Load this parameter from YAML."""
+        return cls.from_dict(_read_yaml(path))
 
 
 @dataclass(frozen=True)
@@ -138,6 +232,41 @@ class IntegerParameter:
         if self.scale == "log" and self.lower <= 0:
             raise ValueError("log scale lower bound must be positive")
         object.__setattr__(self, "active_when", _freeze_conditions(self.active_when))
+
+    def to_dict(self) -> dict[str, object]:
+        """Return the ordered public representation of this parameter."""
+        return {
+            "type": "integer",
+            "name": self.name,
+            "lower": self.lower,
+            "upper": self.upper,
+            "scale": self.scale,
+            "active_when": _conditions_dict(self.active_when),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "IntegerParameter":
+        """Load an integer parameter from its exact public schema."""
+        required = {"type", "name", "lower", "upper", "scale", "active_when"}
+        _require_exact_keys(data, required, "integer parameter")
+        if data["type"] != "integer":
+            raise ValueError("integer parameter type must be 'integer'")
+        return cls(
+            name=data["name"],
+            lower=data["lower"],
+            upper=data["upper"],
+            scale=data["scale"],
+            active_when=_conditions_from_dict(data["active_when"]),
+        )
+
+    def to_yaml(self, path: str | Path) -> None:
+        """Write this parameter as stable safe YAML."""
+        _write_yaml(path, self.to_dict())
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "IntegerParameter":
+        """Load this parameter from YAML."""
+        return cls.from_dict(_read_yaml(path))
 
 
 NumericParameter: TypeAlias = ContinuousParameter | IntegerParameter
@@ -177,6 +306,46 @@ class SearchSpace:
                         raise ValueError(f"condition category is invalid for {condition_name}")
             known[parameter.name] = parameter
         object.__setattr__(self, "parameters", parameters)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return the ordered public representation of this search space."""
+        return {
+            "schema_version": SEARCH_SPACE_SCHEMA_VERSION,
+            "parameters": [parameter.to_dict() for parameter in self.parameters],
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "SearchSpace":
+        """Load a search space from its strict public representation."""
+        _require_exact_keys(data, {"schema_version", "parameters"}, "search space")
+        if data["schema_version"] != SEARCH_SPACE_SCHEMA_VERSION:
+            raise ValueError("search space schema version differs")
+        parameters = data["parameters"]
+        if not isinstance(parameters, list):
+            raise TypeError("search space parameters must be a list")
+        loaded: list[Parameter] = []
+        loaders = {
+            "categorical": CategoricalParameter.from_dict,
+            "continuous": ContinuousParameter.from_dict,
+            "integer": IntegerParameter.from_dict,
+        }
+        for parameter in parameters:
+            if not isinstance(parameter, Mapping):
+                raise TypeError("search space parameter must be a mapping")
+            parameter_type = parameter.get("type")
+            if parameter_type not in loaders:
+                raise ValueError(f"unknown search space parameter type: {parameter_type!r}")
+            loaded.append(loaders[parameter_type](parameter))
+        return cls(tuple(loaded))
+
+    def to_yaml(self, path: str | Path) -> None:
+        """Write this search space as stable safe YAML."""
+        _write_yaml(path, self.to_dict())
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "SearchSpace":
+        """Load a search space from YAML."""
+        return cls.from_dict(_read_yaml(path))
 
     @property
     def encoded_dimension(self) -> int:
