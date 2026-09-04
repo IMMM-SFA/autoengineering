@@ -355,6 +355,13 @@ pixi run lint          # Run ruff linter
 pixi run install       # Reinstall package in development mode
 ```
 
+Development of the Bayesian optimization layer is tracked in
+[`docs/bayesian-optimization-status.md`](docs/bayesian-optimization-status.md).
+
+## AI assistance
+
+Development and review of the Bayesian optimization branch used OpenAI Codex with GPT-5.
+
 ## License
 
 BSD-3-Clause. Copyright (c) 2025, Battelle Memorial Institute.
