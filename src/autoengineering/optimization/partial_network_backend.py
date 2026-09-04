@@ -814,7 +814,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 )
             seed = self._seed(
                 fingerprint,
-                "common-antithetic-fantasy",
+                "common-pseudorandom-fantasy",
                 str(output_index),
             )
             seeds.append(seed)
@@ -845,12 +845,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
 
     @staticmethod
     def _fantasy_standard_normals(seed: int, count: int) -> np.ndarray:
-        generator = np.random.default_rng(seed)
-        positive = generator.standard_normal(count // 2)
-        draws = np.concatenate((positive, -positive))
-        if count % 2:
-            draws = np.concatenate((draws, np.zeros(1, dtype=float)))
-        return draws
+        return np.random.default_rng(seed).standard_normal(count)
 
     def _acquisition_stats(self, posterior, best: float) -> tuple[float, float]:
         feasible = np.ones(posterior.sample_count, dtype=bool)
@@ -1000,7 +995,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 "minimum_value_per_cost": self.minimum_value_per_cost,
                 "cost_quantile": self.cost_quantile,
                 "reserve_system_refresh_budget": True,
-                "fantasy_sampler": "common_antithetic_normal",
+                "fantasy_sampler": "common_pseudorandom_normal",
             }
         )
         identity["constructor"] = constructor
@@ -1008,7 +1003,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "component_parents": "earlier_successful_system_artifacts",
             "component_chaining": False,
             "system_refresh_budget": "reserved_after_component_action",
-            "fantasy_sampler": "common_antithetic_normal",
+            "fantasy_sampler": "common_pseudorandom_normal",
             "score": "finite_pool_one_step_value_of_information_per_cost",
         }
         return identity
@@ -1023,7 +1018,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "minimum_value_per_cost": self.minimum_value_per_cost,
             "cost_quantile": self.cost_quantile,
             "reserve_system_refresh_budget": True,
-            "fantasy_sampler": "common_antithetic_normal",
+            "fantasy_sampler": "common_pseudorandom_normal",
         }
         return state
 
