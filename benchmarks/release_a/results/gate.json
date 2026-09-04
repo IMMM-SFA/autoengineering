@@ -176,10 +176,10 @@
   ],
   "passed": true,
   "provenance": {
-    "command": "pixi run -e bayes benchmark-release-a --output /private/tmp/autoengineering-release-a-rerun-afc66b8",
+    "command": "pixi run -e bayes benchmark-release-a --output /private/tmp/autoengineering-release-a-item7",
     "correction_sha256": "201a122103c88923a5bcfe1287521f3b39cb997d7e80b4320c2bb62f557ba204",
     "decision_sha256": "2ff080d09092197c55c6ff0cbd36f023477fe58c7cbed32d15ce58fe0e003168",
-    "git_head_at_execution": "afc66b82372074c043547c1a1c998be68ebe578f",
+    "git_head_at_execution": "9a095c947c2234c4b7c5bd4475bec50392d6ea6f",
     "git_tree_clean": true,
     "packages": {
       "ConfigSpace": "1.2.2",
@@ -193,7 +193,7 @@
     },
     "platform": "macOS-26.5-arm64-arm-64bit",
     "python": "3.12.13",
-    "source_sha256": "61ff6c25a666e10e280e5c73e893745c495cd447e2f6014d5727cde793c8caa6"
+    "source_sha256": "93f317f997a81f4e2ed787e536a61464e7e824b3f64e940338e8c13723fe3eef"
   },
   "schema_version": "1.0"
 }
