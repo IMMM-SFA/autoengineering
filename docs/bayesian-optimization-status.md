@@ -4,9 +4,9 @@ _Status date: 2026-09-04_
 
 The branch `codex/bayesian-optimization-implementation` contains the optimization contracts,
 reproducible baselines, evaluator integration, whole-system BoTorch backend, sequential budget
-controller, hardened recovery layer, and public run configuration. It does not yet provide an
-approved benchmark release gate, function-network optimization, or complete documentation. The
-public optimization command and self-contained example are complete.
+controller, hardened recovery layer, public run configuration, command, example, and approved
+Release A benchmark gate. It does not yet provide function-network optimization or complete
+documentation.
 
 ## Recovery context
 
@@ -30,7 +30,7 @@ commit `b3dcdd4`.
 | 5. Evaluator integration | Complete | System evaluation, artifact durability, path validation, resource limits, and failure classification are implemented. |
 | 6. Whole-system BoTorch backend | Complete | The backend supports constrained mixed-variable optimization, conditional projection, noise modes, deterministic replay, diagnostics, and bounded fallbacks. |
 | 7. Budget controller and provenance | Complete | Canonical identity, exact transition replay, manifest-last commits, and bootstrap, action, and terminal recovery passed independent review. |
-| 8. CLI and Release A benchmark gate | In progress | The strict run specification, optimization command, and checked example are complete through `5a257d0`. Add the benchmark harness, SMAC comparison adapter, and release criteria. |
+| 8. CLI and Release A benchmark gate | Complete | The run specification, command, example, SMAC comparison, raw scientific audit, and frozen release criteria pass. |
 | 9. Function-network representation | Not implemented | Represent component functions, couplings, observations, costs, and graph evaluation scopes. |
 | 10. Full-observability function-network BO | Not implemented | Fit component surrogates and propagate intermediate observations through the system graph. |
 | 11. Partial-observability function-network BO | Not implemented | Select the configuration and component evaluation using cost-aware value of information or knowledge gradient methods. |
@@ -90,6 +90,20 @@ The independent review in
 remaining implementation defect. A public CLI probe matched the expected result and all four input
 hashes. Two fresh runs produced byte-identical ledgers and recommendation files.
 
+### Item 5: Release A benchmark gate
+
+Decision 0001 freezes five problems, five methods, 30 seeds, 10 evaluations per run, and the
+release thresholds. Decision 0002 records evidence corrections found by independent review without
+changing those definitions. The corrected implementation through `c38d6ca` produced 7,500 raw
+evaluation records and 750 complete runs with no run errors, invalid configurations, or budget
+overruns.
+
+All 600 native runs replay exactly, all 150 SMAC runs complete, and the raw scientific audit reports
+zero issues. BoTorch met every pooled and per-problem regret criterion. Three of 750 post-warm
+suggestions used unresolved fallbacks, below the aggregate and per-run limits. The independent
+review in [`reviews/05-release-a-benchmark-review.md`](reviews/05-release-a-benchmark-review.md)
+found no remaining implementation defect.
+
 ## Work required for Release A
 
 Release A is whole-system Bayesian optimization. It treats one execution of the complete model
@@ -100,19 +114,10 @@ methods.
 
 The `optimize` command and its self-contained checked example are complete.
 
-### Implement the benchmark release gate
+### Benchmark release gate
 
-The approved plan calls for five benchmark problems and 30 seeds per method. The comparison set is:
-
-- fixed candidate order;
-- random search;
-- scrambled Sobol search;
-- SMAC; and
-- the whole-system BoTorch backend.
-
-The benchmark should compare feasible regret or objective quality against evaluator cost. It
-should also record constraint violations, failures, optimizer overhead, and replay consistency.
-SMAC is provisioned as a dependency but no SMAC adapter or shared benchmark harness exists.
+The Release A benchmark gate is complete. Its raw records, summary, report, decisions, and machine
+gate are checked under `benchmarks/release_a/results/` and `docs/decisions/`.
 
 ### Complete documentation and review
 
@@ -143,14 +148,16 @@ and multi-fidelity evaluation remain outside Release A.
 
 ## Verification evidence
 
-The latest post-review gate was verified on 2026-09-04 at signed item 4 commit `5a257d0`.
+The latest post-review gate was verified on 2026-09-04 against the signed benchmark implementation
+through `c38d6ca`. The checked gate records its exact clean execution revision.
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 334 passed, 22 skipped |
-| `pixi run -e bayes test-bayes` | 355 passed, 1 skipped, 2 dependency warnings |
+| `pixi run test` | 363 passed, 23 skipped |
+| `pixi run -e bayes test-bayes` | 385 passed, 1 skipped, 5 dependency warnings |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
+| `pixi run -e bayes benchmark-release-a` | Passed, including raw reconstruction |
 | Waterology constraints | 7 of 7 passed |
 
 The Bayesian warnings are Torch JIT deprecation notices from dependencies.

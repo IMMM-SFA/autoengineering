@@ -1,6 +1,6 @@
 # Bayesian optimization implementation plan
 
-_Status: In progress; items 1 through 4 complete_
+_Status: In progress; items 1 through 5 complete_
 
 _Branch point: `262a984`_
 

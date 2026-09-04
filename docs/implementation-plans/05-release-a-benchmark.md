@@ -77,3 +77,23 @@ release threshold. The replacement run must start from a clean signed revision, 
 penalty, audit the exact matrix and recomputed scientific fields, retain results across observation
 failures, include complete optimizer overhead, and bind provenance to every result-affecting source
 and environment file.
+
+## Completion evidence
+
+The benchmark harness was implemented in signed commit `5c752c7`. Independent review invalidated
+its first passing trial because of evidence and comparison defects recorded in Decision 0002. The
+corrections were committed at `0d73ea9` before the replacement run, and report newline normalization
+was committed at `c38d6ca` before the final artifact run. No problem, method setting, or numeric
+threshold from Decision 0001 changed.
+
+The checked replacement evidence in `benchmarks/release_a/results/` contains 7,500 evaluation
+records and 750 complete summary rows. It has no run errors, invalid configurations, or budget
+overruns. All 600 native runs replay exactly, all 150 SMAC runs complete, and the scientific audit
+has zero issues. Three of 750 post-warm BoTorch suggestions have unresolved fallbacks, below both
+frozen limits. Every pooled and per-problem regret criterion passes.
+
+The independent review in
+[`05-release-a-benchmark-review.md`](../reviews/05-release-a-benchmark-review.md) found no remaining
+implementation defect. The final repository gate produced 363 passed and 23 skipped tests in the
+default environment, 385 passed and 1 skipped in the Bayesian environment, passing lint and
+whitespace checks, and 7 of 7 scoped Waterology constraints.
