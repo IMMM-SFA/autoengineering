@@ -6,8 +6,9 @@ The branch `codex/bayesian-optimization-implementation` contains the optimizatio
 reproducible baselines, evaluator integration, whole-system BoTorch backend, sequential budget
 controller, hardened recovery layer, public run configuration, command, example, approved Release
 A benchmark gate, complete Release A documentation, and a validated full-observability
-function-network research backend. The full-network gate now passes. Partial-observability work has
-not started.
+function-network research backend. The partial-observability backend is implemented, but its
+frozen comparison gate failed. It remains experimental, and the final research comparison has not
+started.
 
 ## Recovery context
 
@@ -34,8 +35,8 @@ commit `b3dcdd4`.
 | 8. CLI and Release A benchmark gate | Complete | The run specification, command, example, SMAC comparison, raw scientific audit, and frozen release criteria pass. |
 | 9. Function-network representation | Complete | Immutable functions, local parameters, couplings, scalar observations, costs, scopes, verified NPZ traces, and deterministic training-table replay are implemented. |
 | 10. Full-observability function-network BO | Complete | Component surrogates, posterior propagation, system-only acquisition, and exact evidence reconstruction pass. Pooled 90 percent interval coverage is 0.828125 against the frozen 0.75 minimum. |
-| 11. Partial-observability function-network BO | Not implemented | Select the configuration and component evaluation using cost-aware value of information or knowledge gradient methods. |
-| 12. Documentation and research provenance | In progress | Release A API, CLI, assumptions, limitations, examples, and benchmark interpretation are complete. Function-network literature correspondence remains for item 10. |
+| 11. Partial-observability function-network BO | Implemented; gate failed | Mixed-scope value of information, lineage, cost, replay, recovery, and raw evidence are implemented. Two frozen criteria failed. |
+| 12. Documentation and research provenance | Blocked by gate | Release A and full-observability documentation are complete. The final research comparison cannot start while Item 9 is unaccepted. |
 
 ## Completed plan items
 
@@ -145,6 +146,27 @@ comparison, calibration, and the fallback limits pass. Pooled 90 percent interva
 [item 8 review](reviews/08-full-observability-function-network-bo-review.md) preserve the protocol,
 two invalidated runs, one valid adverse iteration, corrections, and passing replacement evidence.
 
+### Item 9: partial-observability function-network BO
+
+Signed execution revision `aebc741` adds component-scoped actions, exact parent-artifact recovery
+from the ledger, mixed-observation component fits, deterministic finite candidate pools, one-step
+value of information per conservative evaluator cost, system refreshes, and observed-only
+recommendations. Random mixed-scope and propagated variance-reduction controls share the same
+validation and cost contracts.
+
+The frozen 40-run comparison completed with no run errors, invalid transitions, lineage defects,
+replay differences, nonfinite values, or cost overruns. Ten of twelve separate criteria pass. The
+complete-matrix criterion fails because nine runs ended with `search_space_exhausted`, which
+Decision 0007 did not accept. The random-control criterion also fails: the policy improved median
+regret area by 0.004448 on the informative chain, below the required 0.005, and tied random on the
+branch. The pooled final-regret and regret-area comparisons against full-network BO pass.
+
+The immutable evidence is under `benchmarks/partial_network/results/`. The
+[item 9 review](reviews/09-partial-observability-function-network-bo-review.md) records the
+implementation, exact failures, a post-evidence optional-dependency message correction, and the
+retained experimental status. Item 10 is not authorized by the parent plan while this gate remains
+failed.
+
 ## Work required for Release A
 
 Release A is whole-system Bayesian optimization. It treats one execution of the complete model
@@ -169,15 +191,14 @@ review, and two-platform archive gate are complete.
 
 The current `SystemBayesBackend` models the complete chain as one black-box function.
 `FullNetworkBayesBackend` fits separate scalar component surrogates when every intermediate output
-is observed and passes its frozen comparison gate. The representation can also evaluate a declared
-component, but no backend decides which subsystem to query. Stage 11 is now the next implementation
-stage.
+is observed and passes its frozen comparison gate. `PartialNetworkBayesBackend` can decide whether
+to evaluate the system or a declared component, but its first frozen comparison failed two
+criteria. It remains an experimental research backend.
 
-The research sequence should start with a graph representation that separates design variables,
-coupling variables, component outputs, observation availability, and evaluation cost. A
-full-observability backend can then test whether component surrogates improve efficiency when all
-intermediate outputs are available. Partial-observability experiments should follow only after the
-full-observability representation and benchmarks are stable.
+The graph representation separates design variables, coupling variables, component outputs,
+observation availability, and evaluation cost. Full observability passed its comparison. Partial
+observability now has reproducible adverse evidence that must remain visible in any future
+investigation.
 
 This separation matches the background review in
 `background_research/multi-model-system-optimization.md`: whole-system BO, multi-fidelity BO, and
@@ -187,19 +208,22 @@ and multi-fidelity evaluation remain outside Release A.
 ## Verification evidence
 
 Item 8 evidence revision `4e064ed` records clean execution revision `2a6894e` and passes every
-frozen criterion.
+frozen criterion. Item 9 evidence revision `45eab5b` records clean execution revision `aebc741`
+and reproduces its failed scientific gate. The current software checks are separate from that
+adverse result.
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 410 passed, 31 skipped |
-| `pixi run -e bayes test-bayes` | 440 passed, 1 skipped, 14 dependency warnings |
+| `pixi run test` | 420 passed, 43 skipped |
+| `pixi run -e bayes test-bayes` | 462 passed, 1 skipped, 28 dependency warnings |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
-| `pixi run -e bayes benchmark-release-a` | Passed, including raw reconstruction |
+| Release A exact-revision reconstruction | Passed |
 | Optional dependency isolation | Passed, including both public import orders |
-| Function-network focused checks | 107 passed |
 | Full-network benchmark matrix | Passed; 40 runs, 400 evaluations, 240 acquisitions |
-| Full-network raw reconstruction | Passed with zero issues |
+| Full-network exact-revision reconstruction | Passed with zero issues |
+| Partial-network benchmark matrix | Failed 2 of 12 frozen criteria; 40 runs completed |
+| Partial-network exact-revision reconstruction | Reproduced the failed gate with zero raw issues |
 | Refreshed Release A matrix | Passed; 7,500-record scientific signature unchanged |
 | Waterology constraints | 7 of 7 passed on the touched documentation |
 
@@ -208,5 +232,5 @@ The Bayesian warnings are Torch, Pyro, SMAC, and ConfigSpace notices from depend
 ## Integration state
 
 The implementation remains isolated on `codex/bayesian-optimization-implementation`. All Release A
-and Item 8 gates pass. Items 9 and 10 remain to be implemented. No push, publication, or merge has
-been performed.
+and Item 8 gates pass. Item 9 is implemented but unaccepted after its frozen gate failed. Item 10
+has not started. No push, publication, or merge has been performed.

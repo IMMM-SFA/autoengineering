@@ -452,6 +452,24 @@ The method respects lineage and total budget, produces reproducible actions, and
 decision quality per evaluator cost under preregistered criteria. Unsupported observation patterns
 must fail explicitly.
 
+### Evidence and stop state
+
+The partial-observation backend, ledger-backed parent reconstruction, mixed-scope controller,
+finite-pool value-of-information policy, two controls, recovery tests, and raw evidence pipeline
+are implemented. Decision 0007 froze the comparison before the full run.
+
+The signed execution revision `aebc741` completed all 40 runs without run errors, invalid
+transitions, or measured-cost overruns. Lineage, replay, observed recommendations, conservative
+costs, regret comparisons against full-network BO, fallback limits, and raw reconstruction pass.
+The overall gate fails because nine runs ended with the unaccepted `search_space_exhausted` stop
+and the value policy improved median regret area over random by 0.004448 on the informative chain,
+below the frozen 0.005 margin. The branch medians were equal. The evidence remains in
+`benchmarks/partial_network/results/`, and the audit is in
+[`reviews/09-partial-observability-function-network-bo-review.md`](reviews/09-partial-observability-function-network-bo-review.md).
+Post-evidence commit `15c79ef` corrects only the no-extra import message found by the complete
+default test suite. Item 9 is implemented but not accepted. The backend remains experimental, and
+Item 10 has not started.
+
 ## 10. Complete the research comparison and documentation
 
 Compare whole-system, full-observability, and partial-observability methods on the same function

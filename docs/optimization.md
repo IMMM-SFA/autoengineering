@@ -349,10 +349,43 @@ constraint Brier score, calibration, and fallback limits meet the preregistered 
 percent interval coverage is 0.828125 against a minimum of 0.75. The
 [full-network report](../benchmarks/full_network/results/report.md) and
 [review](reviews/08-full-observability-function-network-bo-review.md) preserve the result and its
-correction history. The backend remains a research method outside Release A. Partial-observability
-work is tracked as Item 9.
+correction history. The backend remains a research method outside Release A.
+
+## Partial-observability research backend
+
+`PartialNetworkBayesBackend` is available from
+`autoengineering.optimization.partial_network_backend` in the Bayesian environment. It extends the
+full-network component models with system and component action pools. A component action must name
+one earlier successful system artifact. `LedgerBackedFunctionNetworkEvaluator` reconstructs that
+parent from the ledger, verifies its digest, and supplies only the component's direct upstream
+ports.
+
+The backend scores affordable actions with a deterministic finite-pool, one-step value-of-
+information approximation. Scores estimate improvement in the terminal decision per conservative
+evaluator cost. The policy records its fantasy seeds, Monte Carlo error, cost estimates, candidate
+class, and fallback state. It limits consecutive component actions and schedules complete-system
+refreshes. Only a feasible observed system result can be the final recommendation.
+
+This implementation requires scalar component outputs, an acyclic network, exact parent artifacts,
+and independent scalar Gaussian processes. It does not infer missing upstream arrays from surrogate
+means. Component rows train only the outputs they observe and never become terminal objective or
+constraint observations. The public `optimize` command does not expose this experimental backend.
+
+The checked evidence command reconstructs the published artifacts and exits nonzero because the
+frozen gate failed:
+
+```sh
+pixi run -e bayes benchmark-partial-network
+```
+
+All 40 runs completed without execution, lineage, replay, or cost errors. The policy matched the
+full-network method under the frozen regret tolerances. Nine runs used an unaccepted finite-pool
+exhaustion stop, and the policy missed the required random-control improvement by 0.000552 on the
+informative chain. The [partial-network report](../benchmarks/partial_network/results/report.md)
+and [review](reviews/09-partial-observability-function-network-bo-review.md) retain the full adverse
+result. The backend remains experimental, and Item 10 has not started.
 
 The Release A command still accepts only whole-system optimization. Do not describe a
 `SystemBayesBackend` run as function-network optimization, component Bayesian optimization,
-multi-fidelity optimization, or partial-observability optimization. The remaining research work is
+multi-fidelity optimization, or partial-observability optimization. The blocked research work is
 tracked in the [`Bayesian optimization plan`](bayesian-optimization-plan.md).
