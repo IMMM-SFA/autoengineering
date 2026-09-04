@@ -276,6 +276,7 @@ def test_example_index_matches_checked_system_examples():
         if path.parent.is_dir()
     }
     expected_network = {
+        "function_network": "No",
         "hydro_chain": "No",
         "leaf_river": "No with checked cache",
         "lotka_volterra": "No",
