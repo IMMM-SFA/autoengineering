@@ -1108,7 +1108,8 @@ def test_artifact_root_rejects_directory_replaced_after_preopen_stat(
     if os.name == "nt":
         pytest.skip("POSIX directory descriptor")
     parent = tmp_path / "parent"
-    parent.mkdir()
+    parent.mkdir(mode=0o700)
+    parent.chmod(0o700)
     root = parent / "artifacts"
     opened = []
     closed = []
@@ -1121,7 +1122,8 @@ def test_artifact_root_rejects_directory_replaced_after_preopen_stat(
         if path == "parent" and kwargs.get("dir_fd") is not None and not replaced:
             replaced = True
             parent.rename(tmp_path / "parent-original")
-            parent.mkdir()
+            parent.mkdir(mode=0o700)
+            parent.chmod(0o700)
         descriptor = original_open(path, flags, *args, **kwargs)
         opened.append(descriptor)
         return descriptor

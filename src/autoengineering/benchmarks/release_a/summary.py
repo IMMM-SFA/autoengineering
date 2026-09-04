@@ -338,7 +338,7 @@ def _audit_records(
                 benchmark_seed=seed,
                 evaluation_index=index,
             )
-            if result.to_dict() != expected_result.to_dict():
+            if not _scientific_values_equal(result.to_dict(), expected_result.to_dict()):
                 report(f"scientific result differs at {label}")
             preview_cost = problem.preview_cost(dict(action.config))
             if not math.isclose(result.cost, preview_cost, rel_tol=0.0, abs_tol=1e-12):
@@ -398,6 +398,32 @@ def _audit_records(
         "issue_count": issue_count,
         "reported_issues": issues,
     }
+
+
+def _scientific_values_equal(observed: object, expected: object) -> bool:
+    """Compare reconstructed result values across supported floating-point platforms."""
+    if isinstance(expected, float):
+        return (
+            not isinstance(observed, bool)
+            and isinstance(observed, (int, float))
+            and math.isclose(float(observed), expected, rel_tol=0.0, abs_tol=1e-12)
+        )
+    if isinstance(expected, Mapping):
+        return (
+            isinstance(observed, Mapping)
+            and set(observed) == set(expected)
+            and all(_scientific_values_equal(observed[key], value) for key, value in expected.items())
+        )
+    if isinstance(expected, (list, tuple)):
+        return (
+            isinstance(observed, (list, tuple))
+            and len(observed) == len(expected)
+            and all(
+                _scientific_values_equal(observed_value, expected_value)
+                for observed_value, expected_value in zip(observed, expected, strict=True)
+            )
+        )
+    return observed == expected
 
 
 def _numeric_comparisons(rows: list[dict[str, object]]) -> dict[str, object]:

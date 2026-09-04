@@ -16,6 +16,7 @@ import pytest
 
 from autoengineering.benchmarks.release_a import __main__ as benchmark_main
 from autoengineering.benchmarks.release_a import runner as benchmark_runner
+from autoengineering.benchmarks.release_a import summary as benchmark_summary
 from autoengineering.benchmarks.release_a.methods import METHOD_NAMES, Suggestion, _smac_cost
 from autoengineering.benchmarks.release_a.problems import (
     EVALUATIONS_PER_RUN,
@@ -262,6 +263,33 @@ def test_gate_rejects_duplicate_evaluation_indices():
 
     assert criteria["complete_matrix"]["passed"] is False
     assert criteria["scientific_record_audit"]["passed"] is False
+
+
+def test_scientific_audit_tolerates_platform_roundoff_but_rejects_changed_result():
+    problem = problem_by_name("smooth_continuous")
+    records = execute_suite(
+        problems=(problem,),
+        methods=("fixed",),
+        seeds=(0,),
+        replay_native=True,
+        progress=False,
+    )
+    expected_keys = {(problem.name, "fixed", 0)}
+    score = records[0]["result"]["outcomes"]["score"]
+
+    records[0]["result"]["outcomes"]["score"] = score + 1e-15
+    audit = benchmark_summary._audit_records(records, expected_keys)
+    assert audit["passed"] is True
+    assert audit["issue_count"] == 0
+
+    records[0]["result"]["outcomes"]["score"] = score + 1e-8
+    audit = benchmark_summary._audit_records(records, expected_keys)
+    assert audit["passed"] is False
+    assert audit["reported_issues"] == [
+        "scientific result differs at smooth_continuous/fixed/0/0",
+        "best_feasible_objective differs at smooth_continuous/fixed/0/0",
+        "normalized_regret differs at smooth_continuous/fixed/0/0",
+    ]
 
 
 def test_completed_evaluation_survives_observe_failure(monkeypatch):
