@@ -455,26 +455,36 @@ class FullNetworkBayesBackend(_BaselineBackend):
             models: dict[str, object] = {}
             constants: dict[str, tuple[float, float]] = {}
             fit_attempts: dict[str, int] = {}
-            if not feature_names:
-                for output in component.scalar_outputs:
-                    values = np.asarray([row.outputs[output.name] for row in rows], dtype=float)
+            for output in component.scalar_outputs:
+                output_rows = tuple(row for row in rows if output.name in row.outputs)
+                if not output_rows:
+                    raise ValueError(
+                        f"component {component_name!r} output {output.name!r} has no "
+                        "successful observations"
+                    )
+                self._validate_output_training_rows(component, output.name, output_rows)
+                if not feature_names:
+                    values = np.asarray(
+                        [row.outputs[output.name] for row in output_rows], dtype=float
+                    )
                     constants[output.name] = (
                         float(np.mean(values)),
-                        self._constant_variance(rows, output.name, values),
+                        self._constant_variance(output_rows, output.name, values),
                     )
-            else:
-                train_x = torch.tensor(
-                    [
-                        self._encode_training_row(component, row, feature_names, center, scale)
-                        for row in rows
-                    ],
-                    dtype=torch.double,
-                )
-                for output in component.scalar_outputs:
+                else:
+                    train_x = torch.tensor(
+                        [
+                            self._encode_training_row(
+                                component, row, feature_names, center, scale
+                            )
+                            for row in output_rows
+                        ],
+                        dtype=torch.double,
+                    )
                     train_y = torch.tensor(
-                        [[row.outputs[output.name]] for row in rows], dtype=torch.double
+                        [[row.outputs[output.name]] for row in output_rows], dtype=torch.double
                     )
-                    train_yvar = self._training_variance(rows, output.name)
+                    train_yvar = self._training_variance(output_rows, output.name)
                     model, attempts = self._fit_one(
                         train_x,
                         train_y,
@@ -494,6 +504,14 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 row_count=len(rows),
             )
         return MappingProxyType(prepared)
+
+    def _validate_output_training_rows(
+        self,
+        component: FunctionComponentSpec,
+        output_name: str,
+        rows: tuple[ComponentTrainingRow, ...],
+    ) -> None:
+        return None
 
     def _training_variance(
         self, rows: tuple[ComponentTrainingRow, ...], output_name: str
