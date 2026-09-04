@@ -14,7 +14,14 @@ import warnings
 
 import numpy as np
 from scipy.stats import qmc
-import torch
+
+try:
+    import torch
+except ImportError as error:  # pragma: no cover - exercised in a no-extra subprocess
+    raise ImportError(
+        "PartialNetworkBayesBackend requires the optional Bayesian dependencies; "
+        "install autoengineering[bayes] or use the pixi bayes environment."
+    ) from error
 
 from autoengineering.system.graph import System
 
