@@ -154,6 +154,13 @@ def test_partial_candidate_pools_replay_and_bind_parent_lineage(tmp_path, partia
     )
     assert all(candidate.estimated_cost >= 0.5 for candidate in first_pool.component)
 
+    action, result = ledger.entries()[0]
+    relocated = replace(
+        result,
+        artifacts={name: f"/other/location/{name}.npz" for name in result.artifacts},
+    )
+    assert first._fingerprint(((action, result),)) == first._fingerprint(((action, relocated),))
+
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
 def test_partial_validation_costs_and_monotone_mixed_scope_ids(tmp_path, partial_contract):

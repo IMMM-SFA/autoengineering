@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
+import hashlib
+import json
 import math
 from pathlib import Path
 from types import MappingProxyType
@@ -211,6 +213,17 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 "partial backend requires positive declared costs for system and eligible "
                 f"component actions: {nonpositive}"
             )
+
+    @staticmethod
+    def _fingerprint(entries) -> str:
+        payload = []
+        for action, result in entries:
+            result_data = result.to_dict()
+            result_data["artifacts"] = tuple(result.artifacts)
+            payload.append({"action": action.to_dict(), "result": result_data})
+        return hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
 
     @staticmethod
     def _eligible_component_names(network: FunctionNetworkSpec) -> tuple[str, ...]:
