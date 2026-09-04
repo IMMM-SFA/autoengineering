@@ -96,6 +96,7 @@ class ComponentTrainingRow:
     scope: EvaluationScope
     inputs: Mapping[str, Scalar]
     outputs: Mapping[str, float]
+    standard_errors: Mapping[str, float]
     artifact_ids: tuple[str, ...]
     artifact_sha256: Mapping[str, str]
     cost: float
@@ -112,6 +113,12 @@ class ComponentTrainingRow:
         if not outputs:
             raise ValueError("training outputs must not be empty")
         object.__setattr__(self, "outputs", outputs)
+        standard_errors = _freeze_floats(self.standard_errors, "training standard_errors")
+        if not set(standard_errors).issubset(outputs):
+            raise ValueError("training standard_errors must reference training outputs")
+        if any(value < 0 for value in standard_errors.values()):
+            raise ValueError("training standard_errors must be non-negative")
+        object.__setattr__(self, "standard_errors", standard_errors)
         artifact_ids = tuple(self.artifact_ids)
         if not artifact_ids or any(not isinstance(item, str) or not item for item in artifact_ids):
             raise ValueError("training artifact_ids must contain non-empty strings")
@@ -141,6 +148,7 @@ class ComponentTrainingRow:
             "scope": self.scope.value,
             "inputs": dict(self.inputs),
             "outputs": dict(self.outputs),
+            "standard_errors": dict(self.standard_errors),
             "artifact_ids": list(self.artifact_ids),
             "artifact_sha256": dict(self.artifact_sha256),
             "cost": self.cost,
@@ -482,6 +490,12 @@ def reconstruct_component_training_tables(
                     scope=action.scope,
                     inputs=averaged_inputs,
                     outputs=averaged_outputs,
+                    standard_errors={
+                        name: result.standard_errors[scalar_observation_name(component.component, name)]
+                        for name in averaged_outputs
+                        if scalar_observation_name(component.component, name)
+                        in result.standard_errors
+                    },
                     artifact_ids=artifact_ids,
                     artifact_sha256={artifact_id: registry[artifact_id][1] for artifact_id in artifact_ids},
                     cost=result.cost,
