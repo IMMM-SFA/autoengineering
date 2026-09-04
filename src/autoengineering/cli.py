@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import click
 from rich.console import Console
@@ -39,9 +40,23 @@ def graph(system_file):
 @cli.command()
 @click.argument("system_file", type=click.Path(exists=True))
 @click.option("--component", "-c", required=True, help="Component name to validate.")
-@click.option("--baseline", "-b", required=True, type=click.Path(exists=True), help="Path to baseline data (CSV).")
-@click.option("--simulated", "-s", required=True, type=click.Path(exists=True), help="Path to simulated data (CSV).")
-@click.option("--metrics", "-m", multiple=True, default=None, help="Metrics to compute (default: all).")
+@click.option(
+    "--baseline",
+    "-b",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to baseline data (CSV).",
+)
+@click.option(
+    "--simulated",
+    "-s",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to simulated data (CSV).",
+)
+@click.option(
+    "--metrics", "-m", multiple=True, default=None, help="Metrics to compute (default: all)."
+)
 @click.option("--format", "fmt", type=click.Choice(["text", "json"]), default="text")
 def validate(system_file, component, baseline, simulated, metrics, fmt):
     """Validate a component against baseline data."""
@@ -73,7 +88,13 @@ def validate(system_file, component, baseline, simulated, metrics, fmt):
 
 @cli.command()
 @click.argument("system_file", type=click.Path(exists=True))
-@click.option("--results", "-r", required=True, type=click.Path(exists=True), help="Path to validation results JSON.")
+@click.option(
+    "--results",
+    "-r",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to validation results JSON.",
+)
 @click.option("--format", "fmt", type=click.Choice(["markdown", "json"]), default="markdown")
 def report(system_file, results, fmt):
     """Generate an analysis report from validation results."""
@@ -85,9 +106,7 @@ def report(system_file, results, fmt):
     with open(results) as f:
         raw = json.load(f)
 
-    validation_results = [
-        ValidationResult(**r) for r in raw
-    ]
+    validation_results = [ValidationResult(**r) for r in raw]
 
     output = generate_report(system, validation_results, format=fmt)
 
@@ -108,9 +127,72 @@ def components(system_file):
 
 
 @cli.command()
+@click.argument("system_file", type=click.Path(path_type=Path))
+@click.argument(
+    "optimization_file",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+)
+@click.option(
+    "--workdir",
+    required=True,
+    type=click.Path(path_type=Path),
+    help="New or resumable optimization study directory.",
+)
+@click.option(
+    "--max-new-evaluations",
+    type=click.IntRange(min=0),
+    default=None,
+    help="Limit new evaluations in this invocation.",
+)
+@click.option("--resume", is_flag=True, help="Resume recognizable study state.")
+@click.option("--format", "fmt", type=click.Choice(["text", "json"]), default="text")
+def optimize(system_file, optimization_file, workdir, max_new_evaluations, resume, fmt):
+    """Run or resume a configured whole-system optimization study."""
+    from autoengineering.optimization.command import execute_optimization
+    from autoengineering.optimization.run_spec import OptimizationRunSpec
+
+    try:
+        run = OptimizationRunSpec.from_yaml(optimization_file)
+        resolved_system = run.resolve_system_file(system_file, optimization_file)
+        system = System.from_yaml(resolved_system)
+        evaluator_factory = run.load_evaluator_factory(optimization_file)
+        summary = execute_optimization(
+            run,
+            system,
+            evaluator_factory,
+            system_path=system_file,
+            specification_path=optimization_file,
+            work_directory=workdir,
+            resume=resume,
+            max_new_evaluations=max_new_evaluations,
+        )
+    except click.ClickException:
+        raise
+    except Exception as error:
+        message = str(error) or type(error).__name__
+        raise click.ClickException(message) from error
+
+    if fmt == "json":
+        click.echo(json.dumps(summary, indent=2, sort_keys=True))
+        return
+    recommendation = summary["recommendation"]
+    assert isinstance(recommendation, dict)
+    click.echo(f"Work directory: {summary['work_directory']}")
+    click.echo(f"State: {summary['state']}")
+    click.echo(
+        f"Evaluations: {summary['evaluation_count']} total, {summary['new_evaluation_count']} new"
+    )
+    click.echo(f"Cost: {summary['total_evaluator_cost']} {summary['cost_unit']}")
+    click.echo(f"Status counts: {json.dumps(summary['status_counts'], sort_keys=True)}")
+    click.echo(f"Recommendation: {json.dumps(recommendation, sort_keys=True)}")
+
+
+@cli.command()
 @click.argument("system_file", type=click.Path(exists=True))
 @click.option("--component", "-c", required=True, help="Component to research replacements for.")
-@click.option("--output", "-o", type=click.Path(), default=None, help="Write the scaffold to this file.")
+@click.option(
+    "--output", "-o", type=click.Path(), default=None, help="Write the scaffold to this file."
+)
 def candidates(system_file, component, output):
     """Scaffold a candidates YAML for a component (fill in via deep research)."""
     from autoengineering.research.candidates import candidate_template
@@ -129,16 +211,57 @@ def candidates(system_file, component, output):
 
 @cli.command()
 @click.argument("system_file", type=click.Path(exists=True))
-@click.option("--candidates", "-C", "candidates_file", required=True, type=click.Path(exists=True), help="Candidates YAML from deep research.")
-@click.option("--chain", required=True, help="run_chain factory as 'module:callable'; called with the system to get {output: array}.")
-@click.option("--observed", "-b", required=True, type=click.Path(exists=True), help="Observed data (CSV, first numeric column).")
-@click.option("--output", "-O", "validate_output", required=True, help="Which run_chain output key to score.")
-@click.option("--metrics", "-m", multiple=True, default=None, help="Metrics to compute (default: rmse bias nse kge).")
-@click.option("--target", "-t", multiple=True, help="Satisficing target as metric=value (e.g. nse=0.5). Repeatable.")
+@click.option(
+    "--candidates",
+    "-C",
+    "candidates_file",
+    required=True,
+    type=click.Path(exists=True),
+    help="Candidates YAML from deep research.",
+)
+@click.option(
+    "--chain",
+    required=True,
+    help="run_chain factory as 'module:callable'; called with the system to get {output: array}.",
+)
+@click.option(
+    "--observed",
+    "-b",
+    required=True,
+    type=click.Path(exists=True),
+    help="Observed data (CSV, first numeric column).",
+)
+@click.option(
+    "--output", "-O", "validate_output", required=True, help="Which run_chain output key to score."
+)
+@click.option(
+    "--metrics",
+    "-m",
+    multiple=True,
+    default=None,
+    help="Metrics to compute (default: rmse bias nse kge).",
+)
+@click.option(
+    "--target",
+    "-t",
+    multiple=True,
+    help="Satisficing target as metric=value (e.g. nse=0.5). Repeatable.",
+)
 @click.option("--max-iter", type=int, default=20, help="Maximum candidates to evaluate.")
 @click.option("--workdir", type=click.Path(), default="outputs", help="Where to write artifacts.")
 @click.option("--slug", default="auto-improve", help="Artifact name slug.")
-def improve(system_file, candidates_file, chain, observed, validate_output, metrics, target, max_iter, workdir, slug):
+def improve(
+    system_file,
+    candidates_file,
+    chain,
+    observed,
+    validate_output,
+    metrics,
+    target,
+    max_iter,
+    workdir,
+    slug,
+):
     """Run the bounded auto-research loop over candidate replacements."""
     import numpy as np
     import pandas as pd

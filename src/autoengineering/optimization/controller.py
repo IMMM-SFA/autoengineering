@@ -178,6 +178,16 @@ class StudyRecoveryError(RuntimeError):
     """Raised when durable study state cannot be reconciled without ambiguity."""
 
 
+@dataclass(frozen=True)
+class StudyRunResult:
+    """One internally consistent post-invocation view of committed study state."""
+
+    recommendation: Recommendation
+    entries: tuple[tuple[EvaluationAction, EvaluationResult], ...]
+    stop_reason: str | None
+    new_evaluation_count: int
+
+
 class StudyLockError(RuntimeError):
     """Raised when another controller process owns a study work directory."""
 
@@ -418,6 +428,10 @@ class OptimizationStudy:
 
     def run(self, *, max_new_evaluations: int | None = None) -> Recommendation:
         """Ask, evaluate, and tell sequentially until stopped or the call limit is met."""
+        return self.run_result(max_new_evaluations=max_new_evaluations).recommendation
+
+    def run_result(self, *, max_new_evaluations: int | None = None) -> StudyRunResult:
+        """Run and return a locked snapshot with this invocation's completed count."""
         if max_new_evaluations is not None and (
             isinstance(max_new_evaluations, bool)
             or not isinstance(max_new_evaluations, int)
@@ -435,6 +449,9 @@ class OptimizationStudy:
                 result = self.evaluator(action)
                 if not isinstance(result, EvaluationResult):
                     raise TypeError("evaluator must return EvaluationResult")
+                if result.action_id != action.id:
+                    raise ValueError("evaluator result action ID must match the pending action")
+                self._validate_result(result)
             except Exception as error:
                 elapsed = max(0.0, self.monotonic_clock() - started)
                 result = EvaluationResult.infrastructure_failure(
@@ -448,10 +465,21 @@ class OptimizationStudy:
             completed += 1
         with self._lock():
             if self.stop_reason is None and max_new_evaluations != 0:
-                reason = self._stop_before_suggest(check_budget=False)
-                if reason in {"max_cost", "max_evaluations", "target_attained"}:
+                reason = self._stop_before_suggest()
+                exhaustion_check = getattr(self.backend, "finite_space_exhausted", None)
+                if reason is None and callable(exhaustion_check) and exhaustion_check(self.ledger):
+                    reason = "finite_space_exhausted"
+                if reason is not None:
                     self._commit_terminal(reason)
-        return self.recommend()
+            self._assert_committed_ledger()
+            entries = self._validate_ledger()
+            recommendation = self.backend.recommend(self.ledger)
+            return StudyRunResult(
+                recommendation=recommendation,
+                entries=entries,
+                stop_reason=self.stop_reason,
+                new_evaluation_count=completed,
+            )
 
     def recommend(self) -> Recommendation:
         """Return the backend's recommendation over the current durable ledger."""

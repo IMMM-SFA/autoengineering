@@ -99,6 +99,76 @@ def test_controller_never_starts_an_action_beyond_remaining_budget(tmp_path):
     assert study.stop_reason == "insufficient_remaining_budget"
 
 
+def test_bounded_controller_does_not_request_an_action_beyond_the_invocation_limit(tmp_path, study):
+    space = SearchSpace((CategoricalParameter("model", ("a", "b")),))
+
+    class OneSuggestionBackend(RandomBackend):
+        def __init__(self, spec, search_space):
+            super().__init__(spec, search_space)
+            self.suggest_calls = 0
+
+        def suggest(self, ledger, n=1):
+            self.suggest_calls += 1
+            if self.suggest_calls > 1:
+                raise RuntimeError("unexpected post-limit suggestion")
+            return super().suggest(ledger, n)
+
+    backend = OneSuggestionBackend(study, space)
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    controller = OptimizationStudy(
+        study,
+        space,
+        backend,
+        ledger,
+        lambda action: EvaluationResult.success(
+            action.id, {"score": 1.0, "bias": 0.0}, {}, 1.0, "cpu_hour"
+        ),
+        tmp_path,
+    )
+
+    recommendation = controller.run(max_new_evaluations=1)
+
+    assert backend.suggest_calls == 1
+    assert len(ledger.entries()) == 1
+    assert controller.stop_reason is None
+    assert recommendation.feasible is True
+
+
+def test_controller_accepts_a_backend_implementing_the_original_public_protocol(
+    tmp_path, study, space
+):
+    delegate = RandomBackend(study, space)
+
+    class CompatibleBackend:
+        name = delegate.name
+        spec = delegate.spec
+        space = delegate.space
+        suggest = delegate.suggest
+        recommend = delegate.recommend
+        diagnostics = delegate.diagnostics
+        identity_dict = delegate.identity_dict
+        state_dict = delegate.state_dict
+
+    backend = CompatibleBackend()
+    assert isinstance(backend, OptimizerBackend)
+
+    controller = OptimizationStudy(
+        study,
+        space,
+        backend,
+        ObservationLedger(tmp_path / "observations.jsonl"),
+        lambda action: EvaluationResult.success(
+            action.id, {"score": 1.0, "bias": 0.0}, {}, 1.0, "cpu_hour"
+        ),
+        tmp_path,
+    )
+
+    result = controller.run_result(max_new_evaluations=1)
+
+    assert result.new_evaluation_count == 1
+    assert len(result.entries) == 1
+
+
 def test_controller_resume_replays_an_interrupted_action_once(tmp_path):
     """Losing a process after ask must record precisely one interruption result on resume."""
     spec = StudySpec(

@@ -311,6 +311,21 @@ class OptimizationRunSpec:
             for declared in self.input_files
         }
 
+    def resolve_system_file(
+        self,
+        system_path: str | Path,
+        specification_path: str | Path,
+    ) -> Path:
+        """Resolve a system YAML path relative to a checked run specification file."""
+        spec_path = _specification_file(specification_path)
+        raw_system = Path(system_path)
+        if raw_system.is_absolute():
+            if raw_system.is_symlink() or not raw_system.is_file():
+                raise ValueError("system YAML must be a regular nonsymlink file")
+            return raw_system.resolve(strict=True)
+        declared_system = _validate_relative_path(str(system_path), "system YAML path")
+        return _resolve_declared_file(declared_system, spec_path, "system YAML path")
+
     def load_evaluator_factory(self, specification_path: str | Path) -> Callable[..., object]:
         """Import the declared callable with the specification directory on `sys.path`."""
         factory, _ = self._load_evaluator_factory_and_source(specification_path)
@@ -377,15 +392,12 @@ class OptimizationRunSpec:
         if recorded != self:
             raise ValueError("run specification file differs from the in-memory run contract")
         raw_system = Path(system_path)
-        if raw_system.is_absolute():
-            if raw_system.is_symlink() or not raw_system.is_file():
-                raise ValueError("system YAML must be a regular nonsymlink file")
-            resolved_system = raw_system.resolve(strict=True)
-            system_label = raw_system.name
-        else:
-            declared_system = _validate_relative_path(str(system_path), "system YAML path")
-            resolved_system = _resolve_declared_file(declared_system, spec_path, "system YAML path")
-            system_label = declared_system
+        resolved_system = self.resolve_system_file(raw_system, spec_path)
+        system_label = (
+            raw_system.name
+            if raw_system.is_absolute()
+            else _validate_relative_path(str(system_path), "system YAML path")
+        )
         _, source_path = self._load_evaluator_factory_and_source(spec_path)
         hashes = {
             f"system:{system_label}": _sha256_file(resolved_system),

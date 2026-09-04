@@ -161,6 +161,14 @@ class _BaselineBackend:
             "sequence_state": "derived_from_ledger",
         }
 
+    def finite_space_exhausted(self, ledger: ObservationLedgerReader) -> bool:
+        """Inspect finite enumeration without fitting or advancing a policy sequence."""
+        finite_configs = self._finite_configs()
+        if finite_configs is None:
+            return False
+        _, observed = self._next_index_and_observed(ledger)
+        return all(_canonical_config(config) in observed for config in finite_configs)
+
     def _next_index_and_observed(
         self, ledger: ObservationLedgerReader
     ) -> tuple[int, set[tuple[tuple[str, str, Scalar], ...]]]:

@@ -1,7 +1,7 @@
 """Optimization study contracts and search-space definitions."""
 
 from .backend import OptimizerBackend, RandomBackend, SearchSpaceExhausted, SobolBackend
-from .controller import OptimizationStudy, StudyLockError, StudyRecoveryError
+from .controller import OptimizationStudy, StudyLockError, StudyRecoveryError, StudyRunResult
 from .ledger import LedgerCorruptionError, ObservationLedger, ObservationLedgerReader
 from .provenance import RunIdentity
 from .records import (
@@ -47,5 +47,6 @@ __all__ = [
     "StudySpec",
     "StudyLockError",
     "StudyRecoveryError",
+    "StudyRunResult",
     "SobolBackend",
 ]
