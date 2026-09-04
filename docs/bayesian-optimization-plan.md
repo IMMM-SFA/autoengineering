@@ -316,6 +316,14 @@ Do not integrate the branch into `main` until recovery, replay, default tests, B
 and the benchmark gate all pass at the same revision. Keep function-network changes out of the
 Release A integration.
 
+### Completion evidence
+
+Item 6 is complete at signed revision `6661004`. The guide, entry points, example index, and
+documentation contracts passed independent review. Git archives of that exact revision passed
+lint, default tests, Bayesian tests, optional dependency isolation, and benchmark reconstruction on
+macOS ARM and Linux x86-64. The full record is in
+[`reviews/06-release-a-documentation-review.md`](reviews/06-release-a-documentation-review.md).
+
 ## 7. Add the function-network representation
 
 Add an immutable optimization representation without changing the core `System` schema until the

@@ -4,9 +4,9 @@ _Status date: 2026-09-04_
 
 The branch `codex/bayesian-optimization-implementation` contains the optimization contracts,
 reproducible baselines, evaluator integration, whole-system BoTorch backend, sequential budget
-controller, hardened recovery layer, public run configuration, command, example, and approved
-Release A benchmark gate. It does not yet provide function-network optimization or complete
-documentation.
+controller, hardened recovery layer, public run configuration, command, example, approved Release
+A benchmark gate, and complete Release A documentation. It does not yet provide function-network
+optimization.
 
 ## Recovery context
 
@@ -34,7 +34,7 @@ commit `b3dcdd4`.
 | 9. Function-network representation | Not implemented | Represent component functions, couplings, observations, costs, and graph evaluation scopes. |
 | 10. Full-observability function-network BO | Not implemented | Fit component surrogates and propagate intermediate observations through the system graph. |
 | 11. Partial-observability function-network BO | Not implemented | Select the configuration and component evaluation using cost-aware value of information or knowledge gradient methods. |
-| 12. Documentation and research provenance | In progress | This status record and item 1 through 4 reviews exist. The broader API, CLI, assumptions, limitations, benchmark evidence, and literature correspondence remain incomplete. |
+| 12. Documentation and research provenance | In progress | Release A API, CLI, assumptions, limitations, examples, and benchmark interpretation are complete. Function-network literature correspondence remains for item 10. |
 
 ## Completed plan items
 
@@ -104,6 +104,18 @@ suggestions used unresolved fallbacks, below the aggregate and per-run limits. T
 review in [`reviews/05-release-a-benchmark-review.md`](reviews/05-release-a-benchmark-review.md)
 found no remaining implementation defect.
 
+### Item 6: Release A documentation and review
+
+Signed revision `6661004` adds the optimization guide, current README and agent entry points, a
+complete example index, and structural documentation tests. Independent review corrected public
+imports, commands, package extras, path semantics, noise wording, and example network claims.
+
+Fresh Git archives passed on macOS 26.5 ARM and Ubuntu 24.04 x86-64 with the same locked Python,
+Ruff, BoTorch, SMAC, and Torch versions. The Linux gate found and fixed a cross-platform Ruff lock
+difference, floating-point reconstruction at about 1e-16, and a test fixture that inherited the
+host umask. The [item 6 review](reviews/06-release-a-documentation-review.md) records the exact
+revisions, corrections, and platform results.
+
 ## Work required for Release A
 
 Release A is whole-system Bayesian optimization. It treats one execution of the complete model
@@ -119,15 +131,10 @@ The `optimize` command and its self-contained checked example are complete.
 The Release A benchmark gate is complete. Its raw records, summary, report, decisions, and machine
 gate are checked under `benchmarks/release_a/results/` and `docs/decisions/`.
 
-### Complete documentation and review
+### Documentation and review
 
-Update `README.md`, the Python API reference, CLI reference, examples, and the auto-engineer agent
-prompt. Explain the optional dependency boundary and distinguish whole-system BO from the later
-multi-model research layer. Record limitations for categorical enumeration, sequential execution,
-noise assumptions, and acquisition fallback behavior.
-
-Run an independent Release A review after the controller, CLI, example, and benchmark work. Then
-run lint, the default and Bayesian test environments, and the benchmark gate before integration.
+The optimization guide, Python and CLI entry points, example index, agent instructions, independent
+review, and two-platform archive gate are complete.
 
 ## Research layer after Release A
 
@@ -148,22 +155,24 @@ and multi-fidelity evaluation remain outside Release A.
 
 ## Verification evidence
 
-The latest post-review gate was verified on 2026-09-04 against the signed benchmark implementation
-through `c38d6ca`. The checked gate records its exact clean execution revision.
+The latest post-review gate was verified on 2026-09-04 from fresh Git archives of signed revision
+`6661004`. The checked benchmark gate records clean execution revision `afc66b8`, whose source hash
+also applies to `6661004` because the latter changes only checked benchmark results.
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 363 passed, 23 skipped |
-| `pixi run -e bayes test-bayes` | 385 passed, 1 skipped, 5 dependency warnings |
+| `pixi run test` | 380 passed, 23 skipped on macOS and Linux |
+| `pixi run -e bayes test-bayes` | 402 passed, 1 skipped, 6 dependency warnings on macOS and Linux |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
 | `pixi run -e bayes benchmark-release-a` | Passed, including raw reconstruction |
-| Waterology constraints | 7 of 7 passed |
+| Optional dependency isolation | Passed on macOS and Linux |
+| Waterology constraints | 7 of 7 passed on the touched item 6 files |
 
-The Bayesian warnings are Torch JIT deprecation notices from dependencies.
+The Bayesian warnings are Torch, Pyro, SMAC, and ConfigSpace notices from dependencies.
 
 ## Integration state
 
-The implementation remains isolated on `codex/bayesian-optimization-implementation`. Integration
-into `main` should wait until all Release A items pass. Function-network work begins only after the
-Release A recovery, replay, and benchmark gates pass.
+The implementation remains isolated on `codex/bayesian-optimization-implementation`. All Release A
+items pass, but this task continues through the research layer before integration. No push,
+publication, or merge has been performed.
