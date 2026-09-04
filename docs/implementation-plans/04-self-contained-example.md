@@ -67,3 +67,24 @@ match its checked expected result, and two fresh CLI runs must produce the same 
 recommendation bytes.
 
 The parent plan and status document will be updated only after this evidence exists.
+
+## Completion evidence
+
+Item 4 was implemented in signed commit `5a257d0`. The checked example contains the system, run
+specification, evaluator, declared input data, analytic optimum, seeded expected result, and
+repository-root instructions. The independent review in
+[`04-self-contained-example-review.md`](../reviews/04-self-contained-example-review.md) found no
+remaining implementation defect.
+
+The final gate at `5a257d0` produced:
+
+- `pixi run pytest -q tests/test_optimization_example.py`: 2 passed;
+- `pixi run test`: 334 passed, 22 skipped;
+- `pixi run -e bayes test-bayes`: 355 passed, 1 skipped, with two upstream Torch deprecation
+  warnings;
+- `pixi run lint`: passed;
+- `git diff --check`: passed; and
+- scoped Waterology constraints: 7 of 7 passed.
+
+The independent CLI probe also matched every checked source hash and produced byte-identical
+ledgers and recommendation files in two fresh runs.

@@ -5,8 +5,8 @@ _Status date: 2026-09-04_
 The branch `codex/bayesian-optimization-implementation` contains the optimization contracts,
 reproducible baselines, evaluator integration, whole-system BoTorch backend, sequential budget
 controller, hardened recovery layer, and public run configuration. It does not yet provide an
-example, benchmark release gate, function-network optimization, or complete documentation. The
-public optimization command is complete.
+approved benchmark release gate, function-network optimization, or complete documentation. The
+public optimization command and self-contained example are complete.
 
 ## Recovery context
 
@@ -30,11 +30,11 @@ commit `b3dcdd4`.
 | 5. Evaluator integration | Complete | System evaluation, artifact durability, path validation, resource limits, and failure classification are implemented. |
 | 6. Whole-system BoTorch backend | Complete | The backend supports constrained mixed-variable optimization, conditional projection, noise modes, deterministic replay, diagnostics, and bounded fallbacks. |
 | 7. Budget controller and provenance | Complete | Canonical identity, exact transition replay, manifest-last commits, and bootstrap, action, and terminal recovery passed independent review. |
-| 8. CLI and Release A benchmark gate | In progress | The strict run specification is complete at `ff472f8`, and the optimization command is complete at `4f6034f`. Add the end-to-end example, benchmark harness, SMAC comparison adapter, and release criteria. |
+| 8. CLI and Release A benchmark gate | In progress | The strict run specification, optimization command, and checked example are complete through `5a257d0`. Add the benchmark harness, SMAC comparison adapter, and release criteria. |
 | 9. Function-network representation | Not implemented | Represent component functions, couplings, observations, costs, and graph evaluation scopes. |
 | 10. Full-observability function-network BO | Not implemented | Fit component surrogates and propagate intermediate observations through the system graph. |
 | 11. Partial-observability function-network BO | Not implemented | Select the configuration and component evaluation using cost-aware value of information or knowledge gradient methods. |
-| 12. Documentation and research provenance | In progress | This status record and item 1 through 3 reviews exist. The broader API, CLI, examples, assumptions, limitations, benchmark evidence, and literature correspondence remain incomplete. |
+| 12. Documentation and research provenance | In progress | This status record and item 1 through 4 reviews exist. The broader API, CLI, assumptions, limitations, benchmark evidence, and literature correspondence remain incomplete. |
 
 ## Completed plan items
 
@@ -77,16 +77,28 @@ The independent review in
 implementation defect after its findings were fixed. Its final focused checks passed 178 tests with
 22 skips in the default environment and 92 tests with one skip in the Bayesian environment.
 
+### Item 4: self-contained optimization example
+
+Signed implementation commit `5a257d0` adds a deterministic three-component optimization chain
+with categorical, continuous, integer, and conditional parameters. It has an absolute-bias
+constraint, a controlled model-failure region, and a unique analytic feasible optimum. The checked
+files include local input data, the seeded Sobol result, bounded start and resume commands, and
+artifact inspection instructions.
+
+The independent review in
+[`reviews/04-self-contained-example-review.md`](reviews/04-self-contained-example-review.md) found no
+remaining implementation defect. A public CLI probe matched the expected result and all four input
+hashes. Two fresh runs produced byte-identical ledgers and recommendation files.
+
 ## Work required for Release A
 
 Release A is whole-system Bayesian optimization. It treats one execution of the complete model
 chain as the expensive observation. It does not require function-network or partial-observation
 methods.
 
-### Add the example
+### CLI and example
 
-The `optimize` command is complete. Add at least one example that runs the complete workflow from a
-declared system and search space.
+The `optimize` command and its self-contained checked example are complete.
 
 ### Implement the benchmark release gate
 
@@ -131,12 +143,12 @@ and multi-fidelity evaluation remain outside Release A.
 
 ## Verification evidence
 
-The latest post-review gate was verified on 2026-09-04 at signed item 3 commit `4f6034f`.
+The latest post-review gate was verified on 2026-09-04 at signed item 4 commit `5a257d0`.
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 332 passed, 22 skipped |
-| `pixi run -e bayes test-bayes` | 353 passed, 1 skipped, 2 dependency warnings |
+| `pixi run test` | 334 passed, 22 skipped |
+| `pixi run -e bayes test-bayes` | 355 passed, 1 skipped, 2 dependency warnings |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
 | Waterology constraints | 7 of 7 passed |
