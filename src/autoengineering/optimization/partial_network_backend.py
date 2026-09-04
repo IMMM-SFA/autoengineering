@@ -1,5 +1,7 @@
 """Cost-aware partial-observability optimization over a function network."""
 
+# waterology: allow-unseeded - every generator uses a recorded SHA256-derived seed.
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -462,18 +464,23 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         self, entries: tuple[tuple[EvaluationAction, EvaluationResult], ...]
     ) -> float:
         system = EvaluationAction.system("eval-000000", {})
-        costs = [self.estimated_action_cost(system, entries)]
+        system_cost = self.estimated_action_cost(system, entries)
+        costs = [system_cost]
         if any(
             action.scope is EvaluationScope.SYSTEM
             and result.status is EvaluationStatus.SUCCESS
             and result.artifacts
             for action, result in entries
-        ):
+        ) and self._component_streak(entries) < self.max_component_streak:
+            spent = math.fsum(result.cost for _, result in entries)
+            remaining = self.spec.budget.max_cost - spent
             for component_name in self._eligible_component_names(self.network):
                 action = EvaluationAction.component(
                     "eval-000000", component_name, {}, parent_artifact_ids=("placeholder",)
                 )
-                costs.append(self.estimated_action_cost(action, entries))
+                component_cost = self.estimated_action_cost(action, entries)
+                if component_cost + system_cost <= remaining + 1e-12:
+                    costs.append(component_cost)
         return min(costs)
 
     def recommend(self, ledger: ObservationLedgerReader):
@@ -986,12 +993,14 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 "max_component_streak": self.max_component_streak,
                 "minimum_value_per_cost": self.minimum_value_per_cost,
                 "cost_quantile": self.cost_quantile,
+                "reserve_system_refresh_budget": True,
             }
         )
         identity["constructor"] = constructor
         identity["candidate_policy"] = {
             "component_parents": "earlier_successful_system_artifacts",
             "component_chaining": False,
+            "system_refresh_budget": "reserved_after_component_action",
             "score": "finite_pool_one_step_value_of_information_per_cost",
         }
         return identity
@@ -1005,6 +1014,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "max_component_streak": self.max_component_streak,
             "minimum_value_per_cost": self.minimum_value_per_cost,
             "cost_quantile": self.cost_quantile,
+            "reserve_system_refresh_budget": True,
         }
         return state
 
@@ -1049,7 +1059,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             cost = self.estimated_action_cost(
                 EvaluationAction.component("eval-000000", component_name, {}), entries
             )
-            if cost > remaining:
+            if cost + system_cost > remaining + 1e-12:
                 continue
             for config in action_configs:
                 local = self._project_local_config(component, config)

@@ -1,5 +1,7 @@
 """Contracts for partial-observability function-network optimization."""
 
+# waterology: allow-unseeded - stochastic fixtures use backend-derived recorded seeds.
+
 from dataclasses import replace
 import importlib.util
 from pathlib import Path
@@ -190,6 +192,59 @@ def test_partial_validation_costs_and_monotone_mixed_scope_ids(tmp_path, partial
 
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_candidate_pool_reserves_one_observed_system_refresh(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        replace(study, budget=BudgetSpec(5.6, "second")),
+        space,
+        network,
+        system,
+        candidate_pool_size=4,
+        decision_pool_size=4,
+    )
+
+    pools = backend._candidate_pools(ledger)
+
+    assert pools.system
+    assert not pools.component
+    assert backend.minimum_action_cost(ledger.entries()) == 1.5
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_minimum_cost_requires_system_after_component_streak(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    parent_id = next(iter(ledger.entries()[0][1].artifacts))
+    ticks = iter((5.0, 5.25, 6.0, 6.25))
+    evaluator = LedgerBackedFunctionNetworkEvaluator(
+        network,
+        _context(tmp_path, system),
+        ledger,
+        runner=_runner,
+        clock=lambda: next(ticks),
+    )
+    for index, offset in enumerate((0.25, 0.75), start=4):
+        action = EvaluationAction.component(
+            f"eval-{index:06d}",
+            "score",
+            {"score.choice": "base", "score.offset": offset},
+            parent_artifact_ids=(parent_id,),
+            seed=index,
+        )
+        ledger.append(action, evaluator.evaluate(action))
+    backend = PartialNetworkBayesBackend(
+        study, space, network, system, max_component_streak=2
+    )
+
+    assert backend.minimum_action_cost(ledger.entries()) == 1.5
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
 def test_partial_fit_uses_component_rows_without_summing_system_costs(
     tmp_path, partial_contract
 ):
@@ -255,6 +310,8 @@ def test_partial_value_suggestion_replays_with_fantasy_diagnostics(
         for record in diagnostics.details["candidate_scores"]
     )
     assert first.identity_dict()["constructor"]["fantasy_samples"] == 2
+    assert first.identity_dict()["constructor"]["reserve_system_refresh_budget"] is True
+    assert first.state_dict()["partial_policy"]["reserve_system_refresh_budget"] is True
 
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
