@@ -680,6 +680,9 @@ def _execute_component_action(
     flattened = {str(name): np.asarray(value) for name, value in outputs.items()}
     for name, value in outputs.items():
         flattened[f"{component.name}.{name}"] = np.asarray(value)
+    for port in component.inputs:
+        if port.name in inputs:
+            flattened[f"__input__.{component.name}.{port.name}"] = np.asarray(inputs[port.name])
     return flattened
 
 

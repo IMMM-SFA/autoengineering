@@ -244,6 +244,13 @@ def test_validation_rejects_dangling_and_incomplete_couplings(network_system, ne
     with pytest.raises(ValueError, match="couplings differ"):
         replace(network_spec, couplings=network_spec.couplings[:-1]).validate(network_system)
 
+    without_scalar = replace(network_spec.components[0], scalar_outputs=())
+    with pytest.raises(ValueError, match="system-observable scalar output"):
+        replace(
+            network_spec,
+            components=(without_scalar, *network_spec.components[1:]),
+        ).validate(network_system)
+
 
 def test_validation_rejects_incompatible_types_and_units(network_system, network_spec):
     transform = network_spec.components[1]
@@ -410,6 +417,10 @@ def test_function_network_evaluates_system_and_component_actions_and_replays_tab
         system_result.artifacts[parent_id], system_result.artifact_sha256[parent_id]
     )
     component_context = _evaluation_context(tmp_path, network_system, parents={parent_id: parent})
+    component_context = replace(
+        component_context,
+        source_arrays={"source.driver": np.array([2.0, 4.0, 6.0])},
+    )
     component_action = EvaluationAction.component(
         "eval-000002",
         "transform",
@@ -424,8 +435,16 @@ def test_function_network_evaluates_system_and_component_actions_and_replays_tab
         clock=_clock(2.0, 2.5),
     ).evaluate(component_action)
     assert component_result.status is EvaluationStatus.SUCCESS
-    assert component_result.outcomes == {"transform.flow_mean": 3.0}
+    assert component_result.outcomes == {"transform.flow_mean": 6.0}
     assert component_result.cost == 0.5
+    component_artifact_id = next(iter(component_result.artifacts))
+    component_trace = read_verified_npz(
+        component_result.artifacts[component_artifact_id],
+        component_result.artifact_sha256[component_artifact_id],
+    )
+    assert np.array_equal(
+        component_trace["__input__.transform.driver"], np.array([2.0, 4.0, 6.0])
+    )
     ledger.append(component_action, component_result)
 
     first = reconstruct_component_training_tables(network_spec, network_system, ledger)
@@ -440,10 +459,11 @@ def test_function_network_evaluates_system_and_component_actions_and_replays_tab
         "gain": 2.0,
         "source.driver_mean": 2.0,
     }
-    assert first["transform"][1].outputs == {"flow_mean": 3.0}
+    assert first["transform"][1].inputs["source.driver_mean"] == 4.0
+    assert first["transform"][1].outputs == {"flow_mean": 6.0}
     assert first["transform"][1].artifact_ids == (
         parent_id,
-        next(iter(component_result.artifacts)),
+        component_artifact_id,
     )
     assert first["score"][0].inputs["transform.flow_mean"] == 4.0
 

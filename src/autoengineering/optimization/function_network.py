@@ -646,6 +646,15 @@ def _validate_coupling(
             raise ValueError("coupling source and target data types are incompatible")
     if output.units and input_.units and output.units != input_.units:
         raise ValueError("coupling source and target units are incompatible")
+    scalar_outputs = [
+        item
+        for item in source.scalar_outputs
+        if item.port == coupling.source_port and EvaluationScope.SYSTEM in item.observed_in
+    ]
+    if not scalar_outputs:
+        raise ValueError(
+            "coupling source port must have a system-observable scalar output for replay"
+        )
 
 
 def _validate_terminal(

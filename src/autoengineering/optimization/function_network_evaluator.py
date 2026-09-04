@@ -539,7 +539,11 @@ def _component_trace_rows(
             for output in source.scalar_outputs:
                 if output.port != coupling.source_port:
                     continue
-                key = f"{source.component}.{output.port}"
+                key = (
+                    f"__input__.{component.component}.{coupling.target_port}"
+                    if action.scope is EvaluationScope.COMPONENT
+                    else f"{source.component}.{output.port}"
+                )
                 if key not in available:
                     raise FunctionNetworkArtifactError(
                         f"trace lacks upstream coupling output {key!r}"
