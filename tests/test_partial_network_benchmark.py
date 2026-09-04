@@ -10,7 +10,11 @@ import pytest
 if importlib.util.find_spec("botorch") is not None:
     from autoengineering.benchmarks.partial_network import __main__ as benchmark_main
     from autoengineering.benchmarks.partial_network.problems import benchmark_problems
-    from autoengineering.benchmarks.partial_network.runner import execute_run
+    from autoengineering.benchmarks.partial_network.runner import (
+        PARTIAL_SETTINGS,
+        _backend,
+        execute_run,
+    )
     from autoengineering.benchmarks.partial_network.summary import (
         _audit_records,
         _lineage_audit,
@@ -18,6 +22,12 @@ if importlib.util.find_spec("botorch") is not None:
         component_summary,
         summarize_records,
         value_cost_payload,
+    )
+    from autoengineering.optimization import ObservationLedger
+    from autoengineering.optimization.partial_network_backend import PartialNetworkBayesBackend
+    from autoengineering.optimization.partial_network_baselines import (
+        CheapestInformativePartialNetworkBackend,
+        RandomPartialNetworkBackend,
     )
 else:
     benchmark_main = None
@@ -46,6 +56,46 @@ def test_partial_benchmark_problems_match_frozen_analytic_optima():
     assert branch.analytic(branch_config)["utility"] == pytest.approx(1.0)
     assert branch.feasible(branch.analytic(branch_config))
     assert chain.expected_cost(None) == branch.expected_cost(None) == 1.0
+
+
+@pytest.mark.skipif(benchmark_main is None, reason="optional Bayesian dependencies")
+def test_partial_benchmark_candidate_generation_matches_decision_0008(tmp_path):
+    expected_settings = {
+        "min_initial": 4,
+        "min_component_observations": 3,
+        "candidate_pool_size": 16,
+        "decision_pool_size": 4,
+        "posterior_samples": 16,
+        "fantasy_samples": 4,
+        "fit_retry_limit": 2,
+        "max_component_streak": 2,
+        "minimum_value_per_cost": 0.0,
+        "cost_quantile": 0.9,
+    }
+    assert PARTIAL_SETTINGS == expected_settings
+
+    problem = benchmark_problems()[0]
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    ledger.initialize()
+    backend_types = {
+        "function_network_partial": PartialNetworkBayesBackend,
+        "function_network_partial_random": RandomPartialNetworkBackend,
+        "function_network_partial_cheapest_informative": (CheapestInformativePartialNetworkBackend),
+    }
+    for method, backend_type in backend_types.items():
+        backend = _backend(problem, method, 97)
+        assert type(backend) is backend_type
+        assert backend.identity_dict()["constructor"] == {
+            **expected_settings,
+            "reserve_system_refresh_budget": True,
+            "fantasy_sampler": "common_antithetic_normal",
+        }
+        assert len(backend._candidate_pools(ledger).system) == 16
+
+    records = execute_run(problem, "function_network_partial", 97)
+    acquisition = next(item for item in records if item["record_type"] == "acquisition")
+    assert acquisition["diagnostics"]["backend"] == "function_network_partial"
+    assert acquisition["diagnostics"]["details"]["candidate_pool_size"] == 16
 
 
 @pytest.mark.skipif(benchmark_main is None, reason="optional Bayesian dependencies")

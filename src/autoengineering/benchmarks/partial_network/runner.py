@@ -40,7 +40,7 @@ BUDGET = 8.0
 PARTIAL_SETTINGS = {
     "min_initial": 4,
     "min_component_observations": 3,
-    "candidate_pool_size": 2,
+    "candidate_pool_size": 16,
     "decision_pool_size": 4,
     "posterior_samples": 16,
     "fantasy_samples": 4,
