@@ -366,7 +366,7 @@ def _audit_records(
         elif record["record_type"] == "run_error":
             issues.append(f"run error {key!r}: {record['error_type']}: {record['error']}")
     warm_configs = {}
-    for key in expected_keys:
+    for key in sorted(expected_keys):
         problem_name, method, seed = key
         problem = problem_by_name(problem_name)
         group = sorted(evaluations[key], key=lambda item: int(item["evaluation_index"]))
@@ -388,6 +388,12 @@ def _audit_records(
                 continue
             if action.scope is not EvaluationScope.SYSTEM or action.id != f"eval-{index:06d}":
                 issues.append(f"action identity or scope differs at {label}")
+            if (
+                set(result.artifacts) != {action.id}
+                or result.artifacts[action.id] != f"trace:{action.id}"
+                or set(result.artifact_sha256) != {action.id}
+            ):
+                issues.append(f"trace identity differs at {label}")
             truth = problem.analytic(action.config)
             if set(result.outcomes) != set(truth) or any(
                 not math.isclose(result.outcomes[name], value, rel_tol=0.0, abs_tol=1e-12)

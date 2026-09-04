@@ -86,6 +86,9 @@ def _provenance(root: Path, output: Path) -> dict[str, object]:
     decision = root / "docs/decisions/0003-full-network-benchmark.md"
     if not decision.is_file():
         raise ValueError("decision 0003 must exist before benchmark execution")
+    correction = root / "docs/decisions/0004-full-network-evidence-corrections.md"
+    if not correction.is_file():
+        raise ValueError("decision 0004 must exist before replacement benchmark execution")
     versions = {}
     for package in (
         "autoengineering",
@@ -101,6 +104,7 @@ def _provenance(root: Path, output: Path) -> dict[str, object]:
             versions[package] = "not_installed"
     return {
         "decision_sha256": sha256(decision),
+        "correction_sha256": sha256(correction),
         "source_sha256": source_hash(root),
         "source_file_sha256": source_file_hashes(root),
         "git_head_at_execution": _git_output(root, "rev-parse", "HEAD"),
@@ -193,6 +197,9 @@ def verify_existing(output: Path) -> bool:
     decision = root / "docs/decisions/0003-full-network-benchmark.md"
     if provenance["decision_sha256"] != sha256(decision):
         raise ValueError("checked benchmark decision hash differs from the current decision")
+    correction = root / "docs/decisions/0004-full-network-evidence-corrections.md"
+    if provenance["correction_sha256"] != sha256(correction):
+        raise ValueError("checked benchmark correction hash differs from the current decision")
     if provenance["source_sha256"] != source_hash(root):
         raise ValueError("checked benchmark source hash differs from the current implementation")
     records = read_raw_records(output / "raw-records.jsonl")

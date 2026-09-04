@@ -36,6 +36,16 @@ CALIBRATION_POINTS = 16
 CALIBRATION_SAMPLES = 256
 
 
+class RunExecutionError(RuntimeError):
+    """Retain completed raw and calibration records when a run later fails."""
+
+    def __init__(self, records, calibration, cause: Exception) -> None:
+        super().__init__(str(cause))
+        self.records = records
+        self.calibration = calibration
+        self.cause = cause
+
+
 class MemoryLedger:
     """Small append-only ledger used while trace artifacts remain available."""
 
@@ -152,6 +162,11 @@ def execute_suite(
                     )
                 try:
                     run_records, run_calibration = execute_run(problem, method, seed)
+                except RunExecutionError as error:
+                    records.extend(error.records)
+                    calibration.extend(error.calibration)
+                    records.append(_error_record(problem, method, seed, error.cause))
+                    continue
                 except Exception as error:
                     records.append(_error_record(problem, method, seed, error))
                     continue
@@ -164,7 +179,25 @@ def execute_run(
     problem: FullNetworkProblem, method: str, seed: int
 ) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     """Execute one ten-evaluation closed loop and replay every suggestion."""
-    with tempfile.TemporaryDirectory(prefix="autoengineering-full-network-") as directory:
+    records: list[dict[str, object]] = []
+    calibration: list[dict[str, object]] = []
+    try:
+        return _execute_run(problem, method, seed, records, calibration)
+    except Exception as error:
+        raise RunExecutionError(records, calibration, error) from error
+
+
+def _execute_run(
+    problem: FullNetworkProblem,
+    method: str,
+    seed: int,
+    records: list[dict[str, object]],
+    calibration: list[dict[str, object]],
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    temporary_root = Path(tempfile.gettempdir()).resolve(strict=True)
+    with tempfile.TemporaryDirectory(
+        prefix="autoengineering-full-network-", dir=temporary_root
+    ) as directory:
         ledger = MemoryLedger()
         evaluator = FunctionNetworkEvaluator(
             problem.network,
@@ -174,8 +207,6 @@ def execute_run(
         )
         backend = _backend(problem, method, seed)
         warm = _warm_backend(problem, seed)
-        records: list[dict[str, object]] = []
-        calibration: list[dict[str, object]] = []
         cumulative_cost = 0.0
         best: float | None = None
         for index in range(EVALUATIONS_PER_RUN):
@@ -256,7 +287,9 @@ def execute_run(
             if method == "function_network_full" and index == WARM_START_COUNT - 1:
                 calibration = _calibrate(problem, seed, backend, ledger)
         recommendation = backend.recommend(ledger)
-        if recommendation.action_id not in {action.id for action, _ in ledger.entries()}:
+        if recommendation.action_id is not None and recommendation.action_id not in {
+            action.id for action, _ in ledger.entries()
+        }:
             raise ValueError("backend recommendation was not an observed action")
         return records, calibration
 

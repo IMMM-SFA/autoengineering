@@ -3,6 +3,9 @@ from __future__ import annotations
 import copy
 import json
 
+import pytest
+
+from autoengineering.benchmarks.full_network import runner as benchmark_runner
 from autoengineering.optimization import EvaluationAction, EvaluationResult
 from autoengineering.benchmarks.full_network.problems import (
     benchmark_problems,
@@ -183,3 +186,21 @@ def test_adverse_fallback_result_is_retained_and_fails_gate():
     )
     assert criterion["passed"] is False
     assert "favorable, null, or adverse" in render_report(summarize_records(adverse), gate)
+
+
+def test_run_uses_real_temporary_ancestry_and_retains_completed_records(monkeypatch):
+    class BrokenRecommendationBackend:
+        def recommend(self, ledger):
+            raise RuntimeError("recommendation failure")
+
+    monkeypatch.setattr(benchmark_runner, "EVALUATIONS_PER_RUN", 1)
+    monkeypatch.setattr(
+        benchmark_runner,
+        "_backend",
+        lambda problem, method, seed: BrokenRecommendationBackend(),
+    )
+    with pytest.raises(benchmark_runner.RunExecutionError, match="recommendation failure") as info:
+        benchmark_runner.execute_run(benchmark_problems()[0], "system", 0)
+    assert len(info.value.records) == 1
+    assert info.value.records[0]["record_type"] == "evaluation"
+    assert info.value.records[0]["result"]["artifacts"] == {"eval-000000": "trace:eval-000000"}
