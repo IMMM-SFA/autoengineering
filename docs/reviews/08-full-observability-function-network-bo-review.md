@@ -89,3 +89,22 @@ undercovered under the frozen protocol. The criterion was not relaxed and no pro
 `FullNetworkBayesBackend` remains experimental. The parent plan forbids Item 9 until the Item 8
 numerical, calibration, replay, and comparison gates all pass, so partial-observability work has not
 started.
+
+## Repository verification
+
+The final Item 8 source and documentation passed:
+
+| Check | Result |
+| --- | --- |
+| `pixi run lint` | Pass |
+| `pixi run test` | 409 passed, 30 skipped |
+| `pixi run -e bayes test-bayes` | 438 passed, 1 skipped, 9 dependency warnings |
+| `pixi run -e bayes benchmark-release-a` | Pass, 750 runs and 7,500 evaluations |
+| `pixi run -e bayes benchmark-full-network` | Exact reconstruction, then expected exit 1 for coverage |
+| Waterology constraints | 7 of 7 passed on touched files |
+| `git diff --check` | Pass |
+
+The Release A matrix was refreshed from clean revision `6aae2fa` because adding the experimental
+backend changed the optimization source hash. Its timing-excluded 7,500-record scientific signature
+was `7f7274e2b081a9d20be18359d045289764598af27cf7a8ea9790d1fb225bb9e5`, exactly matching the prior
+checked evidence. Signed commit `1cbb143` binds the refreshed Release A records to the Item 8 source.

@@ -191,8 +191,8 @@ evidence records clean execution revision `b287c82` and fails only its frozen co
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 404 passed, 23 skipped |
-| `pixi run -e bayes test-bayes` | 426 passed, 1 skipped, 5 dependency warnings |
+| `pixi run test` | 409 passed, 30 skipped |
+| `pixi run -e bayes test-bayes` | 438 passed, 1 skipped, 9 dependency warnings |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
 | `pixi run -e bayes benchmark-release-a` | Passed, including raw reconstruction |
@@ -200,6 +200,7 @@ evidence records clean execution revision `b287c82` and fails only its frozen co
 | Function-network focused checks | 107 passed |
 | Full-network benchmark matrix | 40 runs, 400 evaluations, 240 acquisitions; coverage gate failed |
 | Full-network raw reconstruction | Passed with zero issues |
+| Refreshed Release A matrix | Passed; 7,500-record scientific signature unchanged |
 | Waterology constraints | 7 of 7 passed on the touched documentation |
 
 The Bayesian warnings are Torch, Pyro, SMAC, and ConfigSpace notices from dependencies.
