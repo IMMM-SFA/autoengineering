@@ -1,0 +1,58 @@
+system:
+  name: Optimization chain
+  description: A deterministic input, transform, and score chain for the optimization CLI.
+  components:
+    - name: observations
+      model_type: tabular_input
+      description: Reads the checked predictor and target values.
+      inputs: []
+      outputs:
+        - name: observations
+          direction: out
+          data_type: table
+          units: dimensionless
+          description: Predictor and target pairs.
+      metadata: {}
+    - name: configurable_transform
+      model_type: algebraic_model
+      description: Applies the selected architecture and numeric parameters.
+      inputs:
+        - name: observations
+          direction: in
+          data_type: table
+          units: dimensionless
+          description: Predictor and target pairs.
+      outputs:
+        - name: predictions
+          direction: out
+          data_type: vector
+          units: dimensionless
+          description: Model predictions.
+      metadata: {}
+    - name: score
+      model_type: metric
+      description: Computes negative RMSE and absolute bias.
+      inputs:
+        - name: predictions
+          direction: in
+          data_type: vector
+          units: dimensionless
+          description: Model predictions.
+      outputs:
+        - name: metrics
+          direction: out
+          data_type: scalar_set
+          units: dimensionless
+          description: Objective and constraint outcomes.
+      metadata: {}
+  connections:
+    - source: observations
+      target: configurable_transform
+      port_from: observations
+      port_to: observations
+      description: Checked input data.
+    - source: configurable_transform
+      target: score
+      port_from: predictions
+      port_to: predictions
+      description: Predictions for evaluation.

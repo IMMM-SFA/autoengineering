@@ -1,0 +1,31 @@
+{
+  "known_feasible_optimum": {
+    "config": {
+      "architecture": "linear",
+      "gain": 1.25,
+      "stages": 2
+    },
+    "outcomes": {
+      "absolute_bias": 0.0,
+      "score": 0.0
+    }
+  },
+  "seeded_sobol_run": {
+    "evaluation_count": 12,
+    "recommendation": {
+      "action_id": "eval-000002",
+      "config": {
+        "architecture": "linear",
+        "gain": 1.2455264371819794,
+        "stages": 3
+      },
+      "feasible": true,
+      "message": "best feasible observed configuration",
+      "outcomes": {
+        "absolute_bias": 0.10000000000000002,
+        "score": -0.10005001940101457
+      }
+    },
+    "stop_reason": "max_cost"
+  }
+}

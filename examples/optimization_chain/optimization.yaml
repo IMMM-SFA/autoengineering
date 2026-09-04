@@ -1,0 +1,57 @@
+schema_version: '1.0'
+study:
+  name: optimization-chain
+  objective:
+    outcome: score
+    direction: maximize
+  constraints:
+    - outcome: absolute_bias
+      operator: <=
+      threshold: 0.3
+      safety: false
+  budget:
+    max_cost: 12.0
+    cost_unit: model_run
+    max_evaluations: 12
+    initial_cost_estimate: 1.0
+  noise:
+    mode: deterministic
+    noise_floor: 1.0e-06
+  backend: system
+  seed: 41
+  schema_version: '1.0'
+search_space:
+  schema_version: '1.0'
+  parameters:
+    - type: categorical
+      name: architecture
+      categories:
+        - linear
+        - nonlinear
+    - type: continuous
+      name: gain
+      lower: 0.5
+      upper: 2.0
+      scale: linear
+      active_when: {}
+    - type: integer
+      name: stages
+      lower: 1
+      upper: 4
+      scale: linear
+      active_when: {}
+    - type: continuous
+      name: curvature
+      lower: 0.05
+      upper: 0.5
+      scale: linear
+      active_when:
+        architecture:
+          - nonlinear
+policy: sobol
+policy_options: {}
+evaluator_factory: evaluator:make_evaluator
+input_files:
+  - input.csv
+target_value: null
+max_new_evaluations: null
