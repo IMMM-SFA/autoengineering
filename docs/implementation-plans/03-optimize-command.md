@@ -51,7 +51,7 @@ Bayesian Pixi environment. Release A rejects non-system study architectures.
 Text output will report the resolved work directory, terminal or invocation-limited state,
 evaluation count, total evaluator cost and unit, and recommended configuration. JSON output will
 contain the same fields plus the complete recommendation record. Both formats derive counts and
-cost from the committed ledger after the run.
+cost from one locked view of the committed ledger after the run.
 
 ## Tests
 
@@ -76,3 +76,20 @@ sequences and recommendations, and all focused, default, Bayesian, lint, whitesp
 Waterology checks pass after the final edit.
 
 The status document will be updated only after this evidence exists.
+
+## Completion evidence
+
+Item 3 was implemented in signed commit `4f6034f`. The command validates its complete run contract
+before creating durable state, preserves explicit new and resume intent, and returns a consistent
+summary from the controller's locked result snapshot. The independent review in
+[`03-optimize-command-review.md`](../reviews/03-optimize-command-review.md) found no remaining
+implementation defect after its findings were corrected.
+
+The final gate at `4f6034f` produced:
+
+- `pixi run test`: 332 passed, 22 skipped;
+- `pixi run -e bayes test-bayes`: 353 passed, 1 skipped, with two upstream Torch deprecation
+  warnings;
+- `pixi run lint`: passed;
+- `git diff --check`: passed; and
+- scoped Waterology constraints: 7 of 7 passed.
