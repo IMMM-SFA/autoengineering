@@ -26,6 +26,9 @@ from autoengineering.optimization import (
     SearchSpace,
     StudySpec,
 )
+from autoengineering.optimization.function_network_evaluator import (
+    reconstruct_component_training_tables,
+)
 from autoengineering.research.runner import EvaluationContext
 from autoengineering.system.graph import System
 
@@ -229,6 +232,23 @@ def test_full_network_posterior_and_suggestion_replay_from_verified_tables(
     assert json.loads(json.dumps(state, sort_keys=True)) == state
     assert "SingleTaskGP" not in str(state)
     assert first_backend.identity_dict()["constructor"]["posterior_samples"] == 32
+
+
+@pytest.mark.skipif(FullNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_component_gp_uses_declared_feature_coordinates_without_second_transform(
+    tmp_path, full_network_contract
+):
+    system, network, study, space = full_network_contract
+    ledger = _observed_ledger(tmp_path, full_network_contract)
+    backend = FullNetworkBayesBackend(study, space, network, system)
+    tables = reconstruct_component_training_tables(network, system, ledger)
+    prepared = backend._fit_components(tables, backend._fingerprint(ledger.entries()))
+
+    fitted = [model for component in prepared.values() for model in component.models.values()]
+    assert fitted
+    for model in fitted:
+        assert not hasattr(model, "input_transform")
+        assert torch.equal(model.transform_inputs(model.train_inputs[0]), model.train_inputs[0])
 
 
 @pytest.mark.skipif(FullNetworkBayesBackend is None, reason="optional Bayesian dependencies")

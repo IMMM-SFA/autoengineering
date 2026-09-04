@@ -18,7 +18,6 @@ try:
     from botorch.exceptions.warnings import NumericsWarning, OptimizationWarning
     from botorch.fit import fit_gpytorch_mll
     from botorch.models import SingleTaskGP
-    from botorch.models.transforms.input import Normalize
     from botorch.models.transforms.outcome import Standardize
     from gpytorch.mlls import ExactMarginalLogLikelihood
 except ImportError as error:  # pragma: no cover - exercised in a no-extra subprocess
@@ -523,7 +522,6 @@ class FullNetworkBayesBackend(_BaselineBackend):
                     train_x,
                     train_y,
                     train_Yvar=train_yvar,
-                    input_transform=Normalize(d=train_x.shape[-1]),
                     outcome_transform=Standardize(m=1),
                 )
                 mll = ExactMarginalLogLikelihood(model.likelihood, model)
