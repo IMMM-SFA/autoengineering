@@ -304,7 +304,53 @@ evaluation, parent artifact reuse, and replay in the default environment. The pu
 available from `autoengineering.optimization`, including `FunctionNetworkSpec`,
 `FunctionNetworkEvaluator`, and `reconstruct_component_training_tables`.
 
-This layer does not yet fit component surrogates or provide a function-network Bayesian policy.
+## Experimental full-observability backend
+
+`FullNetworkBayesBackend` is available from
+`autoengineering.optimization.full_network_backend` in the Bayesian environment. It fits one
+independent scalar Gaussian process for each declared component output, then propagates independent
+seeded innovations through the validated topological order. It scores complete global
+configurations by constrained Monte Carlo expected improvement and returns only system actions.
+Final recommendations still come only from feasible successful system observations.
+
+The constructor requires matching `StudySpec`, `SearchSpace`, `FunctionNetworkSpec`, and `System`
+objects. The study backend must be `function_network_full`. Every declared scalar output must be
+observable at system scope, and the global search space must exactly match the qualified component
+parameters. Component-scope rows are rejected by this backend.
+
+```python
+from autoengineering.optimization.full_network_backend import FullNetworkBayesBackend
+
+backend = FullNetworkBayesBackend(
+    study,
+    search_space,
+    function_network,
+    system,
+    min_initial=4,
+    candidate_pool_size=64,
+    posterior_samples=128,
+)
+actions = backend.suggest(ledger)
+```
+
+The first version assumes independent output Gaussian processes and independent component
+innovations conditional on sampled upstream values. It supports scalar declared outputs and acyclic
+networks. It does not choose component actions, learn correlated outputs, represent functional
+outputs directly, or provide partial observability.
+
+Run or verify its checked research evidence with:
+
+```sh
+pixi run -e bayes benchmark-full-network
+```
+
+The command currently exits nonzero because the preregistered calibration gate failed. All 40 runs,
+raw reconstruction, action replay, regret comparisons, constraint Brier score, and fallback limits
+passed, but pooled 90 percent interval coverage was 0.65625 against a minimum of 0.75. The
+[full-network report](../benchmarks/full_network/results/report.md) and
+[review](reviews/08-full-observability-function-network-bo-review.md) preserve the result. The
+backend remains experimental, and partial-observability work is blocked.
+
 The Release A command still accepts only whole-system optimization. Do not describe a
 `SystemBayesBackend` run as function-network optimization, component Bayesian optimization,
 multi-fidelity optimization, or partial-observability optimization. The remaining research work is

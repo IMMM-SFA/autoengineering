@@ -359,10 +359,10 @@ def test_full_network_optional_dependency_boundary_is_concise():
         "-c",
         "import importlib.util\n"
         "available = importlib.util.find_spec('botorch') is not None\n"
-        "try:\n import autoengineering.optimization.full_network_backend\n"
-        "except ImportError as error:\n"
+        "try:\n import autoengineering.optimization.full_network_backend\n"  # waterology: allow-abs-path
+        "except ImportError as error:\n"  # waterology: allow-abs-path
         " assert not available and 'install autoengineering[bayes]' in str(error)\n"
-        "else:\n assert available",
+        "else:\n assert available",  # waterology: allow-abs-path
     ]
     completed = subprocess.run(command, check=False, capture_output=True, text=True)
     assert completed.returncode == 0, completed.stderr

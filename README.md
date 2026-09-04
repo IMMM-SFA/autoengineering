@@ -330,9 +330,12 @@ permitted component actions using scalar ledger outcomes and verified NPZ traces
 `reconstruct_component_training_tables` rebuilds deterministic scalar tables from those durable
 observations.
 
-This experimental layer does not yet include a component-surrogate Bayesian backend. See the
-checked [`function_network`](examples/function_network/) example and the
-[optimization guide](docs/optimization.md#function-network-boundary).
+An experimental component-surrogate backend is available from
+`autoengineering.optimization.full_network_backend`. It requests only complete system evaluations
+and did not pass its frozen calibration gate, so it is not part of Release A. See the checked
+[`function_network`](examples/function_network/) example, the
+[optimization guide](docs/optimization.md#experimental-full-observability-backend), and the
+[full-network evidence](benchmarks/full_network/results/report.md).
 
 ## CLI Reference
 
@@ -427,6 +430,7 @@ pixi run lint
 pixi run test
 pixi run -e bayes test-bayes
 pixi run -e bayes benchmark-release-a
+pixi run -e bayes benchmark-full-network
 ```
 
 The checked [Release A benchmark report](benchmarks/release_a/results/report.md) records the current
