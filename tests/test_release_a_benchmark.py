@@ -224,6 +224,8 @@ def test_raw_records_reconstruct_summary_and_failing_gate(tmp_path):
     assert summary_csv(rows) == summary_csv(summarize_records(read_raw_records(raw_path)))
     assert gate["passed"] is False
     assert json.loads(gate_json(gate)) == gate
+    assert render_report(rows, gate).endswith("\n")
+    assert not render_report(rows, gate).endswith("\n\n")
 
 
 def test_raw_reader_rejects_an_invalid_envelope(tmp_path):

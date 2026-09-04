@@ -492,7 +492,6 @@ def render_report(rows: list[dict[str, object]], gate: Mapping[str, object]) -> 
             "## Run failures",
             "",
             f"Incomplete runs: {len(failed)}",
-            "",
         ]
     )
     for row in failed:
