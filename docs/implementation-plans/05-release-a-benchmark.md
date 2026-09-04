@@ -68,3 +68,12 @@ Waterology checks, and an independent review must also pass.
 
 If a criterion fails, retain that result and mark item 5 blocked or in progress. Do not alter the
 decision thresholds after the full comparison.
+
+## Independent review correction checkpoint
+
+The first comparative run at `5c752c7` passed the numeric gate but was invalidated by independent
+review. Decision 0002 fixes the evidence defects without changing any problem, method setting, or
+release threshold. The replacement run must start from a clean signed revision, use the fixed SMAC
+penalty, audit the exact matrix and recomputed scientific fields, retain results across observation
+failures, include complete optimizer overhead, and bind provenance to every result-affecting source
+and environment file.

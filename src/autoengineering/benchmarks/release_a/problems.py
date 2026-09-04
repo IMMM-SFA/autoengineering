@@ -1,5 +1,7 @@
 """Frozen synthetic problems for the preregistered Release A benchmark."""
 
+# waterology: allow-unseeded - noisy draws use an explicit SeedSequence below.
+
 from __future__ import annotations
 
 from dataclasses import dataclass

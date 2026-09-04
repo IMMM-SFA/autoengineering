@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+from pathlib import Path
 import subprocess
 import sys
 
@@ -25,6 +26,7 @@ from autoengineering.benchmarks.release_a.runner import (
 from autoengineering.benchmarks.release_a.summary import (
     evaluate_gate,
     gate_json,
+    render_report,
     summarize_records,
     summary_csv,
 )
@@ -170,6 +172,19 @@ def test_raw_reader_rejects_an_invalid_envelope(tmp_path):
 
     with pytest.raises(ValueError, match="envelope"):
         read_raw_records(path)
+
+
+def test_checked_release_a_artifacts_reconstruct_from_raw_records():
+    root = Path(__file__).resolve().parents[1]
+    output = root / "benchmarks/release_a/results"
+    records = read_raw_records(output / "raw-records.jsonl")
+    existing_gate = json.loads((output / "gate.json").read_text(encoding="utf-8"))
+    rows = summarize_records(records)
+    rebuilt_gate = evaluate_gate(records, provenance=existing_gate["provenance"])
+
+    assert summary_csv(rows) == (output / "run-summary.csv").read_text(encoding="utf-8")
+    assert gate_json(rebuilt_gate) == (output / "gate.json").read_text(encoding="utf-8")
+    assert render_report(rows, rebuilt_gate) == (output / "report.md").read_text(encoding="utf-8")
 
 
 def test_preregistered_method_order_is_stable():
