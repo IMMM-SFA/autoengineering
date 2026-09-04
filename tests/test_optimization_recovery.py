@@ -11,8 +11,10 @@ import pytest
 from autoengineering.optimization import (
     BudgetSpec,
     CategoricalParameter,
+    BackendDiagnostics,
     EvaluationAction,
     EvaluationResult,
+    EvaluationScope,
     NoiseSpec,
     ObjectiveSpec,
     ObservationLedger,
@@ -50,6 +52,12 @@ def _evaluator(action):
         {},
         1.0,
         "run",
+    )
+
+
+def _partial_evaluator(action):
+    return EvaluationResult.success(
+        action.id, {"model.value": 1.0}, {}, 0.25, "run"
     )
 
 
@@ -124,6 +132,63 @@ class _SnapshotReadingSobol(SobolBackend):
         entries, contents = ledger.snapshot()
         assert contents == b"".join(ledger.record_bytes(*entry) for entry in entries)
         return super().suggest(ledger, n=n)
+
+
+class _PartialComponentBackend:
+    name = "function_network_partial_test"
+
+    def __init__(self, spec, space):
+        self.spec = spec
+        self.space = space
+
+    def suggest(self, ledger, n=1):
+        entries = ledger.entries()
+        return (
+            EvaluationAction.component(
+                f"eval-{len(entries):06d}",
+                "model",
+                {"model.choice": "base"},
+                suggested_by=self.name,
+            ),
+        )
+
+    def recommend(self, ledger):
+        from autoengineering.optimization import Recommendation
+
+        return Recommendation(None, {}, {}, False, "component results are not terminal")
+
+    def diagnostics(self, ledger):
+        return BackendDiagnostics(
+            self.name,
+            "test_backend",
+            details={"ledger_entries": len(ledger.entries())},
+        )
+
+    def identity_dict(self):
+        return {"schema_version": "1.0", "name": self.name, "constructor": {}}
+
+    def state_dict(self):
+        return {"schema_version": "1.0", "name": self.name}
+
+    def validate_entries(self, entries):
+        for index, (action, _) in enumerate(entries):
+            if action.scope is not EvaluationScope.COMPONENT or action.id != f"eval-{index:06d}":
+                raise ValueError("invalid mixed-scope test ledger")
+
+    def validate_action(self, action, entries):
+        if (
+            action.scope is not EvaluationScope.COMPONENT
+            or action.component != "model"
+            or action.config != {"model.choice": "base"}
+            or action.id != f"eval-{len(entries):06d}"
+        ):
+            raise ValueError("invalid component action")
+
+    def estimated_action_cost(self, action, entries):
+        return 0.25
+
+    def minimum_action_cost(self, entries):
+        return 0.25
 
 
 class _AlteredEncodingSpace(SearchSpace):
@@ -483,6 +548,94 @@ def test_resume_accepts_only_the_exact_pending_ledger_extension(tmp_path, spec, 
     assert resumed.ledger.entries() == ((action, result),)
     assert resumed.ledger.path.read_bytes() == ledger_bytes
     assert not pending_path.exists()
+
+
+@pytest.mark.parametrize("boundary", ("before_evaluation", "after_result", "after_ledger"))
+def test_partial_component_action_recovers_once_at_each_pending_boundary(tmp_path, boundary):
+    spec = StudySpec(
+        name="partial-recovery",
+        objective=ObjectiveSpec("score", "maximize"),
+        constraints=(),
+        budget=BudgetSpec(1.0, "run"),
+        noise=NoiseSpec(),
+        backend="function_network_partial",
+        seed=17,
+    )
+    space = SearchSpace((CategoricalParameter("model.choice", ("base",)),))
+    backend = _PartialComponentBackend(spec, space)
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    first = OptimizationStudy(spec, space, backend, ledger, _partial_evaluator, tmp_path)
+    action = first.ask()[0]
+    result = _partial_evaluator(action)
+    pending_path = tmp_path / "pending-actions.json"
+    if boundary in {"after_result", "after_ledger"}:
+        pending = json.loads(pending_path.read_text())
+        pending["result"] = result.to_dict()
+        pending_path.write_text(canonical_json(pending) + "\n", encoding="utf-8")
+    if boundary == "after_ledger":
+        ledger.append(action, result)
+    _abandon(first)
+
+    resumed = OptimizationStudy(
+        spec,
+        space,
+        _PartialComponentBackend(spec, space),
+        ledger,
+        _partial_evaluator,
+        tmp_path,
+    )
+
+    entries = resumed.ledger.entries()
+    assert len(entries) == 1
+    assert entries[0][0] == action
+    expected_status = "infrastructure_failure" if boundary == "before_evaluation" else "success"
+    assert entries[0][1].status.value == expected_status
+    assert not pending_path.exists()
+
+
+def test_partial_component_action_recovers_before_manifest_replacement(
+    tmp_path, monkeypatch
+):
+    from autoengineering.optimization import provenance
+
+    spec = StudySpec(
+        name="partial-recovery-write",
+        objective=ObjectiveSpec("score", "maximize"),
+        constraints=(),
+        budget=BudgetSpec(1.0, "run"),
+        noise=NoiseSpec(),
+        backend="function_network_partial",
+        seed=17,
+    )
+    space = SearchSpace((CategoricalParameter("model.choice", ("base",)),))
+    ledger = ObservationLedger(tmp_path / "observations.jsonl")
+    first = OptimizationStudy(
+        spec, space, _PartialComponentBackend(spec, space), ledger, _partial_evaluator, tmp_path
+    )
+    action = first.ask()[0]
+    original = provenance.atomic_write_json
+
+    def interrupt(directory, name, value):
+        if name == "recommendation.json":
+            raise OSError("simulated partial manifest interruption")
+        return original(directory, name, value)
+
+    monkeypatch.setattr(provenance, "atomic_write_json", interrupt)
+    with pytest.raises(OSError, match="partial manifest interruption"):
+        first.tell(action, _partial_evaluator(action))
+    _abandon(first)
+    monkeypatch.setattr(provenance, "atomic_write_json", original)
+
+    resumed = OptimizationStudy(
+        spec,
+        space,
+        _PartialComponentBackend(spec, space),
+        ledger,
+        _partial_evaluator,
+        tmp_path,
+    )
+    assert len(resumed.ledger.entries()) == 1
+    assert not (tmp_path / "pending-actions.json").exists()
 
 
 def test_nonexact_pending_ledger_extension_fails_without_changes(tmp_path, spec, space):

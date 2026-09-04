@@ -327,6 +327,10 @@ class LedgerBackedFunctionNetworkEvaluator:
             clock=self.clock,
         ).evaluate(action)
 
+    def __call__(self, action: EvaluationAction) -> EvaluationResult:
+        """Support direct use as an ``OptimizationStudy`` evaluator."""
+        return self.evaluate(action)
+
 
 def _reducer_function(
     component_name: str, output: ScalarOutputSpec

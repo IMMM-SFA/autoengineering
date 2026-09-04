@@ -21,6 +21,7 @@ from autoengineering.optimization import (
     NoiseSpec,
     ObjectiveSpec,
     ObservationLedger,
+    OptimizationStudy,
     SearchSpace,
     StudySpec,
 )
@@ -355,6 +356,72 @@ def test_partial_benchmark_baselines_replay_and_keep_observed_recommendations(
         study, space, network, system, **settings
     ).suggest(ledger)[0]
     assert informative.scope is EvaluationScope.COMPONENT
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_closed_loop_executes_component_and_resumes_from_ledger(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    directory = tmp_path / "study"
+    directory.mkdir()
+    ledger = ObservationLedger(directory / "observations.jsonl")
+    ticks = iter(np.arange(0.0, 20.0, 0.25))
+    evaluator = LedgerBackedFunctionNetworkEvaluator(
+        network,
+        _context(directory, system),
+        ledger,
+        runner=_runner,
+        clock=lambda: next(ticks),
+    )
+    settings = {
+        "candidate_pool_size": 2,
+        "decision_pool_size": 2,
+        "posterior_samples": 8,
+        "fantasy_samples": 2,
+    }
+    backend = CheapestInformativePartialNetworkBackend(
+        study, space, network, system, **settings
+    )
+    controller = OptimizationStudy(
+        study, space, backend, ledger, evaluator, directory
+    )
+    result = controller.run_result(max_new_evaluations=5)
+
+    assert result.new_evaluation_count == 5
+    assert [action.scope for action, _ in result.entries[:4]] == [
+        EvaluationScope.SYSTEM
+    ] * 4
+    assert result.entries[4][0].scope is EvaluationScope.COMPONENT
+    parent_id = result.entries[4][0].parent_artifact_ids[0]
+    assert any(
+        parent_id in observation.artifacts
+        and action.scope is EvaluationScope.SYSTEM
+        and observation.status.value == "success"
+        for action, observation in result.entries[:4]
+    )
+    assert sum(observation.cost for _, observation in result.entries) == 1.25
+    assert result.recommendation.action_id in {
+        action.id for action, _ in result.entries[:4]
+    }
+
+    resumed = OptimizationStudy(
+        study,
+        space,
+        CheapestInformativePartialNetworkBackend(
+            study, space, network, system, **settings
+        ),
+        ObservationLedger(ledger.path),
+        LedgerBackedFunctionNetworkEvaluator(
+            network,
+            _context(directory, system),
+            ObservationLedger(ledger.path),
+            runner=_runner,
+            clock=lambda: next(ticks),
+        ),
+        directory,
+    )
+    assert resumed.recommend() == result.recommendation
 
 
 def test_partial_network_optional_dependency_boundary_is_concise():
