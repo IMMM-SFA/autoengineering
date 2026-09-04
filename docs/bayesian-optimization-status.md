@@ -4,8 +4,9 @@ _Status date: 2026-09-04_
 
 The branch `codex/bayesian-optimization-implementation` contains the optimization contracts,
 reproducible baselines, evaluator integration, whole-system BoTorch backend, sequential budget
-controller, and hardened recovery layer. It does not yet provide a user-facing optimization
-command, benchmark release gate, function-network optimization, or complete documentation.
+controller, hardened recovery layer, and public run configuration. It does not yet provide an
+optimization command, benchmark release gate, function-network optimization, or complete
+documentation.
 
 ## Recovery context
 
@@ -29,13 +30,15 @@ commit `b3dcdd4`.
 | 5. Evaluator integration | Complete | System evaluation, artifact durability, path validation, resource limits, and failure classification are implemented. |
 | 6. Whole-system BoTorch backend | Complete | The backend supports constrained mixed-variable optimization, conditional projection, noise modes, deterministic replay, diagnostics, and bounded fallbacks. |
 | 7. Budget controller and provenance | Complete | Canonical identity, exact transition replay, manifest-last commits, and bootstrap, action, and terminal recovery passed independent review. |
-| 8. CLI and Release A benchmark gate | Not implemented | Add the run specification, optimization command, end-to-end example, benchmark harness, SMAC comparison adapter, and release criteria. |
+| 8. CLI and Release A benchmark gate | In progress | The strict run specification is complete at `ff472f8`. Add the optimization command, end-to-end example, benchmark harness, SMAC comparison adapter, and release criteria. |
 | 9. Function-network representation | Not implemented | Represent component functions, couplings, observations, costs, and graph evaluation scopes. |
 | 10. Full-observability function-network BO | Not implemented | Fit component surrogates and propagate intermediate observations through the system graph. |
 | 11. Partial-observability function-network BO | Not implemented | Select the configuration and component evaluation using cost-aware value of information or knowledge gradient methods. |
-| 12. Documentation and research provenance | In progress | This status record and item 1 review exist. The API, CLI, examples, assumptions, limitations, benchmark evidence, and literature correspondence remain incomplete. |
+| 12. Documentation and research provenance | In progress | This status record and item 1 and 2 reviews exist. The API, CLI, examples, assumptions, limitations, benchmark evidence, and literature correspondence remain incomplete. |
 
-## Completed recovery gate
+## Completed plan items
+
+### Item 1: recovery and durable identity
 
 Each study now binds the study specification, search space and encoding, backend constructor
 identity, in-directory ledger path and bytes, input hashes, seed, and original start timestamp.
@@ -48,18 +51,30 @@ The independent review in [`reviews/01-recovery-review.md`](reviews/01-recovery-
 remaining implementation defect. Its focused checks passed with 119 tests and 21 skips in the
 default environment, and 120 tests in the Bayesian environment.
 
+### Item 2: public run configuration
+
+Signed implementation commit `ff472f8` adds strict typed dictionary and YAML serialization for
+search spaces and parameters. `OptimizationRunSpec` combines the study, search space, policy,
+evaluator entry point, declared inputs, target, and invocation limit. It resolves local inputs
+relative to the run file, rejects duplicate YAML keys and path escapes, isolates local evaluator
+imports, and hashes only the matching run file and explicitly named inputs.
+
+The independent review in
+[`reviews/02-run-configuration-review.md`](reviews/02-run-configuration-review.md) found no remaining
+implementation defect after six findings were fixed. Its final focused check passed 69 tests, lint,
+and the base import dependency probe.
+
 ## Work required for Release A
 
 Release A is whole-system Bayesian optimization. It treats one execution of the complete model
 chain as the expensive observation. It does not require function-network or partial-observation
 methods.
 
-### Define the run configuration, CLI, and example
+### Add the CLI and example
 
-Add one serializable run specification shared by the Python API and CLI. Add an `optimize` command
-that can start or resume a study, select a policy, enforce a budget, and write durable recommendation
-and provenance artifacts. At least one example should run the complete workflow from a declared
-system and search space.
+Add an `optimize` command that uses the shared run specification to start or resume a study, select
+a policy, enforce a budget, and write durable recommendation and provenance artifacts. At least one
+example should run the complete workflow from a declared system and search space.
 
 ### Implement the benchmark release gate
 
@@ -104,12 +119,12 @@ and multi-fidelity evaluation remain outside Release A.
 
 ## Verification evidence
 
-The post-review item 1 gate was verified on 2026-09-04 at signed commit `b3dcdd4`.
+The latest post-review gate was verified on 2026-09-04 at signed item 2 commit `ff472f8`.
 
 | Check | Result |
 | --- | --- |
-| `pixi run test` | 253 passed, 21 skipped |
-| `pixi run -e bayes test-bayes` | 274 passed, 2 dependency warnings |
+| `pixi run test` | 305 passed, 21 skipped |
+| `pixi run -e bayes test-bayes` | 326 passed, 2 dependency warnings |
 | `pixi run lint` | Passed |
 | `git diff --check` | Passed |
 | Waterology constraints | 7 of 7 passed |

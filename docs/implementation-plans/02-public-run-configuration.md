@@ -79,3 +79,11 @@ Item 2 is complete only when:
   constraints pass after the final edit.
 
 The status document will be updated only after this evidence exists.
+
+## Completion evidence
+
+Item 2 was implemented in signed commit `ff472f8`. The final gate passed with 305 tests and 21
+optional dependency skips in the default environment, and 326 tests in the Bayesian environment.
+The Bayesian run reported two dependency deprecation warnings from `torch.jit.script`. Lint,
+`git diff --check`, and all seven Waterology constraints passed. The independent review found no
+remaining implementation defect after six findings were corrected and regression tested.

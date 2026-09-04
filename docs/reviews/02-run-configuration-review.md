@@ -8,16 +8,15 @@ _Reviewed state: live uncommitted item 2 diff in the isolated implementation wor
 
 Review result: no implementation defect remains in the item 2 scope. Six provenance and input
 validation defects found during review were corrected and covered by regressions. The broad
-completion gates still need evidence from the final saved state.
+completion gates were refreshed after the final review fix.
 
 ## Must fix
 
 No implementation findings remain.
 
-Before item 2 is marked complete, refresh the broad checks required by
-`docs/implementation-plans/02-public-run-configuration.md:67-79`. The final focused tests, lint, and
-whitespace check pass, but the default suite, Bayesian suite, and Waterology constraints have not
-been run after the last review fix. This is a verification blocker, not a code finding.
+The implementer refreshed the broad completion gates after the review. The results are recorded in
+`docs/implementation-plans/02-public-run-configuration.md` and
+`docs/bayesian-optimization-status.md`.
 
 ## Should fix
 
