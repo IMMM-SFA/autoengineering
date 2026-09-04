@@ -347,6 +347,7 @@ class FullNetworkBayesBackend(_BaselineBackend):
                 "candidate_pool_size": self.candidate_pool_size,
                 "posterior_samples": self.posterior_sample_count,
                 "acquisition": "constrained_monte_carlo_expected_improvement",
+                "posterior_dependence": "independent_output_and_component_innovations",
                 "deterministic_seed": self._seed(fingerprint, "suggest"),
             },
         )
@@ -624,14 +625,13 @@ class FullNetworkBayesBackend(_BaselineBackend):
                         torch.manual_seed(draw_seed)
                         with torch.no_grad():
                             posterior = model.posterior(x_tensor)
-                            samples = (
-                                posterior.rsample(torch.Size([1]))
-                                .squeeze(0)
-                                .squeeze(-1)
-                                .detach()
-                                .cpu()
-                                .numpy()
+                            means = posterior.mean.squeeze(-1).detach().cpu().numpy()
+                            variances = (
+                                posterior.variance.squeeze(-1).clamp_min(0.0).detach().cpu().numpy()
                             )
+                    generator = np.random.default_rng(draw_seed)
+                    innovations = generator.standard_normal(sample_count)
+                    samples = means + np.sqrt(variances) * innovations
                     outputs[output.name] = np.asarray(samples, dtype=float)
             for name, values in outputs.items():
                 if values.shape != (sample_count,) or not np.all(np.isfinite(values)):

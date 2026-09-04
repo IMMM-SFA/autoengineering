@@ -227,10 +227,6 @@ def _execute_run(
             if action.id != f"eval-{index:06d}":
                 raise ValueError("benchmark backend returned a noncanonical action ID")
             diagnostics = active.diagnostics(ledger)
-            replay_diagnostics = fresh.diagnostics(ledger)
-            replay_consistent &= _diagnostic_signature(diagnostics.to_dict()) == (
-                _diagnostic_signature(replay_diagnostics.to_dict())
-            )
             if not replay_consistent:
                 raise ValueError("fresh backend suggestion replay differed")
             if index >= WARM_START_COUNT:

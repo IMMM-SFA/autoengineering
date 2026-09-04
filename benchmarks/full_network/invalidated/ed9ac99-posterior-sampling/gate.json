@@ -1,0 +1,247 @@
+{
+  "criteria": [
+    {
+      "details": {
+        "acquisitions": 234,
+        "complete_runs": 39,
+        "evaluations": 394,
+        "expected_runs": 40,
+        "missing_runs": 0,
+        "observed_runs": 40
+      },
+      "name": "complete_matrix",
+      "passed": false
+    },
+    {
+      "details": {
+        "issue_count": 393,
+        "passed": false,
+        "reported_issues": [
+          "run error ('smooth_chain', 'system', 0): ValueError: fresh backend suggestion replay differed",
+          "scientific outcome differs at constrained_branch/function_network_full/0/0",
+          "scientific outcome differs at constrained_branch/function_network_full/0/1",
+          "scientific outcome differs at constrained_branch/function_network_full/0/2",
+          "scientific outcome differs at constrained_branch/function_network_full/0/3",
+          "scientific outcome differs at constrained_branch/function_network_full/0/4",
+          "scientific outcome differs at constrained_branch/function_network_full/0/5",
+          "scientific outcome differs at constrained_branch/function_network_full/0/6",
+          "scientific outcome differs at constrained_branch/function_network_full/0/7",
+          "scientific outcome differs at constrained_branch/function_network_full/0/8",
+          "scientific outcome differs at constrained_branch/function_network_full/0/9",
+          "scientific outcome differs at constrained_branch/function_network_full/1/0",
+          "scientific outcome differs at constrained_branch/function_network_full/1/1",
+          "scientific outcome differs at constrained_branch/function_network_full/1/2",
+          "scientific outcome differs at constrained_branch/function_network_full/1/3",
+          "scientific outcome differs at constrained_branch/function_network_full/1/4",
+          "scientific outcome differs at constrained_branch/function_network_full/1/5",
+          "scientific outcome differs at constrained_branch/function_network_full/1/6",
+          "scientific outcome differs at constrained_branch/function_network_full/1/7",
+          "scientific outcome differs at constrained_branch/function_network_full/1/8",
+          "scientific outcome differs at constrained_branch/function_network_full/1/9",
+          "scientific outcome differs at constrained_branch/function_network_full/2/0",
+          "scientific outcome differs at constrained_branch/function_network_full/2/1",
+          "scientific outcome differs at constrained_branch/function_network_full/2/2",
+          "scientific outcome differs at constrained_branch/function_network_full/2/3",
+          "scientific outcome differs at constrained_branch/function_network_full/2/4",
+          "scientific outcome differs at constrained_branch/function_network_full/2/5",
+          "scientific outcome differs at constrained_branch/function_network_full/2/6",
+          "scientific outcome differs at constrained_branch/function_network_full/2/7",
+          "scientific outcome differs at constrained_branch/function_network_full/2/8",
+          "scientific outcome differs at constrained_branch/function_network_full/2/9",
+          "scientific outcome differs at constrained_branch/function_network_full/3/0",
+          "scientific outcome differs at constrained_branch/function_network_full/3/1",
+          "scientific outcome differs at constrained_branch/function_network_full/3/2",
+          "scientific outcome differs at constrained_branch/function_network_full/3/3",
+          "scientific outcome differs at constrained_branch/function_network_full/3/4",
+          "scientific outcome differs at constrained_branch/function_network_full/3/5",
+          "scientific outcome differs at constrained_branch/function_network_full/3/6",
+          "scientific outcome differs at constrained_branch/function_network_full/3/7",
+          "scientific outcome differs at constrained_branch/function_network_full/3/8",
+          "scientific outcome differs at constrained_branch/function_network_full/3/9",
+          "scientific outcome differs at constrained_branch/function_network_full/4/0",
+          "scientific outcome differs at constrained_branch/function_network_full/4/1",
+          "scientific outcome differs at constrained_branch/function_network_full/4/2",
+          "scientific outcome differs at constrained_branch/function_network_full/4/3",
+          "scientific outcome differs at constrained_branch/function_network_full/4/4",
+          "scientific outcome differs at constrained_branch/function_network_full/4/5",
+          "scientific outcome differs at constrained_branch/function_network_full/4/6",
+          "scientific outcome differs at constrained_branch/function_network_full/4/7",
+          "scientific outcome differs at constrained_branch/function_network_full/4/8",
+          "scientific outcome differs at constrained_branch/function_network_full/4/9",
+          "scientific outcome differs at constrained_branch/function_network_full/5/0",
+          "scientific outcome differs at constrained_branch/function_network_full/5/1",
+          "scientific outcome differs at constrained_branch/function_network_full/5/2",
+          "scientific outcome differs at constrained_branch/function_network_full/5/3",
+          "scientific outcome differs at constrained_branch/function_network_full/5/4",
+          "scientific outcome differs at constrained_branch/function_network_full/5/5",
+          "scientific outcome differs at constrained_branch/function_network_full/5/6",
+          "scientific outcome differs at constrained_branch/function_network_full/5/7",
+          "scientific outcome differs at constrained_branch/function_network_full/5/8",
+          "scientific outcome differs at constrained_branch/function_network_full/5/9",
+          "scientific outcome differs at constrained_branch/function_network_full/6/0",
+          "scientific outcome differs at constrained_branch/function_network_full/6/1",
+          "scientific outcome differs at constrained_branch/function_network_full/6/2",
+          "scientific outcome differs at constrained_branch/function_network_full/6/3",
+          "scientific outcome differs at constrained_branch/function_network_full/6/4",
+          "scientific outcome differs at constrained_branch/function_network_full/6/5",
+          "scientific outcome differs at constrained_branch/function_network_full/6/6",
+          "scientific outcome differs at constrained_branch/function_network_full/6/7",
+          "scientific outcome differs at constrained_branch/function_network_full/6/8",
+          "scientific outcome differs at constrained_branch/function_network_full/6/9",
+          "scientific outcome differs at constrained_branch/function_network_full/7/0",
+          "scientific outcome differs at constrained_branch/function_network_full/7/1",
+          "scientific outcome differs at constrained_branch/function_network_full/7/2",
+          "scientific outcome differs at constrained_branch/function_network_full/7/3",
+          "scientific outcome differs at constrained_branch/function_network_full/7/4",
+          "scientific outcome differs at constrained_branch/function_network_full/7/5",
+          "scientific outcome differs at constrained_branch/function_network_full/7/6",
+          "scientific outcome differs at constrained_branch/function_network_full/7/7",
+          "scientific outcome differs at constrained_branch/function_network_full/7/8",
+          "scientific outcome differs at constrained_branch/function_network_full/7/9",
+          "scientific outcome differs at constrained_branch/function_network_full/8/0",
+          "scientific outcome differs at constrained_branch/function_network_full/8/1",
+          "scientific outcome differs at constrained_branch/function_network_full/8/2",
+          "scientific outcome differs at constrained_branch/function_network_full/8/3",
+          "scientific outcome differs at constrained_branch/function_network_full/8/4",
+          "scientific outcome differs at constrained_branch/function_network_full/8/5",
+          "scientific outcome differs at constrained_branch/function_network_full/8/6",
+          "scientific outcome differs at constrained_branch/function_network_full/8/7",
+          "scientific outcome differs at constrained_branch/function_network_full/8/8",
+          "scientific outcome differs at constrained_branch/function_network_full/8/9",
+          "scientific outcome differs at constrained_branch/function_network_full/9/0",
+          "scientific outcome differs at constrained_branch/function_network_full/9/1",
+          "scientific outcome differs at constrained_branch/function_network_full/9/2",
+          "scientific outcome differs at constrained_branch/function_network_full/9/3",
+          "scientific outcome differs at constrained_branch/function_network_full/9/4",
+          "scientific outcome differs at constrained_branch/function_network_full/9/5",
+          "scientific outcome differs at constrained_branch/function_network_full/9/6",
+          "scientific outcome differs at constrained_branch/function_network_full/9/7",
+          "scientific outcome differs at constrained_branch/function_network_full/9/8"
+        ]
+      },
+      "name": "raw_record_audit",
+      "passed": false
+    },
+    {
+      "details": {
+        "system_scope_runs": 40
+      },
+      "name": "system_scope",
+      "passed": true
+    },
+    {
+      "details": {
+        "consistent_runs": 40
+      },
+      "name": "deterministic_replay",
+      "passed": true
+    },
+    {
+      "details": {
+        "constraint_brier": 0.3,
+        "coverage_90": 0.00625,
+        "expected_records": 320,
+        "finite_moments": true,
+        "issue_count": 0,
+        "observed_records": 320,
+        "reported_issues": [],
+        "unique_records": 320
+      },
+      "name": "heldout_calibration",
+      "passed": false
+    },
+    {
+      "details": {
+        "full_median": 0.002440942689073855,
+        "full_minus_system": 0.00022590790715720788,
+        "maximum": 0.05,
+        "system_median": 0.002215034781916647
+      },
+      "name": "pooled_final_regret_match",
+      "passed": true
+    },
+    {
+      "details": {
+        "constrained_branch": {
+          "full_median": 0.002541167396080235,
+          "full_minus_system": 0.0013971891812165627,
+          "maximum": 0.1,
+          "system_median": 0.0011439782148636723
+        },
+        "smooth_chain": {
+          "full_median": 0.002440942689073855,
+          "full_minus_system": -0.004889803550431782,
+          "maximum": 0.1,
+          "system_median": 0.007330746239505637
+        }
+      },
+      "name": "problem_final_regret_match",
+      "passed": true
+    },
+    {
+      "details": {
+        "full_median": 0.17915168141415128,
+        "full_minus_system": -0.0010727305466179948,
+        "maximum": 0.05,
+        "system_median": 0.18022441196076927
+      },
+      "name": "pooled_regret_area_match",
+      "passed": true
+    },
+    {
+      "details": {
+        "modeled_suggestions": 120,
+        "overall_maximum": 0.05,
+        "overall_rate": 0.0,
+        "problem_maximum": 0.15,
+        "problem_rates": {
+          "constrained_branch": 0.0,
+          "smooth_chain": 0.0
+        },
+        "unresolved_suggestions": 0
+      },
+      "name": "bounded_full_network_fallbacks",
+      "passed": true
+    }
+  ],
+  "passed": false,
+  "provenance": {
+    "command": "pixi run -e bayes benchmark-full-network --output benchmarks/full_network/results",
+    "correction_sha256": "e940ec17d8adf26927414070471ae352e2da9ab54f3fcb881948dbdabb1ca0bb",
+    "decision_sha256": "228f8042934944e210dc8e568f5564bbf2ba0077b320ba1cd795b6e42c97a343",
+    "git_head_at_execution": "ed9ac99a1af6bc20032aa56c37bc2c62515c28fe",
+    "git_tree_clean": true,
+    "packages": {
+      "autoengineering": "0.1.0",
+      "botorch": "0.17.2",
+      "gpytorch": "1.15.2",
+      "numpy": "2.5.2",
+      "scipy": "1.18.0",
+      "torch": "2.13.0"
+    },
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "python": "3.12.13",
+    "source_file_sha256": {
+      "pixi.lock": "2a14a7a6c4c74870ee2820028f69140151e80efb897a825c8e3359c4e2d82fd5",
+      "pixi.toml": "3f4b1488f360aced5f79e3f38305ac05eed4ac6ed6eef5ffc384915a0e570868",
+      "pyproject.toml": "50367045d7d43a42adb4a2d4ca90b5c9d642ed7babe512ac6a62800c194a2ca9",
+      "src/autoengineering/benchmarks/full_network/__init__.py": "6c00c1757a15bd7faf1e01bd5740a0a47274c27df32312301aca7165843a8b4c",
+      "src/autoengineering/benchmarks/full_network/__main__.py": "e0da4baa6fcdd5a00e6d8a158f350b96afed3878a14e18ff7e8dd52565dd22a6",
+      "src/autoengineering/benchmarks/full_network/problems.py": "75096a0e87774fa6c6ce3a1c88e33ad164b0101d640400ef8146c87a7545a9b3",
+      "src/autoengineering/benchmarks/full_network/runner.py": "aa61faf523ddb626a28e32154fd07c3de35edb5fea3575647c57432ed1fa1587",
+      "src/autoengineering/benchmarks/full_network/summary.py": "4b7cf60b9238bd775fbcb7b1dbbfb5abb4dc23277c78cd3da4c092c00dad2c52",
+      "src/autoengineering/optimization/backend.py": "50ef7eed714678b6b5b9cde4e8aa47d2d28de45bd3d8e64944e8ca1a41e1a7a9",
+      "src/autoengineering/optimization/full_network_backend.py": "534af0a576a4c4052859d6cfc8a3b061e897b9a21b15f615d3accd57238415b5",
+      "src/autoengineering/optimization/function_network.py": "b076160c472aa6aeb9ddd33d06aa53badbf115764c27d57825463b1ca50f4376",
+      "src/autoengineering/optimization/function_network_evaluator.py": "9ffbc1b4d35d39c55982c2cd91034223aeb7852030bb891b4ab11a05085bec15",
+      "src/autoengineering/optimization/ledger.py": "e137064014cc337a0643cc76b3cf7f4adc5772ca920ed5cd8c078310b3dbda63",
+      "src/autoengineering/optimization/records.py": "47f92d0c169c4026f813b5a8b58522e550eb4510c43f767351b6cd1de0ed8425",
+      "src/autoengineering/optimization/space.py": "7b8ebfb55ae072ea2e82f57a3f8ff00c6895be4bd4adc9d8bbc6ef4fc7e54652",
+      "src/autoengineering/optimization/spec.py": "87df5c77ed379718fa547add64233c02ff9551cde21426be23c7a7a6d46a597e",
+      "src/autoengineering/optimization/system_backend.py": "d24a83776010691d425b9aabfd6b3abf03e44423396796ea434c45a75624d0cf",
+      "src/autoengineering/research/runner.py": "3c56db99d10bb90f5230e5c197a82721df00a4a454830755e8d9598735821fec"
+    },
+    "source_sha256": "f50dfe46d60276e78cebecca56de1700c1a048a23e1a689dd37486188b3cf435"
+  },
+  "schema_version": "1.0"
+}

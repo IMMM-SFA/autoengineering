@@ -82,6 +82,36 @@ class FullNetworkProblem:
             for item in self.network.constraints
         )
 
+    def observed_outcomes(self, config: Mapping[str, object]) -> Mapping[str, float]:
+        """Return every scalar outcome emitted by the system evaluator."""
+        terminal = self.analytic(config)
+        if self.name == "smooth_chain":
+            latent = math_sin_pi(float(config["warp.x"]))
+            utility = terminal["utility"]
+            return MappingProxyType(
+                {
+                    "source.driver": 1.0,
+                    "warp.latent": latent,
+                    "terminal.utility": utility,
+                    "utility": utility,
+                }
+            )
+        left = float(config["left.x"])
+        right = float(config["right.y"]) ** 2
+        utility = terminal["utility"]
+        balance = terminal["balance"]
+        return MappingProxyType(
+            {
+                "source.driver": 1.0,
+                "left.left_signal": left,
+                "right.right_signal": right,
+                "terminal.utility": utility,
+                "terminal.balance": balance,
+                "utility": utility,
+                "balance": balance,
+            }
+        )
+
 
 def _port(name: str, direction: str, units: str = "unit") -> FunctionPortSpec:
     return FunctionPortSpec(name, direction, "scalar", units)

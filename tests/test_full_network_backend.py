@@ -207,7 +207,7 @@ def test_full_network_posterior_and_suggestion_replay_from_verified_tables(
     assert np.array_equal(first.objective, second.objective)
     assert np.array_equal(first.constraints["minimum_flow"], second.constraints["minimum_flow"])
     assert np.all(np.isfinite(first.objective))
-    assert float(np.var(first.objective)) >= 0.0
+    assert float(np.var(first.objective)) > 1e-6
 
     first_actions = first_backend.suggest(ledger)
     second_actions = second_backend.suggest(ledger)
@@ -217,6 +217,11 @@ def test_full_network_posterior_and_suggestion_replay_from_verified_tables(
     diagnostics = first_backend.diagnostics(ledger)
     assert diagnostics.fit_state in {"fitted", "fallback"}
     assert diagnostics.details["usable_system_observations"] == 4
+    if diagnostics.fit_state == "fitted":
+        assert (
+            diagnostics.details["posterior_dependence"]
+            == "independent_output_and_component_innovations"
+        )
     assert first_backend.recommend(ledger).action_id in {
         action.id for action, _ in ledger.entries()
     }
@@ -237,11 +242,7 @@ def test_affine_posterior_propagation_matches_closed_form(full_network_contract)
     class Posterior:
         def __init__(self, mean, variance):
             self.mean = mean
-            self.variance = variance
-
-        def rsample(self, sample_shape):
-            noise = torch.randn((*sample_shape, *self.mean.shape), dtype=torch.double)
-            return self.mean.unsqueeze(0) + math.sqrt(self.variance) * noise
+            self.variance = torch.full_like(mean, variance)
 
     class AffineModel:
         def __init__(self, multiplier, variance):
@@ -250,8 +251,6 @@ def test_affine_posterior_propagation_matches_closed_form(full_network_contract)
 
         def posterior(self, values):
             return Posterior(self.multiplier * values[:, :1], self.variance)
-
-    import math
 
     components = network.component_map
     prepared = MappingProxyType(

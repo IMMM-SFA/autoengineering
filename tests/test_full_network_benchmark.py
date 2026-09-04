@@ -62,7 +62,7 @@ def _evidence():
                         seed=index,
                         suggested_by=method,
                     )
-                    truth = problem.analytic(config)
+                    truth = problem.observed_outcomes(config)
                     feasible = problem.feasible(truth)
                     if feasible:
                         objective = truth[problem.network.objective.outcome]

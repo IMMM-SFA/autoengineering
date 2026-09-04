@@ -394,15 +394,15 @@ def _audit_records(
                 or set(result.artifact_sha256) != {action.id}
             ):
                 issues.append(f"trace identity differs at {label}")
-            truth = problem.analytic(action.config)
+            truth = problem.observed_outcomes(action.config)
             if set(result.outcomes) != set(truth) or any(
                 not math.isclose(result.outcomes[name], value, rel_tol=0.0, abs_tol=1e-12)
                 for name, value in truth.items()
             ):
                 issues.append(f"scientific outcome differs at {label}")
-            feasible = problem.feasible(truth)
+            feasible = problem.feasible(result.outcomes)
             if feasible:
-                objective = truth[problem.network.objective.outcome]
+                objective = result.outcomes[problem.network.objective.outcome]
                 best = objective if best is None else max(best, objective)
             expected = {
                 "cumulative_cost": float(index + 1),
