@@ -1,6 +1,6 @@
 # Item 9 acquisition reassessment and proposed common-utility correction
 
-_Status: Proposed; approval required before implementation or compute_
+_Status: Approved for execution on 2026-09-04_
 
 _Date: 2026-09-04_
 
@@ -8,7 +8,7 @@ _Date: 2026-09-04_
 
 Replace the partial policy's asymmetric action scores with one common terminal decision utility for
 system and component observations. This is an algorithm change, not another finite-pool adjustment.
-No code change, benchmark run, replacement run, or Item 10 work is authorized by this proposal.
+No benchmark run, replacement run, or Item 10 work is authorized outside this fixed correction.
 
 If this proposal is not accepted, Item 9 remains experimental and the parent plan stops before
 Item 10.
@@ -36,6 +36,16 @@ matrix, 25 maximum component scores and 12 selected actions changed. In the fina
 scored decisions had a positive component value. The system score still exceeded the component
 score at most decisions. The median ratio of the maximum system score to the maximum positive
 component score was 2.76.
+
+The preimplementation inventory found one prior documentation conflict. Decision 0009 records
+`9bbc9e00fefab89581323c8fd37c71d700682f11716e580d7dc27654e6457fa6` as the complete
+candidate-generation root digest. That value cannot be reconstructed with the declared sorted-file
+algorithm. The committed candidate path has no diff from evidence commit `f14066d`; its standard
+development digest remains `0331414f043e17b27543faf8ca343e185ead066a4f4edccd4df4ce91363937e6`,
+and its companion manifest remains
+`17bf8719bca3b72597252d02b830be88d37e04f7b19f38871a01b9553ce2707b`. The reproducible complete
+root digest is `32168e168b3b3c941ec19f560c3b9d3bf0b26ecb57c90ed751ce64ce69ce740c`. Decision 0010 must retain
+both the unreproduced claim and the verified values without changing Decision 0009.
 
 ## Architectural finding
 
@@ -135,7 +145,8 @@ inventory, and hashes for all prior Item 9 evidence. Record that the earlier asy
 remains an adverse result rather than relabeling it.
 
 Gate: the decision is committed and signed, the worktree is clean, every Decision 0007 criterion
-matches byte for byte, and all earlier evidence hashes match.
+matches byte for byte, all earlier constituent evidence hashes match, and the Decision 0009 root
+digest conflict is explicit.
 
 ### 2. Specify common-utility behavior
 
