@@ -59,7 +59,7 @@ def test_partial_benchmark_problems_match_frozen_analytic_optima():
 
 
 @pytest.mark.skipif(benchmark_main is None, reason="optional Bayesian dependencies")
-def test_partial_benchmark_candidate_generation_matches_decision_0009(tmp_path):
+def test_partial_benchmark_configuration_matches_decision_0010(tmp_path):
     expected_settings = {
         "min_initial": 4,
         "min_component_observations": 3,
@@ -90,6 +90,10 @@ def test_partial_benchmark_candidate_generation_matches_decision_0009(tmp_path):
             "reserve_system_refresh_budget": True,
             "fantasy_sampler": "common_antithetic_normal",
         }
+        if method == "function_network_partial":
+            assert backend.identity_dict()["candidate_policy"]["score"] == (
+                "finite_pool_common_terminal_utility_v1"
+            )
         assert len(backend._candidate_pools(ledger).system) == 16
 
     records = execute_run(problem, "function_network_partial", 97)

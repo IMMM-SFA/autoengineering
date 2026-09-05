@@ -37,9 +37,11 @@ if importlib.util.find_spec("botorch") is not None:
     import torch
 
     from autoengineering.optimization.partial_network_backend import (
-        _ScoredCandidate,
+        PartialActionCandidate,
         PartialNetworkBayesBackend,
+        _ScoredCandidate,
     )
+    from autoengineering.optimization.full_network_backend import NetworkPosteriorSamples
     from autoengineering.optimization.partial_network_baselines import (
         CheapestInformativePartialNetworkBackend,
         RandomPartialNetworkBackend,
@@ -318,6 +320,214 @@ def test_partial_value_suggestion_replays_with_fantasy_diagnostics(
     assert first.state_dict()["partial_policy"]["fantasy_sampler"] == (
         "common_antithetic_normal"
     )
+    assert first.identity_dict()["candidate_policy"]["score"] == (
+        "finite_pool_common_terminal_utility_v1"
+    )
+    assert first.state_dict()["partial_policy"]["acquisition_contract"] == (
+        "finite_pool_common_terminal_utility_v1"
+    )
+    assert diagnostics.details["acquisition"] == "finite_pool_common_terminal_utility_v1"
+    assert all(
+        record["baseline_terminal_utility"] is not None
+        and record["fantasy_terminal_utilities"]
+        for record in diagnostics.details["candidate_scores"]
+    )
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_terminal_utility_includes_observed_incumbent(
+    tmp_path, partial_contract, monkeypatch
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        study,
+        space,
+        network,
+        system,
+        candidate_pool_size=2,
+        decision_pool_size=2,
+        posterior_samples=8,
+        fantasy_samples=2,
+    )
+    decisions = backend._candidate_pools(ledger).decisions
+    posteriors = {
+        decisions[0]["transform.gain"]: NetworkPosteriorSamples(
+            objective=np.array([4.0, 0.0]),
+            constraints={"minimum_flow": np.array([1.0, 1.0])},
+            component_outputs={},
+            sample_count=2,
+            seed=11,
+        ),
+        decisions[1]["transform.gain"]: NetworkPosteriorSamples(
+            objective=np.array([3.0, 3.0]),
+            constraints={"minimum_flow": np.array([1.0, 1.0])},
+            component_outputs={},
+            sample_count=2,
+            seed=12,
+        ),
+    }
+    monkeypatch.setattr(
+        backend,
+        "_propagate",
+        lambda prepared, config, fingerprint, sample_count: posteriors[
+            config["transform.gain"]
+        ],
+    )
+
+    utility, seeds = backend._terminal_utility({}, decisions, "fingerprint", best=2.0)
+
+    assert utility == pytest.approx(3.0)
+    assert seeds == (11, 12)
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_preposterior_scores_share_one_baseline_and_respect_cost(partial_contract):
+    system, network, study, space = partial_contract
+    backend = PartialNetworkBayesBackend(study, space, network, system)
+    system_candidate = PartialActionCandidate(EvaluationScope.SYSTEM, {}, 1.0)
+    uninformative = PartialActionCandidate(
+        EvaluationScope.COMPONENT,
+        {},
+        0.25,
+        component="transform",
+        parent_artifact_id="artifact-1",
+    )
+    informative = replace(uninformative, estimated_cost=0.5)
+
+    system_score = backend._preposterior_score(
+        system_candidate, 5.0, (5.5, 5.5), (1, 2)
+    )
+    no_information_score = backend._preposterior_score(
+        uninformative, 5.0, (5.0, 5.0), (1, 2)
+    )
+    informative_score = backend._preposterior_score(
+        informative, 5.0, (5.75, 6.25), (1, 2)
+    )
+
+    assert system_score.raw_value == pytest.approx(0.5)
+    assert system_score.score == pytest.approx(0.5)
+    assert no_information_score.value == 0.0
+    assert no_information_score.score == 0.0
+    assert informative_score.raw_value == pytest.approx(1.0)
+    assert informative_score.score == pytest.approx(2.0)
+    assert informative_score.score > system_score.score
+    assert informative_score.baseline_utility == 5.0
+    assert informative_score.fantasy_utilities == (5.75, 6.25)
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_system_value_uses_post_observation_utility(
+    tmp_path, partial_contract, monkeypatch
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        study,
+        space,
+        network,
+        system,
+        candidate_pool_size=2,
+        decision_pool_size=2,
+        posterior_samples=8,
+        fantasy_samples=2,
+    )
+    candidate = backend._candidate_pools(ledger).system[0]
+    before = object()
+    after_low = object()
+    after_high = object()
+    monkeypatch.setattr(
+        backend,
+        "_conditioned_system_fantasies",
+        lambda *args: (((after_low, 2.0), (after_high, 3.0)), (101, 102)),
+    )
+    monkeypatch.setattr(
+        backend,
+        "_terminal_utility",
+        lambda prepared, decisions, fingerprint, best: (
+            {id(after_low): 6.0, id(after_high): 8.0}[id(prepared)],
+            (201,),
+        ),
+    )
+
+    scored = backend._system_value(
+        candidate,
+        backend._candidate_pools(ledger).decisions,
+        before,
+        "fingerprint",
+        best=2.0,
+        baseline_utility=5.0,
+    )
+
+    assert scored.raw_value == pytest.approx(2.0)
+    assert scored.value == pytest.approx(2.0)
+    assert scored.score == pytest.approx(2.0 / candidate.estimated_cost)
+    assert scored.fantasy_utilities == (6.0, 8.0)
+    assert scored.seeds == (101, 102, 201, 201)
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_system_fantasies_condition_all_system_outputs_with_common_draws(
+    tmp_path, partial_contract
+):
+    system, network, study, space = partial_contract
+    ledger = _observed_ledger(tmp_path, partial_contract)
+    backend = PartialNetworkBayesBackend(
+        study,
+        space,
+        network,
+        system,
+        candidate_pool_size=2,
+        decision_pool_size=2,
+        posterior_samples=8,
+        fantasy_samples=2,
+    )
+    fingerprint = backend._fingerprint(ledger.entries())
+    tables = reconstruct_component_training_tables(network, system, ledger)
+    prepared = backend._fit_components(tables, fingerprint)
+    candidates = backend._candidate_pools(ledger).system
+
+    first, first_seeds = backend._conditioned_system_fantasies(
+        prepared, candidates[0], fingerprint, best=8.0
+    )
+    second, second_seeds = backend._conditioned_system_fantasies(
+        prepared, candidates[1], fingerprint, best=8.0
+    )
+
+    assert len(first) == backend.fantasy_sample_count
+    assert first_seeds == second_seeds
+    for conditioned, updated_best in first:
+        assert np.isfinite(updated_best)
+        assert conditioned["source"].constants != prepared["source"].constants
+        for component_name in ("transform", "score"):
+            for output_name, model in prepared[component_name].models.items():
+                conditioned_model = conditioned[component_name].models[output_name]
+                assert conditioned_model.train_inputs[0].shape[0] == (
+                    model.train_inputs[0].shape[0] + 1
+                )
+
+
+@pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
+def test_partial_system_incumbent_updates_only_for_feasible_fantasy(partial_contract):
+    system, network, study, space = partial_contract
+    backend = PartialNetworkBayesBackend(study, space, network, system)
+
+    assert backend._updated_incumbent(
+        5.0, 7.0, {"minimum_flow": 1.0}
+    ) == pytest.approx(7.0)
+    assert backend._updated_incumbent(
+        5.0, 7.0, {"minimum_flow": -1.0}
+    ) == pytest.approx(5.0)
+
+    minimize = PartialNetworkBayesBackend(
+        replace(study, objective=ObjectiveSpec("utility", "minimize")),
+        space,
+        network,
+        system,
+    )
+    assert minimize._updated_incumbent(
+        5.0, 2.0, {"minimum_flow": 1.0}
+    ) == pytest.approx(2.0)
 
 
 @pytest.mark.skipif(PartialNetworkBayesBackend is None, reason="optional Bayesian dependencies")
