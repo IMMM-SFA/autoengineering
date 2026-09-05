@@ -69,8 +69,38 @@ actions without changing costs, pools, controls, or final recommendation rules.
 
 - Executable implementation: complete at signed revision
   `df42706e817cb61a117e7c695d4a0119c8b1e9f3`
-- Full matrices used: 0 of at most 2
-- Development matrix: not started
-- Replacement matrix: not authorized
+- Full matrices used: 1 of at most 2
+- Development matrix: complete, adverse
+- Replacement matrix: forbidden because development failed
 - Item 9: experimental
 - Item 10: blocked by Item 9
+
+## Development outcome
+
+_Completed: 2026-09-05_
+
+The development matrix completed all 40 runs at signed revision
+`8ba5dcbf110c9a60fc486f912c95efeee7c03dee`. It passed 11 of 12 frozen criteria. The
+`random_component_control` criterion failed.
+
+The common utility changed mixed-scope selection. The value policy selected six component actions
+on `informative_chain` and five on `informative_branch`. On the controlled branch comparison it
+selected `left` twice and `right` once, so `controlled_informative_component` passed. All 40 runs
+completed without an error, all raw records reconstructed, replay was deterministic, lineage and
+terminal separation checks covered 90 component actions, all recommendations referenced observed
+system results, conservative costs passed, and no fit or scoring fallback occurred.
+
+The value policy minus random control regret-area difference was
+`0.0007868264809469117` on `informative_chain` and approximately zero
+(`-5.551115123125783e-17`) on `informative_branch`. Neither reached the required `-0.005`
+improvement. Decision 0010 therefore forbids a replacement matrix and ends Item 9 algorithmic
+remediation. Item 10 remains blocked.
+
+- Evidence: `benchmarks/partial_network/common-utility/development/`
+- Companion manifest: `benchmarks/partial_network/common-utility/development-manifest.json`
+- Raw SHA-256: `ae2a3cf986e807ead80fd60dc13401131b04d80f89937d4a8449e1c211a59cb5`
+- Evidence directory SHA-256:
+  `91307b916ddc6a3d6220b09cf4cd0dd1f6bb3f211cff66f3a8a77d4d7d49d585`
+- Companion manifest SHA-256:
+  `ee52a9dfd3c959f9df95b6720585d6181902231d54f6e2748462da008244d4f7`
+- Source SHA-256: `1a537f7a845eaace0c4dc4a04c23cb4dd5710a2bebc78a1dbf1f42ea4e1050d1`
