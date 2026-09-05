@@ -1,5 +1,10 @@
 # Real models on a laptop
 
+__Sensor QA correction (2026-09-05):__ all cached solar module-temperature readings
+are unusable. Temperature-error diagnostics and observed-intermediate-truth claims
+are withdrawn. Frozen AC-power comparisons and simulated-trace reuse checks remain
+separate. See [the QA record](../complex_models/results/data-quality.json).
+
 Three offline examples couple CSDMS BMI model components and compare explicit component swaps,
 random search, Sobol search and whole-system Bayesian optimization. They use measured response data and preserve unfavorable
 results. No GPU, external service or API key is needed after environment installation.
@@ -7,7 +12,7 @@ results. No GPU, external service or API key is needed after environment install
 | Domain | Model chain | Measured target | What can change |
 | --- | --- | --- | --- |
 | Water | Hamon/Hargreaves PET -> soil bucket -> linear reservoir | USGS discharge | PET method, soil capacity, reservoir recession |
-| Solar energy | Ross temperature -> PVWatts DC -> PVWatts inverter | PVDAQ inverter AC power and module temperature | Ambient-only or Ross temperature, heat loss, aggregate loss factor |
+| Solar energy | Ross temperature -> PVWatts DC -> PVWatts inverter | PVDAQ inverter AC power | Ambient-only or Ross temperature, heat loss, aggregate loss factor |
 | Materials | Temperature basis -> polynomial or rational regression | NIST copper thermal expansion coefficient | Regression family and regularization |
 
 The materials case is an empirical regression pipeline rather than a coupled physical simulator.
@@ -77,7 +82,7 @@ These examples are not operational forecasts or engineering design validations.
   negative or missing power plus low-irradiance rows are excluded by the registered rule.
   Source metadata are preserved. The 4738 kW total DC rating is divided equally between the
   two inverters; string metadata do not fully reconcile that allocation, so this is a declared
-  modeling assumption. Measured back-of-module temperature approximates cell temperature.
+  modeling assumption. Simulated module temperature approximates cell temperature; the cached measured module sensor is unusable.
   The plant has CdTe modules; this simplified model does not resolve spectral response,
   tracker geometry, snow, mismatch or curtailment. A fitted loss factor may absorb such errors.
   See the [pvlib temperature models](https://pvlib-python.readthedocs.io/en/stable/user_guide/modeling_topics/temperature.html)
@@ -107,8 +112,8 @@ The example driver reads BMI class paths and exchange connections from candidate
 It couples components through BMI initialize, set_value, update, get_value_ptr and finalize.
 The package-wide Python/command runner has not gained a BMI backend; this driver is scoped to
 the examples. Opportunity ranks compare terminal RMSE with the training-mean response
-reference evaluated on validation rows. Solar temperature is ranked separately against the
-ambient-only temperature reference. These are diagnostic references, not release thresholds.
+reference evaluated on validation rows. Historical solar-temperature ranks are invalid because the cached module sensor is unusable.
+They are retained only as withdrawn diagnostics, not accuracy evidence or release thresholds.
 Only copper fits model coefficients on the training subset. Hydrology uses earlier forcing to
 carry state into validation; solar optimization scores only its validation day. The solar
 training window supports component diagnostics, not an additional hidden fitting step.

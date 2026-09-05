@@ -1,0 +1,12 @@
+{
+  "config": {
+    "alpha": 0.5,
+    "beta": 1.0,
+    "cmax": 300.0,
+    "kfast": 0.5,
+    "kslow": 0.05,
+    "pet": "hargreaves",
+    "pet_scale": 1.0
+  },
+  "selected": "complex"
+}

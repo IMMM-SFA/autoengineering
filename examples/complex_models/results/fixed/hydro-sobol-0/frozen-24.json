@@ -1,0 +1,16 @@
+{
+  "evaluations": 24,
+  "recommendation": {
+    "action_id": "eval-000022",
+    "config": {
+      "capacity": 118.60311886295676,
+      "pet": "hamon",
+      "recession": 0.9411777024157345
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 2.5898775711961144
+    }
+  }
+}

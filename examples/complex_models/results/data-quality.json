@@ -1,0 +1,43 @@
+{
+  "columns": {
+    "air_c": {
+      "count": 639,
+      "finite_count": 639,
+      "maximum": 12.8,
+      "minimum": -11.9,
+      "unique_count": 214
+    },
+    "module_c": {
+      "count": 639,
+      "finite_count": 639,
+      "maximum": 3276.7,
+      "minimum": 3276.7,
+      "unique_count": 1
+    },
+    "poa_w_m2": {
+      "count": 639,
+      "finite_count": 639,
+      "maximum": 717.72,
+      "minimum": 50.36,
+      "unique_count": 635
+    },
+    "power_kw": {
+      "count": 639,
+      "finite_count": 639,
+      "maximum": 1259.0,
+      "minimum": 0.0,
+      "unique_count": 388
+    }
+  },
+  "data_path": "examples/local_models/data/solar.csv",
+  "data_sha256": "6b872d741bf507ea17f465739c31aeddcad1b09675761adb7d63bb1e78ec0e6e",
+  "decision": "Withdraw measured module-temperature RMSE/ranking and observed-intermediate-truth claims. Preserve frozen AC-power experiments; no rows, targets or splits changed.",
+  "invalid_module_temperature_rows": 639,
+  "limits": "Screening plausible ranges does not certify other sensors. The exact encoding of the unusable temperature value is not established.",
+  "module_temperature_status": "unavailable",
+  "source_sha256": "81debaa8fc6263b6c6707c5827022e30ca547c74b2b9bc40a4c13fb38d389c07",
+  "temperature_screen_c": [
+    -100,
+    200
+  ]
+}

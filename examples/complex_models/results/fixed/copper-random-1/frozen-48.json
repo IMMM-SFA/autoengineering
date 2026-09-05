@@ -1,0 +1,15 @@
+{
+  "evaluations": 48,
+  "recommendation": {
+    "action_id": "eval-000047",
+    "config": {
+      "model": "rational3",
+      "ridge": 1.4062689997401015e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.195996003064471
+    }
+  }
+}

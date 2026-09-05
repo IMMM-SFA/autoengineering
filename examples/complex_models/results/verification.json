@@ -1,0 +1,36 @@
+{
+  "base_revision": "1a01a6e",
+  "tests": {
+    "command": "pixi run -e examples python -m pytest tests/test_complex_models.py tests/test_local_convergence.py tests/test_local_models.py tests/test_local_bmi.py tests/test_optimization_boundaries.py -q -p no:cacheprovider",
+    "passed": 51,
+    "seconds": 3.92,
+    "scope": "Focused example, BMI, stopping, boundary and QA tests; full repository suite not rerun."
+  },
+  "lint": "src tests examples scripts passed",
+  "project_constraints": "8/8 passed",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "bmipy": "2.0.1",
+    "pvlib": "0.15.0",
+    "botorch": "0.17.2",
+    "torch": "2.13.0",
+    "pytest": "9.0.2"
+  },
+  "fixed_studies": 45,
+  "target_studies": 75,
+  "primary_calls": 8942,
+  "historical_prefixes_verified": 72,
+  "recommendation_records_audited": 300,
+  "failures": 0,
+  "report_generator_sha256": "caa86947444395c550621a6185cd0fd778360fb866b2e5307691646783f01c3b",
+  "independent_review": "No unresolved must-fix findings; review.md retains the history. Parent confirmed51tests after the final reviewer note.",
+  "corrections": [
+    "Diagnostic-only metadata alias fixed with deepcopy; all primary models and runs unchanged.",
+    "Unusable solar module-temperature observations flagged; temperature accuracy and intermediate-truth claims withdrawn; frozen AC studies unchanged."
+  ],
+  "source_archives": "Exact pre-run workflow.py and README.md in both fixed/source and target/source.",
+  "preview": "mdp unavailable: doc.md-preview application bundle not found."
+}

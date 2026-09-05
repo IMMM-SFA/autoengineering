@@ -1,5 +1,10 @@
 # BMI example development results
 
+__Post-run QA correction (2026-09-05):__ measured solar module-temperature diagnostics
+and observed-intermediate-truth claims are withdrawn because the cached sensor is
+unusable. AC-power optimization and simulated-trace reuse are separate. See
+[the QA record](../../complex_models/results/data-quality.json).
+
 All 27 studies completed, with 324 recorded model evaluations. Recorded study time totaled 127.5 seconds.
 
 Each optimizer used 12 model calls and seeds 0, 1 and 2. The table gives held-out RMSE. Optimizer columns are medians across seeds. Lower is better. Fixed swaps were selected on validation data and used a separate small candidate budget.
