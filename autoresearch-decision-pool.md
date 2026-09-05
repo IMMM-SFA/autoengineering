@@ -63,9 +63,31 @@ candidate set, costs, seeds, and selection rule.
 
 ## Current state
 
-- Full matrices used: 0 of at most 2
-- Development matrix: pending
-- Replacement matrix: not authorized unless development passes
+- Full matrices used: 1 of at most 2
+- Development matrix: complete, adverse
+- Replacement matrix: not authorized because development failed
 - Item 9: experimental
 - Item 10: blocked by Item 9
 
+## Development result
+
+The development matrix completed all 40 runs at signed revision
+`b1147bcf293af52eedbd2eeed64ae732357a7522`. It passed 10 of 12 frozen criteria.
+The failed criteria were `controlled_informative_component` and `random_component_control`.
+
+Expanding the terminal decision pool did not cause the value policy to select either controlled
+branch component. The value policy minus random-control regret-area differences were
+`-0.0014498890245697726` for the chain and `-0.00029282913842992864` for the branch. Neither met
+the required `-0.005` improvement. The differences are numerically unchanged from the retained
+candidate-generation baseline at the reported precision.
+
+- Evidence: `benchmarks/partial_network/decision-pool/development/`
+- Companion manifest: `benchmarks/partial_network/decision-pool/development-manifest.json`
+- Raw SHA-256: `c2c7f20cf81d59e53ef2e06633cd16c7e195ece92aa89e34971450f5ef1accfe`
+- Evidence directory SHA-256: `e8d4b415e20838a46aa5f3111393f881d81b29ea286b4adc5cfd762f88a8bca0`
+- Candidate-pool diagnostic entries: 80 at size 16
+- Decision-pool diagnostic entries: 80 at size 16
+- Controlled branch selections: left 0, right 0
+
+The raw records reconstruct the same failed gate with status 1. The approved stop rule therefore
+forbids the replacement matrix and any further Item 9 experiment. Item 10 remains blocked.
