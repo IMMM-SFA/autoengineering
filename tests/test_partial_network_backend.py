@@ -522,7 +522,7 @@ def test_partial_system_incumbent_updates_only_for_feasible_fantasy(partial_cont
     minimize = PartialNetworkBayesBackend(
         replace(study, objective=ObjectiveSpec("utility", "minimize")),
         space,
-        network,
+        replace(network, objective=replace(network.objective, direction="minimize")),
         system,
     )
     assert minimize._updated_incumbent(

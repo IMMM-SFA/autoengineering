@@ -35,7 +35,11 @@ from .backend import (
     _canonical_config,
     _parse_action_index,
 )
-from .full_network_backend import FullNetworkBayesBackend, _PreparedComponent
+from .full_network_backend import (
+    FullNetworkBayesBackend,
+    NetworkPosteriorSamples,
+    _PreparedComponent,
+)
 from .function_network import (
     FunctionComponentSpec,
     FunctionNetworkSpec,
@@ -61,6 +65,9 @@ from .records import (
 )
 from .space import SearchSpace
 from .spec import StudySpec
+
+
+_ACQUISITION_CONTRACT = "finite_pool_common_terminal_utility_v1"
 
 
 @dataclass(frozen=True)
@@ -117,6 +124,8 @@ class _ScoredCandidate:
     mcse: float
     score: float
     seeds: tuple[int, ...]
+    baseline_utility: float | None = None
+    fantasy_utilities: tuple[float, ...] = ()
 
 
 class PartialNetworkBayesBackend(FullNetworkBayesBackend):
@@ -212,11 +221,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             raise ValueError(
                 f"partial backend requires terminal outcomes at system scope: {hidden_terminal}"
             )
-        nonpositive = [
-            name
-            for name in eligible
-            if network.component_map[name].expected_cost <= 0
-        ]
+        nonpositive = [name for name in eligible if network.component_map[name].expected_cost <= 0]
         if nonpositive or sum(component.expected_cost for component in network.components) <= 0:
             raise ValueError(
                 "partial backend requires positive declared costs for system and eligible "
@@ -281,9 +286,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         aggregated = []
         for members in groups.values():
             first = members[0]
-            output_names = tuple(
-                dict.fromkeys(name for row in members for name in row.outputs)
-            )
+            output_names = tuple(dict.fromkeys(name for row in members for name in row.outputs))
             outputs = {
                 name: float(np.mean([row.outputs[name] for row in members if name in row.outputs]))
                 for name in output_names
@@ -291,9 +294,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             standard_errors = {}
             for name in output_names:
                 errors = [
-                    row.standard_errors[name]
-                    for row in members
-                    if name in row.standard_errors
+                    row.standard_errors[name] for row in members if name in row.standard_errors
                 ]
                 observed = sum(name in row.outputs for row in members)
                 if errors and len(errors) == observed:
@@ -363,7 +364,9 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         if component is None:
             raise ValueError(f"unknown component action: {action.component!r}")
         if component.component not in self._eligible_component_names(self.network):
-            raise ValueError(f"component {component.component!r} is not eligible for partial action")
+            raise ValueError(
+                f"component {component.component!r} is not eligible for partial action"
+            )
         prefix = f"{component.component}."
         if any(not name.startswith(prefix) for name in action.config):
             raise ValueError("component action contains a foreign qualified parameter")
@@ -466,12 +469,15 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         system = EvaluationAction.system("eval-000000", {})
         system_cost = self.estimated_action_cost(system, entries)
         costs = [system_cost]
-        if any(
-            action.scope is EvaluationScope.SYSTEM
-            and result.status is EvaluationStatus.SUCCESS
-            and result.artifacts
-            for action, result in entries
-        ) and self._component_streak(entries) < self.max_component_streak:
+        if (
+            any(
+                action.scope is EvaluationScope.SYSTEM
+                and result.status is EvaluationStatus.SUCCESS
+                and result.artifacts
+                for action, result in entries
+            )
+            and self._component_streak(entries) < self.max_component_streak
+        ):
             spent = math.fsum(result.cost for _, result in entries)
             remaining = self.spec.budget.max_cost - spent
             for component_name in self._eligible_component_names(self.network):
@@ -487,9 +493,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         self.validate_entries(ledger.entries())
         return _BaselineBackend.recommend(self, ledger)
 
-    def _suggest(
-        self, ledger: ObservationLedgerReader, n: int
-    ) -> tuple[EvaluationAction, ...]:
+    def _suggest(self, ledger: ObservationLedgerReader, n: int) -> tuple[EvaluationAction, ...]:
         if n != 1:
             raise ValueError("partial function-network optimization is sequential")
         started = time.perf_counter()
@@ -513,9 +517,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         deficient = self._deficient_components(tables)
         if deficient:
             candidates = tuple(
-                candidate
-                for candidate in pools.component
-                if candidate.component in deficient
+                candidate for candidate in pools.component if candidate.component in deficient
             )
             if not candidates:
                 return self._warm_system_action(
@@ -600,7 +602,9 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             )
         if not scored:
             raise SearchSpaceExhausted("no affordable partial-network action remains")
-        maximum_bound = max(item.score + 1.96 * item.mcse / item.candidate.estimated_cost for item in scored)
+        maximum_bound = max(
+            item.score + 1.96 * item.mcse / item.candidate.estimated_cost for item in scored
+        )
         self._last_fingerprint = fingerprint
         self._last_diagnostics = BackendDiagnostics(
             backend=self.name,
@@ -619,7 +623,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 "maximum_value_per_cost_bound": maximum_bound,
                 "forced_system_refresh": force_system,
                 "component_streak": self._component_streak(entries),
-                "acquisition": "finite_pool_one_step_value_of_information_per_cost",
+                "acquisition": _ACQUISITION_CONTRACT,
                 "candidate_scores": tuple(self._score_details(item) for item in scored),
             },
         )
@@ -640,36 +644,20 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         *,
         include_components: bool,
     ) -> tuple[_ScoredCandidate, ...]:
-        baseline_values = [
-            self._acquisition_stats(
-                self._propagate(
-                    prepared,
-                    config,
-                    fingerprint,
-                    self.posterior_sample_count,
-                ),
-                best,
-            )[0]
-            for config in pools.decisions
-        ]
-        baseline_value = max(baseline_values)
+        baseline_utility, baseline_seeds = self._terminal_utility(
+            prepared, pools.decisions, fingerprint, best
+        )
         scored = []
         for candidate in pools.system:
-            posterior = self._propagate(
-                prepared,
-                candidate.config,
-                fingerprint,
-                self.posterior_sample_count,
-            )
-            value, mcse = self._acquisition_stats(posterior, best)
             scored.append(
-                _ScoredCandidate(
+                self._system_value(
                     candidate,
-                    value,
-                    value,
-                    mcse,
-                    value / candidate.estimated_cost,
-                    (posterior.seed,),
+                    pools.decisions,
+                    prepared,
+                    fingerprint,
+                    best,
+                    baseline_utility,
+                    baseline_seeds=baseline_seeds,
                 )
             )
         if include_components:
@@ -682,7 +670,8 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                         prepared,
                         fingerprint,
                         best,
-                        baseline_value,
+                        baseline_utility,
+                        baseline_seeds=baseline_seeds,
                     )
                 )
         return tuple(
@@ -694,6 +683,83 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             and item.mcse >= 0
         )
 
+    def _terminal_utility(
+        self,
+        prepared: Mapping[str, _PreparedComponent],
+        decisions: tuple[Mapping[str, Scalar], ...],
+        fingerprint: str,
+        best: float,
+    ) -> tuple[float, tuple[int, ...]]:
+        improvements = []
+        seeds = []
+        for config in decisions:
+            posterior = self._propagate(
+                prepared,
+                config,
+                fingerprint,
+                self.posterior_sample_count,
+            )
+            improvements.append(self._acquisition_stats(posterior, best)[0])
+            seeds.append(posterior.seed)
+        sign = 1.0 if self.spec.objective.direction == "maximize" else -1.0
+        return sign * best + max(improvements), tuple(seeds)
+
+    @staticmethod
+    def _preposterior_score(
+        candidate: PartialActionCandidate,
+        baseline_utility: float,
+        fantasy_utilities: tuple[float, ...],
+        seeds: tuple[int, ...],
+    ) -> _ScoredCandidate:
+        differences = np.asarray(fantasy_utilities, dtype=float) - baseline_utility
+        raw = float(np.mean(differences))
+        mcse = (
+            0.0
+            if len(differences) == 1
+            else float(np.std(differences, ddof=1) / math.sqrt(len(differences)))
+        )
+        value = max(raw, 0.0)
+        score = value / candidate.estimated_cost if candidate.estimated_cost > 0 else math.inf
+        return _ScoredCandidate(
+            candidate,
+            value,
+            raw,
+            mcse,
+            score,
+            seeds,
+            baseline_utility,
+            fantasy_utilities,
+        )
+
+    def _system_value(
+        self,
+        candidate: PartialActionCandidate,
+        decisions: tuple[Mapping[str, Scalar], ...],
+        prepared: Mapping[str, _PreparedComponent],
+        fingerprint: str,
+        best: float,
+        baseline_utility: float,
+        *,
+        baseline_seeds: tuple[int, ...] = (),
+    ) -> _ScoredCandidate:
+        conditioned, fantasy_seeds = self._conditioned_system_fantasies(
+            prepared, candidate, fingerprint, best
+        )
+        fantasy_utilities = []
+        terminal_seeds = []
+        for fantasy_prepared, fantasy_best in conditioned:
+            utility, seeds = self._terminal_utility(
+                fantasy_prepared, decisions, fingerprint, fantasy_best
+            )
+            fantasy_utilities.append(utility)
+            terminal_seeds.extend(seeds)
+        return self._preposterior_score(
+            candidate,
+            baseline_utility,
+            tuple(fantasy_utilities),
+            (*baseline_seeds, *fantasy_seeds, *terminal_seeds),
+        )
+
     def _component_value(
         self,
         ledger: ObservationLedgerReader,
@@ -702,7 +768,9 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         prepared: Mapping[str, _PreparedComponent],
         fingerprint: str,
         best: float,
-        baseline_value: float,
+        baseline_utility: float,
+        *,
+        baseline_seeds: tuple[int, ...] = (),
     ) -> _ScoredCandidate:
         item = prepared[candidate.component or ""]
         x = self._component_candidate_input(ledger, candidate, item)
@@ -713,35 +781,17 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             fingerprint,
             candidate,
         )
-        differences = []
-        propagation_seeds = []
+        fantasy_utilities = []
+        terminal_seeds = []
         for fantasy_prepared in conditioned:
-            fantasy_values = []
-            for config in decisions:
-                posterior = self._propagate(
-                    fantasy_prepared,
-                    config,
-                    fingerprint,
-                    self.posterior_sample_count,
-                )
-                propagation_seeds.append(posterior.seed)
-                fantasy_values.append(self._acquisition_stats(posterior, best)[0])
-            value = max(fantasy_values)
-            differences.append(value - baseline_value)
-        raw = float(np.mean(differences))
-        mcse = (
-            0.0
-            if len(differences) == 1
-            else float(np.std(differences, ddof=1) / math.sqrt(len(differences)))
-        )
-        value = max(raw, 0.0)
-        return _ScoredCandidate(
+            utility, seeds = self._terminal_utility(fantasy_prepared, decisions, fingerprint, best)
+            fantasy_utilities.append(utility)
+            terminal_seeds.extend(seeds)
+        return self._preposterior_score(
             candidate,
-            value,
-            raw,
-            mcse,
-            value / candidate.estimated_cost,
-            (*fantasy_seeds, *propagation_seeds),
+            baseline_utility,
+            tuple(fantasy_utilities),
+            (*baseline_seeds, *fantasy_seeds, *terminal_seeds),
         )
 
     def _component_candidate_input(
@@ -790,6 +840,164 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         ]
         return torch.tensor([encoded], dtype=torch.double)
 
+    def _system_fantasy_posterior(
+        self,
+        prepared: Mapping[str, _PreparedComponent],
+        candidate: PartialActionCandidate,
+        fingerprint: str,
+    ) -> tuple[NetworkPosteriorSamples, tuple[int, ...]]:
+        self.space.encode(candidate.config)
+        propagated: dict[str, np.ndarray] = {}
+        component_outputs: dict[str, Mapping[str, np.ndarray]] = {}
+        seeds = []
+        for component_name in self.order:
+            item = prepared[component_name]
+            local = {
+                parameter.name: candidate.config[f"{component_name}.{parameter.name}"]
+                for parameter in item.spec.parameters
+                if f"{component_name}.{parameter.name}" in candidate.config
+            }
+            validate_local_parameter_values(item.spec, local)
+            outputs: dict[str, np.ndarray] = {}
+            if item.constants:
+                for output_name, (mean, variance) in item.constants.items():
+                    seed = self._seed(
+                        fingerprint,
+                        "common-antithetic-system-fantasy",
+                        component_name,
+                        output_name,
+                    )
+                    seeds.append(seed)
+                    innovations = self._fantasy_standard_normals(seed, self.fantasy_sample_count)
+                    outputs[output_name] = mean + math.sqrt(max(variance, 0.0)) * innovations
+            else:
+                x = self._prediction_inputs(item, local, propagated, self.fantasy_sample_count)
+                x_tensor = torch.tensor(x, dtype=torch.double)
+                for output in item.spec.scalar_outputs:
+                    seed = self._seed(
+                        fingerprint,
+                        "common-antithetic-system-fantasy",
+                        component_name,
+                        output.name,
+                    )
+                    seeds.append(seed)
+                    with torch.no_grad():
+                        posterior = item.models[output.name].posterior(x_tensor)
+                        means = posterior.mean.squeeze(-1).detach().cpu().numpy()
+                        variances = (
+                            posterior.variance.squeeze(-1).clamp_min(0.0).detach().cpu().numpy()
+                        )
+                    innovations = self._fantasy_standard_normals(seed, self.fantasy_sample_count)
+                    outputs[output.name] = means + np.sqrt(variances) * innovations
+            for output_name, values in outputs.items():
+                samples = np.asarray(values, dtype=float)
+                if samples.shape != (self.fantasy_sample_count,) or not np.all(
+                    np.isfinite(samples)
+                ):
+                    raise ValueError(
+                        f"component {component_name!r} produced invalid system fantasies"
+                    )
+                propagated[f"{component_name}.{output_name}"] = samples
+            component_outputs[component_name] = MappingProxyType(outputs)
+        objective_key = f"{self.network.objective.component}.{self.network.objective.scalar_output}"
+        constraints = {
+            constraint.outcome: propagated[f"{constraint.component}.{constraint.scalar_output}"]
+            for constraint in self.network.constraints
+        }
+        posterior = NetworkPosteriorSamples(
+            objective=propagated[objective_key],
+            constraints=constraints,
+            component_outputs=component_outputs,
+            sample_count=self.fantasy_sample_count,
+            seed=self._seed(fingerprint, "common-antithetic-system-fantasy"),
+        )
+        return posterior, tuple(seeds)
+
+    def _conditioned_system_fantasies(
+        self,
+        prepared: Mapping[str, _PreparedComponent],
+        candidate: PartialActionCandidate,
+        fingerprint: str,
+        best: float,
+    ) -> tuple[tuple[tuple[Mapping[str, _PreparedComponent], float], ...], tuple[int, ...]]:
+        posterior, seeds = self._system_fantasy_posterior(prepared, candidate, fingerprint)
+        noise = max(self.spec.noise.noise_floor, np.finfo(np.float64).eps) ** 2
+        fantasies = []
+        for index in range(self.fantasy_sample_count):
+            conditioned: dict[str, _PreparedComponent] = {}
+            propagated: dict[str, np.ndarray] = {}
+            for component_name in self.order:
+                item = prepared[component_name]
+                local = {
+                    parameter.name: candidate.config[f"{component_name}.{parameter.name}"]
+                    for parameter in item.spec.parameters
+                    if f"{component_name}.{parameter.name}" in candidate.config
+                }
+                models = dict(item.models)
+                constants = dict(item.constants)
+                x_tensor = None
+                for output in item.spec.scalar_outputs:
+                    observed = float(
+                        posterior.component_outputs[component_name][output.name][index]
+                    )
+                    if EvaluationScope.SYSTEM not in output.observed_in:
+                        continue
+                    if output.name in constants:
+                        mean, variance = constants[output.name]
+                        total_variance = variance + noise
+                        gain = 0.0 if total_variance <= 0 else variance / total_variance
+                        constants[output.name] = (
+                            mean + gain * (observed - mean),
+                            max(variance * (1.0 - gain), 0.0),
+                        )
+                        continue
+                    if x_tensor is None:
+                        x = self._prediction_inputs(item, local, propagated, 1)
+                        x_tensor = torch.tensor(x, dtype=torch.double)
+                    y = torch.tensor([[observed]], dtype=torch.double)
+                    models[output.name] = item.models[output.name].condition_on_observations(
+                        X=x_tensor,
+                        Y=y,
+                        noise=torch.full_like(y, noise),
+                    )
+                    models[output.name].eval()
+                conditioned[component_name] = replace(
+                    item,
+                    models=MappingProxyType(models),
+                    constants=MappingProxyType(constants),
+                )
+                for output in item.spec.scalar_outputs:
+                    propagated[f"{component_name}.{output.name}"] = np.asarray(
+                        [posterior.component_outputs[component_name][output.name][index]],
+                        dtype=float,
+                    )
+            constraints = {
+                name: float(values[index]) for name, values in posterior.constraints.items()
+            }
+            updated_best = self._updated_incumbent(
+                best, float(posterior.objective[index]), constraints
+            )
+            fantasies.append((MappingProxyType(conditioned), updated_best))
+        return tuple(fantasies), seeds
+
+    def _updated_incumbent(
+        self,
+        best: float,
+        objective: float,
+        constraints: Mapping[str, float],
+    ) -> float:
+        feasible = all(
+            constraints[constraint.outcome] >= constraint.threshold
+            if constraint.operator == ">="
+            else constraints[constraint.outcome] <= constraint.threshold
+            for constraint in self.spec.constraints
+        )
+        if not feasible:
+            return best
+        if self.spec.objective.direction == "maximize":
+            return max(best, objective)
+        return min(best, objective)
+
     def _conditioned_fantasies(
         self,
         prepared: Mapping[str, _PreparedComponent],
@@ -822,9 +1030,9 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
                 posterior = model.posterior(x)
                 mean = float(posterior.mean.squeeze())
                 variance = float(posterior.variance.squeeze().clamp_min(0.0))
-            draws[output_name] = mean + math.sqrt(
-                variance
-            ) * self._fantasy_standard_normals(seed, self.fantasy_sample_count)
+            draws[output_name] = mean + math.sqrt(variance) * self._fantasy_standard_normals(
+                seed, self.fantasy_sample_count
+            )
         fantasies = []
         noise = max(self.spec.noise.noise_floor, np.finfo(np.float64).eps) ** 2
         for index in range(self.fantasy_sample_count):
@@ -877,7 +1085,11 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         for component_name in self.order:
             component = self.network.component_map[component_name]
             rows = self._aggregate_duplicate_rows(tables[component_name])
-            required = 1 if not component.parameters and not component.inputs else self.min_component_observations
+            required = (
+                1
+                if not component.parameters and not component.inputs
+                else self.min_component_observations
+            )
             if any(
                 sum(output.name in row.outputs for row in rows) < required
                 for output in component.scalar_outputs
@@ -908,9 +1120,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         if not pools.system:
             raise SearchSpaceExhausted("no affordable complete-system warm action remains")
         selected = pools.system[0]
-        self._set_warm_diagnostics(
-            fingerprint, started, entries, reason, selected, warnings_
-        )
+        self._set_warm_diagnostics(fingerprint, started, entries, reason, selected, warnings_)
         return (self._action_from_candidate(selected, next_index, "system_warm_start"),)
 
     def _warm_component_action(
@@ -981,6 +1191,8 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "raw_value_difference": item.raw_value,
             "monte_carlo_standard_error": item.mcse,
             "value_per_cost": item.score,
+            "baseline_terminal_utility": item.baseline_utility,
+            "fantasy_terminal_utilities": item.fantasy_utilities,
             "seeds": item.seeds,
         }
 
@@ -1009,7 +1221,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "component_chaining": False,
             "system_refresh_budget": "reserved_after_component_action",
             "fantasy_sampler": "common_antithetic_normal",
-            "score": "finite_pool_one_step_value_of_information_per_cost",
+            "score": _ACQUISITION_CONTRACT,
         }
         return identity
 
@@ -1024,6 +1236,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             "cost_quantile": self.cost_quantile,
             "reserve_system_refresh_budget": True,
             "fantasy_sampler": "common_antithetic_normal",
+            "acquisition_contract": _ACQUISITION_CONTRACT,
         }
         return state
 
@@ -1031,12 +1244,8 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         entries = ledger.entries()
         self.validate_entries(entries)
         fingerprint = self._fingerprint(entries)
-        action_configs = self._sobol_configs(
-            self.candidate_pool_size, fingerprint, "action-pool"
-        )
-        decisions = self._sobol_configs(
-            self.decision_pool_size, fingerprint, "decision-pool"
-        )
+        action_configs = self._sobol_configs(self.candidate_pool_size, fingerprint, "action-pool")
+        decisions = self._sobol_configs(self.decision_pool_size, fingerprint, "decision-pool")
         spent = math.fsum(result.cost for _, result in entries)
         remaining = self.spec.budget.max_cost - spent
         observed_system = {
@@ -1100,7 +1309,10 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
             base = Path(ledger_path).parent
         eligible = {}
         for action, result in entries:
-            if action.scope is not EvaluationScope.SYSTEM or result.status is not EvaluationStatus.SUCCESS:
+            if (
+                action.scope is not EvaluationScope.SYSTEM
+                or result.status is not EvaluationStatus.SUCCESS
+            ):
                 continue
             for artifact_id, value in result.artifacts.items():
                 path = Path(value)
@@ -1126,9 +1338,7 @@ class PartialNetworkBayesBackend(FullNetworkBayesBackend):
         component: FunctionComponentSpec, config: Mapping[str, Scalar]
     ) -> Mapping[str, Scalar]:
         prefix = f"{component.component}."
-        local = {
-            name: value for name, value in config.items() if name.startswith(prefix)
-        }
+        local = {name: value for name, value in config.items() if name.startswith(prefix)}
         validate_local_parameter_values(
             component,
             {name.removeprefix(prefix): value for name, value in local.items()},
