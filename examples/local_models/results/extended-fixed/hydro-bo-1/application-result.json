@@ -1,0 +1,39 @@
+{
+  "controller_and_optimizer_seconds": 4.474438291508704,
+  "diagnostics": {
+    "backend": "system",
+    "details": {
+      "ledger_entries": 24,
+      "ledger_fingerprint": "69abc565556b9ebe0518df519fcb1f823755cbe0eee64f386f81bef052120262"
+    },
+    "fallback_reasons": [],
+    "fit_state": "not_fit_for_ledger",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "hydro",
+  "evaluations": 24,
+  "method": "bo",
+  "model_seconds": 0.703877916559577,
+  "recommendation": {
+    "action_id": "eval-000004",
+    "config": {
+      "capacity": 200.0,
+      "pet": "hargreaves",
+      "recession": 0.95
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 2.0659955546313915
+    }
+  },
+  "seed": 1,
+  "study_seconds": 5.178316208068281,
+  "test": {
+    "bias": -0.20907361719947917,
+    "max_balance_error": 7.815970093361102e-14,
+    "nse": 0.39867949900159483,
+    "rmse": 2.8839228598885933
+  }
+}

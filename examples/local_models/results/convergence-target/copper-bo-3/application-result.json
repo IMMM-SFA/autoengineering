@@ -1,0 +1,59 @@
+{
+  "cap": 60,
+  "controller_and_optimizer_seconds": 0.3235615398734808,
+  "domain": "copper",
+  "evaluations": 4,
+  "method": "bo",
+  "model_seconds": 0.05624625086784363,
+  "recommendation": {
+    "action_id": "eval-000003",
+    "config": {
+      "model": "rational3",
+      "ridge": 8.21917915015978e-06
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.20416668932215265
+    }
+  },
+  "seed": 3,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.3798077907413244,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0014470109167874594,
+    "rmse": 0.2566264096175495
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.5514373050779507,
+      "evaluations": 1,
+      "model_seconds": 0.0148503752425313,
+      "study_seconds": 0.1369897909462452,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.3571840415920821,
+      "evaluations": 2,
+      "model_seconds": 0.03619429189711809,
+      "study_seconds": 0.22646112460643053,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.3571840415920821,
+      "evaluations": 3,
+      "model_seconds": 0.04366058390587568,
+      "study_seconds": 0.30326270777732134,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.20416668932215265,
+      "evaluations": 4,
+      "model_seconds": 0.05624625086784363,
+      "study_seconds": 0.3795885406434536,
+      "target_reached": true
+    }
+  ]
+}

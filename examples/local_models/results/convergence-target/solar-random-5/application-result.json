@@ -1,0 +1,110 @@
+{
+  "cap": 60,
+  "controller_and_optimizer_seconds": 0.7353129577822983,
+  "domain": "solar",
+  "evaluations": 11,
+  "method": "random",
+  "model_seconds": 0.26384137524291873,
+  "recommendation": {
+    "action_id": "eval-000010",
+    "config": {
+      "heat_loss": 58.01165594986735,
+      "loss": 0.6797804110318388,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.71562050793068
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.9991543330252171,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -8.667776117018523,
+    "rmse": 114.10647691673698,
+    "temperature_rmse": 3275.984071656743
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 1,
+      "model_seconds": 0.026989541947841644,
+      "study_seconds": 0.1267051249742508,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 2,
+      "model_seconds": 0.053160374984145164,
+      "study_seconds": 0.22301120776683092,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 3,
+      "model_seconds": 0.08395549980923533,
+      "study_seconds": 0.31926541589200497,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 4,
+      "model_seconds": 0.10159004060551524,
+      "study_seconds": 0.38551954086869955,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 5,
+      "model_seconds": 0.1165290828794241,
+      "study_seconds": 0.45253712497651577,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 6,
+      "model_seconds": 0.14302683295682073,
+      "study_seconds": 0.5240297080017626,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 7,
+      "model_seconds": 0.17114866618067026,
+      "study_seconds": 0.6143330000340939,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 8,
+      "model_seconds": 0.19751325016841292,
+      "study_seconds": 0.7093654158525169,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 9,
+      "model_seconds": 0.2199190421961248,
+      "study_seconds": 0.8078300408087671,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 10,
+      "model_seconds": 0.2423940422013402,
+      "study_seconds": 0.9063096661120653,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.71562050793068,
+      "evaluations": 11,
+      "model_seconds": 0.26384137524291873,
+      "study_seconds": 0.998879499733448,
+      "target_reached": true
+    }
+  ]
+}

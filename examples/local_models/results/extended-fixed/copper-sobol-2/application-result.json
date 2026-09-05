@@ -1,0 +1,39 @@
+{
+  "controller_and_optimizer_seconds": 1.6086951671168208,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 24,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 24
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "copper",
+  "evaluations": 24,
+  "method": "sobol",
+  "model_seconds": 0.34070729091763496,
+  "recommendation": {
+    "action_id": "eval-000010",
+    "config": {
+      "model": "rational3",
+      "ridge": 1.7323950672424206e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19599479143277304
+    }
+  },
+  "seed": 2,
+  "study_seconds": 1.9494024580344558,
+  "test": {
+    "bias": 0.0006046791092394708,
+    "rmse": 0.2476670710704066
+  }
+}

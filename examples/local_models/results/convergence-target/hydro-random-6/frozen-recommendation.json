@@ -1,0 +1,13 @@
+{
+  "action_id": "eval-000010",
+  "config": {
+    "capacity": 177.72500167844498,
+    "pet": "hamon",
+    "recession": 0.9392582745335362
+  },
+  "feasible": true,
+  "message": "best feasible observed configuration",
+  "outcomes": {
+    "rmse": 2.3938113231570806
+  }
+}

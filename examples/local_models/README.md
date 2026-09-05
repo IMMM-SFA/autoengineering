@@ -188,3 +188,20 @@ Create `outputs/` first if it does not exist. Audit and closure outputs must be 
 The restricted-family closure check supplements the general reversal probe: Ross temperature
 means can reconstruct attainable traces on fixed forcing, while mean DC power does not preserve
 inverter output exactly. Application partial BO remains not implemented or evaluated.
+
+## More evaluations and a common stopping target
+
+The follow-up comparison doubles the fixed budget from 12 to 24 complete-model
+calls. A separate experiment uses five new seeds and stops each method at a frozen
+validation RMSE target or 60 calls. All evaluations still execute the BMI chains.
+
+```bash
+pixi run -e examples python -m examples.local_models.convergence --mode fixed --output outputs/local-models-extended
+pixi run -e examples python -m examples.local_models.convergence --mode target --output outputs/local-models-target
+```
+
+Output directories must be new. See [the protocol](CONVERGENCE_PROTOCOL.md) for
+target construction, timing boundaries and censored runs, and
+[the results](results/CONVERGENCE_RESULTS.md) for the paired budget comparison,
+evaluations to target, success rates, elapsed time and held-out error. Reaching a
+shared validation target measures search efficiency without claiming a global optimum.

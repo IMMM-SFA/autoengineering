@@ -1,0 +1,47 @@
+{
+  "cap": 60,
+  "controller_and_optimizer_seconds": 0.15695699956268072,
+  "domain": "solar",
+  "evaluations": 2,
+  "method": "random",
+  "model_seconds": 0.04395695868879557,
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "heat_loss": 20.036725994295793,
+      "loss": 0.6850939799837074,
+      "temperature": "ross"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.34383678929535
+    }
+  },
+  "seed": 7,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.2009139582514763,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -48.08566934761666,
+    "rmse": 129.3426769679796,
+    "temperature_rmse": 3255.6258930417475
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 282.1233955170845,
+      "evaluations": 1,
+      "model_seconds": 0.022201083600521088,
+      "study_seconds": 0.13545695831999183,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.34383678929535,
+      "evaluations": 2,
+      "model_seconds": 0.04395695868879557,
+      "study_seconds": 0.20070062531158328,
+      "target_reached": true
+    }
+  ]
+}
