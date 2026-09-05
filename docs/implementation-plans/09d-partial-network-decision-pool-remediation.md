@@ -1,6 +1,6 @@
 # Item 9 decision-pool remediation plan
 
-_Status: Proposed; execution requires explicit approval_
+_Status: Approved for execution on 2026-09-04_
 
 _Date: 2026-09-04_
 
