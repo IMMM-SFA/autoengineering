@@ -59,12 +59,12 @@ def test_partial_benchmark_problems_match_frozen_analytic_optima():
 
 
 @pytest.mark.skipif(benchmark_main is None, reason="optional Bayesian dependencies")
-def test_partial_benchmark_candidate_generation_matches_decision_0008(tmp_path):
+def test_partial_benchmark_candidate_generation_matches_decision_0009(tmp_path):
     expected_settings = {
         "min_initial": 4,
         "min_component_observations": 3,
         "candidate_pool_size": 16,
-        "decision_pool_size": 4,
+        "decision_pool_size": 16,
         "posterior_samples": 16,
         "fantasy_samples": 4,
         "fit_retry_limit": 2,
@@ -96,6 +96,7 @@ def test_partial_benchmark_candidate_generation_matches_decision_0008(tmp_path):
     acquisition = next(item for item in records if item["record_type"] == "acquisition")
     assert acquisition["diagnostics"]["backend"] == "function_network_partial"
     assert acquisition["diagnostics"]["details"]["candidate_pool_size"] == 16
+    assert acquisition["diagnostics"]["details"]["decision_pool_size"] == 16
 
 
 @pytest.mark.skipif(benchmark_main is None, reason="optional Bayesian dependencies")

@@ -41,7 +41,7 @@ PARTIAL_SETTINGS = {
     "min_initial": 4,
     "min_component_observations": 3,
     "candidate_pool_size": 16,
-    "decision_pool_size": 4,
+    "decision_pool_size": 16,
     "posterior_samples": 16,
     "fantasy_samples": 4,
     "fit_retry_limit": 2,
