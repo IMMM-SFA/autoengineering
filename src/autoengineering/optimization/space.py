@@ -488,6 +488,11 @@ class SearchSpace:
 
     @staticmethod
     def _denormalize(parameter: NumericParameter, normalized: float) -> Scalar:
+        # Preserve declared endpoints instead of reconstructing them with rounded arithmetic.
+        if normalized == 0.0:
+            return parameter.lower
+        if normalized == 1.0:
+            return parameter.upper
         if parameter.scale == "linear":
             value = parameter.lower + normalized * (parameter.upper - parameter.lower)
         else:
@@ -497,4 +502,4 @@ class SearchSpace:
             )
         if isinstance(parameter, IntegerParameter):
             return min(parameter.upper, max(parameter.lower, math.floor(value + 0.5)))
-        return value
+        return min(parameter.upper, max(parameter.lower, value))

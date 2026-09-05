@@ -1,0 +1,25 @@
+{
+  "solar": {
+    "rows_in_window": 2015,
+    "excluded": 1376,
+    "selection": "finite required sensors; POA >= 50 W/m2; AC >= 0 kW"
+  },
+  "splits": {
+    "solar": {
+      "train": 355,
+      "test": 191,
+      "validation": 93
+    },
+    "copper": {
+      "train": 141,
+      "test": 48,
+      "validation": 47
+    },
+    "hydro": {
+      "test": 366,
+      "train": 183,
+      "validation": 92,
+      "warmup": 90
+    }
+  }
+}

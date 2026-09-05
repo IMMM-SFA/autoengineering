@@ -2,7 +2,8 @@
 
 Run examples from the repository root after `pixi install`. Four examples execute model chains and
 component improvement workflows. The two optimization examples cover the Release A whole-system
-controller and the later function-network representation.
+controller and the later function-network representation. The local real-model suite adds
+water, solar energy and materials comparisons on measured observations.
 
 | Example | Purpose | Network access | Command |
 | --- | --- | --- | --- |
@@ -12,6 +13,7 @@ controller and the later function-network representation.
 | [`leaf_river`](leaf_river/) | Rainfall-runoff workflow using USGS and NOAA observations. | No with checked cache | `pixi run python examples/leaf_river/run_workflow.py` |
 | [`optimization_chain`](optimization_chain/) | Deterministic mixed-space whole-system optimization with resume. | No | See below. |
 | [`function_network`](function_network/) | NPZ-backed system and component evaluation with deterministic training-table replay. | No | See below. |
+| [`local_models`](local_models/) | Real water, solar and materials models with swaps, random/Sobol/BO comparisons and component reuse tests. | No after environment setup | `pixi run -e examples python -m examples.local_models.run --output outputs/local-models` |
 
 The Leaf River observations are checked into `leaf_river/data/`, so a fresh checkout does not need
 network access. Its fetcher contacts USGS and NOAA only if those cache files are absent. The

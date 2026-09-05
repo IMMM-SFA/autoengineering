@@ -1,0 +1,39 @@
+{
+  "controller_and_optimizer_seconds": 3.938736168667674,
+  "diagnostics": {
+    "backend": "random",
+    "details": {
+      "ledger_entries": 12,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 12
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "copper",
+  "evaluations": 12,
+  "method": "random",
+  "model_seconds": 0.06956524820998311,
+  "recommendation": {
+    "action_id": "eval-000010",
+    "config": {
+      "model": "rational3",
+      "ridge": 1.5333804449976467e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19599552709823775
+    }
+  },
+  "seed": 2,
+  "study_seconds": 4.008301416877657,
+  "test": {
+    "bias": 0.0006044930917245747,
+    "rmse": 0.24766349906306936
+  }
+}

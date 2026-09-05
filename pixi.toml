@@ -43,3 +43,8 @@ smac = ">=2.3,<3"
 [environments]
 default = { solve-group = "default" }
 bayes = { features = ["bayes"], solve-group = "default" }
+examples = { features = ["bayes", "real-examples"], solve-group = "default" }
+
+[feature.real-examples.dependencies]
+pvlib = "==0.15.0"
+bmipy = "==2.0.1"

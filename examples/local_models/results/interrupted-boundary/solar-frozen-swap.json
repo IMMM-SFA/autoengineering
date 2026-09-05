@@ -1,0 +1,48 @@
+{
+  "config": {
+    "heat_loss": 25.0,
+    "loss": 1.0,
+    "temperature": "ross"
+  },
+  "index": 1,
+  "model_seconds": 9.650038555264473e-05,
+  "ranking": [
+    {
+      "component": "system_output",
+      "failing_metrics": [],
+      "results": [
+        {
+          "component": "system_output",
+          "interpretation": "",
+          "metric": "rmse",
+          "status": "pass",
+          "threshold": 380.9490244249827,
+          "value": 298.250402
+        }
+      ],
+      "score": 0.0,
+      "summary": "All metrics passing"
+    },
+    {
+      "component": "temperature",
+      "failing_metrics": [],
+      "results": [
+        {
+          "component": "temperature",
+          "interpretation": "",
+          "metric": "rmse",
+          "status": "pass",
+          "threshold": 3274.638279671233,
+          "value": 3263.43706
+        }
+      ],
+      "score": 0.0,
+      "summary": "All metrics passing"
+    }
+  ],
+  "validation": {
+    "bias": 237.4470536017045,
+    "rmse": 298.25040238863556,
+    "temperature_rmse": 3263.4370601741352
+  }
+}

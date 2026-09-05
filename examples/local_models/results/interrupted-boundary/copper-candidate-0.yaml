@@ -1,0 +1,40 @@
+system:
+  name: copper
+  description: Real observations and small local models. See PROTOCOL.md.
+  components:
+  - name: temperature_basis
+    model_type: temperature_basis
+    description: temperature basis
+    inputs: []
+    outputs:
+    - name: state
+      direction: out
+      data_type: array
+      units: ''
+      description: ''
+    metadata: {}
+  - name: regression
+    model_type: regression
+    description: regression
+    inputs:
+    - name: state
+      direction: in
+      data_type: array
+      units: ''
+      description: ''
+    outputs:
+    - name: state
+      direction: out
+      data_type: array
+      units: ''
+      description: ''
+    metadata:
+      configuration:
+        model: polynomial
+        ridge: 1.0e-06
+  connections:
+  - source: temperature_basis
+    target: regression
+    port_from: state
+    port_to: state
+    description: ''

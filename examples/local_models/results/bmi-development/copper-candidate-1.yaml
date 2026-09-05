@@ -1,0 +1,47 @@
+system:
+  name: copper
+  description: Real models coupled through BMI. See PROTOCOL.md.
+  components:
+  - name: temperature_basis
+    model_type: TemperatureBasisBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: temperature
+      direction: in
+      data_type: float64
+      units: K
+      description: ''
+    outputs:
+    - name: scaled_temperature
+      direction: out
+      data_type: float64
+      units: '1'
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:TemperatureBasisBmi
+  - name: regression
+    model_type: CopperRegressionBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: scaled_temperature
+      direction: in
+      data_type: float64
+      units: '1'
+      description: ''
+    outputs:
+    - name: expansion_coefficient
+      direction: out
+      data_type: float64
+      units: source_expansion_units
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:CopperRegressionBmi
+      configuration:
+        model: rational2
+        ridge: 1.0e-06
+  connections:
+  - source: temperature_basis
+    target: regression
+    port_from: scaled_temperature
+    port_to: scaled_temperature
+    description: ''

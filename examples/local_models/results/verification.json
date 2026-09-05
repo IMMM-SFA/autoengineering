@@ -1,0 +1,38 @@
+{
+  "verified_utc": "2026-09-05T10:48:24.121638+00:00",
+  "checks": {
+    "examples": {
+      "command": "pixi run -e examples python -m pytest tests -q -p no:cacheprovider",
+      "result": "497 passed, 1 skipped, 44 warnings in 332.92s (0:05:32)"
+    },
+    "default": {
+      "command": "pixi run test",
+      "result": "423 passed, 54 skipped in 98.31s (0:01:38)"
+    }
+  },
+  "lint": "passed: src, tests, examples, scripts",
+  "waterology_constraints": "8/8 passed on touched source, docs and manifest",
+  "offline_regeneration": "byte-identical prepared CSVs and preparation audit",
+  "observation_audit": {
+    "observations": 324,
+    "recommendations": 27,
+    "issues": []
+  },
+  "final_matrix_manifest_sha256": "e817e0df9903c6a3cec6b311406b3983e656c1ac92ad9c22229f0d32d443cf52",
+  "versions": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "bmipy": "2.0.1",
+    "pvlib": "0.15.0",
+    "botorch": "0.17.2",
+    "torch": "2.13.0"
+  },
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "python": "3.12.13",
+  "limitations": [
+    "Copper output unit multiplier unresolved",
+    "Application partial BO not implemented or evaluated",
+    "Historical exact replay requires original code at affected decoded boundaries",
+    "New BMI environment verified locally; no new Linux run"
+  ]
+}
