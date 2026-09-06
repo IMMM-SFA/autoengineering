@@ -1,0 +1,143 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.5900444579310715,
+  "diagnostics": {
+    "backend": "random",
+    "details": {
+      "ledger_entries": 13,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 13
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar_diode",
+  "evaluations": 13,
+  "method": "random",
+  "model_seconds": 2.1355391670949757,
+  "recommendation": {
+    "action_id": "eval-000012",
+    "config": {
+      "a_scale": 0.9267526727361975,
+      "heat_loss": 22.33804046922797,
+      "io_scale": 1.4927007615322263,
+      "irradiance_scale": 1.0340196247962843,
+      "loss": 0.6244788234960684,
+      "rs_scale": 0.6684850702251943,
+      "rsh_scale": 1.6541657835517813
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 175.0871725624283
+    }
+  },
+  "seed": 7,
+  "stop_reason": "target_reached",
+  "study_seconds": 2.7255836250260472,
+  "target": 182.10662824491178,
+  "target_reached": true,
+  "test": {
+    "bias": -42.594733009653304,
+    "rmse": 126.37801789933499,
+    "temperature_rmse": 3257.1010487150384
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 195.7791415712478,
+      "evaluations": 1,
+      "model_seconds": 0.16217199992388487,
+      "study_seconds": 0.2449205000884831,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.7791415712478,
+      "evaluations": 2,
+      "model_seconds": 0.33482295786961913,
+      "study_seconds": 0.46234633307904005,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4609397634193,
+      "evaluations": 3,
+      "model_seconds": 0.5064860824495554,
+      "study_seconds": 0.678770249709487,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4609397634193,
+      "evaluations": 4,
+      "model_seconds": 0.687437332700938,
+      "study_seconds": 0.9028708329424262,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4609397634193,
+      "evaluations": 5,
+      "model_seconds": 0.8584012077189982,
+      "study_seconds": 1.1142527498304844,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4609397634193,
+      "evaluations": 6,
+      "model_seconds": 1.0138453734107316,
+      "study_seconds": 1.3125368328765035,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4609397634193,
+      "evaluations": 7,
+      "model_seconds": 1.171655248850584,
+      "study_seconds": 1.5125590418465436,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 182.19696787167896,
+      "evaluations": 8,
+      "model_seconds": 1.3310405411757529,
+      "study_seconds": 1.7128055416978896,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 182.19696787167896,
+      "evaluations": 9,
+      "model_seconds": 1.498929541092366,
+      "study_seconds": 1.922080249991268,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 182.19696787167896,
+      "evaluations": 10,
+      "model_seconds": 1.6552104162983596,
+      "study_seconds": 2.1199082918465137,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 182.19696787167896,
+      "evaluations": 11,
+      "model_seconds": 1.8186627081595361,
+      "study_seconds": 2.3249739171005785,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 182.19696787167896,
+      "evaluations": 12,
+      "model_seconds": 1.9824768751859665,
+      "study_seconds": 2.530624291859567,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 175.0871725624283,
+      "evaluations": 13,
+      "model_seconds": 2.1355391670949757,
+      "study_seconds": 2.7253971667960286,
+      "target_reached": true
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+[
+  {
+    "id": "baseline",
+    "status": "evaluated",
+    "objective": 269.7657086989648,
+    "metrics": {
+      "inverter.rmse": 269.7657086989648,
+      "inverter.bias": 86.0021636115078,
+      "temperature.rmse": 3.2815306360904737,
+      "temperature.bias": -0.11171003650224584,
+      "temperature_observation_qa": {
+        "status": "range_check_passed",
+        "invalid_count": 0,
+        "count": 43523,
+        "minimum_c": -25.4,
+        "maximum_c": 70.1,
+        "limits_c": [
+          -60,
+          110
+        ]
+      },
+      "scored_energy_bias_kwh": 311922.68057197117
+    },
+    "seconds": 0.2664489168673754,
+    "candidate": null
+  },
+  {
+    "id": "steady_faiman_ablation",
+    "status": "evaluated",
+    "objective": 267.50710313756935,
+    "metrics": {
+      "inverter.rmse": 267.50710313756935,
+      "inverter.bias": 84.66667631540324,
+      "temperature.rmse": 4.945582307160199,
+      "temperature.bias": 0.17900557158478075,
+      "temperature_observation_qa": {
+        "status": "range_check_passed",
+        "invalid_count": 0,
+        "count": 43523,
+        "minimum_c": -25.4,
+        "maximum_c": 70.1,
+        "limits_c": [
+          -60,
+          110
+        ]
+      },
+      "scored_energy_bias_kwh": 307078.9794396079
+    },
+    "seconds": 0.22580849984660745,
+    "candidate": {
+      "id": "steady_faiman_ablation",
+      "component": "temperature",
+      "params": {
+        "method": "faiman"
+      },
+      "rationale": "Explicit ablation of thermal transience, not a weaker baseline"
+    }
+  },
+  {
+    "id": "sapm_module",
+    "status": "evaluated",
+    "objective": 269.61571371388146,
+    "metrics": {
+      "inverter.rmse": 269.61571371388146,
+      "inverter.bias": 89.60386464373056,
+      "temperature.rmse": 4.690895178886189,
+      "temperature.bias": -1.2263767003260695,
+      "temperature_observation_qa": {
+        "status": "range_check_passed",
+        "invalid_count": 0,
+        "count": 43523,
+        "minimum_c": -25.4,
+        "maximum_c": 70.1,
+        "limits_c": [
+          -60,
+          110
+        ]
+      },
+      "scored_energy_bias_kwh": 324985.75007409044
+    },
+    "seconds": 0.2324253749102354,
+    "candidate": {
+      "id": "sapm_module",
+      "component": "temperature",
+      "params": {
+        "method": "sapm_module"
+      },
+      "rationale": "Alternate module temperature law"
+    }
+  },
+  {
+    "id": "faiman_u0_30",
+    "status": "evaluated",
+    "objective": 271.70994548856254,
+    "metrics": {
+      "inverter.rmse": 271.70994548856254,
+      "inverter.bias": 92.14192920558632,
+      "temperature.rmse": 3.8787147299536566,
+      "temperature.bias": -2.067322548264771,
+      "temperature_observation_qa": {
+        "status": "range_check_passed",
+        "invalid_count": 0,
+        "count": 43523,
+        "minimum_c": -25.4,
+        "maximum_c": 70.1,
+        "limits_c": [
+          -60,
+          110
+        ]
+      },
+      "scored_energy_bias_kwh": 334191.0987345611
+    },
+    "seconds": 0.2704374580644071,
+    "candidate": {
+      "id": "faiman_u0_30",
+      "component": "temperature",
+      "params": {
+        "u0": 30.0
+      },
+      "rationale": "Test a higher still-air heat loss coefficient"
+    }
+  }
+]

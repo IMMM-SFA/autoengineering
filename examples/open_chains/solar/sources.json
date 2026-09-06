@@ -1,0 +1,28 @@
+{
+  "files": [
+    {
+      "name": "9068_system_metadata.json",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/metadata/9068_system_metadata.json",
+      "bytes": 186092,
+      "sha256": "6861ae58145427dd790315257feef95b6ed5067fe5b5378dc5b2fa4acc23937f"
+    },
+    {
+      "name": "9068_irradiance_data.csv",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/data/9068_irradiance_data.csv",
+      "bytes": 31130390,
+      "sha256": "48a0b97014cba3f33ee8cc892c77e618f3995a2073d759672db3f809d351d5a9"
+    },
+    {
+      "name": "9068_environment_data.csv",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/data/9068_environment_data.csv",
+      "bytes": 287958472,
+      "sha256": "73572779243c8b1623bbcfc23f8dbc385d808b2c2e9350e6758dc60984367f26"
+    },
+    {
+      "name": "9068_ac_power_data.csv",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/data/9068_ac_power_data.csv",
+      "bytes": 65002925,
+      "sha256": "d0f7381abfaad9f53ae74fca7c6761aecbc344e595faf316406c3b081f0d1548"
+    }
+  ]
+}

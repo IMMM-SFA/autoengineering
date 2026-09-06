@@ -1,0 +1,16 @@
+{
+  "evidence_kind": "Engineering design comparison under fixed NOJ wakes; no observed accuracy claim",
+  "objective": "negative annual energy (GWh)",
+  "selected": "topfarm_20",
+  "baseline": -142.3542479032891,
+  "selected_value": -143.2373781946087,
+  "gain": 0.8831302913196168,
+  "test": {
+    "baseline_aep_gwh": 143.0624801871524,
+    "selected_aep_gwh": 143.1246712742151,
+    "gain_gwh": 0.06219108706270049,
+    "kind": "finer-grid sensitivity under the same wake model; not observations"
+  },
+  "failed_trials": 0,
+  "infeasible_trials": 0
+}

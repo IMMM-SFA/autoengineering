@@ -1,0 +1,60 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.07868875004351139,
+  "diagnostics": null,
+  "domain": "solar",
+  "evaluations": 2,
+  "method": "sobol",
+  "model_seconds": 0.019852458965033293,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 2,
+    "source_directory": "solar-sobol-6",
+    "source_ledger_sha256": "d25782be2cbc0685753119a39474e7125332ec9919623d24084d381a02a5d3dd",
+    "source_observations": 2,
+    "source_trajectory_sha256": "f1117702930e43ba3e4688956ea88f60784829c8716cfa0c39f5c2152e84d46b",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "heat_loss": 44.866151036694646,
+      "loss": 0.7044127462897449,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 180.38855162774908
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.09854120900854468,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": 15.904664737554103,
+    "rmse": 114.67762523601503,
+    "temperature_rmse": 3275.984071656743
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 317.08980326569065,
+      "evaluations": 1,
+      "model_seconds": 0.010303041897714138,
+      "study_seconds": 0.06177262496203184,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 180.38855162774908,
+      "evaluations": 2,
+      "model_seconds": 0.019852458965033293,
+      "study_seconds": 0.09854120900854468,
+      "target_reached": true
+    }
+  ]
+}

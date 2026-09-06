@@ -63,6 +63,16 @@ Read `docs/optimization.md` before configuring or changing an optimization study
 evaluates the complete system for each proposed configuration. Do not describe it as
 function-network, component-level, multi-fidelity, or partial-observability optimization.
 
+Apply the pilot heuristic in `docs/optimization.md#choosing-a-search-method` before
+long parameter searches. Use a small affordable Sobol pilot (typically 32 calls,
+inside the total budget), then assess target difficulty, model cost and surrogate
+predictability. Reduce or omit the pilot for extremely expensive objectives or
+small finite candidate lists. Stop at the stated target, continue Sobol for easy or
+cheap searches, and try BO when its anticipated evaluation savings justify its
+overhead. Keep test data outside this decision and retain all failures/censoring.
+This is guidance, not an implemented automatic policy switch. Never change policy
+or budget during recovery, or fabricate a pilot handoff to a new BO study.
+
 1. Create a strict `optimization.yaml` with an objective, scientific constraints, budget, noise
    mode, search space, policy, and evaluator factory.
 2. Validate the system and optimization paths before choosing a new work directory.

@@ -1,0 +1,11 @@
+{
+  "controller_state": "not copied; this is a reporting projection, not a resumable study",
+  "discarded_from_analysis": 0,
+  "kind": "retrospective_prefix",
+  "retained_observations": 5,
+  "source_directory": "copper-sobol-5",
+  "source_ledger_sha256": "3b5f350703dbb6e4993a83174f80b6f332229e522cd8c090ad7567e518df3b1a",
+  "source_observations": 5,
+  "source_trajectory_sha256": "90739438454d862ce0641150b24326649880d5c98dd64037d86dc5cb8b51791f",
+  "timing": "cumulative trajectory timer at retained final call"
+}

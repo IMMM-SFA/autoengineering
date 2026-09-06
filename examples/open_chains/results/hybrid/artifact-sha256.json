@@ -1,0 +1,13 @@
+{
+  "cbc_dispatch.npz": "a9bab942a5c45609413c9842f4bce665e8ae0aefef972e98a7aabb58a82cf6b6",
+  "summary.json": "f7e6ff2ad2c0d4681a128ae96893c1d2991536881ed3ada80d3dacdad9c69c54",
+  "trials.json": "980e584e215bff76c6f6bb67330bed8a7b5a94a2decf727e4dd6cae52b585e08",
+  "report.md": "16cae70917e0c664e15d7b41f60060c5dcf08c080e18eb307ac9757f6aa2b52b",
+  "baseline-system.yaml": "86654df9b4c4d5a768ae412f3acea054a0cbe4d7b45f148ecf709c0717359791",
+  "baseline.npz": "76a500aee77b6c0d336fb7a79bf174c7d4b3402744a5973039f9f68eb21d54c0",
+  "selected-system.yaml": "060c49ccf1a515bfddf146d6f5df86c5520d78b619a83b8b9ec02cf6d6ede9c1",
+  "cbc_buffered_soc.npz": "294a031d436a434d327eb40321ceb04fad14c33a5f5f9af1f62153f1046b6151",
+  "manifest.json": "7472e523164b3ba9562a93ee22ceb3f049b032d85d3108a7308a1e0ffbf070b0",
+  "selection.json": "33c0721fea5c70353c51083b3147749705d71ddb780ee6a691e72ad5d8f1c595",
+  "graph.mmd": "6d81d0c2bd8b31fc3cf99a398bc6bc3860e3be8f003dc3d53a71a188daf4067c"
+}

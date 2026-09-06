@@ -1,0 +1,11 @@
+{
+  "controller_state": "not copied; this is a reporting projection, not a resumable study",
+  "discarded_from_analysis": 0,
+  "kind": "retrospective_prefix",
+  "retained_observations": 2,
+  "source_directory": "solar-sobol-6",
+  "source_ledger_sha256": "d25782be2cbc0685753119a39474e7125332ec9919623d24084d381a02a5d3dd",
+  "source_observations": 2,
+  "source_trajectory_sha256": "f1117702930e43ba3e4688956ea88f60784829c8716cfa0c39f5c2152e84d46b",
+  "timing": "cumulative trajectory timer at retained final call"
+}

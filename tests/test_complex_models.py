@@ -125,7 +125,7 @@ def test_checkpoint_driver_freezes_observed_recommendations(tmp_path):
 def test_target_mode_stops_without_running_later_checkpoints(tmp_path):
     from examples.complex_models.run import study
 
-    row = study("copper", "sobol", 0, 200, tmp_path / "run", {}, target=1e6)
+    row = study("copper", "sobol", 0, 10000, tmp_path / "run", {}, target=1e6)
     assert row["evaluations"] == 1
     assert row["target_reached"]
     assert row["checkpoints"] == []
@@ -235,3 +235,13 @@ def test_unusable_module_sensor_is_flagged_and_diagnostic_withdrawn():
     assert "temperature_rmse" not in result
     assert "unavailable" in result["module_temperature_observation_status"]
     assert result["rmse"] > 0
+
+
+def test_target_cap_counts_unreachable_attempts(tmp_path):
+    from examples.complex_models.run import study, TARGET_CAP
+
+    assert TARGET_CAP == 2000
+    row = study("copper", "sobol", 0, 3, tmp_path / "run", {}, target=0.0)
+    assert row["evaluations"] == 3
+    assert not row["target_reached"]
+    assert row["stop_reason"] == "evaluation_cap"

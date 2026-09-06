@@ -1,0 +1,6 @@
+domain,nominal_parameters,model_ms_per_call
+hydro,3,16.1573150883972
+solar,3,13.4119161569591
+copper,2,8.47638754445749
+hymod,7,17.172881848334026
+solar_diode,7,160.33146566769574

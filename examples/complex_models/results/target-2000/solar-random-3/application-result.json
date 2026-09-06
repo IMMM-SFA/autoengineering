@@ -1,0 +1,81 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.15600645914673805,
+  "diagnostics": null,
+  "domain": "solar",
+  "evaluations": 5,
+  "method": "random",
+  "model_seconds": 0.050527498591691256,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 5,
+    "source_directory": "solar-random-3",
+    "source_ledger_sha256": "12ea7330b7ea914ebfa34d62b1837a2dbb9777ce35f1d6bce1c66f6a5f5ef126",
+    "source_observations": 5,
+    "source_trajectory_sha256": "82daf61176c4174808d8c0c4e6fbef4b2ef399527f99447d0c0d6873816ac7ac",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000004",
+    "config": {
+      "heat_loss": 35.5098830702,
+      "loss": 0.6527908306005816,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 175.09818261672692
+    }
+  },
+  "seed": 3,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.2065339577384293,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -35.60637831965387,
+    "rmse": 120.69098208702478,
+    "temperature_rmse": 3275.984071656743
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 275.57473305326596,
+      "evaluations": 1,
+      "model_seconds": 0.010613707825541496,
+      "study_seconds": 0.06286983285099268,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 186.45342219576597,
+      "evaluations": 2,
+      "model_seconds": 0.0208504986949265,
+      "study_seconds": 0.09921366674825549,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 186.45342219576597,
+      "evaluations": 3,
+      "model_seconds": 0.031078831758350134,
+      "study_seconds": 0.13471462484449148,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 186.45342219576597,
+      "evaluations": 4,
+      "model_seconds": 0.040663206949830055,
+      "study_seconds": 0.1706260829232633,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 175.09818261672692,
+      "evaluations": 5,
+      "model_seconds": 0.050527498591691256,
+      "study_seconds": 0.2065339577384293,
+      "target_reached": true
+    }
+  ]
+}

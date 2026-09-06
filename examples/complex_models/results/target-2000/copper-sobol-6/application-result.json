@@ -1,0 +1,51 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.05243141716346145,
+  "diagnostics": null,
+  "domain": "copper",
+  "evaluations": 1,
+  "method": "sobol",
+  "model_seconds": 0.006412707734853029,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 1,
+    "source_directory": "copper-sobol-6",
+    "source_ledger_sha256": "f37d2c8a7fe03b006e37c5b7fdebde31ddf82c36282569f2e910f900b44ad16e",
+    "source_observations": 1,
+    "source_trajectory_sha256": "ea80d3d0a725a158e701dc436c5c4355eee5cd27cfc8e639520412c6b496cc84",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000000",
+    "config": {
+      "model": "rational3",
+      "ridge": 9.730441723600648e-07
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19646264559703372
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.058844124898314476,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0007274816539056631,
+    "rmse": 0.2491603100541964
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.19646264559703372,
+      "evaluations": 1,
+      "model_seconds": 0.006412707734853029,
+      "study_seconds": 0.058844124898314476,
+      "target_reached": true
+    }
+  ]
+}

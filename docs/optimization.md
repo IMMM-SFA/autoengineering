@@ -10,6 +10,57 @@ shortest complete workflow. The checked
 [Release A benchmark report](../benchmarks/release_a/results/report.md) tests mixed and conditional
 spaces, constraints, noise, model failures, variable costs, replay, and optimizer quality.
 
+## Choosing a search method
+
+Use a pilot before committing to a long search when its evaluation cost is affordable.
+This is the current working heuristic, not a validated automatic selection rule.
+Define the objective, acceptable quality, constraints, data split and total cost/time
+budget first. Keep the final test set outside pilot design and method selection.
+
+1. Start with a small scrambled Sobol pilot, usually 32 evaluations. Count it within
+   the total evaluation budget. Reduce or omit it when objectives are extremely
+   expensive, the search is a small finite candidate list, or existing suitable
+   observations already answer the pilot questions. Do not require 32 costly calls
+   simply to follow this recipe.
+2. Record objective spread, target attainment, failures/infeasibility, evaluation
+   time and repeatability when noise is plausible. Examine rough parameter
+   sensitivity and interactions. A small pilot cannot establish effective dimension
+   or a reliable high-dimensional response surface on its own.
+3. Stop if the stated target is met. Continue Sobol when acceptable configurations
+   are common or evaluations are cheap relative to optimizer overhead. Keep random
+   search as a simple comparator.
+4. Try BO when acceptable configurations are scarce, evaluations are costly enough
+   to justify adaptation, and the objective appears learnable from the pilot. Check
+   surrogate predictions on withheld pilot observations when the sample permits.
+   High nominal dimension, discontinuities or noise do not automatically favor BO.
+5. Judge alternatives at comparable total time and quality, including pilot calls,
+   failed calls, initialization, optimizer and controller overhead. For a common
+   quality target, estimated model time saved must exceed additional overhead.
+   Report target success and capped runs alongside cost. Validate prediction on the
+   untouched test set after selection; target attainment is not generalization.
+
+This is a workflow decision made by the user or agent. The CLI does not automatically
+switch policies or import pilot observations into a different study. Policy and
+budget are immutable parts of recovery identity. Continue the same Sobol study with
+an unchanged predeclared total budget, or create a separately identified BO study.
+Do not rewrite a ledger or relabel Sobol observations as BO. Until an explicit pilot
+handoff exists, include any fresh BO initialization in the cost comparison.
+
+The example matrix uses a 2000-call ceiling. That is a benchmark setting, not a
+universal recommendation for other models. Physical detail, parameter count, target
+difficulty and evaluation cost are separate considerations. See the
+[figure report](../reports/model-search-results/report.html) and
+[saved references](../background_research/pilot-based-selection.md).
+
+### TODO
+
+- [ ] further explore a pilot-based selection rule
+  - Evaluate pilot sizes, sensitivity and surrogate-prediction diagnostics across
+    independent problems and multiple target difficulties. Compare equal total-time
+    budgets, preserve holdouts, and include very expensive objectives.
+  - Design an explicit, provenance-preserving pilot handoff before automating policy
+    changes. Account for every pilot and initialization call.
+
 ## Installation
 
 Install the base environment for random and scrambled Sobol search:

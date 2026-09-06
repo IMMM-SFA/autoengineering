@@ -1,0 +1,115 @@
+{
+  "cap": 200,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.551745998673141,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 9,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 9
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar_diode",
+  "evaluations": 9,
+  "method": "sobol",
+  "model_seconds": 1.9147817096672952,
+  "recommendation": {
+    "action_id": "eval-000008",
+    "config": {
+      "a_scale": 0.9089433308690786,
+      "heat_loss": 54.13117772899568,
+      "io_scale": 1.0349910307386425,
+      "irradiance_scale": 0.9289976802654564,
+      "loss": 0.837648831680417,
+      "rs_scale": 1.3996792116800651,
+      "rsh_scale": 0.7259125245628196
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 181.736419852539
+    }
+  },
+  "seed": 4,
+  "stop_reason": "target_reached",
+  "study_seconds": 2.466527708340436,
+  "target": 182.10662824491178,
+  "target_reached": true,
+  "test": {
+    "bias": 3.7355050253097493,
+    "rmse": 116.64290968617988,
+    "temperature_rmse": 3268.980293981654
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 194.63428903600698,
+      "evaluations": 1,
+      "model_seconds": 0.23013662500306964,
+      "study_seconds": 0.3356940830126405,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 194.63428903600698,
+      "evaluations": 2,
+      "model_seconds": 0.45265016704797745,
+      "study_seconds": 0.6181792081333697,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 194.63428903600698,
+      "evaluations": 3,
+      "model_seconds": 0.6685639168135822,
+      "study_seconds": 0.8830687082372606,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4945774863535,
+      "evaluations": 4,
+      "model_seconds": 0.8146578338928521,
+      "study_seconds": 1.0724742920137942,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4945774863535,
+      "evaluations": 5,
+      "model_seconds": 1.0197342932224274,
+      "study_seconds": 1.321470333263278,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4945774863535,
+      "evaluations": 6,
+      "model_seconds": 1.1698137512430549,
+      "study_seconds": 1.5202187080867589,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4945774863535,
+      "evaluations": 7,
+      "model_seconds": 1.4249702515080571,
+      "study_seconds": 1.8491941252723336,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 183.4945774863535,
+      "evaluations": 8,
+      "model_seconds": 1.6808709595352411,
+      "study_seconds": 2.169264500029385,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 181.736419852539,
+      "evaluations": 9,
+      "model_seconds": 1.9147817096672952,
+      "study_seconds": 2.4663013331592083,
+      "target_reached": true
+    }
+  ]
+}

@@ -62,6 +62,17 @@ autoengineering improve system.yaml -C candidates.yaml \
     --chain run_auto_research:make_run_chain -b observed.csv -O routing.streamflow
 ```
 
+### Choosing how to search
+
+For parameter optimization, start with an affordable Sobol pilot and use the
+observed target difficulty, evaluation cost and response predictability to choose
+whether to continue Sobol or try BO. A typical pilot is 32 calls, counted within the
+total budget. Reduce or skip it for extremely expensive objectives or a small
+finite candidate list. Compare total time, retain failures and capped runs, and
+keep final test data outside selection. This is the current working approach;
+[the optimization guide](docs/optimization.md#choosing-a-search-method) specifies
+its limits, recovery boundary and research TODO.
+
 ## Quick Start
 
 1. Install the `autoengineering` package:

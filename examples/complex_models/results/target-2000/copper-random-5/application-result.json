@@ -1,0 +1,65 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.10554616618901491,
+  "diagnostics": null,
+  "domain": "copper",
+  "evaluations": 3,
+  "method": "random",
+  "model_seconds": 0.017165458761155605,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 3,
+    "source_directory": "copper-random-5",
+    "source_ledger_sha256": "01206a7992351f82801330a599ae2092d7bb2b2b0c29181a1b32864c45d372be",
+    "source_observations": 3,
+    "source_trajectory_sha256": "b8258c116b84a41134afbffa592d0757ab1f4131a2d338a67e53f3312c71ce23",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000002",
+    "config": {
+      "model": "rational3",
+      "ridge": 9.879823531088693e-06
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.20572891139796573
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.12271162495017052,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0015642895647753063,
+    "rmse": 0.2579312539423315
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.6312099058657323,
+      "evaluations": 1,
+      "model_seconds": 0.006932874675840139,
+      "study_seconds": 0.06007699994370341,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.6312099058657323,
+      "evaluations": 2,
+      "model_seconds": 0.010754124727100134,
+      "study_seconds": 0.09002587478607893,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.20572891139796573,
+      "evaluations": 3,
+      "model_seconds": 0.017165458761155605,
+      "study_seconds": 0.12271162495017052,
+      "target_reached": true
+    }
+  ]
+}

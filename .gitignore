@@ -234,3 +234,7 @@ autoresearch.jsonl
 
 # Generated local BMI example invocations; checked evidence lives with the examples.
 /outputs/local-models*/
+
+# Preserve benchmark evidence despite the generic build target exclusion.
+!examples/complex_models/results/target/
+!examples/complex_models/results/target/**

@@ -1,0 +1,131 @@
+{
+  "data": [
+    {
+      "hoverinfo": "skip",
+      "line": {
+        "color": "#A8A59B"
+      },
+      "mode": "lines",
+      "showlegend": false,
+      "x": [
+        269.7657086989648,
+        267.50710313756935
+      ],
+      "y": [
+        "Selection year",
+        "Selection year"
+      ],
+      "type": "scatter"
+    },
+    {
+      "hoverinfo": "skip",
+      "line": {
+        "color": "#A8A59B"
+      },
+      "mode": "lines",
+      "showlegend": false,
+      "x": [
+        241.8798560295896,
+        239.89961918147378
+      ],
+      "y": [
+        "Test year",
+        "Test year"
+      ],
+      "type": "scatter"
+    },
+    {
+      "hovertemplate": "Baseline<br>%{y}<br>%{x:.4f} kW<extra></extra>",
+      "marker": {
+        "color": "#77766D",
+        "size": 12
+      },
+      "mode": "markers",
+      "name": "Baseline",
+      "x": [
+        269.7657086989648,
+        241.8798560295896
+      ],
+      "y": [
+        "Selection year",
+        "Test year"
+      ],
+      "type": "scatter"
+    },
+    {
+      "hovertemplate": "Selected<br>%{y}<br>%{x:.4f} kW<extra></extra>",
+      "marker": {
+        "color": "#237F79",
+        "size": 12
+      },
+      "mode": "markers",
+      "name": "Selected",
+      "x": [
+        267.50710313756935,
+        239.89961918147378
+      ],
+      "y": [
+        "Selection year",
+        "Test year"
+      ],
+      "type": "scatter"
+    }
+  ],
+  "layout": {
+    "template": {
+      "data": {
+        "scatter": [
+          {
+            "type": "scatter"
+          }
+        ]
+      }
+    },
+    "xaxis": {
+      "title": {
+        "text": "AC power RMSE (kW; lower is better)",
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "font": {
+      "family": "Arial, sans-serif",
+      "size": 13,
+      "color": "#333333"
+    },
+    "margin": {
+      "t": 35,
+      "r": 25,
+      "b": 160,
+      "l": 75
+    },
+    "legend": {
+      "orientation": "h",
+      "x": 0,
+      "y": -0.2,
+      "xanchor": "left",
+      "yanchor": "top"
+    },
+    "hoverlabel": {
+      "font": {
+        "size": 12
+      }
+    },
+    "title": {},
+    "height": 410,
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "showlegend": true,
+    "yaxis": {
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    }
+  }
+}

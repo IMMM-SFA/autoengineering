@@ -1,0 +1,78 @@
+{
+  "cap": 200,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.3038992523215711,
+  "diagnostics": {
+    "backend": "system",
+    "details": {
+      "ledger_entries": 5,
+      "ledger_fingerprint": "0e199a2f406ed71d50a5980e79d9a481deb3dc137beaa69754959ebfd65c2944"
+    },
+    "fallback_reasons": [],
+    "fit_state": "not_fit_for_ledger",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "copper",
+  "evaluations": 5,
+  "method": "bo",
+  "model_seconds": 0.0392778730019927,
+  "recommendation": {
+    "action_id": "eval-000004",
+    "config": {
+      "model": "rational3",
+      "ridge": 7.714528345603081e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19597913769610728
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.3431771253235638,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0006106319471027808,
+    "rmse": 0.24777299681680248
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.42193481458054327,
+      "evaluations": 1,
+      "model_seconds": 0.009346416685730219,
+      "study_seconds": 0.08937791595235467,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.42193481458054327,
+      "evaluations": 2,
+      "model_seconds": 0.01717562461271882,
+      "study_seconds": 0.1384025001898408,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.42193481458054327,
+      "evaluations": 3,
+      "model_seconds": 0.022468415554612875,
+      "study_seconds": 0.1858267500065267,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.2448107705054331,
+      "evaluations": 4,
+      "model_seconds": 0.030457123182713985,
+      "study_seconds": 0.236779916100204,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.19597913769610728,
+      "evaluations": 5,
+      "model_seconds": 0.0392778730019927,
+      "study_seconds": 0.3430135832168162,
+      "target_reached": true
+    }
+  ]
+}

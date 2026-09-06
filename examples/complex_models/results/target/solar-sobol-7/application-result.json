@@ -1,0 +1,76 @@
+{
+  "cap": 200,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.21660291776061058,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 4,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 4
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar",
+  "evaluations": 4,
+  "method": "sobol",
+  "model_seconds": 0.05945008201524615,
+  "recommendation": {
+    "action_id": "eval-000003",
+    "config": {
+      "heat_loss": 23.65127205848694,
+      "loss": 0.6594991609454155,
+      "temperature": "ross"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.8924972331747
+    }
+  },
+  "seed": 7,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.27605299977585673,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -65.39662771407643,
+    "rmse": 138.32720258338153,
+    "temperature_rmse": 3258.735314723245
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 338.86854349850506,
+      "evaluations": 1,
+      "model_seconds": 0.014876333065330982,
+      "study_seconds": 0.0984769999049604,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 198.61816601622627,
+      "evaluations": 2,
+      "model_seconds": 0.02986720809713006,
+      "study_seconds": 0.16016833297908306,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 198.61816601622627,
+      "evaluations": 3,
+      "model_seconds": 0.04427074920386076,
+      "study_seconds": 0.21784766670316458,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.8924972331747,
+      "evaluations": 4,
+      "model_seconds": 0.05945008201524615,
+      "study_seconds": 0.2759039169177413,
+      "target_reached": true
+    }
+  ]
+}

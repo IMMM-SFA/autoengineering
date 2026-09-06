@@ -1,0 +1,93 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.2137186648324132,
+  "diagnostics": null,
+  "domain": "copper",
+  "evaluations": 7,
+  "method": "random",
+  "model_seconds": 0.03941112710162997,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 7,
+    "source_directory": "copper-random-6",
+    "source_ledger_sha256": "f0b156b13a1dd83295be508fb7c45ea471b24059f5e535adc4b015da1d667720",
+    "source_observations": 7,
+    "source_trajectory_sha256": "df5210240b6db27cee7dab827f03d4214494f56500da70502eca9e6cd0089497",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000006",
+    "config": {
+      "model": "rational3",
+      "ridge": 3.9455864640038066e-06
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19971166313321398
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.25312979193404317,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0010795012996600527,
+    "rmse": 0.25271248219476034
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.49188250620207885,
+      "evaluations": 1,
+      "model_seconds": 0.007725375238806009,
+      "study_seconds": 0.06259979167953134,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.49188250620207885,
+      "evaluations": 2,
+      "model_seconds": 0.01162720937281847,
+      "study_seconds": 0.092763208784163,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 3,
+      "model_seconds": 0.019126167055219412,
+      "study_seconds": 0.1275072917342186,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 4,
+      "model_seconds": 0.022944001015275717,
+      "study_seconds": 0.15767449978739023,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 5,
+      "model_seconds": 0.026803834829479456,
+      "study_seconds": 0.187392208725214,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 6,
+      "model_seconds": 0.03282925207167864,
+      "study_seconds": 0.220467624720186,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.19971166313321398,
+      "evaluations": 7,
+      "model_seconds": 0.03941112710162997,
+      "study_seconds": 0.25312979193404317,
+      "target_reached": true
+    }
+  ]
+}

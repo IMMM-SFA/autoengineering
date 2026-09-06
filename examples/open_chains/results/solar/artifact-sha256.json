@@ -1,0 +1,21 @@
+{
+  "summary.json": "6918967c9f0716e4de16d75fb75ce611e9de1a656c091e625711a78ed7abfa08",
+  "test-selected.npz": "aa79df004b3916609bdb37206689cdb325d807fe0fe6c151d75e64d48434622a",
+  "component-validation.json": "c7346013ffcc912ce26e230d48998770f6be9d3f1971ed5da899e3f0c5836117",
+  "test-observed.csv": "bcf8b4de457a30f02caf3ff3d608d0ac940559bcf767ea7997a3305e6bfe6fa1",
+  "faiman_u0_30.npz": "307c93f5e930d56f7fb041b0270868ba1c3a326ac569c8490a6e2c81f1c1e10a",
+  "test-baseline.npz": "51cf8b2324fa9734985c54ec2d011d51bff31dea012222a1a982b9412c69cb84",
+  "trials.json": "8d8913a55b725eedd966a3776286c0c63ee65e7e59447e6ea29b064972f5dd7f",
+  "report.md": "852d6d2e55ce20036977bd960d2efa1e88d9297a9590dc0766f83915ba4bf312",
+  "sapm_module.npz": "d60baefa26ac23984b66223a523b13233894cae569551ba3d7c96a3d5bbf4fc7",
+  "baseline-system.yaml": "1c7b9a2e76b29ff903f123330475faeeb141344d312a09bdca4cc6343ea05b73",
+  "baseline.npz": "acf07cd2337c1107cd7516f2fd82cc6b563ed08d3bd0242b8f611d95e57d72ba",
+  "selected-system.yaml": "11b6b29885351821a5427ca85cae1fd9731960a0fcc12180c5d6f1212edd1713",
+  "selection-observed.csv": "8ac6d45a0248826fc34d5ff951b8677c345a5aed0d443d7034a5c8a518e65f98",
+  "test.json": "d5a32094c082d7f38234d7c589804ea8406925637735b477ccf0c5767e0ffcc5",
+  "manifest.json": "f0fcdcfad13bac2196738dd05b5b35208420b45361ce0a14a3261037c135a706",
+  "selection.json": "43eff51a6b9c6e0ac0ec9f09347847d70223a7d8d82d22b86af555a52ecf58c6",
+  "steady_faiman_ablation.npz": "0bfea41029ec7135e6cbceb7d0aef1d8cc9fbc2ba65c1781a6720fbe59f32a27",
+  "opportunities.json": "5db40c8ba09527f0e903c621d55ea8b4adada5d1ffeb8976f01984439f524036",
+  "graph.mmd": "4907439babe89ff474c9effdcd208f42e2c21b97ae7cb21e2d5bf09dec57c790"
+}

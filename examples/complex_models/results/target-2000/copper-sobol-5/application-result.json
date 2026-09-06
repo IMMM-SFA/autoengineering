@@ -1,0 +1,79 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.15952275041490793,
+  "diagnostics": null,
+  "domain": "copper",
+  "evaluations": 5,
+  "method": "sobol",
+  "model_seconds": 0.029411999508738518,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 5,
+    "source_directory": "copper-sobol-5",
+    "source_ledger_sha256": "3b5f350703dbb6e4993a83174f80b6f332229e522cd8c090ad7567e518df3b1a",
+    "source_observations": 5,
+    "source_trajectory_sha256": "90739438454d862ce0641150b24326649880d5c98dd64037d86dc5cb8b51791f",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000004",
+    "config": {
+      "model": "rational3",
+      "ridge": 1.5030681329180061e-06
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.1969853492470523
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.18893474992364645,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0007982873620878036,
+    "rmse": 0.24987999529564367
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.42193481458054327,
+      "evaluations": 1,
+      "model_seconds": 0.007031416054815054,
+      "study_seconds": 0.059199708979576826,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.42193481458054327,
+      "evaluations": 2,
+      "model_seconds": 0.013099582865834236,
+      "study_seconds": 0.09250883385539055,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.42193481458054327,
+      "evaluations": 3,
+      "model_seconds": 0.01693779183551669,
+      "study_seconds": 0.12335291691124439,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.2448107705054331,
+      "evaluations": 4,
+      "model_seconds": 0.023015041835606098,
+      "study_seconds": 0.15580041706562042,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.1969853492470523,
+      "evaluations": 5,
+      "model_seconds": 0.029411999508738518,
+      "study_seconds": 0.18893474992364645,
+      "target_reached": true
+    }
+  ]
+}

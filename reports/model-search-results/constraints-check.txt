@@ -1,0 +1,10 @@
+[ok ] conservation-tol    
+[ok ] deterministic-seed  
+[ok ] mc-has-mcse         
+[ok ] no-absolute-paths   
+[ok ] no-hardcoded-results
+[ok ] overfull-boxes      
+[ok ] pixi-r-task-dollar  
+[ok ] plotly-text-overlap 
+
+8/8 passed

@@ -1,0 +1,13 @@
+{
+  "action_id": "eval-000207",
+  "config": {
+    "capacity": 184.2400454171002,
+    "pet": "hargreaves",
+    "recession": 0.9374590031802654
+  },
+  "feasible": true,
+  "message": "best feasible observed configuration",
+  "outcomes": {
+    "rmse": 2.158993279097928
+  }
+}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
@@ -36,12 +37,17 @@ def verify(directory: Path) -> tuple[list, int]:
     for name, digest in manifest["inputs"].items():
         path = REPO / name
         if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
-            # Only diagnostic code and its QA documentation changed after primary runs.
-            assert name in {
-                "examples/complex_models/workflow.py",
-                "examples/complex_models/README.md",
-            }, name
-            path = directory / "source" / name
+            snapshot = directory / "source" / name
+            if snapshot.exists() and hashlib.sha256(snapshot.read_bytes()).hexdigest() == digest:
+                path = snapshot
+            else:
+                assert name in {
+                    "examples/complex_models/run.py",
+                    "examples/complex_models/README.md",
+                    "examples/complex_models/PROTOCOL.md",
+                    "pixi.lock",
+                }, name
+                path = ROOT / "history/a262556" / Path(name).name
         assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, name
     rows = read(directory / "results.json")["runs"]
     expected = {(d, m, s) for d in DOMAINS for m in METHODS for s in manifest["seeds"]}
@@ -92,9 +98,13 @@ def verify(directory: Path) -> tuple[list, int]:
             if first:
                 assert first == len(ledger) and row["stop_reason"] == "target_reached"
             elif row["stop_reason"] == "evaluation_cap":
-                assert len(ledger) == 200
+                assert len(ledger) == manifest["cap"]
             else:
-                assert len(ledger) < 200 and row["stop_reason"] not in ["target_reached", "", None]
+                assert len(ledger) < manifest["cap"] and row["stop_reason"] not in [
+                    "target_reached",
+                    "",
+                    None,
+                ]
             for step in row["trajectory"]:
                 expected_hit = (
                     step["best_validation_rmse"] is not None
@@ -115,6 +125,69 @@ def verify(directory: Path) -> tuple[list, int]:
     return rows, prefixes
 
 
+def verify_projections(directory: Path) -> int:
+    """Prove projected evidence is an exact cutoff of the preserved raw run."""
+    manifest = read(directory / "manifest.json")
+    source = REPO / manifest["projection_source"]
+    assert manifest["targets"] == read(RESULTS / "targets.json")
+    assert read(source / "manifest.json")["targets"] == manifest["targets"]
+    inventory_path = source / "ledger-inventory.json"
+    assert (
+        hashlib.sha256(inventory_path.read_bytes()).hexdigest()
+        == manifest["source_inventory_sha256"]
+    )
+    inventory = read(inventory_path)
+    assert {str(p.relative_to(source)) for p in source.glob("*/observations.jsonl")} == set(
+        inventory
+    )
+    count = 0
+    for row in read(directory / "results.json")["runs"]:
+        name = f"{row['domain']}-{row['method']}-{row['seed']}"
+        raw = source / name / "observations.jsonl"
+        if not raw.exists():
+            assert "projection" not in row
+            continue
+        count += 1
+        projection = read(directory / name / "projection.json")
+        assert projection == row["projection"]
+        raw_bytes = raw.read_bytes()
+        digest = hashlib.sha256(raw_bytes).hexdigest()
+        raw_lines = raw_bytes.splitlines(keepends=True)
+        assert (
+            digest
+            == projection["source_ledger_sha256"]
+            == inventory[f"{name}/observations.jsonl"]["sha256"]
+        )
+        assert (
+            len(raw_lines)
+            == projection["source_observations"]
+            == inventory[f"{name}/observations.jsonl"]["observations"]
+        )
+        n = row["evaluations"]
+        for i, raw_line in enumerate(raw_lines[:n]):
+            entry = json.loads(raw_line)
+            assert entry["action"]["id"] == f"eval-{i:06d}"
+            assert entry["result"]["cost"] == 1.0
+            assert entry["result"]["cost_unit"] == "model_call"
+        assert (directory / name / "observations.jsonl").read_bytes() == b"".join(raw_lines[:n])
+        assert projection["retained_observations"] == n
+        assert projection["discarded_from_analysis"] == len(raw_lines) - n
+        trajectory_path = source / name / "trajectory.json"
+        assert (
+            hashlib.sha256(trajectory_path.read_bytes()).hexdigest()
+            == projection["source_trajectory_sha256"]
+        )
+        assert row["trajectory"] == read(trajectory_path)[:n]
+        final = row["trajectory"][-1]
+        assert row["study_seconds"] == final["study_seconds"]
+        assert row["model_seconds"] == final["model_seconds"]
+        assert (
+            row["controller_and_optimizer_seconds"] == row["study_seconds"] - row["model_seconds"]
+        )
+    assert count == len(inventory)
+    return count
+
+
 def format_number(value, precision=4):
     return "NA" if value is None else f"{value:.{precision}f}"
 
@@ -132,14 +205,54 @@ def median_validation(rows):
 
 
 def main() -> None:
-    fixed, nfixed = verify(RESULTS / "fixed")
-    target, ntarget = verify(RESULTS / "target")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--target-directory",
+        default="target-2000",
+        choices=["target", "target-10000", "target-2000"],
+    )
+    args = parser.parse_args()
+    directories = {"fixed": RESULTS / "fixed", "target": RESULTS / args.target_directory}
+    fixed, nfixed = verify(directories["fixed"])
+    target, ntarget = verify(directories["target"])
+    cap = read(directories["target"] / "manifest.json")["cap"]
+    projected = (
+        verify_projections(directories["target"]) if args.target_directory == "target-2000" else 0
+    )
+    extended_prefixes = 0
+    uncached_prefixes = 0
+    if args.target_directory != "target":
+        for row in target:
+            name = f"{row['domain']}-{row['method']}-{row['seed']}"
+            old_entries = entries(RESULTS / "target" / name / "observations.jsonl")
+            new_entries = entries(directories["target"] / name / "observations.jsonl")
+            assert [comparable(e) for e in new_entries[: len(old_entries)]] == [
+                comparable(e) for e in old_entries
+            ], name
+            extended_prefixes += 1
+        assert extended_prefixes == 75
+        uncached = RESULTS / "target-10000-uncached"
+        inventory = read(uncached / "ledger-inventory.json")
+        paths = {str(p.relative_to(uncached)) for p in uncached.glob("*/observations.jsonl")}
+        assert paths == set(inventory)
+        for name, expected in inventory.items():
+            old_ledger = uncached / name
+            assert hashlib.sha256(old_ledger.read_bytes()).hexdigest() == expected["sha256"]
+            prior = entries(old_ledger)
+            assert len(prior) == expected["observations"]
+            current = entries(directories["target"] / name)
+            assert [comparable(e) for e in current[: min(len(prior), cap)]] == [
+                comparable(e) for e in prior[:cap]
+            ], name
+            uncached_prefixes += 1
+        assert uncached_prefixes == len(inventory) > 0
+
     assert nfixed == 27 and ntarget == 45
     for mode, rows in [("fixed", fixed), ("target", target)]:
-        audit = read(RESULTS / f"{mode}-audit.json")
+        audit = read(RESULTS / f"{directories[mode].name}-audit.json")
         assert (
             audit["results_sha256"]
-            == hashlib.sha256((RESULTS / mode / "results.json").read_bytes()).hexdigest()
+            == hashlib.sha256((directories[mode] / "results.json").read_bytes()).hexdigest()
         )
         assert (
             audit["source_sha256"]
@@ -156,7 +269,7 @@ def main() -> None:
         for row in rows:
             name = f"{row['domain']}-{row['method']}-{row['seed']}"
             expected_hashes[name] = hashlib.sha256(
-                (RESULTS / mode / name / "observations.jsonl").read_bytes()
+                (directories[mode] / name / "observations.jsonl").read_bytes()
             ).hexdigest()
         assert audit["ledger_sha256"] == expected_hashes
     frozen = read(RESULTS / "targets.json")
@@ -182,13 +295,15 @@ def main() -> None:
         == hashlib.sha256((REPO / quality["data_path"]).read_bytes()).hexdigest()
     )
     lines = [
-        "# Larger BMI models: 96-call checkpoints and 200-call targets",
+        f"# Model examples: 96-call checkpoints and {cap}-call targets",
         "",
         f"Completed {len(fixed)} fixed studies ({sum(r['evaluations'] for r in fixed)} calls) and "
-        f"{len(target)} target studies ({sum(r['evaluations'] for r in target)} calls). "
-        f"Verified {nfixed} historical fixed prefixes and {ntarget} historical target prefixes.",
+        f"{len(target)} target studies ({sum(r['evaluations'] for r in target)} retained calls). "
+        f"Verified {nfixed} historical fixed prefixes, {ntarget} older target prefixes, and "
+        f"{extended_prefixes} historical target trajectories originally capped at 200. "
+        f"Verified {uncached_prefixes} uncached extension prefixes through the applicable cap.",
         "",
-        "Two new seven-parameter chains extend hydrology and solar modeling. The existing "
+        "The seven-parameter HYMOD and single-diode chains extend hydrology and solar modeling. The original "
         "three models, datasets, splits and accuracy targets stay unchanged. The new models reuse "
         "existing datasets; they add model complexity, not independent data or new domains.",
         "",
@@ -249,7 +364,7 @@ def main() -> None:
         "",
         "## Calls to the frozen validation target",
         "",
-        "Five separate seeds (3-7), stopping immediately at the target or after 200 attempts. "
+        f"Five separate seeds (3-7), stopping at the target, backend termination or {cap} attempts. "
         "Existing targets are unchanged. Each new target is 1.05 times the lowest validation "
         "RMSE in its fixed matrix, frozen before these five seeds. This is a development quality "
         "target, not global convergence.",
@@ -267,7 +382,7 @@ def main() -> None:
                 str(r["evaluations"])
                 if r["target_reached"]
                 else (
-                    ">200"
+                    f">{r['cap']}"
                     if r["stop_reason"] == "evaluation_cap"
                     else f"stopped@{r['evaluations']}"
                 )
@@ -280,11 +395,26 @@ def main() -> None:
             )
     lines += [
         "",
-        "A >200 value is censored, not convergence at 200. Successful-only medians exclude "
+        f"A >{cap} value is censored, not convergence at {cap}. Successful-only medians exclude "
         "capped or terminated runs. Mean calls consumed is a restricted computational cost and "
         "cannot alone rank methods with unequal success rates. Missing scores are not silently "
         "dropped. Individual JSON records retain actual termination reasons.",
         "",
+        *(
+            [
+                f"The user reduced the cap during the 10000-call run. {projected} studies are "
+                "retrospective prefixes ending at the first target hit or call 2000. Their "
+                "recommendations and held-out scores use only those prefixes; their timings end "
+                f"at the retained call. Raw longer runs remain in target-10000. The other {len(target) - projected} "
+                "studies ran with a 2000-call budget. "
+                f"The preserved source recorded {sum(r['projection']['source_observations'] for r in target if 'projection' in r):,} calls; "
+                f"{sum(r['projection']['discarded_from_analysis'] for r in target if 'projection' in r):,} later calls are excluded from this analysis. "
+                "See ../PROTOCOL-2000.md.",
+                "",
+            ]
+            if args.target_directory == "target-2000"
+            else []
+        ),
         "## Timing, adaptive actions and failures",
         "",
         "Study time includes optimization and durable bookkeeping. Model time covers BMI "
@@ -293,6 +423,27 @@ def main() -> None:
         "are sequential with one Torch CPU thread. These are single-machine measurements; "
         "model-dependent cost and bookkeeping matter alongside evaluation counts.",
         "",
+        *(
+            [
+                "The extended target experiment uses a benchmark-local cache of exact-byte parsed ledger "
+                "records. File integrity, artifact and controller checks still run on every read. "
+                "The interrupted uncached extension is preserved separately and its observations "
+                "are verified as exact prefixes through the applicable cap. Fixed-budget timings use the uncached implementation "
+                "and should not be directly compared with cached target-study timings."
+            ]
+            if args.target_directory != "target"
+            else []
+        ),
+        "",
+        *(
+            [
+                "Background test validation overlapped part of the reduced target experiment. "
+                "Timing comparisons are descriptive rather than controlled throughput measurements.",
+                "",
+            ]
+            if args.target_directory == "target-2000"
+            else []
+        ),
         "| Experiment | Model | Method | Median model seconds | Median optimizer/controller seconds | Adaptive BO actions | Fallback actions | Failed attempts |",
         "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
@@ -303,7 +454,9 @@ def main() -> None:
                 raw = [
                     e
                     for r in group
-                    for e in entries(RESULTS / mode / f"{d}-{m}-{r['seed']}" / "observations.jsonl")
+                    for e in entries(
+                        directories[mode] / f"{d}-{m}-{r['seed']}" / "observations.jsonl"
+                    )
                 ]
                 adaptive = sum(e["action"]["suggested_by"] == "system:bayes" for e in raw)
                 warmup = 8 if d in ["hymod", "solar_diode"] else 4
@@ -312,7 +465,7 @@ def main() -> None:
                 for r in group:
                     successful = 0
                     for e in entries(
-                        RESULTS / mode / f"{d}-{m}-{r['seed']}" / "observations.jsonl"
+                        directories[mode] / f"{d}-{m}-{r['seed']}" / "observations.jsonl"
                     ):
                         fallback += (
                             m == "bo"
@@ -348,8 +501,8 @@ def main() -> None:
         "",
         "See ../PROTOCOL.md for sources, bounds, targets and timing definitions. "
         "workflow/results.json retains actual BMI component-swap diagnostics. "
-        "fixed/ and target/ retain ledgers, manifests, timings and frozen recommendations. "
-        "Each retains the exact earlier workflow.py and README.md under source/. The later diagnostic fix "
+        f"fixed/ and {directories['target'].name}/ retain ledgers, manifests, timings and frozen recommendations. "
+        "Source snapshots and history/a262556 preserve earlier hashed inputs. The workflow diagnostic fix "
         "deep-copies component metadata before swapping. Initial incorrect swap diagnostics "
         "are preserved in workflow-initial/. Intermediate diagnostics before sensor QA are in "
         "workflow-before-temperature-qa/; corrected diagnostics are in workflow/.",
@@ -388,6 +541,9 @@ def main() -> None:
                             "model_seconds": step["model_seconds"],
                         }
                     )
+    from scripts.summarize_open_chains import report_lines
+
+    lines += report_lines()
     (RESULTS / "RESULTS.md").write_text("\n".join(lines))
     print(f"Verified {len(fixed) + len(target)} studies; wrote {RESULTS / 'RESULTS.md'}")
 

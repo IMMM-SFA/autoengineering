@@ -1,0 +1,1 @@
+Preserved uncached 10000-cap attempt. Interrupted during HYMOD random seed 3 to remove repeated parsing overhead. Not a completed study matrix. Fresh cached runs must match every committed observation here; partial study timing is not combined with restarted timing.

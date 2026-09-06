@@ -1,0 +1,11 @@
+```mermaid
+graph LR
+    layout["layout\n(layout)"]
+    wakes["wakes\n(wakes)"]
+    energy["energy\n(energy)"]
+    northing["northing\n(port_adapter)"]
+    layout -->|x| wakes
+    layout -->|y| northing
+    wakes -->|aep_gwh| energy
+    northing -->|y| wakes
+```

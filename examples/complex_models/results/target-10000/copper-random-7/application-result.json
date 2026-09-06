@@ -1,0 +1,60 @@
+{
+  "cap": 10000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.07863233285024762,
+  "diagnostics": {
+    "backend": "random",
+    "details": {
+      "ledger_entries": 2,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 2
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "copper",
+  "evaluations": 2,
+  "method": "random",
+  "model_seconds": 0.013330583926290274,
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "model": "rational3",
+      "ridge": 6.07422269658425e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.1959822510548131
+    }
+  },
+  "seed": 7,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.0919629167765379,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0006089360862072957,
+    "rmse": 0.24774421748519634
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 1.0472359688285595,
+      "evaluations": 1,
+      "model_seconds": 0.0067092920653522015,
+      "study_seconds": 0.059012374840676785,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.1959822510548131,
+      "evaluations": 2,
+      "model_seconds": 0.013330583926290274,
+      "study_seconds": 0.09187187487259507,
+      "target_reached": true
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+system:
+  name: OEDI 9068 measured-input solar
+  description: ''
+  components:
+  - name: temperature
+    model_type: temperature
+    description: ''
+    inputs:
+    - name: poa
+      direction: in
+      data_type: array
+      units: W/m2
+      description: ''
+    - name: ambient
+      direction: in
+      data_type: array
+      units: degC
+      description: ''
+    - name: wind
+      direction: in
+      data_type: array
+      units: m/s
+      description: ''
+    - name: timestamp
+      direction: in
+      data_type: array
+      units: ns since Unix epoch (UTC)
+      description: ''
+    outputs:
+    - name: module_temperature
+      direction: out
+      data_type: array
+      units: degC
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.solar.models:temperature
+        inputs:
+        - poa
+        - ambient
+        - wind
+        - timestamp
+        outputs:
+        - module_temperature
+        params:
+          method: faiman_prilliman
+          u0: 25.0
+          u1: 6.84
+  - name: dc
+    model_type: dc
+    description: ''
+    inputs:
+    - name: poa
+      direction: in
+      data_type: array
+      units: W/m2
+      description: ''
+    - name: module_temperature
+      direction: in
+      data_type: array
+      units: degC
+      description: ''
+    outputs:
+    - name: p_dc
+      direction: out
+      data_type: array
+      units: W
+      description: ''
+    - name: v_dc
+      direction: out
+      data_type: array
+      units: V
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.solar.models:dc_power
+        inputs:
+        - poa
+        - module_temperature
+        outputs:
+        - p_dc
+        - v_dc
+        params:
+          delta_t: 0.0
+  - name: inverter
+    model_type: inverter
+    description: ''
+    inputs:
+    - name: p_dc
+      direction: in
+      data_type: array
+      units: W
+      description: ''
+    - name: v_dc
+      direction: in
+      data_type: array
+      units: V
+      description: ''
+    outputs:
+    - name: ac_kw
+      direction: out
+      data_type: array
+      units: kW
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.solar.models:inverter
+        inputs:
+        - p_dc
+        - v_dc
+        outputs:
+        - ac_kw
+        params: {}
+  - name: voltage
+    model_type: port_adapter
+    description: Identity adapter for an additional edge port in a DiGraph.
+    inputs:
+    - name: value
+      direction: in
+      data_type: array
+      units: V
+      description: ''
+    outputs:
+    - name: v_dc
+      direction: out
+      data_type: array
+      units: V
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.common:passthrough
+        inputs:
+        - value
+        outputs:
+        - v_dc
+        params: {}
+  connections:
+  - source: temperature
+    target: dc
+    port_from: module_temperature
+    port_to: module_temperature
+    description: ''
+  - source: dc
+    target: inverter
+    port_from: p_dc
+    port_to: p_dc
+    description: ''
+  - source: dc
+    target: voltage
+    port_from: v_dc
+    port_to: value
+    description: ''
+  - source: voltage
+    target: inverter
+    port_from: v_dc
+    port_to: v_dc
+    description: ''

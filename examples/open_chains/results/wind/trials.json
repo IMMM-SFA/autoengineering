@@ -1,0 +1,57 @@
+[
+  {
+    "id": "baseline",
+    "status": "evaluated",
+    "objective": -142.3542479032891,
+    "metrics": {
+      "aep_gwh": 142.3542479032891,
+      "inner_termination": "not_run",
+      "inner_wake_function_calls": 0,
+      "inner_wake_gradient_calls": 0
+    },
+    "seconds": 0.030087499879300594,
+    "candidate": null
+  },
+  {
+    "id": "topfarm_5",
+    "status": "evaluated",
+    "objective": -142.37985585785032,
+    "metrics": {
+      "aep_gwh": 142.37985585785032,
+      "inner_termination": "not_converged",
+      "inner_wake_function_calls": 7,
+      "inner_wake_gradient_calls": 6
+    },
+    "seconds": 1.2112695001997054,
+    "candidate": {
+      "id": "topfarm_5",
+      "component": "layout",
+      "params": {
+        "method": "topfarm",
+        "maxiter": 5
+      },
+      "rationale": "Short constrained SLSQP layout search"
+    }
+  },
+  {
+    "id": "topfarm_20",
+    "status": "evaluated",
+    "objective": -143.2373781946087,
+    "metrics": {
+      "aep_gwh": 143.2373781946087,
+      "inner_termination": "not_converged",
+      "inner_wake_function_calls": 23,
+      "inner_wake_gradient_calls": 21
+    },
+    "seconds": 0.6373823331668973,
+    "candidate": {
+      "id": "topfarm_20",
+      "component": "layout",
+      "params": {
+        "method": "topfarm",
+        "maxiter": 20
+      },
+      "rationale": "Longer constrained SLSQP layout search"
+    }
+  }
+]

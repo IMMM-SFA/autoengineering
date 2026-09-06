@@ -1,0 +1,19 @@
+[
+  {
+    "id": "cbc_dispatch",
+    "component": "dispatch",
+    "params": {
+      "method": "simple"
+    },
+    "rationale": "Use the HOPP MILP dispatch with identical hardware, prices and 24-hour foresight"
+  },
+  {
+    "id": "cbc_buffered_soc",
+    "component": "dispatch",
+    "params": {
+      "method": "simple",
+      "soc_margin": 5.0
+    },
+    "rationale": "After the initial annual CBC candidate exceeded the frozen SOC screening limit, test a 5 percentage-point upper dispatch guard band. Physical screening limits and hardware stay fixed."
+  }
+]

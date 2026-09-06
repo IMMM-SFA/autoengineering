@@ -1,0 +1,79 @@
+[
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 1,
+    "model_seconds": 0.014909833669662476,
+    "study_seconds": 0.10104866605252028,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 2,
+    "model_seconds": 0.029379875399172306,
+    "study_seconds": 0.1594310412183404,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 3,
+    "model_seconds": 0.044443500228226185,
+    "study_seconds": 0.2174990833736956,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 4,
+    "model_seconds": 0.05972608318552375,
+    "study_seconds": 0.2795932083390653,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 5,
+    "model_seconds": 0.07260729232802987,
+    "study_seconds": 0.3275377913378179,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 6,
+    "model_seconds": 0.08793083298951387,
+    "study_seconds": 0.3869042079895735,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 7,
+    "model_seconds": 0.10218083299696445,
+    "study_seconds": 0.44600670831277966,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 8,
+    "model_seconds": 0.11658508284017444,
+    "study_seconds": 0.505284458398819,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 9,
+    "model_seconds": 0.130473748780787,
+    "study_seconds": 0.5665815002284944,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 10,
+    "model_seconds": 0.14525062404572964,
+    "study_seconds": 0.6262592910788953,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 176.71562050793068,
+    "evaluations": 11,
+    "model_seconds": 0.15919066593050957,
+    "study_seconds": 0.6853945832699537,
+    "target_reached": true
+  }
+]

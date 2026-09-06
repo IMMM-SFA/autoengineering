@@ -1,8 +1,8 @@
-# Larger BMI models: 96-call checkpoints and 200-call targets
+# Model examples: 96-call checkpoints and 2000-call targets
 
-Completed 45 fixed studies (4320 calls) and 75 target studies (4622 calls). Verified 27 historical fixed prefixes and 45 historical target prefixes.
+Completed 45 fixed studies (4320 calls) and 75 target studies (24972 retained calls). Verified 27 historical fixed prefixes, 45 older target prefixes, and 75 historical target trajectories originally capped at 200. Verified 46 uncached extension prefixes through the applicable cap.
 
-Two new seven-parameter chains extend hydrology and solar modeling. The existing three models, datasets, splits and accuracy targets stay unchanged. The new models reuse existing datasets; they add model complexity, not independent data or new domains.
+The seven-parameter HYMOD and single-diode chains extend hydrology and solar modeling. The original three models, datasets, splits and accuracy targets stay unchanged. The new models reuse existing datasets; they add model complexity, not independent data or new domains.
 
 ## Sensor QA correction
 
@@ -52,31 +52,37 @@ Median validation RMSE across the same seeds:
 
 ## Calls to the frozen validation target
 
-Five separate seeds (3-7), stopping immediately at the target or after 200 attempts. Existing targets are unchanged. Each new target is 1.05 times the lowest validation RMSE in its fixed matrix, frozen before these five seeds. This is a development quality target, not global convergence.
+Five separate seeds (3-7), stopping at the target, backend termination or 2000 attempts. Existing targets are unchanged. Each new target is 1.05 times the lowest validation RMSE in its fixed matrix, frozen before these five seeds. This is a development quality target, not global convergence.
 
 | Model | Target | Method | Reached | Calls by seed 3-7 | Median successful calls | Mean calls consumed | Median study seconds | Median test RMSE |
 | --- | ---: | --- | ---: | --- | ---: | ---: | ---: | ---: |
-| hydro | 2.1693 | random | 4/5 | 161, 199, 168, >200, 89 | 164.5 | 163.4 | 13.927 | 2.8513 |
-| hydro | 2.1693 | sobol | 1/5 | 133, >200, >200, >200, >200 | 133 | 186.6 | 16.934 | 2.8218 |
-| hydro | 2.1693 | bo | 5/5 | 6, 6, 7, 6, 7 | 6 | 6.4 | 0.517 | 2.8839 |
-| solar | 183.8314 | random | 5/5 | 5, 2, 11, 3, 2 | 3 | 4.6 | 0.217 | 120.6910 |
-| solar | 183.8314 | sobol | 5/5 | 3, 1, 4, 2, 4 | 3 | 2.8 | 0.249 | 137.8004 |
-| solar | 183.8314 | bo | 5/5 | 3, 1, 4, 2, 4 | 3 | 2.8 | 0.234 | 137.8004 |
-| copper | 0.2058 | random | 5/5 | 1, 8, 3, 7, 2 | 3 | 4.2 | 0.184 | 0.2513 |
-| copper | 0.2058 | sobol | 5/5 | 4, 1, 5, 1, 12 | 4 | 4.6 | 0.235 | 0.2492 |
-| copper | 0.2058 | bo | 5/5 | 4, 1, 5, 1, 7 | 4 | 3.6 | 0.246 | 0.2492 |
-| hymod | 1.1383 | random | 0/5 | >200, >200, >200, >200, >200 | NA | 200.0 | 30.197 | 2.3870 |
-| hymod | 1.1383 | sobol | 0/5 | >200, >200, >200, >200, >200 | NA | 200.0 | 24.925 | 2.4586 |
-| hymod | 1.1383 | bo | 4/5 | 158, 62, 146, 67, >200 | 106.5 | 126.6 | 58.948 | 2.6660 |
-| solar_diode | 182.1066 | random | 5/5 | 3, 5, 8, 3, 13 | 5 | 6.4 | 1.144 | 137.1321 |
-| solar_diode | 182.1066 | sobol | 5/5 | 13, 9, 1, 5, 4 | 5 | 6.4 | 1.175 | 114.9054 |
-| solar_diode | 182.1066 | bo | 5/5 | 10, 10, 1, 5, 4 | 5 | 6.0 | 1.095 | 115.8841 |
+| hydro | 2.1693 | random | 4/5 | 161, 199, 168, >2000, 89 | 164.5 | 523.4 | 8.022 | 2.8513 |
+| hydro | 2.1693 | sobol | 5/5 | 133, 324, 368, 208, 337 | 324 | 274.0 | 16.732 | 2.8549 |
+| hydro | 2.1693 | bo | 5/5 | 6, 6, 7, 6, 7 | 6 | 6.4 | 0.428 | 2.8839 |
+| solar | 183.8314 | random | 5/5 | 5, 2, 11, 3, 2 | 3 | 4.6 | 0.133 | 120.6910 |
+| solar | 183.8314 | sobol | 5/5 | 3, 1, 4, 2, 4 | 3 | 2.8 | 0.134 | 137.8004 |
+| solar | 183.8314 | bo | 5/5 | 3, 1, 4, 2, 4 | 3 | 2.8 | 0.138 | 137.8004 |
+| copper | 0.2058 | random | 5/5 | 1, 8, 3, 7, 2 | 3 | 4.2 | 0.123 | 0.2513 |
+| copper | 0.2058 | sobol | 5/5 | 4, 1, 5, 1, 12 | 4 | 4.6 | 0.164 | 0.2492 |
+| copper | 0.2058 | bo | 5/5 | 4, 1, 5, 1, 7 | 4 | 3.6 | 0.175 | 0.2492 |
+| hymod | 1.1383 | random | 0/5 | >2000, >2000, >2000, >2000, >2000 | NA | 2000.0 | 322.139 | 2.5401 |
+| hymod | 1.1383 | sobol | 0/5 | >2000, >2000, >2000, >2000, >2000 | NA | 2000.0 | 384.328 | 2.5591 |
+| hymod | 1.1383 | bo | 5/5 | 158, 62, 146, 67, 313 | 146 | 149.2 | 36.012 | 2.6660 |
+| solar_diode | 182.1066 | random | 5/5 | 3, 5, 8, 3, 13 | 5 | 6.4 | 1.081 | 137.1321 |
+| solar_diode | 182.1066 | sobol | 5/5 | 13, 9, 1, 5, 4 | 5 | 6.4 | 1.056 | 114.9054 |
+| solar_diode | 182.1066 | bo | 5/5 | 10, 10, 1, 5, 4 | 5 | 6.0 | 1.079 | 115.8841 |
 
-A >200 value is censored, not convergence at 200. Successful-only medians exclude capped or terminated runs. Mean calls consumed is a restricted computational cost and cannot alone rank methods with unequal success rates. Missing scores are not silently dropped. Individual JSON records retain actual termination reasons.
+A >2000 value is censored, not convergence at 2000. Successful-only medians exclude capped or terminated runs. Mean calls consumed is a restricted computational cost and cannot alone rank methods with unequal success rates. Missing scores are not silently dropped. Individual JSON records retain actual termination reasons.
+
+The user reduced the cap during the 10000-call run. 53 studies are retrospective prefixes ending at the first target hit or call 2000. Their recommendations and held-out scores use only those prefixes; their timings end at the retained call. Raw longer runs remain in target-10000. The other 22 studies ran with a 2000-call budget. The preserved source recorded 49,093 calls; 34,595 later calls are excluded from this analysis. See ../PROTOCOL-2000.md.
 
 ## Timing, adaptive actions and failures
 
 Study time includes optimization and durable bookkeeping. Model time covers BMI evaluation, including model initialization and any copper training fit. Imports, input loading, backend construction and held-out scoring are outside the study timer. Runs are sequential with one Torch CPU thread. These are single-machine measurements; model-dependent cost and bookkeeping matter alongside evaluation counts.
+
+The extended target experiment uses a benchmark-local cache of exact-byte parsed ledger records. File integrity, artifact and controller checks still run on every read. The interrupted uncached extension is preserved separately and its observations are verified as exact prefixes through the applicable cap. Fixed-budget timings use the uncached implementation and should not be directly compared with cached target-study timings.
+
+Background test validation overlapped part of the reduced target experiment. Timing comparisons are descriptive rather than controlled throughput measurements.
 
 | Experiment | Model | Method | Median model seconds | Median optimizer/controller seconds | Adaptive BO actions | Fallback actions | Failed attempts |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -95,21 +101,21 @@ Study time includes optimization and durable bookkeeping. Model time covers BMI 
 | fixed | solar_diode | random | 18.298 | 5.969 | 0 | 0 | 0 |
 | fixed | solar_diode | sobol | 15.342 | 5.923 | 0 | 0 | 0 |
 | fixed | solar_diode | bo | 15.025 | 18.971 | 264 | 0 | 0 |
-| target | hydro | random | 2.710 | 11.217 | 0 | 0 | 0 |
-| target | hydro | sobol | 3.096 | 13.839 | 0 | 0 | 0 |
-| target | hydro | bo | 0.101 | 0.416 | 12 | 0 | 0 |
-| target | solar | random | 0.044 | 0.173 | 0 | 0 | 0 |
-| target | solar | sobol | 0.048 | 0.202 | 0 | 0 | 0 |
-| target | solar | bo | 0.048 | 0.187 | 0 | 0 | 0 |
-| target | copper | random | 0.023 | 0.161 | 0 | 0 | 0 |
-| target | copper | sobol | 0.034 | 0.201 | 0 | 0 | 0 |
-| target | copper | bo | 0.034 | 0.211 | 4 | 0 | 0 |
-| target | hymod | random | 5.554 | 24.609 | 0 | 0 | 0 |
-| target | hymod | sobol | 4.287 | 20.638 | 0 | 0 | 0 |
-| target | hymod | bo | 2.906 | 55.763 | 593 | 0 | 0 |
-| target | solar_diode | random | 0.849 | 0.295 | 0 | 0 | 0 |
-| target | solar_diode | sobol | 0.895 | 0.280 | 0 | 0 | 0 |
-| target | solar_diode | bo | 0.820 | 0.275 | 4 | 0 | 0 |
+| target | hydro | random | 2.277 | 5.745 | 0 | 0 | 0 |
+| target | hydro | sobol | 4.409 | 12.323 | 0 | 0 | 0 |
+| target | hydro | bo | 0.085 | 0.340 | 12 | 0 | 0 |
+| target | solar | random | 0.030 | 0.104 | 0 | 0 | 0 |
+| target | solar | sobol | 0.029 | 0.104 | 0 | 0 | 0 |
+| target | solar | bo | 0.030 | 0.108 | 0 | 0 | 0 |
+| target | copper | random | 0.017 | 0.106 | 0 | 0 | 0 |
+| target | copper | sobol | 0.025 | 0.138 | 0 | 0 | 0 |
+| target | copper | bo | 0.026 | 0.148 | 4 | 0 | 0 |
+| target | hymod | random | 30.411 | 292.076 | 0 | 0 | 0 |
+| target | hymod | sobol | 36.552 | 346.301 | 0 | 0 | 0 |
+| target | hymod | bo | 2.028 | 33.984 | 706 | 0 | 0 |
+| target | solar_diode | random | 0.833 | 0.249 | 0 | 0 | 0 |
+| target | solar_diode | sobol | 0.816 | 0.241 | 0 | 0 | 0 |
+| target | solar_diode | bo | 0.820 | 0.259 | 4 | 0 | 0 |
 
 For an expensive model, fewer calls can reduce time when saved evaluation cost exceeds additional optimizer overhead. This is conditional on unchanged search behavior and is not a measured speedup on another model. A capped baseline provides a lower bound on calls to target, not an exact eventual convergence time.
 
@@ -119,4 +125,36 @@ The audit checks every successful objective and each checkpoint/final recommenda
 
 HYMOD states are conditional on the chosen initialization; slow reservoirs are not guaranteed to equilibrate during the inherited warmup. The solar module is a representative CEC snapshot, not the identified site hardware. Its parameters need not be identifiable from aggregate AC measurements. Model complexity does not establish physical realism or predictive skill. Validation optimization and held-out improvement remain distinct. Partial-observation BO is not evaluated by this suite.
 
-See ../PROTOCOL.md for sources, bounds, targets and timing definitions. workflow/results.json retains actual BMI component-swap diagnostics. fixed/ and target/ retain ledgers, manifests, timings and frozen recommendations. Each retains the exact earlier workflow.py and README.md under source/. The later diagnostic fix deep-copies component metadata before swapping. Initial incorrect swap diagnostics are preserved in workflow-initial/. Intermediate diagnostics before sensor QA are in workflow-before-temperature-qa/; corrected diagnostics are in workflow/.
+See ../PROTOCOL.md for sources, bounds, targets and timing definitions. workflow/results.json retains actual BMI component-swap diagnostics. fixed/ and target-2000/ retain ledgers, manifests, timings and frozen recommendations. Source snapshots and history/a262556 preserve earlier hashed inputs. The workflow diagnostic fix deep-copies component metadata before swapping. Initial incorrect swap diagnostics are preserved in workflow-initial/. Intermediate diagnostics before sensor QA are in workflow-before-temperature-qa/; corrected diagnostics are in workflow/.
+
+
+## Independently maintained model chains
+
+These are finite component-swap comparisons, not extra RMSE domains in the frozen Bayesian benchmark. All three execute their real upstream software locally. These fixed candidate lists are independent of the separate 2000-call target experiment.
+
+| Chain | Selection objective (minimize) | Baseline | Selected | Selection gain | Evaluations | Seconds |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| solar | selection AC power RMSE (kW) | 269.766 | 267.507 | 2.25861 | 4 | 0.995 |
+| wind | negative annual energy (GWh) | -142.354 | -143.237 | 0.88313 | 3 | 1.879 |
+| hybrid | negative energy revenue (USD) | -1.06197e+07 | -1.08159e+07 | 196173 | 3 | 46.687 |
+
+Solar selected `steady_faiman_ablation` using 2018. On 2019, AC RMSE changed from 241.8799 to 239.8996 kW. This is conditional on measured POA and the declared jointly observed subset. Implausible 2019 module-temperature readings invalidate that intermediate diagnostic, without changing the power score. The test period was inspected during example development and is a temporal holdout, not blinded external validation.
+
+Wind selected `topfarm_20`. On the finer five-degree grid, modeled energy changed from 143.0625 to 143.1247 GWh. The finer-grid gain is 0.0622 GWh. This is a numerical sensitivity check, not observed plant improvement. Bounded feasible iterates do not establish convergence.
+
+Hybrid selected `cbc_buffered_soc`. 1 policy was excluded by the unchanged numerical/physical screens. Gross revenue omits capital and degradation costs and terminal SOC value. Perfect 24-hour foresight and a separate price-year scenario are assumptions, not forecast skill or realized income.
+
+| Chain | Candidate | Status | Inner optimizer / physical diagnostics |
+| --- | --- | --- | --- |
+| solar | baseline | evaluated | See sensor QA and selection/test coverage |
+| solar | steady_faiman_ablation | evaluated | See sensor QA and selection/test coverage |
+| solar | sapm_module | evaluated | See sensor QA and selection/test coverage |
+| solar | faiman_u0_30 | evaluated | See sensor QA and selection/test coverage |
+| wind | baseline | evaluated | not_run; 0 wake function and 0 gradient evaluations |
+| wind | topfarm_5 | evaluated | not_converged; 7 wake function and 6 gradient evaluations |
+| wind | topfarm_20 | evaluated | not_converged; 23 wake function and 21 gradient evaluations |
+| hybrid | baseline | evaluated | SOC 10.000-90.823%; final 11.453%; screen passed |
+| hybrid | cbc_dispatch | infeasible | SOC 10.000-91.234%; final 10.709%; Battery SOC screening range [9, 91] exceeded: [10.000004674858543, 91.23432861631625] |
+| hybrid | cbc_buffered_soc | evaluated | SOC 10.000-86.321%; final 10.906%; screen passed |
+
+Sources, commands, limits and raw evidence are linked from [the open-chain README](../../open_chains/README.md). Each result includes source, environment and artifact hashes. Summarization recomputes objectives from saved arrays. The [older 200-call report](../../complex_models/history/a262556/RESULTS-200.md) is preserved.

@@ -1,0 +1,48 @@
+{
+  "coverage": {
+    "union_rows": 105096,
+    "valid_driver_rows": 64316,
+    "scored_rows": 46721,
+    "selection": [
+      "2019-01-01",
+      "2019-12-31"
+    ],
+    "interval_minutes": 5,
+    "mask": "complete drivers, POA>=50, wind>=0, finite power and module sensor, power>=0, four-step transient warmup after every gap; outages retained"
+  },
+  "baseline_rmse_kw": 241.8798560295896,
+  "selected_rmse_kw": 239.89961918147378,
+  "gain_kw": 1.9802368481158226,
+  "baseline_metrics": {
+    "inverter.rmse": 241.8798560295896,
+    "inverter.bias": 82.15394572915929,
+    "temperature_observation_qa": {
+      "status": "invalid_observation_range",
+      "invalid_count": 308,
+      "count": 46721,
+      "minimum_c": -25.2,
+      "maximum_c": 3276.7,
+      "limits_c": [
+        -60,
+        110
+      ]
+    },
+    "scored_energy_bias_kwh": 319859.5415343376
+  },
+  "selected_metrics": {
+    "inverter.rmse": 239.89961918147378,
+    "inverter.bias": 81.158660340836,
+    "temperature_observation_qa": {
+      "status": "invalid_observation_range",
+      "invalid_count": 308,
+      "count": 46721,
+      "minimum_c": -25.2,
+      "maximum_c": 3276.7,
+      "limits_c": [
+        -60,
+        110
+      ]
+    },
+    "scored_energy_bias_kwh": 315984.48081534985
+  }
+}

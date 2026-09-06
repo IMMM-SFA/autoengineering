@@ -1,0 +1,1 @@
+{"backend":"random","ledger_sha256":"12ea7330b7ea914ebfa34d62b1837a2dbb9777ce35f1d6bce1c66f6a5f5ef126","run_identity_sha256":"69fd79445fa57bf1d35c04c2418f7ecba44b008815007d6d07c7e442a752e1c4","schema_version":"2.0","state":{"finite_enumeration_limit":100000,"name":"random","retry_limit":1024,"sequence_state":"derived_from_ledger","study_seed":3}}

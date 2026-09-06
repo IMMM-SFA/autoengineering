@@ -1,0 +1,30 @@
+# Optimization study
+
+## Recommendation
+
+- Feasible: True
+- Action: eval-000000
+- Configuration: {"heat_loss":19.75890921894461,"loss":0.6400053611956537,"temperature":"ross"}
+- Objective and constraint observations: {"rmse":180.00165734869987}
+- Message: best feasible observed configuration
+
+## Evidence
+
+- Standard errors: {}
+- Total evaluator cost: 1.0
+- Evaluator seconds: 0.0
+- Optimizer overhead seconds: 0.0
+- Stop reason: not_terminal
+- Resume pending actions: 0
+
+## Diagnostics
+
+- Fallback events: []
+- Warnings: []
+- Manifest study hash: 65ffbe52736ef394c15cdc08e0210786303a0c5ac1939e49f79c41449f1e651d
+- Ledger hash: d8a47b1ebc19445c0025cecca4ea2e233bac2689e2f95debb44e1ee7b3e0ef6b
+
+## Verification
+
+- `python -m pytest tests -q -p no:cacheprovider`
+- `ruff check src tests`

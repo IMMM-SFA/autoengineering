@@ -1,0 +1,17 @@
+[workspace]
+name = "model-search-results-report"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[dependencies]
+python = ">=3.12,<3.13"
+numpy = ">=2,<3"
+matplotlib = ">=3.9,<4"
+plotly = ">=6,<7"
+quarto = ">=1.6,<2"
+
+[tasks]
+build = { cmd = "python scripts/build_report.py", env = { MPLCONFIGDIR = ".quarto/matplotlib", MPLBACKEND = "Agg" } }
+render = { cmd = "quarto render report.qmd --to html", depends-on = ["build"] }
+
+check = { cmd = "python scripts/test_report.py", env = { MPLCONFIGDIR = ".quarto/matplotlib", MPLBACKEND = "Agg" } }

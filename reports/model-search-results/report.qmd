@@ -1,0 +1,97 @@
+---
+title: "Choosing how to search a model chain"
+subtitle: "Target attainment, prediction and computational cost"
+bibliography: references.bib
+format:
+  html:
+    embed-resources: true
+    theme:
+      light: flatly
+      dark: darkly
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    include-in-header: assets/head.html
+    include-after-body: assets/interactive.html
+    page-layout: article
+---
+
+{{< include summary.qmd >}}
+
+## The working approach
+
+The current approach is to start with a small affordable Sobol pilot, then decide
+whether to continue Sobol or try Bayesian optimization (BO). A typical pilot is
+32 evaluations, counted inside the total budget. Reduce or omit it when objective
+evaluations are extremely expensive or the candidate list is small and finite.
+Stop when the stated target is reached. Otherwise consider how difficult it is to
+find acceptable configurations, how costly each evaluation is, and whether a
+surrogate can predict the response from the pilot.
+
+Evaluate methods at comparable total time and quality, including initialization,
+failed calls and controller overhead. Use withheld pilot observations for any
+surrogate check, and keep final test data outside method selection. This is
+workflow guidance, not an implemented automatic switch: study policy and budget
+remain immutable during recovery, and there is no automatic pilot transfer to BO.
+The open TODO is to **further explore a pilot-based selection rule**.
+
+This approach draws on BO's motivation for expensive objectives [@frazier2018]
+and the distinction between nominal and effective search dimension
+[@bergstra2012]. Neither reference establishes the proposed pilot size or a
+universal switching threshold. These five benchmark models do not validate a
+selection rule across new problems.
+
+## Reading the figures
+
+The first figures describe the fixed and target experiments in `RESULTS.md`.
+Model selectors expose all five problems. Colors identify random search, Sobol
+and BO consistently in the target and checkpoint figures. Runtime colors identify
+time components. Hover for exact values and use the
+figure toolbar to zoom or download SVG. Printed output uses the saved SVG for
+the selected view. The final three figures describe separate finite component
+comparisons; they are not additional BO benchmark domains.
+
+{{< include figures.qmd >}}
+
+## Interpretation and limits
+
+Use target difficulty and measured evaluation cost as separate inputs to method
+selection. More physical detail or more nominal parameters need not make a given
+target harder to reach. BO begins with Sobol initialization, so a run that stops
+there says little about adaptive acquisition. Lower validation error can coexist
+with worse test error, and short successful-only call counts must be read beside
+censored runs.
+
+The benchmark targets are development criteria, not global optima or scientific
+accuracy standards. The larger models reuse the original data and splits. HYMOD
+results are conditional on its initial stores; the inherited warmup cannot assure
+equilibrium for the slowest reservoir. The single-diode module represents a proxy
+for the plant hardware. Copper retains an unresolved source-unit multiplier.
+Cached solar module-temperature observations in the BMI benchmark are unusable;
+temperature-error diagnostics were withdrawn while the AC objective was retained.
+The solar, wind and hybrid figures each state their distinct validation limits.
+
+The working heuristic organizes an affordable decision process. Its pilot size,
+surrogate diagnostics and economic switching criterion remain research questions.
+
+## Provenance and reproduction
+
+{{< include provenance.qmd >}}
+
+Source: `examples/complex_models/results/RESULTS.md`, the `fixed` and
+`target-2000` matrices, and `examples/open_chains/results`. Model sources,
+forcing provenance and commands are documented in the corresponding example
+READMEs. The report environment has a separate Pixi manifest and lockfile.
+
+From the repository root:
+
+```sh
+pixi run -e examples python -m scripts.summarize_complex_models --target-directory target-2000
+pixi run --manifest-path reports/model-search-results/pixi.toml render
+```
+
+The first command verifies the audited evidence and regenerates `RESULTS.md`.
+The second verifies its plotted aggregates, generates figures and renders this
+single HTML file. Figure data, code and input hashes accompany the source report.
+
+## References

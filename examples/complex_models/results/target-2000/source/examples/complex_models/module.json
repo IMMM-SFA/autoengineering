@@ -1,0 +1,16 @@
+{
+  "name": "First_Solar__Inc__FS_267",
+  "role": "Representative thin-film equivalent module, not verified site module",
+  "source": "pvlib 0.15.0 bundled CEC module database",
+  "url": "https://github.com/pvlib/pvlib-python/blob/v0.15.0/pvlib/data/sam-library-cec-modules-2019-03-05.csv",
+  "source_sha256": "a7c3b1ad3dabb5425368615c16322f2e35185fc416380b471c4e48dd545b1920",
+  "parameters": {
+    "STC": 67.41,
+    "alpha_sc": 0.000575,
+    "a_ref": 2.511862,
+    "I_L_ref": 1.201619,
+    "I_o_ref": 9.899413e-16,
+    "R_s": 14.363601,
+    "R_sh_ref": 783.981079
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "data": [
+    {
+      "hovertemplate": "%{x}<br>%{y:.6f} GWh<extra></extra>",
+      "marker": {
+        "color": [
+          "#7895AC",
+          "#237F79"
+        ]
+      },
+      "text": [
+        "0.8831",
+        "0.0622"
+      ],
+      "textposition": "outside",
+      "x": [
+        "Selection grid",
+        "Finer direction grid"
+      ],
+      "y": [
+        0.8831302913196168,
+        0.06219108706270049
+      ],
+      "type": "bar"
+    }
+  ],
+  "layout": {
+    "template": {
+      "data": {
+        "scatter": [
+          {
+            "type": "scatter"
+          }
+        ]
+      }
+    },
+    "yaxis": {
+      "title": {
+        "text": "Selected minus baseline annual energy (GWh)",
+        "standoff": 12
+      },
+      "range": [
+        0,
+        1.103912864149521
+      ],
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "font": {
+      "family": "Arial, sans-serif",
+      "size": 13,
+      "color": "#333333"
+    },
+    "margin": {
+      "t": 35,
+      "r": 25,
+      "b": 85,
+      "l": 75
+    },
+    "legend": {
+      "orientation": "h",
+      "x": 0,
+      "y": -0.2,
+      "xanchor": "left",
+      "yanchor": "top"
+    },
+    "hoverlabel": {
+      "font": {
+        "size": 12
+      }
+    },
+    "title": {},
+    "height": 440,
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "showlegend": false,
+    "xaxis": {
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 1.0583537924103439,
+  "diagnostics": null,
+  "domain": "hydro",
+  "evaluations": 6,
+  "method": "bo",
+  "model_seconds": 0.08485374925658107,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 6,
+    "source_directory": "hydro-bo-3",
+    "source_ledger_sha256": "cf3923bb20d3d37b692975aebd6346b1fd98c18eddebb4835ef3f7934182eb52",
+    "source_observations": 6,
+    "source_trajectory_sha256": "948fc6a3d0fbf301dd338b164a86101a9cca65df45fd966434c45b1df6b6aabb",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000005",
+    "config": {
+      "capacity": 200.0,
+      "pet": "hargreaves",
+      "recession": 0.95
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 2.0659955546313915
+    }
+  },
+  "seed": 3,
+  "stop_reason": "target_reached",
+  "study_seconds": 1.143207541666925,
+  "target": 2.169295332362961,
+  "target_reached": true,
+  "test": {
+    "bias": -0.20907361719947917,
+    "max_balance_error": 7.815970093361102e-14,
+    "nse": 0.39867949900159483,
+    "rmse": 2.8839228598885933
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 7.121294727159263,
+      "evaluations": 1,
+      "model_seconds": 0.014494874980300665,
+      "study_seconds": 0.7377393748611212,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 6.4857159730483716,
+      "evaluations": 2,
+      "model_seconds": 0.02769458433613181,
+      "study_seconds": 0.7813485418446362,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 6.4857159730483716,
+      "evaluations": 3,
+      "model_seconds": 0.04115950036793947,
+      "study_seconds": 0.8256312077865005,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 4.300538022505931,
+      "evaluations": 4,
+      "model_seconds": 0.05520970840007067,
+      "study_seconds": 0.8704713745974004,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 2.915973395588265,
+      "evaluations": 5,
+      "model_seconds": 0.07039954140782356,
+      "study_seconds": 1.0646760826930404,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 2.0659955546313915,
+      "evaluations": 6,
+      "model_seconds": 0.08485374925658107,
+      "study_seconds": 1.143207541666925,
+      "target_reached": true
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+system:
+  name: solar_diode
+  components:
+  - name: effective
+    model_type: EffectiveIrradianceBmi
+    description: EffectiveIrradianceBmi
+    inputs:
+    - name: irradiance
+      direction: in
+      data_type: float64
+      units: W m-2
+    outputs:
+    - name: effective_irradiance
+      direction: out
+      data_type: float64
+      units: W m-2
+    metadata:
+      bmi_class: examples.complex_models.models:EffectiveIrradianceBmi
+  - name: temperature
+    model_type: SolarTemperatureBmi
+    description: SolarTemperatureBmi
+    inputs:
+    - name: irradiance
+      direction: in
+      data_type: float64
+      units: W m-2
+    - name: air_temperature
+      direction: in
+      data_type: float64
+      units: degC
+    outputs:
+    - name: module_temperature
+      direction: out
+      data_type: float64
+      units: degC
+    metadata:
+      bmi_class: examples.local_models.bmi_components:SolarTemperatureBmi
+  - name: diode
+    model_type: SingleDiodeBmi
+    description: SingleDiodeBmi
+    inputs:
+    - name: effective_irradiance
+      direction: in
+      data_type: float64
+      units: W m-2
+    - name: module_temperature
+      direction: in
+      data_type: float64
+      units: degC
+    outputs:
+    - name: dc_power
+      direction: out
+      data_type: float64
+      units: kW
+    metadata:
+      bmi_class: examples.complex_models.models:SingleDiodeBmi
+  - name: inverter
+    model_type: PvWattsInverterBmi
+    description: PvWattsInverterBmi
+    inputs:
+    - name: dc_power
+      direction: in
+      data_type: float64
+      units: kW
+    outputs:
+    - name: ac_power
+      direction: out
+      data_type: float64
+      units: kW
+    metadata:
+      bmi_class: examples.local_models.bmi_components:PvWattsInverterBmi
+  connections:
+  - source: effective
+    port_from: effective_irradiance
+    target: temperature
+    port_to: irradiance
+  - source: effective
+    port_from: effective_irradiance
+    target: diode
+    port_to: effective_irradiance
+  - source: temperature
+    port_from: module_temperature
+    target: diode
+    port_to: module_temperature
+  - source: diode
+    port_from: dc_power
+    target: inverter
+    port_to: dc_power

@@ -1,0 +1,130 @@
+system:
+  name: HOPP wind solar storage grid
+  description: ''
+  components:
+  - name: dispatch
+    model_type: dispatch
+    description: ''
+    inputs:
+    - name: smoke_flag
+      direction: in
+      data_type: array
+      units: boolean
+      description: ''
+    outputs:
+    - name: pv_kw
+      direction: out
+      data_type: array
+      units: kW
+      description: ''
+    - name: wind_kw
+      direction: out
+      data_type: array
+      units: kW
+      description: ''
+    - name: battery_kw
+      direction: out
+      data_type: array
+      units: kW
+      description: ''
+    - name: grid_kw
+      direction: out
+      data_type: array
+      units: kW
+      description: ''
+    - name: soc
+      direction: out
+      data_type: array
+      units: percent
+      description: ''
+    - name: price
+      direction: out
+      data_type: array
+      units: USD/kWh
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.hybrid.models:dispatch
+        inputs:
+        - smoke_flag
+        outputs:
+        - pv_kw
+        - wind_kw
+        - battery_kw
+        - grid_kw
+        - soc
+        - price
+        params:
+          method: simple
+          soc_margin: 5.0
+  - name: revenue
+    model_type: revenue
+    description: ''
+    inputs:
+    - name: grid_kw
+      direction: in
+      data_type: array
+      units: kW
+      description: ''
+    - name: price
+      direction: in
+      data_type: array
+      units: USD/kWh
+      description: ''
+    outputs:
+    - name: revenue_usd
+      direction: out
+      data_type: array
+      units: USD
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.hybrid.models:revenue
+        inputs:
+        - grid_kw
+        - price
+        outputs:
+        - revenue_usd
+        params: {}
+  - name: tariff
+    model_type: port_adapter
+    description: Identity adapter for an additional edge port in a DiGraph.
+    inputs:
+    - name: value
+      direction: in
+      data_type: array
+      units: USD/kWh
+      description: ''
+    outputs:
+    - name: price
+      direction: out
+      data_type: array
+      units: USD/kWh
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.common:passthrough
+        inputs:
+        - value
+        outputs:
+        - price
+        params: {}
+  connections:
+  - source: dispatch
+    target: revenue
+    port_from: grid_kw
+    port_to: grid_kw
+    description: ''
+  - source: dispatch
+    target: tariff
+    port_from: price
+    port_to: value
+    description: ''
+  - source: tariff
+    target: revenue
+    port_from: price
+    port_to: price
+    description: ''

@@ -1,0 +1,30 @@
+[
+  {
+    "best_validation_rmse": 0.5514373050779507,
+    "evaluations": 1,
+    "model_seconds": 0.0077075837180018425,
+    "study_seconds": 0.06147899990901351,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.3571840415920821,
+    "evaluations": 2,
+    "model_seconds": 0.01543445885181427,
+    "study_seconds": 0.09791266592219472,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.3571840415920821,
+    "evaluations": 3,
+    "model_seconds": 0.019290416967123747,
+    "study_seconds": 0.13060370786115527,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.20416668932215265,
+    "evaluations": 4,
+    "model_seconds": 0.025676042307168245,
+    "study_seconds": 0.16504270769655704,
+    "target_reached": true
+  }
+]

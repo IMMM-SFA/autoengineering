@@ -56,9 +56,7 @@ def _evaluator(action):
 
 
 def _partial_evaluator(action):
-    return EvaluationResult.success(
-        action.id, {"model.value": 1.0}, {}, 0.25, "run"
-    )
+    return EvaluationResult.success(action.id, {"model.value": 1.0}, {}, 0.25, "run")
 
 
 def _study(
@@ -252,7 +250,7 @@ def test_new_study_writes_manifest_last_and_records_complete_identity(tmp_path, 
 
 @pytest.mark.parametrize(
     "mismatch",
-    ("study", "seed", "space", "encoding", "backend", "config", "ledger", "input"),
+    ("study", "seed", "budget", "space", "encoding", "backend", "config", "ledger", "input"),
 )
 def test_incompatible_resume_fails_without_changing_existing_state(tmp_path, spec, space, mismatch):
     _study(tmp_path, spec, space)
@@ -264,6 +262,8 @@ def test_incompatible_resume_fails_without_changing_existing_state(tmp_path, spe
     input_hashes = {"system.yaml": "a" * 64}
     if mismatch == "study":
         resumed_spec = replace(spec, name="other")
+    elif mismatch == "budget":
+        resumed_spec = replace(spec, budget=replace(spec.budget, max_evaluations=10000))
     elif mismatch == "seed":
         resumed_spec = replace(spec, seed=18)
     elif mismatch == "space":
@@ -284,7 +284,7 @@ def test_incompatible_resume_fails_without_changing_existing_state(tmp_path, spe
         ledger = ObservationLedger(tmp_path / "alternate.jsonl")
     elif mismatch == "input":
         input_hashes = {"system.yaml": "b" * 64}
-    if mismatch in {"study", "seed", "space", "encoding"}:
+    if mismatch in {"study", "seed", "budget", "space", "encoding"}:
         backend = SobolBackend(resumed_spec, resumed_space)
 
     with pytest.raises(StudyRecoveryError):
@@ -593,9 +593,7 @@ def test_partial_component_action_recovers_once_at_each_pending_boundary(tmp_pat
     assert not pending_path.exists()
 
 
-def test_partial_component_action_recovers_before_manifest_replacement(
-    tmp_path, monkeypatch
-):
+def test_partial_component_action_recovers_before_manifest_replacement(tmp_path, monkeypatch):
     from autoengineering.optimization import provenance
 
     spec = StudySpec(

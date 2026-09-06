@@ -444,3 +444,11 @@ Development and review of the Bayesian optimization branch used OpenAI Codex wit
 ## License
 
 BSD-3-Clause. Copyright (c) 2025, Battelle Memorial Institute.
+
+## Open model chains
+
+[Three runnable examples](examples/open_chains/README.md) use pvlib with OEDI
+plant measurements, PyWake/TOPFARM with Horns Rev turbine layouts, and HOPP with
+wind, solar and storage dispatch. Separate Pixi environments keep their model
+dependencies isolated. Each saves component swaps, numerical outputs, provenance
+and explicit validation limits.

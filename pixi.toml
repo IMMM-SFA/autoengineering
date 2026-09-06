@@ -41,6 +41,9 @@ autoengineering = { path = ".", editable = true }
 smac = ">=2.3,<3"
 
 [environments]
+solar = { features = ["solar"] }
+wind = { features = ["wind"] }
+hybrid = { features = ["hybrid"] }
 default = { solve-group = "default" }
 bayes = { features = ["bayes"], solve-group = "default" }
 examples = { features = ["bayes", "real-examples"], solve-group = "default" }
@@ -48,3 +51,19 @@ examples = { features = ["bayes", "real-examples"], solve-group = "default" }
 [feature.real-examples.dependencies]
 pvlib = "==0.15.0"
 bmipy = "==2.0.1"
+
+[feature.solar.pypi-dependencies]
+pvlib = "==0.15.2"
+
+[feature.wind.pypi-dependencies]
+py-wake = "==2.6.20"
+topfarm = "==2.6.2"
+
+[feature.hybrid.pypi-dependencies]
+hopp = "==3.4.2"
+
+[feature.hybrid.dependencies]
+coin-or-cbc = "*"
+glpk = "*"
+pandas = ">=2,<3"
+timezonefinder = "==6.5.9"

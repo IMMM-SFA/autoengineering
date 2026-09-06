@@ -1,0 +1,119 @@
+{
+  "data": [
+    {
+      "hovertemplate": "Model<br>%{x}<br>%{y:.3f} seconds<extra></extra>",
+      "marker": {
+        "color": "#7895AC"
+      },
+      "name": "Model",
+      "x": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "y": [
+        0.8137332042679191,
+        0.7639010781422257,
+        0.9301238805055618
+      ],
+      "type": "bar"
+    },
+    {
+      "hovertemplate": "Optimizer + controller<br>%{x}<br>%{y:.3f} seconds<extra></extra>",
+      "marker": {
+        "color": "#C0B9AD"
+      },
+      "name": "Optimizer + controller",
+      "x": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "y": [
+        5.731022878549993,
+        5.064960918389261,
+        36.99815711937845
+      ],
+      "type": "bar"
+    },
+    {
+      "marker": {
+        "color": "#946842",
+        "size": 10,
+        "symbol": "diamond"
+      },
+      "mode": "markers",
+      "name": "Median total",
+      "x": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "y": [
+        6.544756082817912,
+        5.818230166565627,
+        37.92828099988401
+      ],
+      "type": "scatter"
+    }
+  ],
+  "layout": {
+    "template": {
+      "data": {
+        "scatter": [
+          {
+            "type": "scatter"
+          }
+        ]
+      }
+    },
+    "barmode": "group",
+    "yaxis": {
+      "title": {
+        "text": "Elapsed time (seconds)",
+        "standoff": 12
+      },
+      "rangemode": "tozero",
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "font": {
+      "family": "Arial, sans-serif",
+      "size": 13,
+      "color": "#333333"
+    },
+    "margin": {
+      "t": 35,
+      "r": 25,
+      "b": 160,
+      "l": 75
+    },
+    "legend": {
+      "orientation": "h",
+      "x": 0,
+      "y": -0.2,
+      "xanchor": "left",
+      "yanchor": "top"
+    },
+    "hoverlabel": {
+      "font": {
+        "size": 12
+      }
+    },
+    "title": {},
+    "height": 510,
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "showlegend": true,
+    "xaxis": {
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "cap": 200,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.12614483339712024,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 2,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 2
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar",
+  "evaluations": 2,
+  "method": "sobol",
+  "model_seconds": 0.029619333799928427,
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "heat_loss": 44.866151036694646,
+      "loss": 0.7044127462897449,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 180.38855162774908
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.15576416719704866,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": 15.904664737554103,
+    "rmse": 114.67762523601503,
+    "temperature_rmse": 3275.984071656743
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 317.08980326569065,
+      "evaluations": 1,
+      "model_seconds": 0.015122083947062492,
+      "study_seconds": 0.09825166733935475,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 180.38855162774908,
+      "evaluations": 2,
+      "model_seconds": 0.029619333799928427,
+      "study_seconds": 0.15563441719859838,
+      "target_reached": true
+    }
+  ]
+}
