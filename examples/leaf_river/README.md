@@ -1,31 +1,33 @@
-# Leaf River Hydrology Example
+# Leaf River example
 
-A 5-component rainfall-runoff model for the Leaf River near Collins, MS, using real USGS streamflow and NOAA weather data.
+This example compares replacements in a five-component rainfall-runoff model using checked USGS
+streamflow and NOAA weather data for 2019-2020. It demonstrates model execution, validation,
+parameterization swaps, and a bounded candidate loop. It is an exploratory workflow example, not a
+held-out forecast validation or a general claim about which hydrologic method performs better.
 
-## Overview
+## Run
 
-This example demonstrates the full autoengineering workflow on a real watershed:
+From the repository root after `pixi install`:
 
-1. **Fetch** publicly available data from USGS and NOAA REST APIs
-2. **Define** a 5-component system (weather data, PET, soil moisture, runoff, routing)
-3. **Validate** each component against observed streamflow and reference models
-4. **Analyze** and rank components by improvement potential
-5. **Improve** in two rounds, quantifying gains at each step
+```sh
+pixi run python examples/leaf_river/run_workflow.py
+pixi run python examples/leaf_river/run_auto_research.py
+```
 
-## Data Sources
+The first script compares two manually assembled rounds. The second reads
+[candidates.yaml](candidates.yaml), tests alternatives in order, and writes an experiment tree,
+report, and provenance under `outputs/` in this example directory. That directory is generated and
+ignored by Git.
 
-| Source | API | Station/Gage | Period |
-|---|---|---|---|
-| Streamflow | USGS NWIS Daily Values | 02472000 (Leaf River nr Collins, MS) | 2019-2020 |
-| Weather | NOAA GHCN Daily | USW00003940 (Jackson, MS area) | 2019-2020 |
+The checked [streamflow](data/streamflow.csv) and [weather](data/weather.csv) files allow an offline
+run. [fetch_data.py](data/fetch_data.py) contacts the data services when a cache file is absent.
+The cache identifies USGS gage 02472000 and NOAA station USW00003940. The weather station and basin
+are distinct spatial supports, which should be considered when interpreting fit.
 
-Both APIs are free, unauthenticated REST endpoints. The fetched CSV files are checked into this
-example.
-
-## Model Chain
+## Models and alternatives
 
 ```mermaid
-graph LR
+flowchart LR
     weather_data --> pet_estimator
     weather_data --> soil_moisture
     pet_estimator --> soil_moisture
@@ -33,76 +35,32 @@ graph LR
     rainfall_runoff --> routing
 ```
 
-| Component | Method | Known Weakness |
-|---|---|---|
-| PET estimator | Hamon (temp-only) | Underestimates summer PET |
-| Soil moisture | Simple bucket (FC=100mm) | Fixed field capacity |
-| Rainfall-runoff | SCS Curve Number (CN=75) | No antecedent moisture |
-| Routing | Triangular UH + baseflow | Uncalibrated UH shape |
+This is the structural graph. The scripts also supply driver arrays and arithmetic between model
+calls. The YAML alone does not describe every numeric operation.
 
-## Improvement Rounds
+| Component | Baseline | Alternative tested |
+| --- | --- | --- |
+| PET | Hamon | Hargreaves. |
+| Soil moisture | Bucket model | Retained in these comparisons. |
+| Runoff | SCS Curve Number | Antecedent moisture adjustment. |
+| Routing | Triangular response and baseflow | Gamma response and calibrated baseflow. |
 
-**Round 1** -- Swap PET: Hamon to Hargreaves. Uses diurnal temperature range (Tmax-Tmin) as a proxy for solar radiation, producing better seasonal PET estimates.
+The manual script groups changes into rounds. The automated loop evaluates candidates separately
+against the current retained system. It can therefore revert an individual change even when that
+change appeared in a manual round with other improvements.
 
-**Round 2** -- Also swap runoff (SCS-CN with antecedent moisture condition adjustment) and routing (gamma-distribution UH with calibrated baseflow).
+The earlier documentation reported manual NSE values of about 0.23, 0.25, and 0.39, with the
+automated loop also reaching about 0.39. Treat these as example outputs to reproduce, not independent
+validation evidence. Inspect the generated metric tables and retained, reverted, and failed nodes
+before drawing conclusions. The automated loop's fitness and threshold rules are described in the
+[workflow guide](../../docs/workflow.md#bounded-replacement-experiments).
 
-### Results
+## What the example covers
 
-```
-Metric       Baseline   Round 1   Round 2
-rmse           3.0261    2.9877    2.6986
-nse            0.2322    0.2515    0.3894
-kge            0.4350    0.4717    0.5612
-```
+The candidate file illustrates the handoff from research to executable replacements. Running the
+script does not conduct a fresh literature search, run BO, or train a statistical or deep learning
+model. The comparison data are used during selection, so the selected score is not a held-out test.
 
-Each round improves all three metrics, demonstrating cascading improvement from upstream component fixes.
-
-## Running
-
-```bash
-# Manual workflow: swaps done by hand over two rounds
-pixi run python examples/leaf_river/run_workflow.py
-
-# Automated: the bounded auto_improve loop reads candidates.yaml and does the
-# same swaps itself, writing an experiment tree + evidence-first report
-pixi run python examples/leaf_river/run_auto_research.py
-```
-
-The checked cache contains about 730 days of USGS and NOAA data, so a fresh checkout runs without
-network access. `fetch_data.py` downloads the observations only when the cache files are absent.
-
-The automated run reproduces the improvement (NSE 0.23 -> 0.39) and, because it
-evaluates each candidate against the current best, it surfaces something the manual
-script glosses: the AMC runoff swap *on its own* does not beat Hargreaves-only, so it
-is correctly reverted, and the gain comes from the calibrated routing. See the
-generated `outputs/leaf-river.report.md`.
-
-## Files
-
-```
-leaf_river/
-  system.yaml              # System definition (5 components; swappable ones have a `runnable` block)
-  run_workflow.py           # Full 4-step workflow with 2 improvement rounds (manual)
-  run_auto_research.py      # Automated bounded auto_improve loop over candidates.yaml
-  candidates.yaml           # Researched replacement models (rationale + citations)
-  data/
-    fetch_data.py           # USGS/NOAA REST API data fetcher with CSV caching
-  models/
-    pet_hamon.py            # Hamon PET (baseline)
-    pet_hargreaves.py       # Hargreaves PET (improved)
-    soil_moisture.py        # Simple bucket model
-    scs_runoff.py           # Standard SCS Curve Number
-    scs_runoff_amc.py       # SCS-CN with antecedent moisture (improved)
-    routing.py              # Triangular UH + baseflow (baseline)
-    routing_calibrated.py   # Gamma UH + calibrated baseflow (improved)
-    routing_runnable.py     # Thin (direct_runoff, recharge) adapters for the runnable contract
-  outputs/                  # Generated by run_auto_research.py (gitignored)
-```
-
-## Why Leaf River?
-
-- Classic CAMELS benchmark watershed used in many hydrology papers
-- Small enough to be fast, complex enough to demonstrate real improvement
-- Free data with no authentication required
-- 2 years of daily data keeps it lightweight (~730 timesteps)
-- Temperature data available for PET estimation methods
+A broader example should add a declared evaluation split, data-support checks, compute comparisons,
+and result visualizations. The [model improvement guide](../../docs/model-improvement.md) proposes
+how to assess those extensions. More examples are being developed separately.

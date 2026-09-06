@@ -1,65 +1,38 @@
-# Systems Engineering Standards & SysML v2 Investigation
+# Standards and interfaces
 
-This document summarizes our technical discussion regarding open standards for systems engineering, with a specific focus on **SysML v2**, lightweight implementations for research environments, and navigating licensing/dependency constraints.
+Autoengineering currently describes systems in YAML and a NetworkX graph. Runnable metadata and
+optimization evaluators connect that description to model execution. A unified model DAG and
+harness are still planned.
 
------
+Earlier notes considered SysML and model coupling standards. Treat those as integration questions,
+not adopted dependencies. The project has no SysML import/export or BMI adapter contract today.
 
-## 1\. Comparison of Open Standards
+## Questions for the model DAG
 
-We weighed the pros and cons of the most prominent open standards used in **Model-Based Systems Engineering (MBSE)**.
+The DAG needs stable identities for model implementations, ports, parameters, data, and results.
+Before adding an external representation, specify which records must survive a round trip and
+which relationships determine execution. Units, time support, observation availability, and model
+versions need explicit treatment.
 
-| Standard | [SysML](https://en.wikipedia.org/wiki/Systems_modeling_language) | [UML](https://en.wikipedia.org/wiki/Unified_Modeling_Language) | [LML](https://www.google.com/search?q=https://en.wikipedia.org/wiki/Systems_engineering%23Other_tools) |
-| :--- | :--- | :--- | :--- |
-| **Primary Use** | General Systems Engineering | Software Architecture | Lifecycle Management |
-| **Requirements** | Native Support | Limited (Use Cases) | Native Support |
-| **Math/Analysis** | Strong (Parametrics) | Weak | Moderate |
-| **Pros** | Versatile, huge ecosystem | Developer ubiquity | Low learning curve |
-| **Cons** | High complexity (v1.x) | Software-centric | Lower tool adoption |
+SysML integration is a possible later adapter. The earlier investigation used the
+[Systems Modeling repository](https://github.com/Systems-Modeling/SysML-v2-Release) as a starting
+reference. A future adapter should demonstrate a small round trip with preserved meaning before
+becoming a workflow dependency.
 
------
+## Questions for the harness
 
-## 2\. SysML v2 Open Source Ecosystem
+The harness needs consistent preparation, execution, inspection, and error behavior across model
+adapters. It must also state who controls model state, time stepping, and data exchange.
+The [BMI documentation](https://bmi.readthedocs.io/en/latest/) is a reference for investigating
+adapters where a model already exposes that interface. Compatibility has not been demonstrated in
+this package.
 
-SysML v2 represents a shift toward **"Systems as Code"** via a new textual notation. Current open-source and free-tier tools include:
+Document how any adapter maps into the existing runnable and evaluator interfaces. Check units,
+state, time support, and failure behavior through a working example. Keep standard selection
+separate from a claim that an integration is complete.
 
-  * **[SysML v2 Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Release):** The official OMG reference implementation. Includes Eclipse plugins and a Jupyter Lab kernel.
-  * **[Syside Editor (VS Code)](https://sensmetry.com/#products):** A lightweight extension for VS Code that provides a professional textual editing experience.
-  * **[Eclipse SysON](https://sysml.org/sysml-tools/):** A web-based graphical modeler built on the [Eclipse](https://github.com/Systems-Modeling/SysML-v2-Release) ecosystem.
-  * **[Sysand](https://github.com/sensmetry/sysand):** An open-source (BSD-3-Clause) package manager for SysML v2/KerML, facilitating dependency management similar to `pip`.
+## Design decisions still open
 
------
-
-## 3\. Lightweight Research Tool Architecture
-
-For environments like **National Labs** where **Java dependencies** and **LGPL licenses** are concerns, a "Sidecar" architecture is recommended to maintain a permissive (BSD/MIT) codebase:
-
-### Component Strategy
-
-1.  **Core Logic:** Built in Python (permissive license).
-2.  **Model Interaction:** Use the [SysML v2 API Python Client](https://github.com/Systems-Modeling/SysML-v2-API-Python-Client).
-3.  **Isolation:** Run the heavy Java-based [API Services](https://github.com/Systems-Modeling/SysML-v2-API-Services) in a Docker container. Your research tool communicates via REST, preventing license "leakage" and keeping your local environment clean.
-
-### Example Python Integration
-
-Using the API client allows for graph-based traversal of models, similar to [im3synapse](https://github.com/IMMM-SFA/im3synapse):
-
-```python
-from sysml_v2_client import Client
-
-# Connect to the isolated API service
-client = Client(base_url="http://localhost:9000")
-
-# Query the model as a graph
-project = client.get_project_by_name("Research_System")
-root = client.get_root_element(project.id)
-
-for rel in root.owned_relationships:
-    target = client.get_element(rel.target_id)
-    print(f"Subsystem: {target.name}")
-```
-
------
-
-  ## Next Steps
-
-  Would you like me to draft a **Docker Compose** file to stand up the [SysML v2 API Services](https://github.com/Systems-Modeling/SysML-v2-API-Services) so you can begin testing the Python client?
+We need to decide which fields belong in the common DAG, how stateful or coupled models fit the
+execution contract, and whether external standard adapters justify their maintenance cost.
+The [roadmap](../docs/roadmap.md) records the proposed completion criteria.

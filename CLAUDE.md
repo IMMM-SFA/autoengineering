@@ -1,107 +1,63 @@
-# CLAUDE.md
+# Repository guidance
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Read `~/AGENTS.md` for personal conventions. Run commands from this repository's root. Use the
+Waterology writing-style skill for prose and research-software-quality skill for changes and
+verification. Use an isolated worktree when another session is active.
 
-## What this project is
-
-`autoengineering` is a Python package for AI-assisted systems engineering of **multi-model chains**. It helps identify, validate, rank, and swap components within a system of connected models, then quantify the gain. The package is paired with a Claude Code agent (`.claude/agents/auto-engineer.md`) that drives the workflow interactively. Read `concept.md` for the conceptual framing.
-
-Run commands from the repository root.
+Autoengineering is a work in progress. Read [README.md](README.md) for the current scope,
+[workflow.md](docs/workflow.md) for architecture and execution, and
+[roadmap.md](docs/roadmap.md) for planned work. The graph, runnable adapters, replacement loop, and
+optimization controller exist. A unified model DAG, harness, dynamic web app, and general model
+improvement selection and training workflow remain unfinished.
 
 ## Commands
 
-Pixi manages environments on macOS ARM and Linux x86-64:
+Pixi manages Python 3.12 environments on macOS ARM and Linux x86-64. The local package is installed
+in editable mode.
 
-```bash
+```sh
 pixi install
 pixi run lint
 pixi run test
 pixi install -e bayes
 pixi run -e bayes test-bayes
 pixi run -e bayes benchmark-release-a
+pixi run -e bayes benchmark-full-network
 ```
 
-Run a single test:
+Run a focused test or an example:
 
-```bash
+```sh
 pixi run pytest tests/test_validate.py::TestMetrics::test_rmse_perfect -v
+pixi run python examples/signal_chain/run_workflow.py
 ```
 
-Run component workflow examples:
+The [example index](examples/README.md) lists checked examples, requirements, and outputs.
+Additional examples are being developed separately. Do not describe them as available until they
+are integrated.
 
-```bash
-pixi run python examples/signal_chain/run_workflow.py     # synthetic, no domain knowledge
-pixi run python examples/leaf_river/run_workflow.py       # real data, checked cache needs no network
-```
+## Implementation rules
 
-Run the no-network optimization example:
+- Preserve copy semantics in `swap_component` and `System.to_networkx`.
+- Use type annotations, `from __future__ import annotations`, and dataclasses where appropriate.
+  Format Python with Ruff at line length 100.
+- Add relevant tests for new component behavior, metrics, and execution contracts.
+- Keep heavy optimization dependencies optional. Base imports must work without Torch or SMAC.
+- Check both validation and retention semantics before describing an improvement. Thresholds in
+  the replacement loop are not hard acceptance constraints.
+- Read [optimization.md](docs/optimization.md) before changing configuration, budgets, ledgers, or
+  recovery. Preserve immutable run identity and explicit failure and fallback states.
+- Distinguish whole-system BO, full-observability function-network BO, and experimental partial
+  observability. Read [BO status](docs/bayesian-optimization-status.md) before making evidence claims.
+- Keep frozen protocols, decisions, raw evidence, failed runs, and provenance conflicts intact.
+  Documentation changes do not authorize another research run or a relaxed gate.
 
-```bash
-pixi run autoengineering optimize system.yaml examples/optimization_chain/optimization.yaml \
-  --workdir outputs/optimization-chain --max-new-evaluations 3
-pixi run autoengineering optimize system.yaml examples/optimization_chain/optimization.yaml \
-  --workdir outputs/optimization-chain --resume
-```
+The [model improvement criteria](docs/model-improvement.md) are proposed guidance. Do not describe
+`rank_opportunities` or BO acquisition as an implemented selector for statistical, ML, or deep
+surrogate replacements.
 
-CLI (installed as `autoengineering`, also `pixi run autoengineering <cmd>`):
-`describe`, `graph`, `components`, `validate`, `report`, `candidates`, `improve`, `experiments`, and
-`optimize`. The optimize command takes a system YAML, optimization YAML, and explicit work
-directory. See `docs/optimization.md` before changing its run or recovery contract.
+## Attribution and commits
 
-Run the automated research loop end-to-end:
-
-```bash
-pixi run python examples/leaf_river/run_auto_research.py   # reproduces NSE 0.23 -> 0.39 via auto_improve
-```
-
-## Architecture and execution boundary
-
-The original component workflow separates structural system descriptions from numeric example
-models:
-
-- A `System` (`system/graph.py`) is a NetworkX `DiGraph` of `Component` objects loaded from YAML.
-  Components contain metadata, typed ports, and an arbitrary metadata dictionary.
-- Numeric example models live under `examples/<name>/models/`. Workflow scripts wire them together
-  and pass arrays to `validate_arrays()`.
-
-The component workflow runs models, validates arrays, ranks opportunities, swaps a component, and
-runs the chain again. The `research/` runner is the package path that executes declared component
-callables.
-
-### Packages
-
-1. **`system/`** - Define. `System.from_yaml()` / `to_yaml()`, graph queries (`topological_order`, `upstream_of`, `downstream_of`), and rendering (`describe()`, `to_mermaid()`).
-2. **`validate/`** - Validate. `validate_arrays(name, observed, simulated, metrics, thresholds)` returns `ValidationResult` dataclasses. Metrics live in the `METRICS` registry in `compare.py`: `rmse`, `bias`, `relative_bias`, `correlation`, `nse`, `kge`.
-3. **`analyze/`** - Analyze. `rank_opportunities()` groups results by component and scores improvement potential (higher = more room to improve); `generate_report()` produces a markdown/JSON report.
-4. **`execute/`** - Improve. `swap_component(system, target, replacement)` returns a **new** `System` with one component replaced and all connections preserved.
-5. **`research/`** - Research and bounded component improvement. `runner.run_component` and
-   `build_feedforward_runner` execute declared models. `ExperimentTree` records lineage, and
-   `auto_improve` runs the swap, execute, validate, and decide loop.
-6. **`optimization/`** - Durable whole-system optimization. Strict run and search-space schemas feed
-   random, scrambled Sobol, or optional BoTorch policies. `OptimizationStudy` owns budgets, the
-   append-only ledger, recovery, recommendations, and reports. Release A evaluates the complete
-   system for every action. It does not implement function-network or component-level Bayesian
-   optimization.
-
-### The runnable contract (how models get executed)
-
-`research/runner.py` executes a component through `Component.metadata["runnable"]`. The dictionary
-round-trips through YAML and survives `swap_component` copies. It supports Python callables and
-commands with an `.npz` input/output contract. `build_feedforward_runner` wires a feed-forward
-system. Chains with glue arithmetic can provide a handwritten `run_chain`.
-
-### Metric direction convention (important when adding metrics or thresholds)
-
-Pass/fail direction is not uniform. In `validate_arrays`, metrics `nse`, `kge`, `correlation` pass when `value >= threshold` (higher is better); all others pass when `abs(value) <= threshold` (closer to zero is better). `rank_opportunities` additionally floors the score to 0.6 when `nse` or `kge` drops below 0.5. Any new metric must be slotted into the correct side of this convention in both files.
-
-## Conventions
-
-- Immutability is enforced by design: `swap_component` and `to_networkx` return copies; never mutate a `System` in place when a transform is expected to be pure.
-- Use type annotations with `from __future__ import annotations` for new function signatures. Use
-  dataclasses for result and data-transfer types.
-- Format with `ruff` (line length 100). Python 3.12.
-- New components/metrics should come with tests in `tests/` (mirrors the `system`/`validate`/`analyze` split) and, where it demonstrates the workflow, a worked example under `examples/`.
-
-## License / attribution
-
-BSD-3-Clause, Battelle Memorial Institute. Personal-laptop git identity (`Cam Bracken <cameron.bracken@pm.me>`) - see the parent `~/projects/CLAUDE.md`.
+The project uses BSD-3-Clause with Battelle Memorial Institute attribution. Preserve
+[NOTICE](NOTICE) and vendored licenses. Follow the user's Git identity and signing instructions.
+Do not infer publication, push, or merge authority from a review or a passing test.

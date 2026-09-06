@@ -14,7 +14,7 @@ water, solar energy and materials comparisons on measured observations.
 | [`optimization_chain`](optimization_chain/) | Deterministic mixed-space whole-system optimization with resume. | No | See below. |
 | [`function_network`](function_network/) | NPZ-backed system and component evaluation with deterministic training-table replay. | No | See below. |
 | [`local_models`](local_models/) | Real water, solar and materials models with swaps, random/Sobol/BO comparisons and component reuse tests. | No after environment setup | `pixi run -e examples python -m examples.local_models.run --output outputs/local-models` |
-| [`complex_models`](complex_models/) | Larger BMI hydrology and single-diode solar models, 12/24/48/96-call checkpoints and 200-call target tests. | No after environment setup | See its README. |
+| [`complex_models`](complex_models/) | Larger BMI hydrology and single-diode solar models, 12/24/48/96-call checkpoints and 2,000-call target tests. | No after environment setup | See its README. |
 
 The Leaf River observations are checked into `leaf_river/data/`, so a fresh checkout does not need
 network access. Its fetcher contacts USGS and NOAA only if those cache files are absent. The
@@ -54,3 +54,11 @@ The example validates an immutable function-network description against its `Sys
 one system action and one component action, then reconstructs four scalar training rows from the
 ledger and verified NPZ artifacts. Its [`README`](function_network/README.md) describes the checked
 files and output contract.
+
+## Open model chains
+
+[Three local chains](open_chains/README.md) cover pvlib/OEDI solar, PyWake/TOPFARM wind,
+and HOPP hybrid dispatch. They use separate environments and retain validation limits.
+
+The [figure report](../reports/model-search-results/report.html) compares benchmark target
+attainment, test prediction, computational cost, and these component swaps.
