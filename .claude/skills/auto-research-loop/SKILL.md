@@ -1,71 +1,31 @@
 ---
 name: auto-research-loop
-description: Run the bounded auto-research improvement loop over candidate replacement models — swap each in, execute the chain, validate with the package's metrics, keep what improves, and produce an evidence-first cited report. Use after deep-research-candidates has produced candidates.yaml. Adapts feynman's /autoresearch loop and openresearch-cli's experiment-tree + evidence-first reporting.
+description: Run a bounded comparison of executable component replacements and report retained, reverted, and failed trials with their evidence.
 ---
 
-# Auto-Research Loop
+# Test candidate replacements
 
-You are testing candidate replacement models honestly and keeping an auditable
-record. The creative step (which candidates to try) already happened in
-`deep-research-candidates`; here you measure them with the package's own
-`validate_arrays` / `rank_opportunities` and let the evidence decide.
+Use `autoengineering.research.auto_improve` to test supplied candidates. Read `docs/workflow.md`
+for its fitness, threshold, and artifact behavior. This skill adapts feynman's bounded experiments
+and openresearch-cli's experiment records. See `NOTICE`.
 
-The deterministic loop lives in the package (`autoengineering.research.auto_improve`)
-— you do not re-implement it. Your job is to wire up the run, invoke it, and report.
-This adapts feynman's bounded `/autoresearch` loop and openresearch-cli's
-experiment-tree discipline (see the repo `NOTICE`).
+## Prepare the run
 
-## Cardinal rules (experiment-tree discipline)
+Record the baseline, observations, output to score, metrics, thresholds, stop target, candidate
+file, iteration limit, and output directory. Keep the evaluation design fixed. Use authorization
+already provided in the session and ask only when a required decision or execution authority is
+missing.
 
-- **The baseline is immutable.** It is the control every variant is measured against.
-  `auto_improve` never mutates the input system; keep it that way.
-- **Same measurement across nodes.** Use identical `metrics`, `thresholds`, and the
-  same `observed` data and `validate_output` for every candidate. The only variable
-  is the swapped component.
-- **Grow down, not sideways.** The loop already descends from the current best node.
-  A tree that is all direct children of the root with no grandchildren means nothing
-  stacked — surface that in the report rather than hiding it.
-- **Evidence before conclusions.** Read the `ValidationResult`s before proposing the
-  next move. Do not claim an improvement the metrics do not show.
+Validate each runnable and its inputs before the loop. Provide `run_chain(system)` returning named
+arrays. Use `build_feedforward_runner` for an acyclic graph with declared runnable components, or a
+handwritten runner where the chain needs additional arithmetic. The Leaf River example shows the
+latter.
 
-## Step 1 — Confirm the run
+Use a fresh output directory. The replacement loop does not implement the optimization controller's
+durable resume or cost budget. Manage expensive training and model runs through an explicitly
+bounded caller until the planned harness provides a common lifecycle.
 
-Before starting, confirm with the user (feynman `/autoresearch` does this too):
-
-```
-Optimization target: <metric(s)> ( <direction> )
-Observed data:       <path> (column)
-Output scored:       <run_chain key, e.g. routing.streamflow>
-Candidates:          <candidates.yaml> (N candidates)
-Max iterations:      <N>
-Stop target:         <e.g. nse >= 0.5, or none>
-```
-
-Do not start the loop without explicit approval.
-
-## Step 2 — Provide `run_chain`
-
-The loop needs a callable `run_chain(system) -> {output_name: array}` that executes
-the model chain. Two ways to get one:
-
-- **Automatic** (clean feed-forward chains): add a `runnable` block to each component
-  in `system.yaml`, then
-
-  ```python
-  from autoengineering.research import build_feedforward_runner
-  run_chain = build_feedforward_runner(system, {"weather_data.precip": precip, ...})
-  ```
-
-- **Hand-written** (chains with inter-component arithmetic): write a small function
-  that runs the models and returns the named arrays, as the examples do
-  (`examples/leaf_river/run_auto_research.py`).
-
-Every candidate's `runnable.inputs` must be satisfiable from a graph edge or from the
-`source_arrays` you pass in.
-
-## Step 3 — Run the loop
-
-Via the API:
+## Execute
 
 ```python
 from autoengineering.research import auto_improve, load_candidates, write_report
@@ -76,36 +36,34 @@ tree = auto_improve(
     candidates=load_candidates("candidates.yaml"),
     metrics=["rmse", "bias", "nse", "kge"],
     thresholds={"nse": 0.4, "kge": 0.4},
-    target={"nse": 0.5},        # optional satisficing stop
-    max_iterations=20,          # bounded
-    workdir="outputs", slug="my-system",
+    target={"nse": 0.5}, max_iterations=20,
+    workdir="outputs/replacement-study", slug="replacement-study",
 )
-write_report(tree, system, "my-system", "outputs")
+write_report(tree, system, "replacement-study", "outputs/replacement-study")
 ```
 
-Or via the CLI, where `--chain module:factory` is a factory that takes the system and
-returns `run_chain`:
+This template requires a prepared system, runner, observations, and candidate file. For a complete
+example, run `pixi run python examples/leaf_river/run_auto_research.py`.
 
-```bash
-pixi run autoengineering improve system.yaml \
-    -C candidates.yaml --chain run_auto_research:make_run_chain \
-    -b observed.csv -O routing.streamflow -t nse=0.5 --max-iter 20
+The baseline remains immutable. Each candidate is tried once in order against the current retained
+system. Strictly greater fitness produces a kept node. Fitness uses available skill metrics or
+negative absolute RMSE. Thresholds annotate results and do not enforce scientific acceptance.
+Stochastic models need explicit seed handling in their runner.
+
+## Inspect the evidence
+
+Check `autoresearch.md`, `autoresearch.jsonl`, the `CHANGELOG.md` entry, and the report and provenance
+sidecar. Inspect the experiment tree with:
+
+```sh
+pixi run autoengineering experiments outputs/replacement-study/autoresearch.jsonl
 ```
 
-## Step 4 — Evidence-first report
+Report terminal and component metrics where available, costs measured by the caller, retained and
+reverted trials, and failures. Explain any metric tradeoff. A retained trial is not automatically
+an accepted model or evidence of held-out skill. If no candidate improves the baseline, state that
+result and preserve the records.
 
-`auto_improve` writes `autoresearch.md`, `autoresearch.jsonl`, and a `CHANGELOG.md`
-entry; `write_report` adds `outputs/<slug>.report.md` and `outputs/<slug>.provenance.md`.
-The report leads with the baseline → best metric table (evidence), then the kept
-changes, then the candidate `sources` as References.
-
-Before you conclude, verify on disk that the artifacts exist and that any claim you
-make matches the metric table. Render the tree for the user:
-
-```bash
-pixi run autoengineering experiments outputs/autoresearch.jsonl
-```
-
-Final response: state the baseline → best metric change, which swaps were kept, and
-link the report and provenance files. If nothing beat the baseline, say so plainly —
-a null result is a valid, auditable outcome.
+Use `docs/model-improvement.md` to assess possible next work. Do not infer that a failed simple
+candidate justifies a deep model. Whole-system BO uses a separate evaluator, run specification,
+and controller described in `docs/optimization.md`.

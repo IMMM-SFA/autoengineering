@@ -1,8 +1,7 @@
 # Examples
 
-Run examples from the repository root after `pixi install`. Four examples execute model chains and
-component improvement workflows. The two optimization examples cover the Release A whole-system
-controller and the later function-network representation.
+Run examples from the repository root after `pixi install`. These six checked examples cover component replacements, whole-system optimization, and
+function-network records. They demonstrate parts of a workflow that is still in progress.
 
 | Example | Purpose | Network access | Command |
 | --- | --- | --- | --- |
@@ -11,7 +10,7 @@ controller and the later function-network representation.
 | [`lotka_volterra`](lotka_volterra/) | Predator-prey ODE workflow and functional-response replacement. | No | `pixi run python examples/lotka_volterra/run_workflow.py` |
 | [`leaf_river`](leaf_river/) | Rainfall-runoff workflow using USGS and NOAA observations. | No with checked cache | `pixi run python examples/leaf_river/run_workflow.py` |
 | [`optimization_chain`](optimization_chain/) | Deterministic mixed-space whole-system optimization with resume. | No | See below. |
-| [`function_network`](function_network/) | NPZ-backed system and component evaluation with deterministic training-table replay. | No | See below. |
+| [`function_network`](function_network/) | System and component evaluation with NPZ artifacts with deterministic training-table replay. | No | See below. |
 
 The Leaf River observations are checked into `leaf_river/data/`, so a fresh checkout does not need
 network access. Its fetcher contacts USGS and NOAA only if those cache files are absent. The
@@ -51,3 +50,15 @@ The example validates an immutable function-network description against its `Sys
 one system action and one component action, then reconstructs four scalar training rows from the
 ledger and verified NPZ artifacts. Its [`README`](function_network/README.md) describes the checked
 files and output contract.
+
+## Coverage still needed
+
+More examples are being developed in another session. They are not included in this revision.
+We still need comparisons of simple statistical models, basic ML, and full deep learning
+surrogates, with data requirements, compute costs, and evaluation splits stated explicitly.
+We also need visualizations that explain failures and tradeoffs as well as improvements.
+
+Use the [model improvement criteria](../docs/model-improvement.md) to assess those extensions.
+The [roadmap](../docs/roadmap.md) describes how examples should test the model DAG, harness, and
+interactive app. Existing BO surrogates guide search and do not provide a general replacement-model
+training workflow.

@@ -1,6 +1,7 @@
-# Self-contained optimization chain
+# Optimization chain example
 
-This example runs a deterministic three-component chain with no downloads. It searches a
+This offline example runs a deterministic three-component chain through the whole-system
+optimization controller. The checked configuration uses Sobol search, not BoTorch. It searches a
 categorical architecture, a continuous gain, an integer stage count, and a conditional curvature.
 The objective maximizes negative root mean square error while absolute bias must not exceed 0.3.
 
@@ -28,9 +29,9 @@ pixi run autoengineering optimize system.yaml examples/optimization_chain/optimi
   --workdir outputs/optimization-chain --resume
 ```
 
-Add `--format json` to either command for machine-readable output.
+Add `--format json` to either command for JSON output.
 
-## Inspect durable artifacts
+## Inspect the results
 
 ```sh
 pixi run python -m json.tool outputs/optimization-chain/manifest.json
@@ -55,3 +56,11 @@ cmp outputs/repeat-a/recommendation.json outputs/repeat-b/recommendation.json
 ```
 
 The manifests intentionally contain runtime timestamps and are not expected to be byte identical.
+
+## Workflow boundary
+
+The architecture category selects implementations already provided by the evaluator. It does not
+research alternatives or train a replacement model. The example demonstrates a working BO-layer
+contract while the unified model DAG, harness, interactive app, and broader method-selection
+workflow remain in progress. See the [optimization guide](../../docs/optimization.md) and
+[model improvement criteria](../../docs/model-improvement.md).

@@ -2,8 +2,13 @@
 
 Autoengineering Release A supports sequential optimization of a complete feed-forward model
 system. Each proposed configuration runs the whole evaluator once and produces one durable action
-and result record. The optimizer does not yet fit separate component surrogates or choose a
-component to evaluate.
+and result record. This public workflow does not fit separate component surrogates or choose a component to evaluate.
+Separate research backends provide those capabilities with the evidence limits described below.
+
+Autoengineering is a work in progress. Deep research and the replacement loop are described in the
+[workflow guide](workflow.md). The [roadmap](roadmap.md) tracks the common model DAG, harness,
+interactive app, and broader model improvements. BO searches supplied implementations and parameter
+spaces. It does not automatically select or train statistical, ML, or deep surrogate replacements.
 
 The no-network [`optimization_chain`](../examples/optimization_chain/README.md) example is the
 shortest complete workflow. The checked
@@ -67,7 +72,7 @@ Its top-level fields are:
 
 `study.backend` must be `system` in Release A. The policy field is separate: the architecture says
 what is modeled, while the policy says how the next complete-system configuration is selected.
-The function-network backend names are reserved for the later research layer and are rejected by
+The function-network backend names belong to the research layer and are rejected by
 the Release A command.
 
 ### Paths and loading
@@ -156,7 +161,7 @@ limit, insufficient usable observations, missing known errors, fit failures, cla
 warnings, acquisition failures, and invalid candidates all produce recorded diagnostics and a
 deterministic Sobol fallback. A fallback is visible evidence, not a successful BoTorch acquisition.
 
-## Command-line workflow
+## CLI workflow
 
 The command signature is:
 
@@ -290,7 +295,7 @@ The checked gate applies only to Release A whole-system optimization. It does no
 for unobserved systems, forecast settings, safety constraints, component surrogates, or partial
 observability.
 
-## Function-network boundary
+## Function-network representation
 
 The experimental function-network layer now represents local design parameters, coupling inputs
 and outputs, scalar surrogate features, observation availability, evaluation costs, terminal
@@ -360,9 +365,10 @@ one earlier successful system artifact. `LedgerBackedFunctionNetworkEvaluator` r
 parent from the ledger, verifies its digest, and supplies only the component's direct upstream
 ports.
 
-The backend scores affordable actions with a deterministic finite-pool, one-step value-of-
-information approximation. Scores estimate improvement in the terminal decision per conservative
-evaluator cost. The policy records its fantasy seeds, Monte Carlo error, cost estimates, candidate
+The current backend scores affordable actions with a bounded, one-step information-value
+approximation. System and component actions use the same terminal utility horizon, divided by
+conservative evaluator cost. This common utility is an experimental correction to the original
+Item 9 policy. The policy records its fantasy seeds, Monte Carlo error, cost estimates, candidate
 class, and fallback state. It limits consecutive component actions and schedules complete-system
 refreshes. Only a feasible observed system result can be the final recommendation.
 
@@ -371,7 +377,7 @@ and independent scalar Gaussian processes. It does not infer missing upstream ar
 means. Component rows train only the outputs they observe and never become terminal objective or
 constraint observations. The public `optimize` command does not expose this experimental backend.
 
-The checked evidence command reconstructs the published artifacts and exits nonzero because the
+The checked evidence command reconstructs the checked artifacts and exits nonzero because the
 frozen gate failed:
 
 ```sh
@@ -384,6 +390,12 @@ exhaustion stop, and the policy missed the required random-control improvement b
 informative chain. The [partial-network report](../benchmarks/partial_network/results/report.md)
 and [review](reviews/09-partial-observability-function-network-bo-review.md) retain the full adverse
 result. The backend remains experimental, and Item 10 has not started.
+
+The later [common utility development experiment](../benchmarks/partial_network/common-utility/development/report.md)
+passed 11 of 12 criteria but still failed the random component comparison. Its
+[experiment record](../autoresearch-common-utility.md) retains the adverse result, forbids a
+replacement matrix after that failure, and ends Item 9 algorithmic remediation. Item 10 remains
+blocked. This later evidence is distinct from the original gate reconstructed by the command above.
 
 The Release A command still accepts only whole-system optimization. Do not describe a
 `SystemBayesBackend` run as function-network optimization, component Bayesian optimization,

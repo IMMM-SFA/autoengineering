@@ -1,44 +1,28 @@
 ---
 name: multi-hop-lit-search
-description: Find research literature by following citation chains — fetch a paper, extract its references, fetch the most relevant of those, and repeat for a few hops. Use for academic/research queries where a single search misses connected work. Adapted from alphaXiv openresearch-cli's multi-hop literature search.
+description: Find relevant research by following references and citing papers within a bounded search.
 ---
 
-# Multi-Hop Literature Search
+# Search citation chains
 
-A single search returns a shallow slice. Multi-hop search follows the citation
-graph to reach the connected literature a keyword query misses. Adapted from
-openresearch-cli's literature search (see the repo `NOTICE`).
+Use citation links to extend a focused literature search when the initial results leave an
+important question unresolved. This skill adapts alphaXiv's openresearch-cli. See `NOTICE`.
+Use only search and source-reading tools available in the current session.
 
-Use this before a generic web search for academic or research questions. It is
-usually invoked by `deep-research-candidates`, but works standalone.
+1. Form two or three queries covering the method, the observed failure, and relevant comparisons.
+   Record seed sources with title, authors, year, and DOI or stable URL.
+2. Read relevant sources and follow their references or citing papers. Prioritize material that
+   changes the candidate assessment. Bound the search to two or three hops unless the user has
+   authorized a larger investigation.
+3. Stop when no new relevant evidence appears or the source budget is spent. Repeated citations
+   show overlap in the search, not necessarily independent agreement.
+4. Deduplicate by DOI or title. Record source access, relevance, discovery path, supported claims,
+   conflicting findings, and unresolved questions.
 
-## Tool discipline
+Prefer primary methods, data, and implementation sources for candidate claims. Read abstracts,
+HTML, or PDFs with the available tools. If only an abstract is accessible, state that limit.
+Do not present an unread paper as verified support.
 
-Use only visible tools. Prefer feynman's `alpha_search` / `fetch_content` when
-present (alphaXiv full-text, no login); otherwise `WebSearch` / `WebFetch`. Prefer
-metadata, abstracts, and HTML over PDF parsing; if only a PDF exists, cite its URL
-and mark full-text parsing as blocked rather than fetching it. Provider-agnostic.
-
-## Procedure
-
-1. **Seed (hop 0).** Turn the question into 2–3 distinct queries covering the method,
-   its known weakness, and comparisons/reviews. Search; collect the most relevant
-   seed papers with title, authors, year, venue, and a stable URL/DOI.
-
-2. **Expand (hops 1–2).** For each strong seed, fetch it and extract its reference
-   list and (where available) papers that cite it. Rank the new papers by relevance
-   to the question and recency; fetch the top few. Repeat for at most 2–3 hops total.
-
-3. **Stop.** Stop when a hop surfaces no new relevant work, when the same key papers
-   recur across branches (a consensus signal), or at the hop budget. Do not chase the
-   whole graph.
-
-4. **Deduplicate and record.** Merge by DOI/title. Write a source list with, for each
-   entry: citation, URL/DOI, one-line relevance, and the hop it was found at. Note
-   consensus vs. disagreement across sources.
-
-## Output
-
-A deduplicated, cited source list ready to drop into a research brief's References
-and into a candidate's `sources:` field. Flag any source whose URL could not be
-verified as needing follow-up rather than dropping it silently.
+For model improvement research, look for data requirements, evaluation design, compute, and
+reported failures alongside performance. Deliver a cited source list that the research brief and
+candidate rationale can use. Keep inaccessible or uncertain sources visible as unresolved.
