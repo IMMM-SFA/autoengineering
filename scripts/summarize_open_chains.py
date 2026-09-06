@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -11,6 +12,26 @@ from examples.open_chains.common import digest
 
 REPO = Path(__file__).resolve().parents[1]
 ROOT = REPO / "examples/open_chains"
+
+
+def verify_release_metadata(name: str, expected: str) -> None:
+    """Allow only a version-field change against an exact archived release input."""
+    current = REPO / name
+    if digest(current) == expected:
+        return
+    patterns = {
+        "pixi.toml": r'(?m)^version = "[^"\n]+"$',
+        "src/autoengineering/__init__.py": r'(?m)^__version__ = "[^"\n]+"$',
+    }
+    assert name in patterns, f"Changed core source: {name}"
+    archived = REPO / "examples/open_chains/history/source-sha256" / f"{expected}.txt"
+    assert archived.is_file() and digest(archived) == expected, f"Invalid release snapshot: {name}"
+    pattern = patterns[name]
+    old, new = archived.read_text(), current.read_text()
+    assert len(re.findall(pattern, old)) == len(re.findall(pattern, new)) == 1
+    assert re.sub(pattern, "VERSION_FIELD", old) == re.sub(pattern, "VERSION_FIELD", new), (
+        f"Changed non-version content: {name}"
+    )
 
 
 def verify(domain: str) -> tuple[dict, list, dict]:
@@ -23,9 +44,9 @@ def verify(domain: str) -> tuple[dict, list, dict]:
     for name, expected in manifest["source_sha256"].items():
         assert digest(ROOT / name) == expected, f"Changed adapter: {name}"
     for name, expected in manifest["core_source_sha256"].items():
-        assert digest(REPO / name) == expected, f"Changed core source: {name}"
+        verify_release_metadata(name, expected)
     assert digest(REPO / "pixi.lock") == manifest["pixi_lock_sha256"]
-    assert digest(REPO / "pixi.toml") == manifest["pixi_manifest_sha256"]
+    verify_release_metadata("pixi.toml", manifest["pixi_manifest_sha256"])
     assert not manifest["context"]["smoke"]
     trials = json.loads((directory / "trials.json").read_text())
     candidates = json.loads((ROOT / domain / "candidates.json").read_text())

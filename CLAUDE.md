@@ -33,8 +33,8 @@ pixi run python examples/signal_chain/run_workflow.py
 ```
 
 The [example index](examples/README.md) lists checked examples, requirements, and outputs.
-Additional examples are being developed separately. Do not describe them as available until they
-are integrated.
+The local model benchmarks and three open model chains are integrated, with recorded validation
+limits and a standalone figure report.
 
 ## Implementation rules
 
@@ -47,7 +47,7 @@ are integrated.
   the replacement loop are not hard acceptance constraints.
 - Read [optimization.md](docs/optimization.md) before changing configuration, budgets, ledgers, or
   recovery. Preserve immutable run identity and explicit failure and fallback states.
-- Distinguish whole-system BO, full-observability function-network BO, and experimental partial
+- Treat all BO backends as experimental. Distinguish whole-system BO, full-observability function-network BO, and partial
   observability. Read [BO status](docs/bayesian-optimization-status.md) before making evidence claims.
 - Keep frozen protocols, decisions, raw evidence, failed runs, and provenance conflicts intact.
   Documentation changes do not authorize another research run or a relaxed gate.

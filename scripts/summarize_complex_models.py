@@ -11,6 +11,7 @@ from statistics import median, mean
 
 from examples.complex_models.models import DOMAINS, ROOT
 from examples.complex_models.run import CHECKPOINTS, METHODS
+from scripts.summarize_open_chains import verify_release_metadata
 
 RESULTS = ROOT / "results"
 REPO = ROOT.parents[1]
@@ -37,6 +38,9 @@ def verify(directory: Path) -> tuple[list, int]:
     for name, digest in manifest["inputs"].items():
         path = REPO / name
         if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            if name in {"src/autoengineering/__init__.py", "pixi.toml"}:
+                verify_release_metadata(name, digest)
+                continue
             snapshot = directory / "source" / name
             if snapshot.exists() and hashlib.sha256(snapshot.read_bytes()).hexdigest() == digest:
                 path = snapshot

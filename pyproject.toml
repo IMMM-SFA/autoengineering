@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autoengineering"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI-assisted systems engineering for complex model chains"
 license = "BSD-3-Clause"
 requires-python = ">=3.12,<3.13"

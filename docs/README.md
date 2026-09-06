@@ -19,8 +19,8 @@ working interfaces from research results and planned features.
 
 The current documentation includes the guides above, example READMEs, `CLAUDE.md`, the project
 agent, and the three project research skills under `.claude/skills/`. Their prose and capability
-claims are maintained together. Example implementations being developed in another session are
-outside this documentation change.
+claims are maintained together. The local model benchmarks, open model chains and [figure report](../reports/model-search-results/report.html)
+are integrated in version 0.2.0. All BO backends remain experimental.
 
 The following files are historical or executable research records. Their original text is
 preserved so that protocols, decisions, and claims remain traceable:

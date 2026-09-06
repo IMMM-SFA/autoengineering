@@ -53,6 +53,11 @@ and reverted candidates, and report when no candidate helps.
 
 ## Optimization and evidence
 
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
 Read `docs/optimization.md` before configuring a study. The public `optimize` command runs only
 whole-system policies: random, Sobol, and optional BoTorch. Preserve its strict paths, input hashes,
 noise assumptions, budgets, ledger, and compatible resume behavior.
@@ -64,8 +69,7 @@ after failed gates, including the common terminal utility experiment. Read
 
 A BO surrogate guides configuration search. It is not evidence that the package can automatically
 train a replacement deep learning model. A unified model DAG, harness interface, interactive web
-app, and automatic method assessment remain planned. Additional examples are being developed
-separately.
+app, and automatic method assessment remain planned. The example index includes the local model benchmarks and three open model chains.
 
 Apply the pilot heuristic in `docs/optimization.md#choosing-a-search-method` before
 long parameter searches. Use a small affordable Sobol pilot (typically 32 calls,

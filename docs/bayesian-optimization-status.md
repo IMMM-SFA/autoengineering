@@ -1,6 +1,11 @@
 # Bayesian optimization status
 
-_Status reviewed against revision `16f730e`, 2026-09-05._
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
+_Version 0.2.0 integration status. The research-gate review below covers revision `16f730e`._
 
 Whole-system BO is implemented and has passing Release A evidence. Full-observability
 function-network BO has a passing research gate. Partial-observability BO remains experimental
@@ -78,3 +83,11 @@ connected across research, execution, training, optimization, and visualization.
 BO surrogates guide search. They do not provide automatic statistical, ML, or deep surrogate model
 replacement. The [model improvement guide](model-improvement.md) proposes how to decide which of
 those methods is worth implementing and testing.
+
+## Local model comparisons
+
+The [2,000-call results](../examples/complex_models/results/RESULTS.md) and
+[figure report](../reports/model-search-results/report.html) show benefits in some cases,
+including HYMOD validation target attainment, but no consistent advantage in test prediction
+or total runtime. BO remains an experimental option alongside random and Sobol search.
+Broader testing and the pilot selection research in the [roadmap](roadmap.md) remain open.

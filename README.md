@@ -1,5 +1,10 @@
 # Autoengineering
 
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
 Autoengineering is a work in progress for improving systems of connected models. It combines
 component validation, deep research into alternatives, bounded replacement experiments, and
 Bayesian optimization (BO). The aim is to improve the system's measured performance while keeping
@@ -36,7 +41,7 @@ pixi run python examples/leaf_river/run_auto_research.py
 ```
 
 The signal example uses synthetic data. Leaf River uses checked observation files. The
-[example index](examples/README.md) describes all six examples in this revision.
+[example index](examples/README.md) describes the available examples and their requirements.
 
 Start and resume the offline optimization example:
 
@@ -86,7 +91,7 @@ choosing a method, including a decision to collect data or retain the baseline.
 - An eye-catching dynamic web app with an interactive DAG, experiment controls, progress, linked
   result views, and access to the evidence. The harness may be presented inside the app.
 - More examples and visualizations, including adverse results and comparisons at equal budgets.
-  Additional examples are being developed separately.
+  The current examples include local model benchmarks and three open model chains.
 - A range of model improvements: alternative parameterizations, simple statistical models, basic
   machine learning, and full surrogate deep learning models.
 - Tested criteria that weigh data availability, computational complexity, and potential improvement
@@ -125,6 +130,9 @@ pixi run -e bayes benchmark-full-network
 
 The [documentation index](docs/README.md) separates current guides from frozen research protocols
 and evidence. Development and review of the BO branch used OpenAI Codex with GPT-5.
+
+The [figure report](reports/model-search-results/report.html) shows target attainment, test
+prediction, computational cost, and component swaps. See [release notes](CHANGELOG.md).
 
 ## Open model chains
 

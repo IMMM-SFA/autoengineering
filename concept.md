@@ -1,5 +1,10 @@
 # Autoengineering concept
 
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
 Autoengineering asks which change to a connected model system is worth testing next. A useful
 change might improve accuracy, reduce runtime, satisfy a scientific constraint, or make an
 experiment easier to reproduce. The objective and acceptable tradeoffs must be stated before the

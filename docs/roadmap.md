@@ -1,5 +1,10 @@
 # Workflow roadmap
 
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
 Autoengineering is a work in progress. The package can describe systems, evaluate supplied models,
 test replacements, and optimize declared configurations. The next work is to connect those pieces
 and test a broader range of model improvements. This roadmap defines intended outcomes, not a
@@ -83,8 +88,14 @@ must agree. The web app is planned and is not shipped in this revision.
 
 ## 5. Expand examples and visualizations
 
-Additional examples are being developed in another session. Integrate them after their code, data,
-and evidence are available. The [current index](../examples/README.md) lists only checked examples.
+The local model benchmarks and three open model chains are integrated. The
+[current index](../examples/README.md) links their data, evidence and validation limits.
+Broader testing is still needed.
+
+- [ ] further explore a pilot-based selection rule
+
+The [working heuristic](optimization.md#choosing-a-search-method) is provisional. Compare
+its decisions against measured outcomes across more problems and evaluation costs.
 
 Coverage should include different graph shapes, real and synthetic data, parameterization swaps,
 statistical and ML replacements, a deep surrogate, missing observations, and an adverse result.

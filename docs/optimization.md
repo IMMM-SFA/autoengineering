@@ -1,5 +1,10 @@
 # Whole-system optimization
 
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
 Autoengineering Release A supports sequential optimization of a complete feed-forward model
 system. Each proposed configuration runs the whole evaluator once and produces one durable action
 and result record. This public workflow does not fit separate component surrogates or choose a component to evaluate.

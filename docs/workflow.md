@@ -1,5 +1,10 @@
 # Workflow and architecture
 
+Bayesian optimization is experimental across all backends. It helps in some cases, but
+the examples do not show consistent gains across problems, test prediction, and total runtime.
+More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
+change this experimental status.
+
 Autoengineering has working research, replacement, and optimization paths. A common orchestration
 layer is still missing. This guide describes the current interfaces and where a user or agent must
 connect them.
