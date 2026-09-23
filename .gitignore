@@ -238,3 +238,6 @@ autoresearch.jsonl
 # Preserve benchmark evidence despite the generic build target exclusion.
 !examples/complex_models/results/target/
 !examples/complex_models/results/target/**
+
+# Downloaded reference PDFs (not for the repo)
+background_research/pdfs/
