@@ -1,0 +1,20 @@
+[
+  {
+    "id": "topfarm_5",
+    "component": "layout",
+    "params": {
+      "method": "topfarm",
+      "maxiter": 5
+    },
+    "rationale": "Short constrained SLSQP layout search"
+  },
+  {
+    "id": "topfarm_20",
+    "component": "layout",
+    "params": {
+      "method": "topfarm",
+      "maxiter": 20
+    },
+    "rationale": "Longer constrained SLSQP layout search"
+  }
+]

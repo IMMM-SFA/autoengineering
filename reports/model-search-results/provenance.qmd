@@ -1,0 +1,12 @@
+The cap was reduced retrospectively during the original extended run.
+53 studies are exact prefixes ending at their first target hit or the new cap;
+34,595 later observations remain archived and are excluded from the analysis.
+The other 22 studies ran with the reduced cap. Timings of projected runs
+end at the retained call. The target values, seeds and data splits were unchanged.
+
+The numeric audit recalculated all 24,972 retained target objectives and
+all 75 final recommendations. The source report also verifies historical prefixes,
+fixed checkpoints and component artifacts. This report cross-checks 88 Markdown
+rows against the underlying records and freezes the input and figure hashes in
+`provenance.json`. Numeric plot data are exported as CSV, Plotly specifications as
+JSON, and print fallbacks as SVG.

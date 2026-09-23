@@ -1,0 +1,14 @@
+<script src="assets/plotly.min.js"></script>
+<style>
+.figure-block { margin: 1.2rem 0 0.4rem; break-inside: avoid; }
+.plot-control { display: block; margin: 0 0 0.8rem; font-size: 0.95rem; }
+.plot-control select { margin-left: 0.5rem; padding: 0.35rem; max-width: 90%; background: var(--bs-body-bg); color: var(--bs-body-color); border: 1px solid #888; border-radius: 4px; }
+.interactive-plot { width: 100%; }
+.print-fallback { display: none; width: 100%; }
+.figure-block + p { font-size: 0.92rem; line-height: 1.55; }
+@media print {
+  .interactive-plot, .plot-control { display: none !important; }
+  .print-fallback:not([hidden]) { display: block; max-height: 9in; object-fit: contain; }
+  .print-fallback[hidden] { display: none !important; }
+}
+</style>

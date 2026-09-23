@@ -1,0 +1,1 @@
+{"backend":"sobol","ledger_sha256":"4645119e9e83cdf7235d47e8502a6caead490d9d7ab51f7c9e4c1de49a5bbc67","run_identity_sha256":"552c6b0c86904b9b6e96d4220dffc64803ef6744a21fcddf57e30486677148b1","schema_version":"2.0","state":{"finite_enumeration_limit":100000,"name":"sobol","retry_limit":1024,"scan_retries_per_candidate":64,"sequence_state":"derived_from_ledger","study_seed":0}}

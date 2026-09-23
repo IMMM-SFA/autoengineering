@@ -1,0 +1,1 @@
+{"action_id":"eval-000001","config":{"heat_loss":34.52785481501774,"loss":0.6654094770136539,"temperature":"ambient"},"feasible":true,"message":"best feasible observed configuration","outcomes":{"rmse":175.534471092378}}

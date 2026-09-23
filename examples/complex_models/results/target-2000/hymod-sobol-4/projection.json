@@ -1,0 +1,11 @@
+{
+  "controller_state": "not copied; this is a reporting projection, not a resumable study",
+  "discarded_from_analysis": 8000,
+  "kind": "retrospective_prefix",
+  "retained_observations": 2000,
+  "source_directory": "hymod-sobol-4",
+  "source_ledger_sha256": "aeda835ac5d7e3e8cd599b89df33b633c0d15fce7226d848e6bbec1c18278992",
+  "source_observations": 10000,
+  "source_trajectory_sha256": "5ef2d7ba1207fe9c6f898ce5acd99afbb7e3222d6db25e3f1950dd7565978109",
+  "timing": "cumulative trajectory timer at retained final call"
+}

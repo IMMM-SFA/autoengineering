@@ -1,0 +1,36 @@
+[
+  {
+    "component": "inverter",
+    "score": 1.0,
+    "failing_metrics": [
+      "rmse"
+    ],
+    "results": [
+      {
+        "component": "inverter",
+        "metric": "rmse",
+        "value": 2.697657,
+        "threshold": 1.0,
+        "status": "fail",
+        "interpretation": ""
+      }
+    ],
+    "summary": "1 failing metric(s): rmse=2.698"
+  },
+  {
+    "component": "temperature",
+    "score": 0.0,
+    "failing_metrics": [],
+    "results": [
+      {
+        "component": "temperature",
+        "metric": "rmse",
+        "value": 0.656306,
+        "threshold": 1.0,
+        "status": "pass",
+        "interpretation": ""
+      }
+    ],
+    "summary": "All metrics passing"
+  }
+]

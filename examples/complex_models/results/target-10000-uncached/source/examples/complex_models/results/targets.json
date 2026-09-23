@@ -1,0 +1,31 @@
+{
+  "new_model_factor": 1.05,
+  "source_sha256": {
+    "examples/complex_models/results/fixed/hymod-bo-0/observations.jsonl": "a3c12c5201d89b59e2b3dcf1ec574bac26142072fea96699de7d022eaa874333",
+    "examples/complex_models/results/fixed/hymod-bo-1/observations.jsonl": "20a9f3c6bf9a0fa66c4ce545a3cec32b7c6b73d40c704024ed0ce7a6b5d276cc",
+    "examples/complex_models/results/fixed/hymod-bo-2/observations.jsonl": "2f17076b466faba9300742dae743916acb4a51dbbd077d92b70c057cebc7d692",
+    "examples/complex_models/results/fixed/hymod-random-0/observations.jsonl": "21e8f09d9e36199ad7a254d37bcbb0e8bdb04942ad9ef7d44d3e8dd2fdf9e4f3",
+    "examples/complex_models/results/fixed/hymod-random-1/observations.jsonl": "54e81613458ed74a3530269f04bc4adb34d08e551564dd5d90608ce1223e901b",
+    "examples/complex_models/results/fixed/hymod-random-2/observations.jsonl": "aa1d58341d9d9ae2dd0327ede3d6f6677a48c7761209dc727153fa3b2a7ee368",
+    "examples/complex_models/results/fixed/hymod-sobol-0/observations.jsonl": "57f9a229c9fb39cdc1abd20c9821bf624cbc23e2d0acb65ac9ea4d85865c7311",
+    "examples/complex_models/results/fixed/hymod-sobol-1/observations.jsonl": "a6ad2a6f16e57944cc48b2ac5f5e8c4ee1919e6509e6bd6ae6af60cb3e43293b",
+    "examples/complex_models/results/fixed/hymod-sobol-2/observations.jsonl": "f9e8d51a588e15cfda969e3f6dc8e999579d7598675bbc2d5d9283c08ec60ea8",
+    "examples/complex_models/results/fixed/solar_diode-bo-0/observations.jsonl": "fb403f9d6e11235f1d340a1528621a4b23ad527ee49f03ade09013351d4cb206",
+    "examples/complex_models/results/fixed/solar_diode-bo-1/observations.jsonl": "98d9b642e046354bc3f490e7e7d302fbab2753a2d2e81c9b5767ddfc7cb8af81",
+    "examples/complex_models/results/fixed/solar_diode-bo-2/observations.jsonl": "e0fedb4771f1f065e4924f5eac0e5d57a96fc221ea4d4a1a03bb8e9028054cd0",
+    "examples/complex_models/results/fixed/solar_diode-random-0/observations.jsonl": "b32ecf20f9a4d5e615e0352eb7b21ad7ccb3d4fd4176d55e56f09d90520f6d71",
+    "examples/complex_models/results/fixed/solar_diode-random-1/observations.jsonl": "c7b61b4c0a1124d8330c90685540af1d404b02f31b4e20a0a3be1dbfe06ae8a2",
+    "examples/complex_models/results/fixed/solar_diode-random-2/observations.jsonl": "736343821c2172bfd61a3f40aa5776ca71756f535c40aeecca6fac17c6c6102b",
+    "examples/complex_models/results/fixed/solar_diode-sobol-0/observations.jsonl": "87be86ee3d025223d29c4635ae23f7105f51c545f6faf8e36dd9e92b441664dc",
+    "examples/complex_models/results/fixed/solar_diode-sobol-1/observations.jsonl": "7ef5d6f55a7af9dd862d634379adbb6c043c39147d737b2344eb301bcbfd9dd1",
+    "examples/complex_models/results/fixed/solar_diode-sobol-2/observations.jsonl": "39e97c5cdd2d8eaf77c0e32008ca291bfca17641f6013deb19b56a11f04accb6",
+    "examples/local_models/convergence-targets.json": "e0d4c714b60ebeebbedb2be5b7d15713672702a14a2b6614d1e45eb6dd743a8f"
+  },
+  "targets": {
+    "copper": 0.2057744777270775,
+    "hydro": 2.169295332362961,
+    "hymod": 1.1382771629499375,
+    "solar": 183.83143789933789,
+    "solar_diode": 182.10662824491178
+  }
+}

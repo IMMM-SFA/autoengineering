@@ -1,0 +1,14 @@
+{
+  "metrics": {
+    "constraint_brier": null,
+    "coverage_90": null,
+    "expected_records": 320,
+    "finite_moments": true,
+    "issue_count": 0,
+    "observed_records": 0,
+    "reported_issues": [],
+    "unique_records": 0
+  },
+  "records": [],
+  "schema_version": "1.0"
+}

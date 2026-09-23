@@ -1,0 +1,20 @@
+{
+  "evaluations": 12,
+  "recommendation": {
+    "action_id": "eval-000009",
+    "config": {
+      "alpha": 0.2830780669214674,
+      "beta": 3.0,
+      "cmax": 1000.0,
+      "kfast": 0.41509321543259914,
+      "kslow": 0.001,
+      "pet": "hamon",
+      "pet_scale": 0.8378337596255631
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 1.5051764450337688
+    }
+  }
+}

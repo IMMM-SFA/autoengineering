@@ -1,0 +1,12 @@
+{
+  "config": {
+    "a_scale": 1.0,
+    "heat_loss": 25.0,
+    "io_scale": 1.0,
+    "irradiance_scale": 1.0,
+    "loss": 0.85,
+    "rs_scale": 1.0,
+    "rsh_scale": 1.0
+  },
+  "selected": "simpler_swap"
+}

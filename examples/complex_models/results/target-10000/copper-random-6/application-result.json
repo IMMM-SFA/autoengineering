@@ -1,0 +1,95 @@
+{
+  "cap": 10000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.21384853962808847,
+  "diagnostics": {
+    "backend": "random",
+    "details": {
+      "ledger_entries": 7,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 7
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "copper",
+  "evaluations": 7,
+  "method": "random",
+  "model_seconds": 0.03941112710162997,
+  "recommendation": {
+    "action_id": "eval-000006",
+    "config": {
+      "model": "rational3",
+      "ridge": 3.9455864640038066e-06
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19971166313321398
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.25325966672971845,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0010795012996600527,
+    "rmse": 0.25271248219476034
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.49188250620207885,
+      "evaluations": 1,
+      "model_seconds": 0.007725375238806009,
+      "study_seconds": 0.06259979167953134,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.49188250620207885,
+      "evaluations": 2,
+      "model_seconds": 0.01162720937281847,
+      "study_seconds": 0.092763208784163,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 3,
+      "model_seconds": 0.019126167055219412,
+      "study_seconds": 0.1275072917342186,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 4,
+      "model_seconds": 0.022944001015275717,
+      "study_seconds": 0.15767449978739023,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 5,
+      "model_seconds": 0.026803834829479456,
+      "study_seconds": 0.187392208725214,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.36861882735692186,
+      "evaluations": 6,
+      "model_seconds": 0.03282925207167864,
+      "study_seconds": 0.220467624720186,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.19971166313321398,
+      "evaluations": 7,
+      "model_seconds": 0.03941112710162997,
+      "study_seconds": 0.25312979193404317,
+      "target_reached": true
+    }
+  ]
+}

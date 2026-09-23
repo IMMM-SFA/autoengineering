@@ -1,0 +1,86 @@
+system:
+  name: hydro
+  description: Real models coupled through BMI. See PROTOCOL.md.
+  components:
+  - name: pet
+    model_type: PetBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: air_temperature
+      direction: in
+      data_type: float64
+      units: degC
+    - name: maximum_temperature
+      direction: in
+      data_type: float64
+      units: degC
+    - name: minimum_temperature
+      direction: in
+      data_type: float64
+      units: degC
+    - name: day_of_year
+      direction: in
+      data_type: float64
+      units: '1'
+    outputs:
+    - name: potential_evaporation
+      direction: out
+      data_type: float64
+      units: mm d-1
+    metadata:
+      bmi_class: examples.local_models.bmi_components:PetBmi
+  - name: soil_bucket
+    model_type: SoilBucketBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: precipitation
+      direction: in
+      data_type: float64
+      units: mm d-1
+    - name: potential_evaporation
+      direction: in
+      data_type: float64
+      units: mm d-1
+    outputs:
+    - name: actual_evaporation
+      direction: out
+      data_type: float64
+      units: mm d-1
+    - name: excess_water
+      direction: out
+      data_type: float64
+      units: mm d-1
+    - name: soil_storage
+      direction: out
+      data_type: float64
+      units: mm
+    metadata:
+      bmi_class: examples.local_models.bmi_components:SoilBucketBmi
+  - name: routing
+    model_type: LinearReservoirBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: excess_water
+      direction: in
+      data_type: float64
+      units: mm d-1
+    outputs:
+    - name: flow
+      direction: out
+      data_type: float64
+      units: mm d-1
+    - name: reservoir_storage
+      direction: out
+      data_type: float64
+      units: mm
+    metadata:
+      bmi_class: examples.local_models.bmi_components:LinearReservoirBmi
+  connections:
+  - source: pet
+    port_from: potential_evaporation
+    target: soil_bucket
+    port_to: potential_evaporation
+  - source: soil_bucket
+    port_from: excess_water
+    target: routing
+    port_to: excess_water

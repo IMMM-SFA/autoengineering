@@ -1,0 +1,76 @@
+{
+  "cap": 60,
+  "controller_and_optimizer_seconds": 0.5427879574708641,
+  "domain": "hydro",
+  "evaluations": 6,
+  "method": "bo",
+  "model_seconds": 0.15204279264435172,
+  "recommendation": {
+    "action_id": "eval-000005",
+    "config": {
+      "capacity": 200.0,
+      "pet": "hargreaves",
+      "recession": 0.95
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 2.0659955546313915
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.6948307501152158,
+  "target": 2.169295332362961,
+  "target_reached": true,
+  "test": {
+    "bias": -0.20907361719947917,
+    "max_balance_error": 7.815970093361102e-14,
+    "nse": 0.39867949900159483,
+    "rmse": 2.8839228598885933
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 3.0848915556084493,
+      "evaluations": 1,
+      "model_seconds": 0.025363916996866465,
+      "study_seconds": 0.14329312508925796,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 3.0848915556084493,
+      "evaluations": 2,
+      "model_seconds": 0.050721876323223114,
+      "study_seconds": 0.2269250419922173,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 3.0848915556084493,
+      "evaluations": 3,
+      "model_seconds": 0.07357737654820085,
+      "study_seconds": 0.3085505422204733,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 3.0848915556084493,
+      "evaluations": 4,
+      "model_seconds": 0.10324220918118954,
+      "study_seconds": 0.4117492502555251,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 2.925197618632728,
+      "evaluations": 5,
+      "model_seconds": 0.12819837545976043,
+      "study_seconds": 0.5475338753312826,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 2.0659955546313915,
+      "evaluations": 6,
+      "model_seconds": 0.15204279264435172,
+      "study_seconds": 0.6946138748899102,
+      "target_reached": true
+    }
+  ]
+}

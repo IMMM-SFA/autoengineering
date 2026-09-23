@@ -1,0 +1,42 @@
+{
+  "factor": 1.05,
+  "historical_best_validation_rmse": {
+    "copper": 0.19597569307340712,
+    "hydro": 2.0659955546313915,
+    "solar": 175.0775599041313
+  },
+  "source_ledger_sha256": {
+    "examples/local_models/results/bmi-development/copper-bo-0/observations.jsonl": "c2b98a5f0027151f1ec568151731ea6d30bf0015f05e2ce383c27ef07c3710a8",
+    "examples/local_models/results/bmi-development/copper-bo-1/observations.jsonl": "6be69f9464cb023fb24b78f46408e721c03f0f6b39686c2b085ea502c27bf601",
+    "examples/local_models/results/bmi-development/copper-bo-2/observations.jsonl": "dfdddd50bc7c83fb7a39b4c236f3879f616258e5effff5c76fb298858df33ca2",
+    "examples/local_models/results/bmi-development/copper-random-0/observations.jsonl": "ed0a4d7624b64a0c864baf734dfc97e7ac6909f596d478c6bd851034ed2d83b1",
+    "examples/local_models/results/bmi-development/copper-random-1/observations.jsonl": "b04e32e8e09979b27bf9f20c854ae6535ec585a112eb8d96cf4f72f88440ab98",
+    "examples/local_models/results/bmi-development/copper-random-2/observations.jsonl": "12bd1252040c57e430c78d72ebcb2c8d4238503eb15ed1696df54587adf38735",
+    "examples/local_models/results/bmi-development/copper-sobol-0/observations.jsonl": "4645119e9e83cdf7235d47e8502a6caead490d9d7ab51f7c9e4c1de49a5bbc67",
+    "examples/local_models/results/bmi-development/copper-sobol-1/observations.jsonl": "ceb0375411737cb3ea3ef0b8474e28c721e7163669a6a1da74b8848fd746a1e0",
+    "examples/local_models/results/bmi-development/copper-sobol-2/observations.jsonl": "a02f0576bf377bddd37621aff35cb0a62b564a4176dce4c50c8ad8e046c2cd93",
+    "examples/local_models/results/bmi-development/hydro-bo-0/observations.jsonl": "ad10e698dd0def8252af6d91891d1989b899d700040d3b325d542f15478bf0d5",
+    "examples/local_models/results/bmi-development/hydro-bo-1/observations.jsonl": "5e42e616fb5fd4d2df7b346434add34bbf4e4cef4bf14a5118d0d9aa88909cb9",
+    "examples/local_models/results/bmi-development/hydro-bo-2/observations.jsonl": "e87ca8463b5cb32ac64db05e394871bcbbf533e707a3d51ad77019ace45c8e3e",
+    "examples/local_models/results/bmi-development/hydro-random-0/observations.jsonl": "956e92fff64ffe523fee5c130901df44692adc9bf99865c0e04f7254baa96c3c",
+    "examples/local_models/results/bmi-development/hydro-random-1/observations.jsonl": "6e921c6a04afee3c691aa59570842045ea1285b1bcbff7e12c70d6044f48f947",
+    "examples/local_models/results/bmi-development/hydro-random-2/observations.jsonl": "12e88893ec28b1d0d4cba67ecbb0cee0270af8f0a97732513a23623ce68b10e6",
+    "examples/local_models/results/bmi-development/hydro-sobol-0/observations.jsonl": "dda151e113d8ba2ed0f9e0b6e760304f5dc43cb5c96afa0afbf772bfe5a15214",
+    "examples/local_models/results/bmi-development/hydro-sobol-1/observations.jsonl": "f436f0e233d3314359264767eb61a5f03c6bb4a0e08410a34f7b164e5480aac8",
+    "examples/local_models/results/bmi-development/hydro-sobol-2/observations.jsonl": "06e565155476a5f5394bc143bbdbd27792cdd56e41631b510cafc8b6079638af",
+    "examples/local_models/results/bmi-development/solar-bo-0/observations.jsonl": "8394d3d9cfd12de004307b0e7367d75fb961c2374844b92b1adba0ba752f0346",
+    "examples/local_models/results/bmi-development/solar-bo-1/observations.jsonl": "52cb8c44976cef9a24946da7aca61163ace52a473df371618dd0c8e327b63241",
+    "examples/local_models/results/bmi-development/solar-bo-2/observations.jsonl": "fdf1592e86fa9920a4be46d369e16ea3ec45bfc5cbf4a8368371c9769dca526d",
+    "examples/local_models/results/bmi-development/solar-random-0/observations.jsonl": "47a4b560bb0c3946c14c36ebc021861c5b833a077405d201bed9a311075cd7a8",
+    "examples/local_models/results/bmi-development/solar-random-1/observations.jsonl": "b891052fee2a0f2bee5a712838f93be5f1945bdb0455430757377384899faf72",
+    "examples/local_models/results/bmi-development/solar-random-2/observations.jsonl": "033b58e8c475340c8127f40ca6274a1ee4534e30b506a723fbc1d5aa2cffaaaf",
+    "examples/local_models/results/bmi-development/solar-sobol-0/observations.jsonl": "215264af15ea77176fa397688e9fa687cc704e79c32fe0d9191e73184ca480da",
+    "examples/local_models/results/bmi-development/solar-sobol-1/observations.jsonl": "2c16e965d82977ed335cf6659ace4aa76ab7f65dfb742890fd34a007c7300e91",
+    "examples/local_models/results/bmi-development/solar-sobol-2/observations.jsonl": "63700e21064e6b857ad1bb01170ecd5cf1d55d5327b4615c472aa7ca9fc98af5"
+  },
+  "targets": {
+    "copper": 0.2057744777270775,
+    "hydro": 2.169295332362961,
+    "solar": 183.83143789933789
+  }
+}

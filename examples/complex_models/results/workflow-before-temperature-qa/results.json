@@ -1,0 +1,146 @@
+[
+  {
+    "candidates": [
+      {
+        "label": "complex",
+        "ranking": [
+          {
+            "component": "system_output",
+            "failing_metrics": [
+              "rmse"
+            ],
+            "results": [
+              {
+                "component": "system_output",
+                "interpretation": "",
+                "metric": "rmse",
+                "status": "fail",
+                "threshold": 2.098762636542684,
+                "value": 2.145167
+              }
+            ],
+            "score": 1.0,
+            "summary": "1 failing metric(s): rmse=2.145"
+          }
+        ],
+        "test": {
+          "bias": 0.5982929227893883,
+          "max_balance_error": 7.105427357601002e-14,
+          "nse": 0.5698574642817932,
+          "rmse": 2.4391405693413617
+        },
+        "validation": {
+          "bias": 1.186486035244962,
+          "max_balance_error": 6.572520305780927e-14,
+          "nse": -0.044812872845531704,
+          "rmse": 2.145167392030665
+        }
+      },
+      {
+        "label": "simpler_swap",
+        "ranking": [
+          {
+            "component": "system_output",
+            "failing_metrics": [
+              "rmse"
+            ],
+            "results": [
+              {
+                "component": "system_output",
+                "interpretation": "",
+                "metric": "rmse",
+                "status": "fail",
+                "threshold": 2.098762636542684,
+                "value": 3.230686
+              }
+            ],
+            "score": 1.0,
+            "summary": "1 failing metric(s): rmse=3.231"
+          }
+        ],
+        "test": {
+          "bias": 0.5952605458658973,
+          "max_balance_error": 6.394884621840902e-14,
+          "nse": 0.18335211040991084,
+          "rmse": 3.3608416935116208
+        },
+        "validation": {
+          "bias": 1.2232504104498967,
+          "max_balance_error": 6.394884621840902e-14,
+          "nse": -1.3697664547525519,
+          "rmse": 3.2306856537408977
+        }
+      }
+    ],
+    "domain": "hymod",
+    "selected": "complex"
+  },
+  {
+    "candidates": [
+      {
+        "label": "complex",
+        "ranking": [
+          {
+            "component": "system_output",
+            "failing_metrics": [],
+            "results": [
+              {
+                "component": "system_output",
+                "interpretation": "",
+                "metric": "rmse",
+                "status": "pass",
+                "threshold": 380.9490244249827,
+                "value": 258.815273
+              }
+            ],
+            "score": 0.0,
+            "summary": "All metrics passing"
+          }
+        ],
+        "test": {
+          "bias": 186.59241678666217,
+          "rmse": 228.59339138358197,
+          "temperature_rmse": 3259.6653466828952
+        },
+        "validation": {
+          "bias": 195.56292764975973,
+          "rmse": 258.81527297751325,
+          "temperature_rmse": 3263.4370601741352
+        }
+      },
+      {
+        "label": "simpler_swap",
+        "ranking": [
+          {
+            "component": "system_output",
+            "failing_metrics": [],
+            "results": [
+              {
+                "component": "system_output",
+                "interpretation": "",
+                "metric": "rmse",
+                "status": "pass",
+                "threshold": 380.9490244249827,
+                "value": 217.719376
+              }
+            ],
+            "score": 0.0,
+            "summary": "All metrics passing"
+          }
+        ],
+        "test": {
+          "bias": 116.57657415116097,
+          "rmse": 168.44770704322428,
+          "temperature_rmse": 3259.6653466828952
+        },
+        "validation": {
+          "bias": 139.10648877275347,
+          "rmse": 217.71937586375162,
+          "temperature_rmse": 3263.4370601741352
+        }
+      }
+    ],
+    "domain": "solar_diode",
+    "selected": "simpler_swap"
+  }
+]

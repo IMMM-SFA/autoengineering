@@ -1,0 +1,108 @@
+{
+  "candidates": [
+    {
+      "config": {
+        "model": "polynomial",
+        "ridge": 1e-06
+      },
+      "index": 0,
+      "model_seconds": 0.006953000091016293,
+      "ranking": [
+        {
+          "component": "system_output",
+          "failing_metrics": [],
+          "results": [
+            {
+              "component": "system_output",
+              "interpretation": "",
+              "metric": "rmse",
+              "status": "pass",
+              "threshold": 5.793287124166474,
+              "value": 0.992596
+            }
+          ],
+          "score": 0.0,
+          "summary": "All metrics passing"
+        }
+      ],
+      "test": {
+        "bias": 0.03639263434842683,
+        "rmse": 1.0212363243064584
+      },
+      "validation": {
+        "bias": 0.0035932735337453323,
+        "rmse": 0.9925956222187637
+      }
+    },
+    {
+      "config": {
+        "model": "rational2",
+        "ridge": 1e-06
+      },
+      "index": 1,
+      "model_seconds": 0.01457741716876626,
+      "ranking": [
+        {
+          "component": "system_output",
+          "failing_metrics": [],
+          "results": [
+            {
+              "component": "system_output",
+              "interpretation": "",
+              "metric": "rmse",
+              "status": "pass",
+              "threshold": 5.793287124166474,
+              "value": 0.451636
+            }
+          ],
+          "score": 0.0,
+          "summary": "All metrics passing"
+        }
+      ],
+      "test": {
+        "bias": -0.01892660064877648,
+        "rmse": 0.5364749330873405
+      },
+      "validation": {
+        "bias": 0.021138423181888792,
+        "rmse": 0.45163635326732143
+      }
+    },
+    {
+      "config": {
+        "model": "rational3",
+        "ridge": 1e-06
+      },
+      "index": 2,
+      "model_seconds": 0.011685042176395655,
+      "ranking": [
+        {
+          "component": "system_output",
+          "failing_metrics": [],
+          "results": [
+            {
+              "component": "system_output",
+              "interpretation": "",
+              "metric": "rmse",
+              "status": "pass",
+              "threshold": 5.793287124166474,
+              "value": 0.196487
+            }
+          ],
+          "score": 0.0,
+          "summary": "All metrics passing"
+        }
+      ],
+      "test": {
+        "bias": 0.0007311491178254026,
+        "rmse": 0.2491982704088654
+      },
+      "validation": {
+        "bias": 0.008499191229419322,
+        "rmse": 0.19648714682949311
+      }
+    }
+  ],
+  "domain": "copper",
+  "selected_index": 2
+}

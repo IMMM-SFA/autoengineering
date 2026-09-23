@@ -1,0 +1,50 @@
+<script>
+(() => {
+  const figures = [];
+  const toggle = document.querySelector('a.quarto-color-scheme-toggle');
+  if (toggle) toggle.setAttribute('aria-label', 'Toggle light and dark theme');
+  function contrast(value) {
+    const palette = {'#a96c2b':'#e0aa61', '#237f79':'#70c9c0', '#85506e':'#d998bb', '#77766d':'#b0ada3', '#a34f38':'#e79880'};
+    if (typeof value === 'string') return palette[value.toLowerCase()] || value;
+    if (Array.isArray(value)) return value.map(contrast);
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k,v]) => [k,contrast(v)]));
+    return value;
+  }
+  function theme(layout) {
+    const dark = document.body.classList.contains('quarto-dark');
+    const color = dark ? '#e2e2df' : '#333333';
+    layout.font = {...layout.font, color};
+    layout.paper_bgcolor = 'rgba(0,0,0,0)';
+    layout.plot_bgcolor = 'rgba(0,0,0,0)';
+    for (const key of Object.keys(layout)) {
+      if (/^[xy]axis\d*$/.test(key)) {
+        layout[key].gridcolor = dark ? '#4e5355' : '#dddddd';
+        layout[key].color = color;
+      }
+    }
+    return layout;
+  }
+  document.querySelectorAll('.figure-block').forEach(section => {
+    const payload = JSON.parse(section.querySelector('script[type="application/json"]').textContent);
+    const plot = section.querySelector('.interactive-plot');
+    const select = section.querySelector('select');
+    const images = [...section.querySelectorAll('.print-fallback')];
+    let chosen = payload.default;
+    const draw = () => {
+      let specification = structuredClone(payload.variants[chosen]);
+      if (document.body.classList.contains('quarto-dark')) specification = contrast(specification);
+      images.forEach((img,i) => { img.hidden = i !== chosen; });
+      return Plotly.react(plot, specification.data, theme(specification.layout), {
+        responsive: true, displaylogo: false, scrollZoom: false,
+        modeBarButtonsToRemove: ['lasso2d','select2d'],
+        toImageButtonOptions: {format:'svg',filename:section.id}
+      });
+    };
+    if (select) select.addEventListener('change', () => { chosen = Number(select.value); draw(); });
+    figures.push({plot, draw});
+    draw();
+  });
+  new MutationObserver(() => figures.forEach(({draw}) => draw()))
+    .observe(document.body, {attributes:true, attributeFilter:['class']});
+})();
+</script>

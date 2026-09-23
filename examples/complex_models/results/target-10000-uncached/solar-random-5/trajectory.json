@@ -1,0 +1,79 @@
+[
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 1,
+    "model_seconds": 0.010411499999463558,
+    "study_seconds": 0.06360745942220092,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 2,
+    "model_seconds": 0.020369292236864567,
+    "study_seconds": 0.10073912516236305,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 3,
+    "model_seconds": 0.030817626044154167,
+    "study_seconds": 0.13875450007617474,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 218.1574796505553,
+    "evaluations": 4,
+    "model_seconds": 0.04113083425909281,
+    "study_seconds": 0.17638612538576126,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 5,
+    "model_seconds": 0.05147875100374222,
+    "study_seconds": 0.2146344999782741,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 6,
+    "model_seconds": 0.06189287640154362,
+    "study_seconds": 0.2530425423756242,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 7,
+    "model_seconds": 0.07178175123408437,
+    "study_seconds": 0.29098650021478534,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 8,
+    "model_seconds": 0.08169104298576713,
+    "study_seconds": 0.329777667298913,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 9,
+    "model_seconds": 0.09152854280546308,
+    "study_seconds": 0.368691542185843,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 212.0081415519125,
+    "evaluations": 10,
+    "model_seconds": 0.10180412558838725,
+    "study_seconds": 0.4081995841115713,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 176.71562050793068,
+    "evaluations": 11,
+    "model_seconds": 0.11149841779842973,
+    "study_seconds": 0.44657720904797316,
+    "target_reached": true
+  }
+]

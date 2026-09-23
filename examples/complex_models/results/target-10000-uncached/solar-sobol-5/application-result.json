@@ -1,0 +1,76 @@
+{
+  "cap": 10000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.1344391661696136,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 4,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 4
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar",
+  "evaluations": 4,
+  "method": "sobol",
+  "model_seconds": 0.040443750098347664,
+  "recommendation": {
+    "action_id": "eval-000003",
+    "config": {
+      "heat_loss": 40.118017424829304,
+      "loss": 0.6426604761276394,
+      "temperature": "ross"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.71567679731896
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.17488291626796126,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -66.68701674460763,
+    "rmse": 137.80038321983244,
+    "temperature_rmse": 3265.8127220135048
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 212.18076179043393,
+      "evaluations": 1,
+      "model_seconds": 0.01039899978786707,
+      "study_seconds": 0.06324612535536289,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.18076179043393,
+      "evaluations": 2,
+      "model_seconds": 0.020226916763931513,
+      "study_seconds": 0.09963924996554852,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.18076179043393,
+      "evaluations": 3,
+      "model_seconds": 0.03001854196190834,
+      "study_seconds": 0.1370995412580669,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.71567679731896,
+      "evaluations": 4,
+      "model_seconds": 0.040443750098347664,
+      "study_seconds": 0.17478549992665648,
+      "target_reached": true
+    }
+  ]
+}

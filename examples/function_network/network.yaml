@@ -1,0 +1,101 @@
+name: function-network-chain
+components:
+  - component: source
+    entry_point: null
+    parameters: []
+    inputs: []
+    outputs:
+      - name: driver
+        direction: out
+        data_type: timeseries
+        units: unit
+    scalar_outputs:
+      - name: driver_mean
+        port: driver
+        reducer: mean
+        observed_in: [system]
+    expected_cost: 0.0
+    cost_unit: second
+    evaluation_scopes: [system]
+  - component: transform
+    entry_point: models:transform
+    parameters:
+      - type: categorical
+        name: choice
+        categories: [base]
+      - type: continuous
+        name: gain
+        lower: 0.5
+        upper: 2.0
+        scale: linear
+        active_when: {}
+    inputs:
+      - name: driver
+        direction: in
+        data_type: timeseries
+        units: unit
+    outputs:
+      - name: flow
+        direction: out
+        data_type: timeseries
+        units: unit
+    scalar_outputs:
+      - name: flow_mean
+        port: flow
+        reducer: mean
+        observed_in: [system, component]
+    expected_cost: 1.0
+    cost_unit: second
+    evaluation_scopes: [system, component]
+  - component: score
+    entry_point: models:score
+    parameters:
+      - type: categorical
+        name: choice
+        categories: [base]
+      - type: continuous
+        name: offset
+        lower: -2.0
+        upper: 2.0
+        scale: linear
+        active_when: {}
+    inputs:
+      - name: flow
+        direction: in
+        data_type: timeseries
+        units: unit
+    outputs:
+      - name: utility_series
+        direction: out
+        data_type: timeseries
+        units: point
+    scalar_outputs:
+      - name: utility_last
+        port: utility_series
+        reducer: last
+        observed_in: [system, component]
+    expected_cost: 0.5
+    cost_unit: second
+    evaluation_scopes: [system, component]
+couplings:
+  - source_component: source
+    source_port: driver
+    target_component: transform
+    target_port: driver
+  - source_component: transform
+    source_port: flow
+    target_component: score
+    target_port: flow
+objective:
+  outcome: utility
+  component: score
+  scalar_output: utility_last
+  direction: maximize
+constraints:
+  - outcome: minimum_flow
+    component: transform
+    scalar_output: flow_mean
+    operator: ">="
+    threshold: 0.0
+evaluation_scopes: [system, component]
+schema_version: "1.0"

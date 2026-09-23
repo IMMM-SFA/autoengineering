@@ -8,10 +8,16 @@ a temp module so the python runnable path exercises a real import.
 from __future__ import annotations
 
 import textwrap
+import hashlib
+import io
+import os
+import warnings
+import zipfile
 from pathlib import Path
 
 import numpy as np
 import pytest
+import autoengineering.research.runner as runner_module
 
 from autoengineering.research.candidates import (
     Candidate,
@@ -21,9 +27,15 @@ from autoengineering.research.candidates import (
 from autoengineering.research.experiment import ExperimentNode, ExperimentTree
 from autoengineering.research.loop import auto_improve
 from autoengineering.research.runner import (
+    EvaluationContext,
+    InfrastructureFailure,
+    ParentArtifactReference,
+    ScientificInfeasibleError,
     build_feedforward_runner,
+    execute_action,
     run_component,
 )
+from autoengineering.optimization import EvaluationAction, EvaluationStatus
 from autoengineering.system.component import Component
 from autoengineering.system.graph import System
 
@@ -84,6 +96,24 @@ def _system(models_dir: Path) -> System:
     s._graph.add_node("transform", component=poor)
     s.connect("source", "transform", port_from="x", port_to="x")
     return s
+
+
+def _evaluator_context(models_dir: Path) -> EvaluationContext:
+    """Create the independent evaluator fixture used by action tests."""
+    system = _system(models_dir)
+    identity = _transform("tmodels:identity", str(models_dir))
+    return EvaluationContext(
+        system=system,
+        alternatives={"transform": {"identity": identity}},
+        source_arrays={"source.x": np.array([1.0, 2.0, 3.0])},
+        observed={"y": np.array([1.0, 2.0, 3.0])},
+        outcome_functions={
+            "rmse": lambda outputs: float(
+                np.sqrt(np.mean((outputs["transform.y"] - np.array([1.0, 2.0, 3.0])) ** 2))
+            )
+        },
+        cost_unit="cpu_second",
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -181,6 +211,1059 @@ class TestFeedforwardRunner:
 
 
 # --------------------------------------------------------------------------- #
+# Evaluation actions
+# --------------------------------------------------------------------------- #
+
+
+def test_execute_system_action_applies_choice_without_mutating_inputs(models_dir):
+    """Removing action configuration application must return the doubled baseline."""
+    context = _evaluator_context(models_dir)
+    baseline_metadata = context.system.get_component("transform").metadata.copy()
+    alternative_metadata = context.alternatives["transform"]["identity"].metadata.copy()
+    action = EvaluationAction.system(
+        "eval-000001",
+        {"transform.choice": "identity"},
+        seed=1,
+    )
+
+    result = execute_action(action, context)
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes["rmse"] == pytest.approx(0.0)
+    assert result.cost > 0.0
+    assert context.system.get_component("transform").metadata == baseline_metadata
+    assert context.alternatives["transform"]["identity"].metadata == alternative_metadata
+
+
+def test_evaluation_context_snapshots_caller_owned_system_alternatives_and_arrays(models_dir):
+    """Mutating source objects after construction must not change an evaluation."""
+    system = _system(models_dir)
+    identity = _transform("tmodels:identity", str(models_dir))
+    source_arrays = {"source.x": np.array([1.0, 2.0, 3.0])}
+    context = EvaluationContext(
+        system=system,
+        alternatives={"transform": {"identity": identity}},
+        source_arrays=source_arrays,
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["transform.y"][0])},
+        cost_unit="cpu_second",
+    )
+    system.get_component("transform").metadata["runnable"]["entry"] = "tmodels:identity"
+    identity.metadata["runnable"]["entry"] = "tmodels:scale_two"
+    source_arrays["source.x"][0] = 99.0
+
+    result = execute_action(
+        EvaluationAction.system("eval-000011", {"transform.choice": "identity"}), context
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes == {"value": 1.0}
+
+
+def test_execute_action_applies_parameter_to_a_copy(models_dir):
+    """Ignoring a configured parameter must leave the runner output at its default."""
+    context = _evaluator_context(models_dir)
+    alternative = context.alternatives["transform"]["identity"]
+    alternative.metadata["runnable"]["params"] = {"offset": 0.0}
+    action = EvaluationAction.system(
+        "eval-000002",
+        {"transform.choice": "identity", "transform.offset": 2.0},
+    )
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: {
+            "y": inputs["x"] + component.metadata["runnable"]["params"]["offset"]
+        },
+    )
+
+    assert result.outcomes["rmse"] == pytest.approx(2.0)
+    assert alternative.metadata["runnable"]["params"] == {"offset": 0.0}
+
+
+def test_parameter_binding_requires_an_explicit_choice(models_dir):
+    """Applying a parameter to the implicit baseline must be rejected."""
+    system = _system(models_dir)
+    alternative = _transform("tmodels:identity", str(models_dir))
+    alternative.metadata["runnable"]["params"] = {"offset": 0.0}
+    context = EvaluationContext(
+        system=system,
+        alternatives={"transform": {"identity": alternative}},
+        source_arrays={"source.x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["transform.y"][0])},
+        cost_unit="cpu_second",
+    )
+
+    with pytest.raises(ValueError, match="explicit.*choice"):
+        execute_action(EvaluationAction.system("eval-000012", {"transform.offset": 2.0}), context)
+
+
+@pytest.mark.parametrize(
+    "config",
+    (
+        {"transform": "identity"},
+        {"missing.choice": "identity"},
+        {"transform.choice": "missing"},
+        {"transform.unknown": 1.0},
+        {"transform.offset.extra": 1.0},
+    ),
+)
+def test_execute_action_rejects_malformed_or_unknown_bindings(models_dir, config):
+    """Silently ignoring an invalid optimizer binding must be impossible."""
+    with pytest.raises(ValueError):
+        execute_action(
+            EvaluationAction.system("eval-000003", config), _evaluator_context(models_dir)
+        )
+
+
+def test_component_action_rejects_an_unknown_target_before_execution(models_dir):
+    """A missing target must not be converted into an ambiguous model result."""
+    with pytest.raises(ValueError, match="unknown component"):
+        execute_action(
+            EvaluationAction.component("eval-000031", "missing", {}), _evaluator_context(models_dir)
+        )
+
+
+def test_component_action_uses_only_target_component_and_source_inputs(models_dir):
+    """Executing the full graph for a component action must make this call fail."""
+    context = _evaluator_context(models_dir)
+    action = EvaluationAction.component("eval-000004", "transform", {})
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: {
+            "y": inputs["x"]
+            if component.name == "transform"
+            else (_ for _ in ()).throw(AssertionError())
+        },
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes["rmse"] == pytest.approx(0.0)
+
+
+def test_system_action_wires_multiple_components_and_source_arrays(models_dir):
+    """Skipping an edge or an unconnected source input changes the final output."""
+    system = System("three-stage")
+    source = system.add_component("source")
+    source.add_output("x")
+    first = system.add_component(
+        "first", metadata={"runnable": {"inputs": ["x"], "outputs": ["y"]}}
+    )
+    first.add_input("x")
+    first.add_output("y")
+    second = system.add_component(
+        "second", metadata={"runnable": {"inputs": ["y", "offset"], "outputs": ["z"]}}
+    )
+    second.add_input("y")
+    second.add_input("offset")
+    second.add_output("z")
+    system.connect("source", "first", "x", "x")
+    system.connect("first", "second", "y", "y")
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"source.x": np.array([1.0]), "second.offset": np.array([3.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs["second.z"][0])},
+        cost_unit="cpu_second",
+    )
+
+    result = execute_action(
+        EvaluationAction.system("eval-000041", {}),
+        context,
+        runner=lambda component, inputs: (
+            {"y": inputs["x"] + 1.0}
+            if component.name == "first"
+            else {"z": inputs["y"] + inputs["offset"]}
+        ),
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes == {"value": 5.0}
+
+
+def test_replicates_report_mean_standard_error_and_measured_time(models_dir):
+    """Collapsing replicate results to the last run must break both statistics."""
+    values = iter((1.0, 3.0))
+    times = iter((5.0, 7.5))
+    context = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **context.__dict__,
+            "outcome_functions": {"value": lambda outputs: float(outputs["y"][0])},
+        }
+    )
+    action = EvaluationAction.component("eval-000005", "transform", {}, replicates=2)
+
+    result = execute_action(
+        action,
+        context,
+        runner=lambda component, inputs: {"y": np.array([next(values)])},
+        clock=lambda: next(times),
+    )
+
+    assert result.outcomes == {"value": 2.0}
+    assert result.standard_errors == {"value": pytest.approx(1.0)}
+    assert result.evaluator_seconds == pytest.approx(2.5)
+    assert result.cost == pytest.approx(2.5)
+
+
+@pytest.mark.parametrize(
+    ("error", "status"),
+    (
+        (TimeoutError("late"), EvaluationStatus.TIMEOUT),
+        (ImportError("missing"), EvaluationStatus.MODEL_FAILURE),
+        (RuntimeError("model exploded"), EvaluationStatus.MODEL_FAILURE),
+        (OSError("disk unavailable"), EvaluationStatus.MODEL_FAILURE),
+        (ScientificInfeasibleError("outside domain"), EvaluationStatus.SCIENTIFIC_INFEASIBLE),
+    ),
+)
+def test_execute_action_classifies_runner_failures(models_dir, error, status):
+    """Changing a narrow evaluator failure boundary must change this status."""
+    context = _evaluator_context(models_dir)
+    clock_values = iter((0.0, 3.0))
+
+    result = execute_action(
+        EvaluationAction.component("eval-000006", "transform", {}),
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(error),
+        clock=lambda: next(clock_values),
+    )
+
+    assert result.status is status
+    assert result.evaluator_seconds == pytest.approx(3.0)
+    assert result.cost == pytest.approx(3.0)
+
+
+def test_runner_can_explicitly_report_infrastructure_failure(models_dir):
+    """Only a runner's explicit infrastructure signal may produce that status."""
+    clock_values = iter((0.0, 3.0))
+
+    result = execute_action(
+        EvaluationAction.component("eval-000013", "transform", {}),
+        _evaluator_context(models_dir),
+        runner=lambda component, inputs: (_ for _ in ()).throw(InfrastructureFailure("queue down")),
+        clock=lambda: next(clock_values),
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_all_outcomes_run_and_nonfinite_values_are_scientifically_infeasible(models_dir):
+    """Returning after the first invalid outcome must skip the required second check."""
+    called = []
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **base.__dict__,
+            "outcome_functions": {
+                "invalid": lambda outputs: float("nan"),
+                "also_called": lambda outputs: called.append(True) or 1.0,
+            },
+        }
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000007", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SCIENTIFIC_INFEASIBLE
+    assert called == [True]
+
+
+def test_missing_declared_runner_output_is_a_model_failure(models_dir):
+    """Accepting an undeclared output would hide a broken runnable contract."""
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{**base.__dict__, "outcome_functions": {"value": lambda outputs: float(outputs["z"][0])}}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000071", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"z": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.MODEL_FAILURE
+
+
+def test_artifacts_are_hashed_and_identical_replays_reuse_them(models_dir, tmp_path):
+    """Overwriting an existing artifact without comparing bytes must fail this test."""
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(**{**base.__dict__, "artifact_dir": tmp_path / "artifacts"})
+    action = EvaluationAction.component("eval-000008", "transform", {})
+
+    def runner(component, inputs):
+        return {"y": inputs["x"]}
+
+    first = execute_action(action, context, runner=runner)
+    second = execute_action(action, context, runner=runner)
+
+    artifact = Path(first.artifacts[action.id])
+    assert artifact.is_absolute() and artifact.exists()
+    assert first.artifact_sha256[action.id] == hashlib.sha256(artifact.read_bytes()).hexdigest()
+    assert second.artifact_sha256 == first.artifact_sha256
+
+
+def test_artifact_replay_refuses_to_overwrite_different_bytes(models_dir, tmp_path):
+    """Replacing a durable action artifact with changed model output must fail closed."""
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(**{**base.__dict__, "artifact_dir": tmp_path / "artifacts"})
+    action = EvaluationAction.component("eval-000081", "transform", {})
+    values = iter((1.0, 2.0))
+
+    def changing_runner(component, inputs):
+        return {"y": np.array([next(values)])}
+
+    first = execute_action(action, context, runner=changing_runner)
+    second = execute_action(action, context, runner=changing_runner)
+
+    assert first.status is EvaluationStatus.SUCCESS
+    assert second.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+@pytest.mark.parametrize("state", ("unregistered", "missing", "mismatched"))
+def test_unverified_parent_artifact_never_calls_component_runner(models_dir, tmp_path, state):
+    """Calling a component before parent verification must trigger the assertion runner."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([9.0]))
+    digest = hashlib.sha256(parent.read_bytes()).hexdigest()
+    registry = (
+        {}
+        if state == "unregistered"
+        else {
+            "parent": ParentArtifactReference(
+                tmp_path / "missing.npz" if state == "missing" else parent,
+                "0" * 64 if state == "mismatched" else digest,
+            )
+        }
+    )
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(**{**base.__dict__, "parent_artifacts": registry})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000009", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(AssertionError("runner was called")),
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_verified_parent_arrays_load_but_explicit_sources_win_collisions(models_dir, tmp_path):
+    """Reversing the documented source-over-parent collision rule changes this outcome."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([99.0]))
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **base.__dict__,
+            "source_arrays": {"x": np.array([2.0])},
+            "observed": {"y": np.array([2.0])},
+            "outcome_functions": {"value": lambda outputs: float(outputs["y"][0])},
+            "parent_artifacts": {
+                "parent": ParentArtifactReference(
+                    parent, hashlib.sha256(parent.read_bytes()).hexdigest()
+                )
+            },
+        }
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000010", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.outcomes == {"value": 2.0}
+
+
+def test_parent_artifact_is_loaded_from_the_verified_bytes_snapshot(
+    models_dir, tmp_path, monkeypatch
+):
+    """Replacing a file after its bytes are read must not change runner inputs."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([4.0]))
+    original = parent.read_bytes()
+    base = _evaluator_context(models_dir)
+    context = EvaluationContext(
+        **{
+            **base.__dict__,
+            "source_arrays": {},
+            "outcome_functions": {"value": lambda outputs: float(outputs["y"][0])},
+            "parent_artifacts": {
+                "parent": ParentArtifactReference(parent, hashlib.sha256(original).hexdigest())
+            },
+        }
+    )
+
+    def replace_after_read(path, *, max_bytes):
+        np.savez(path, x=np.array([99.0]))
+        return original
+
+    monkeypatch.setattr(runner_module, "_read_parent_artifact_bytes", replace_after_read)
+    result = execute_action(
+        EvaluationAction.component("eval-000014", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert result.outcomes == {"value": 4.0}
+
+
+def test_artifact_action_id_cannot_escape_configured_directory(models_dir, tmp_path):
+    """A traversal action ID must not create an artifact beside the configured root."""
+    root = tmp_path / "artifacts"
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("../escaped", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (tmp_path / "escaped.npz").exists()
+
+
+def test_artifact_writer_rejects_existing_symlink_target(models_dir, tmp_path):
+    """Replacing a symlink target must not write outside the artifact root."""
+    root = tmp_path / "artifacts"
+    root.mkdir()
+    outside = tmp_path / "outside.npz"
+    outside.write_bytes(b"unchanged")
+    (root / "eval-000015.npz").symlink_to(outside)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000015", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert outside.read_bytes() == b"unchanged"
+
+
+def test_artifact_temp_symlink_substitution_cannot_write_outside_root(
+    models_dir, tmp_path, monkeypatch
+):
+    """Replacing the generated temp name with a symlink must abort finalization."""
+    root = tmp_path / "artifacts"
+    outside = tmp_path / "outside.npz"
+    outside.write_bytes(b"unchanged")
+    create_temp = runner_module._create_temp_at
+
+    def substituted_temp(root_fd):
+        descriptor, name = create_temp(root_fd)
+        artifact_path = root / name
+        artifact_path.unlink()
+        artifact_path.symlink_to(outside)
+        return descriptor, name
+
+    monkeypatch.setattr(runner_module, "_create_temp_at", substituted_temp)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000019", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert outside.read_bytes() == b"unchanged"
+    assert list(root.glob("*.tmp"))[0].is_symlink()
+
+
+def test_artifact_collision_cleans_secure_temporary_file(models_dir, tmp_path):
+    """A different existing artifact must fail without leaving a temporary file behind."""
+    root = tmp_path / "artifacts"
+    root.mkdir()
+    (root / "eval-000020.npz").write_bytes(b"different bytes")
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000020", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not list(root.glob("*.tmp"))
+
+
+def test_artifact_finalization_rejects_hardlinked_temp_inode(models_dir, tmp_path, monkeypatch):
+    """A second link to the temporary inode must prevent publication."""
+    root = tmp_path / "artifacts"
+    root.mkdir(mode=0o700)
+    original = runner_module._assert_at
+
+    def inject_hard_link(root_fd, name, descriptor_stat, *, nlink):
+        if name.endswith(".tmp") and nlink == 1:
+            os.link(name, "injected-link", src_dir_fd=root_fd, dst_dir_fd=root_fd)
+        original(root_fd, name, descriptor_stat, nlink=nlink)
+
+    monkeypatch.setattr(runner_module, "_assert_at", inject_hard_link)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000023", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (root / "eval-000023.npz").exists()
+
+
+def test_artifact_replay_rejects_existing_hardlinked_target(models_dir, tmp_path):
+    """An identical artifact with another hard link is not safe to reuse."""
+    root = tmp_path / "artifacts"
+    root.mkdir(mode=0o700)
+    target = root / "eval-000024.npz"
+    np.savez(target, y=np.array([1.0]))
+    os.link(target, tmp_path / "other-link.npz")
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000024", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": np.array([1.0])},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_artifact_fdopen_failure_closes_temp_descriptor_and_cleans_path(
+    models_dir, tmp_path, monkeypatch
+):
+    """A failed fdopen must not leak its mkstemp descriptor or temporary file."""
+    root = tmp_path / "artifacts"
+    closed = []
+    original_close = runner_module.os.close
+    original_fdopen = runner_module.os.fdopen
+
+    def tracked_close(descriptor):
+        closed.append(descriptor)
+        return original_close(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "close", tracked_close)
+    monkeypatch.setattr(
+        runner_module.os, "fdopen", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("fdopen"))
+    )
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000025", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert closed
+    assert not list(root.glob("*.tmp"))
+    monkeypatch.setattr(runner_module.os, "fdopen", original_fdopen)
+
+
+@pytest.mark.parametrize(
+    "clock",
+    (
+        lambda: (_ for _ in ()).throw(RuntimeError("clock unavailable")),
+        lambda: float("nan"),
+        lambda: 1.0 + 0.0j,
+    ),
+)
+def test_clock_start_failures_return_infrastructure_results(models_dir, clock):
+    """A clock exception or nonfinite start value must not escape execute_action."""
+    result = execute_action(
+        EvaluationAction.component("eval-000016", "transform", {}),
+        _evaluator_context(models_dir),
+        runner=lambda component, inputs: {"y": inputs["x"]},
+        clock=clock,
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert result.evaluator_seconds == 0.0
+    assert result.cost == 0.0
+
+
+def test_invalid_completion_clock_is_not_called_again_during_failure_construction(models_dir):
+    """Retrying a broken completion clock would call this test clock a third time."""
+    values = iter((1.0, 1.0))
+    calls = 0
+
+    def clock():
+        nonlocal calls
+        calls += 1
+        if calls > 2:
+            raise AssertionError("clock retried")
+        return next(values)
+
+    result = execute_action(
+        EvaluationAction.component("eval-000017", "transform", {}),
+        _evaluator_context(models_dir),
+        runner=lambda component, inputs: {"y": inputs["x"]},
+        clock=clock,
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert result.evaluator_seconds == 0.0
+    assert result.cost == 0.0
+    assert calls == 2
+
+
+def test_finished_clock_interval_is_cached_when_cost_overflows(models_dir):
+    """A cost overflow must retain timing and never request a third clock value."""
+    calls = 0
+
+    def clock():
+        nonlocal calls
+        calls += 1
+        if calls > 2:
+            raise AssertionError("clock retried")
+        return (1.0, 3.0)[calls - 1]
+
+    context = EvaluationContext(
+        **{
+            **_evaluator_context(models_dir).__dict__,
+            "cost_per_evaluator_second": float.fromhex("0x1.fffffffffffffp+1023"),
+        }
+    )
+    result = execute_action(
+        EvaluationAction.component("eval-000021", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+        clock=clock,
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert result.evaluator_seconds == 2.0
+    assert result.cost == 0.0
+    assert calls == 2
+
+
+def _parent_context(models_dir, parent, digest, **limits):
+    base = _evaluator_context(models_dir)
+    return EvaluationContext(
+        **{
+            **base.__dict__,
+            "source_arrays": {},
+            "parent_artifacts": {"parent": ParentArtifactReference(parent, digest)},
+            **limits,
+        }
+    )
+
+
+def _assert_parent_limit_rejects_before_runner(models_dir, context):
+    result = execute_action(
+        EvaluationAction.component("eval-000022", "transform", {}, parent_artifact_ids=("parent",)),
+        context,
+        runner=lambda component, inputs: (_ for _ in ()).throw(AssertionError("runner was called")),
+    )
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+def test_parent_artifact_compressed_byte_limit_rejects_before_reading_arrays(models_dir, tmp_path):
+    """Oversized parent bytes must be rejected before any runner invocation."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.arange(20.0))
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_bytes=10,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_parent_artifact_member_count_limit_rejects_before_runner(models_dir, tmp_path):
+    """An archive with too many members must not reach the runner."""
+    parent = tmp_path / "parent.npz"
+    np.savez(parent, x=np.array([1.0]), extra=np.array([2.0]))
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_members=1,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_parent_artifact_uncompressed_member_limit_rejects_zip_bomb(models_dir, tmp_path):
+    """A highly compressed large member must be rejected from ZIP metadata."""
+    parent = tmp_path / "parent.npz"
+    np.savez_compressed(parent, x=np.zeros(10_000))
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_bytes=10_000,
+        max_parent_artifact_member_bytes=100,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_parent_artifact_declared_huge_shape_rejects_before_allocation(models_dir, tmp_path):
+    """A tiny NPY header declaring a huge array must never allocate that array."""
+    header = io.BytesIO()
+    np.lib.format.write_array_header_1_0(
+        header,
+        {"descr": "<f8", "fortran_order": False, "shape": (1_000_000_000,)},
+    )
+    parent = tmp_path / "parent.npz"
+    with zipfile.ZipFile(parent, "w") as archive:
+        archive.writestr("x.npy", header.getvalue())
+    context = _parent_context(
+        models_dir,
+        parent,
+        hashlib.sha256(parent.read_bytes()).hexdigest(),
+        max_parent_artifact_member_bytes=1_000,
+        max_parent_artifact_total_bytes=1_000,
+    )
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def _write_parent_member_archive(path, member_names):
+    array = io.BytesIO()
+    np.save(array, np.array([1.0]))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Duplicate name")
+        with zipfile.ZipFile(path, "w") as archive:
+            for member_name in member_names:
+                archive.writestr(member_name, array.getvalue())
+
+
+@pytest.mark.parametrize(
+    "member_names",
+    (
+        ("x.npy", "x.npy"),
+        ("../x.npy",),
+        ("nested/x.npy",),
+        ("nested\\x.npy",),
+        ("x.txt",),
+    ),
+)
+def test_parent_artifact_rejects_ambiguous_or_unsafe_member_names(
+    models_dir, tmp_path, member_names
+):
+    """Unsafe ZIP member names must fail before parent arrays reach the runner."""
+    parent = tmp_path / "parent.npz"
+    _write_parent_member_archive(parent, member_names)
+    context = _parent_context(models_dir, parent, hashlib.sha256(parent.read_bytes()).hexdigest())
+
+    _assert_parent_limit_rejects_before_runner(models_dir, context)
+
+
+def test_produced_artifact_rejects_unsafe_output_name(models_dir, tmp_path):
+    """An unsafe runner output key must never be written into an NPZ artifact."""
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": tmp_path / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000026", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"../unsafe": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.MODEL_FAILURE
+
+
+def test_artifact_replay_rechecks_replaced_destination_after_hash(
+    models_dir, tmp_path, monkeypatch
+):
+    """Replacing a replay target after its digest read must be detected before return."""
+    root = tmp_path / "artifacts"
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+    action = EvaluationAction.component("eval-000027", "transform", {})
+
+    def runner(component, inputs):
+        return {"y": inputs["x"]}
+
+    assert execute_action(action, context, runner=runner).status is EvaluationStatus.SUCCESS
+    original = runner_module._hash_at
+
+    def replace_after_digest(root_fd, name, expected, *, single_link):
+        digest = original(root_fd, name, expected, single_link=single_link)
+        if name == "eval-000027.npz" and single_link:
+            replacement = root / "replacement.npz"
+            np.savez(replacement, y=np.array([99.0]))
+            os.replace(replacement, root / name)
+        return digest
+
+    monkeypatch.setattr(runner_module, "_hash_at", replace_after_digest)
+    result = execute_action(action, context, runner=runner)
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+@pytest.mark.parametrize("logical_name", ("soil-moisture", "flow rate", "Δflow"))
+def test_artifact_preserves_flat_compatible_logical_names(models_dir, tmp_path, logical_name):
+    """Safe existing port-style names must round-trip through a durable NPZ."""
+    system = _system(models_dir)
+    system.get_component("transform").metadata["runnable"]["outputs"] = [logical_name]
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"source.x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: float(outputs[logical_name][0])},
+        cost_unit="cpu_second",
+        artifact_dir=tmp_path / "artifacts",
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000028", "transform", {}),
+        context,
+        runner=lambda component, inputs: {logical_name: inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    with np.load(result.artifacts["eval-000028"], allow_pickle=False) as artifact:
+        assert logical_name in artifact.files
+
+
+def test_artifact_root_rejects_symlink_ancestor(models_dir, tmp_path):
+    """A symlink in the artifact-root ancestry must prevent any output write."""
+    real = tmp_path / "real"
+    real.mkdir()
+    linked = tmp_path / "linked"
+    linked.symlink_to(real, target_is_directory=True)
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": linked / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000029", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (real / "artifacts").exists()
+
+
+def test_artifact_root_rejects_unsafe_writable_ancestor(models_dir, tmp_path):
+    """A group/world-writable non-sticky ancestor must fail closed on POSIX."""
+    if os.name == "nt":
+        pytest.skip("POSIX permission semantics")
+    unsafe = tmp_path / "unsafe"
+    unsafe.mkdir(mode=0o777)
+    unsafe.chmod(0o777)
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": unsafe / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000030", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+@pytest.mark.parametrize(
+    "artifact_dir",
+    (
+        lambda tmp_path: tmp_path / "child" / ".." / "escape",
+        lambda tmp_path: f"{tmp_path}/child/./escape",
+    ),
+)
+def test_artifact_root_rejects_lexical_dot_components(models_dir, tmp_path, artifact_dir):
+    """Dot components must not normalize into a writable artifact destination."""
+    escaped = tmp_path / "escape"
+    context = EvaluationContext(
+        **{
+            **_evaluator_context(models_dir).__dict__,
+            "artifact_dir": artifact_dir(tmp_path),
+        }
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000034", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert not (escaped / "eval-000034.npz").exists()
+
+
+def test_artifact_root_rejects_directory_replaced_after_preopen_stat(
+    models_dir, tmp_path, monkeypatch
+):
+    """A directory replaced after pre-open stat must never become the retained root."""
+    if os.name == "nt":
+        pytest.skip("POSIX directory descriptor")
+    parent = tmp_path / "parent"
+    parent.mkdir(mode=0o700)
+    parent.chmod(0o700)
+    root = parent / "artifacts"
+    opened = []
+    closed = []
+    replaced = False
+    original_open = runner_module.os.open
+    original_close = runner_module.os.close
+
+    def replace_between_stat_and_open(path, flags, *args, **kwargs):
+        nonlocal replaced
+        if path == "parent" and kwargs.get("dir_fd") is not None and not replaced:
+            replaced = True
+            parent.rename(tmp_path / "parent-original")
+            parent.mkdir(mode=0o700)
+            parent.chmod(0o700)
+        descriptor = original_open(path, flags, *args, **kwargs)
+        opened.append(descriptor)
+        return descriptor
+
+    def tracked_close(descriptor):
+        closed.append(descriptor)
+        return original_close(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "open", replace_between_stat_and_open)
+    monkeypatch.setattr(runner_module.os, "close", tracked_close)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000035", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert replaced
+    assert set(opened) <= set(closed)
+    assert not (parent / "artifacts" / "eval-000035.npz").exists()
+
+
+def test_posix_artifact_publication_uses_retained_directory_fd(models_dir, tmp_path, monkeypatch):
+    """Removing dir_fd bindings must make this link-observation test fail."""
+    if os.name == "nt":
+        pytest.skip("POSIX dir_fd contract")
+    observed = []
+    original_link = runner_module.os.link
+
+    def tracked_link(source, target, *args, **kwargs):
+        observed.append((kwargs.get("src_dir_fd"), kwargs.get("dst_dir_fd")))
+        return original_link(source, target, *args, **kwargs)
+
+    monkeypatch.setattr(runner_module.os, "link", tracked_link)
+    context = EvaluationContext(
+        **{**_evaluator_context(models_dir).__dict__, "artifact_dir": tmp_path / "artifacts"}
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000031", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.SUCCESS
+    assert observed and observed[0][0] is not None and observed[0][1] is not None
+
+
+def test_posix_artifact_directory_fd_closes_when_directory_fsync_fails(
+    models_dir, tmp_path, monkeypatch
+):
+    """A directory fsync error must still close the retained root descriptor."""
+    if os.name == "nt":
+        pytest.skip("POSIX directory fsync")
+    root = tmp_path / "artifacts"
+    closed = []
+    original_close = runner_module.os.close
+    original_fsync = runner_module.os.fsync
+
+    def tracked_close(descriptor):
+        closed.append(descriptor)
+        return original_close(descriptor)
+
+    def failing_fsync(descriptor):
+        if root.exists() and os.fstat(descriptor).st_ino == os.stat(root).st_ino:
+            raise OSError("directory fsync")
+        return original_fsync(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "close", tracked_close)
+    monkeypatch.setattr(runner_module.os, "fsync", failing_fsync)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000032", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+    assert closed
+
+
+def test_posix_artifact_root_close_failure_is_infrastructure(models_dir, tmp_path, monkeypatch):
+    """The retained root descriptor is closed and close failure cannot become model failure."""
+    if os.name == "nt":
+        pytest.skip("POSIX directory descriptor")
+    root = tmp_path / "artifacts"
+    original_close = runner_module.os.close
+
+    def fail_root_close(descriptor):
+        if root.exists() and os.fstat(descriptor).st_ino == os.stat(root).st_ino:
+            original_close(descriptor)
+            raise OSError("root close")
+        return original_close(descriptor)
+
+    monkeypatch.setattr(runner_module.os, "close", fail_root_close)
+    context = EvaluationContext(**{**_evaluator_context(models_dir).__dict__, "artifact_dir": root})
+
+    result = execute_action(
+        EvaluationAction.component("eval-000033", "transform", {}),
+        context,
+        runner=lambda component, inputs: {"y": inputs["x"]},
+    )
+
+    assert result.status is EvaluationStatus.INFRASTRUCTURE_FAILURE
+
+
+@pytest.mark.parametrize(
+    ("declared", "returned"),
+    (
+        (["y", "y"], {"y": np.array([1.0])}),
+        ([""], {"": np.array([1.0])}),
+        (["y"], {"y": np.array([1.0]), "extra": np.array([1.0])}),
+    ),
+)
+def test_declared_outputs_must_be_unique_nonempty_and_exact(models_dir, declared, returned):
+    """Malformed declarations or extra model outputs must not be accepted."""
+    system = _system(models_dir)
+    system.get_component("transform").metadata["runnable"]["outputs"] = declared
+    context = EvaluationContext(
+        system=system,
+        alternatives={},
+        source_arrays={"source.x": np.array([1.0])},
+        observed={},
+        outcome_functions={"value": lambda outputs: 1.0},
+        cost_unit="cpu_second",
+    )
+
+    result = execute_action(
+        EvaluationAction.component("eval-000018", "transform", {}),
+        context,
+        runner=lambda component, inputs: returned,
+    )
+
+    assert result.status is EvaluationStatus.MODEL_FAILURE
+
+
+# --------------------------------------------------------------------------- #
 # Candidate round-trip
 # --------------------------------------------------------------------------- #
 
@@ -219,9 +1302,7 @@ class TestCandidates:
 
 class TestExperimentTree:
     def _tree(self):
-        tree = ExperimentTree(
-            ExperimentNode(id="baseline", score=0.2, status="baseline")
-        )
+        tree = ExperimentTree(ExperimentNode(id="baseline", score=0.2, status="baseline"))
         tree.add_child(
             "baseline",
             ExperimentNode(id="e1", score=0.5, status="kept", candidate="c1"),
@@ -248,6 +1329,28 @@ class TestExperimentTree:
         restored = ExperimentTree.from_jsonl(path)
         assert restored.best().id == "e1"
         assert set(restored.nodes) == {"baseline", "e1", "e2"}
+
+    def test_jsonl_preserves_optional_evaluation_links_and_defaults_old_rows(self, tmp_path):
+        """Dropping action/result links or requiring them in old logs must fail this test."""
+        path = tmp_path / "tree.jsonl"
+        path.write_text(
+            "\n".join(
+                (
+                    '{"id": "baseline", "status": "baseline"}',
+                    '{"id": "child", "parent_id": "baseline", "action_id": "eval-000001", '
+                    '"result_status": "success"}',
+                )
+            )
+            + "\n"
+        )
+
+        restored = ExperimentTree.from_jsonl(path)
+
+        assert restored.nodes["baseline"].action_id is None
+        assert restored.nodes["baseline"].result_status is None
+        assert restored.nodes["child"].action_id == "eval-000001"
+        assert restored.nodes["child"].result_status == "success"
+        assert "action_id" in restored.nodes["child"].to_dict()
 
     def test_root_requires_no_parent(self):
         with pytest.raises(ValueError):

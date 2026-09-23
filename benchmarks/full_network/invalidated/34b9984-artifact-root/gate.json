@@ -1,0 +1,226 @@
+{
+  "criteria": [
+    {
+      "details": {
+        "acquisitions": 0,
+        "complete_runs": 0,
+        "evaluations": 0,
+        "expected_runs": 40,
+        "missing_runs": 0,
+        "observed_runs": 40
+      },
+      "name": "complete_matrix",
+      "passed": false
+    },
+    {
+      "details": {
+        "issue_count": 80,
+        "passed": false,
+        "reported_issues": [
+          "run error ('smooth_chain', 'system', 0): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 0): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 1): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 1): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 2): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 2): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 3): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 3): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 4): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 4): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 5): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 5): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 6): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 6): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 7): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 7): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 8): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 8): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'system', 9): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('smooth_chain', 'function_network_full', 9): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 0): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 0): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 1): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 1): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 2): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 2): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 3): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 3): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 4): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 4): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 5): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 5): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 6): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 6): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 7): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 7): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 8): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 8): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'system', 9): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "run error ('constrained_branch', 'function_network_full', 9): RuntimeError: evaluation eval-000000 failed with infrastructure_failure: artifact root ancestry must contain real directories",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 8)",
+          "evaluation indices differ for ('smooth_chain', 'system', 0)",
+          "evaluation indices differ for ('smooth_chain', 'system', 6)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 5)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 2)",
+          "evaluation indices differ for ('smooth_chain', 'system', 3)",
+          "evaluation indices differ for ('smooth_chain', 'system', 9)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 8)",
+          "evaluation indices differ for ('constrained_branch', 'system', 3)",
+          "evaluation indices differ for ('constrained_branch', 'system', 0)",
+          "evaluation indices differ for ('constrained_branch', 'system', 6)",
+          "evaluation indices differ for ('constrained_branch', 'system', 9)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 4)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 1)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 7)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 1)",
+          "evaluation indices differ for ('smooth_chain', 'system', 2)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 4)",
+          "evaluation indices differ for ('smooth_chain', 'system', 5)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 7)",
+          "evaluation indices differ for ('smooth_chain', 'system', 8)",
+          "evaluation indices differ for ('constrained_branch', 'system', 5)",
+          "evaluation indices differ for ('constrained_branch', 'system', 2)",
+          "evaluation indices differ for ('constrained_branch', 'system', 8)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 0)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 6)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 3)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 9)",
+          "evaluation indices differ for ('smooth_chain', 'system', 1)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 3)",
+          "evaluation indices differ for ('smooth_chain', 'system', 4)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 0)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 6)",
+          "evaluation indices differ for ('smooth_chain', 'system', 7)",
+          "evaluation indices differ for ('constrained_branch', 'function_network_full', 9)",
+          "evaluation indices differ for ('constrained_branch', 'system', 1)",
+          "evaluation indices differ for ('constrained_branch', 'system', 4)",
+          "evaluation indices differ for ('constrained_branch', 'system', 7)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 2)",
+          "evaluation indices differ for ('smooth_chain', 'function_network_full', 5)"
+        ]
+      },
+      "name": "raw_record_audit",
+      "passed": false
+    },
+    {
+      "details": {
+        "system_scope_runs": 40
+      },
+      "name": "system_scope",
+      "passed": true
+    },
+    {
+      "details": {
+        "consistent_runs": 0
+      },
+      "name": "deterministic_replay",
+      "passed": false
+    },
+    {
+      "details": {
+        "constraint_brier": null,
+        "coverage_90": null,
+        "expected_records": 320,
+        "finite_moments": true,
+        "issue_count": 0,
+        "observed_records": 0,
+        "reported_issues": [],
+        "unique_records": 0
+      },
+      "name": "heldout_calibration",
+      "passed": false
+    },
+    {
+      "details": {
+        "full_median": null,
+        "full_minus_system": null,
+        "maximum": 0.05,
+        "system_median": null
+      },
+      "name": "pooled_final_regret_match",
+      "passed": false
+    },
+    {
+      "details": {
+        "constrained_branch": {
+          "full_median": null,
+          "full_minus_system": null,
+          "maximum": 0.1,
+          "system_median": null
+        },
+        "smooth_chain": {
+          "full_median": null,
+          "full_minus_system": null,
+          "maximum": 0.1,
+          "system_median": null
+        }
+      },
+      "name": "problem_final_regret_match",
+      "passed": false
+    },
+    {
+      "details": {
+        "full_median": null,
+        "full_minus_system": null,
+        "maximum": 0.05,
+        "system_median": null
+      },
+      "name": "pooled_regret_area_match",
+      "passed": false
+    },
+    {
+      "details": {
+        "modeled_suggestions": 0,
+        "overall_maximum": 0.05,
+        "overall_rate": 1.0,
+        "problem_maximum": 0.15,
+        "problem_rates": {
+          "constrained_branch": 1.0,
+          "smooth_chain": 1.0
+        },
+        "unresolved_suggestions": 0
+      },
+      "name": "bounded_full_network_fallbacks",
+      "passed": false
+    }
+  ],
+  "passed": false,
+  "provenance": {
+    "command": "pixi run -e bayes benchmark-full-network --output benchmarks/full_network/results",
+    "decision_sha256": "228f8042934944e210dc8e568f5564bbf2ba0077b320ba1cd795b6e42c97a343",
+    "git_head_at_execution": "34b9984b09ff00f97c196e2dc34e308bddbabc76",
+    "git_tree_clean": true,
+    "packages": {
+      "autoengineering": "0.1.0",
+      "botorch": "0.17.2",
+      "gpytorch": "1.15.2",
+      "numpy": "2.5.2",
+      "scipy": "1.18.0",
+      "torch": "2.13.0"
+    },
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "python": "3.12.13",
+    "source_file_sha256": {
+      "pixi.lock": "2a14a7a6c4c74870ee2820028f69140151e80efb897a825c8e3359c4e2d82fd5",
+      "pixi.toml": "3f4b1488f360aced5f79e3f38305ac05eed4ac6ed6eef5ffc384915a0e570868",
+      "pyproject.toml": "50367045d7d43a42adb4a2d4ca90b5c9d642ed7babe512ac6a62800c194a2ca9",
+      "src/autoengineering/benchmarks/full_network/__init__.py": "6c00c1757a15bd7faf1e01bd5740a0a47274c27df32312301aca7165843a8b4c",
+      "src/autoengineering/benchmarks/full_network/__main__.py": "1545af837e7e9f95a3c673f67a7b163e1fc092e462ed671cd25443f1bebe5849",
+      "src/autoengineering/benchmarks/full_network/problems.py": "75096a0e87774fa6c6ce3a1c88e33ad164b0101d640400ef8146c87a7545a9b3",
+      "src/autoengineering/benchmarks/full_network/runner.py": "92e287727594dca1447d73aefe8d32e153540f4033a3241b6c7fd3c5a14b2d3d",
+      "src/autoengineering/benchmarks/full_network/summary.py": "32056a29d91eaa6b2d4c4788c2111bf60cadc4905d4d31eb052804d318ad0144",
+      "src/autoengineering/optimization/backend.py": "50ef7eed714678b6b5b9cde4e8aa47d2d28de45bd3d8e64944e8ca1a41e1a7a9",
+      "src/autoengineering/optimization/full_network_backend.py": "534af0a576a4c4052859d6cfc8a3b061e897b9a21b15f615d3accd57238415b5",
+      "src/autoengineering/optimization/function_network.py": "b076160c472aa6aeb9ddd33d06aa53badbf115764c27d57825463b1ca50f4376",
+      "src/autoengineering/optimization/function_network_evaluator.py": "9ffbc1b4d35d39c55982c2cd91034223aeb7852030bb891b4ab11a05085bec15",
+      "src/autoengineering/optimization/ledger.py": "e137064014cc337a0643cc76b3cf7f4adc5772ca920ed5cd8c078310b3dbda63",
+      "src/autoengineering/optimization/records.py": "47f92d0c169c4026f813b5a8b58522e550eb4510c43f767351b6cd1de0ed8425",
+      "src/autoengineering/optimization/space.py": "7b8ebfb55ae072ea2e82f57a3f8ff00c6895be4bd4adc9d8bbc6ef4fc7e54652",
+      "src/autoengineering/optimization/spec.py": "87df5c77ed379718fa547add64233c02ff9551cde21426be23c7a7a6d46a597e",
+      "src/autoengineering/optimization/system_backend.py": "d24a83776010691d425b9aabfd6b3abf03e44423396796ea434c45a75624d0cf",
+      "src/autoengineering/research/runner.py": "3c56db99d10bb90f5230e5c197a82721df00a4a454830755e8d9598735821fec"
+    },
+    "source_sha256": "835808eabad46d0e5f1f1c5dbf737d16c501ebc5cf8ec0179dee574e0ddab001"
+  },
+  "schema_version": "1.0"
+}

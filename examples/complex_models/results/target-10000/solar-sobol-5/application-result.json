@@ -1,0 +1,76 @@
+{
+  "cap": 10000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.13227966567501426,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 4,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 4
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar",
+  "evaluations": 4,
+  "method": "sobol",
+  "model_seconds": 0.03977812500670552,
+  "recommendation": {
+    "action_id": "eval-000003",
+    "config": {
+      "heat_loss": 40.118017424829304,
+      "loss": 0.6426604761276394,
+      "temperature": "ross"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.71567679731896
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.17205779068171978,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -66.68701674460763,
+    "rmse": 137.80038321983244,
+    "temperature_rmse": 3265.8127220135048
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 212.18076179043393,
+      "evaluations": 1,
+      "model_seconds": 0.010232540778815746,
+      "study_seconds": 0.062415082938969135,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.18076179043393,
+      "evaluations": 2,
+      "model_seconds": 0.019890957977622747,
+      "study_seconds": 0.09884091606363654,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.18076179043393,
+      "evaluations": 3,
+      "model_seconds": 0.02962629124522209,
+      "study_seconds": 0.13511958299204707,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.71567679731896,
+      "evaluations": 4,
+      "model_seconds": 0.03977812500670552,
+      "study_seconds": 0.17195695778355002,
+      "target_reached": true
+    }
+  ]
+}

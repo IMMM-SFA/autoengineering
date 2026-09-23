@@ -1,0 +1,67 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.10370587417855859,
+  "diagnostics": null,
+  "domain": "solar",
+  "evaluations": 3,
+  "method": "random",
+  "model_seconds": 0.029638126026839018,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 3,
+    "source_directory": "solar-random-6",
+    "source_ledger_sha256": "e06596f951d3121d7a852d3504e5f566f1f4f2795b37569771fa28be46a62aeb",
+    "source_observations": 3,
+    "source_trajectory_sha256": "ab98c5abfe57ca565400fe740e7d73e5f20dc3f23c9935f868361895e493dea7",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000002",
+    "config": {
+      "heat_loss": 19.160690071275805,
+      "loss": 0.699674258292322,
+      "temperature": "ross"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.5593466847721
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.1333440002053976,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -36.56673528360536,
+    "rmse": 124.32515925870715,
+    "temperature_rmse": 3254.695792031147
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 197.820166392996,
+      "evaluations": 1,
+      "model_seconds": 0.009574584197252989,
+      "study_seconds": 0.06050504231825471,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 188.15564991554254,
+      "evaluations": 2,
+      "model_seconds": 0.019384167157113552,
+      "study_seconds": 0.09678487526252866,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.5593466847721,
+      "evaluations": 3,
+      "model_seconds": 0.029638126026839018,
+      "study_seconds": 0.1333440002053976,
+      "target_reached": true
+    }
+  ]
+}

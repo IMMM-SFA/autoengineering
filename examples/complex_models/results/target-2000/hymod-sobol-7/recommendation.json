@@ -1,0 +1,1 @@
+{"action_id":"eval-001874","config":{"alpha":0.4431226137094199,"beta":1.038091513235122,"cmax":454.28153438927944,"kfast":0.4981772162020207,"kslow":0.001349170527528768,"pet":"hamon","pet_scale":0.9968248950317502},"feasible":true,"message":"best feasible observed configuration","outcomes":{"rmse":1.244145062404692}}

@@ -1,0 +1,88 @@
+{
+  "candidates": [
+    {
+      "config": {
+        "capacity": 100.0,
+        "pet": "hamon",
+        "recession": 0.7
+      },
+      "index": 0,
+      "model_seconds": 0.0035427501425147057,
+      "ranking": [
+        {
+          "component": "system_output",
+          "failing_metrics": [
+            "rmse"
+          ],
+          "results": [
+            {
+              "component": "system_output",
+              "interpretation": "",
+              "metric": "rmse",
+              "status": "fail",
+              "threshold": 2.098762636542684,
+              "value": 5.291468
+            }
+          ],
+          "score": 1.0,
+          "summary": "1 failing metric(s): rmse=5.291"
+        }
+      ],
+      "test": {
+        "bias": 0.6805338381326741,
+        "max_balance_error": 3.197442310920451e-14,
+        "nse": -0.15827711730321603,
+        "rmse": 4.002550983238024
+      },
+      "validation": {
+        "bias": 2.2142155627900846,
+        "max_balance_error": 3.197442310920451e-14,
+        "nse": -5.357238453642056,
+        "rmse": 5.2914680748184795
+      }
+    },
+    {
+      "config": {
+        "capacity": 100.0,
+        "pet": "hargreaves",
+        "recession": 0.7
+      },
+      "index": 1,
+      "model_seconds": 0.0023725409992039204,
+      "ranking": [
+        {
+          "component": "system_output",
+          "failing_metrics": [
+            "rmse"
+          ],
+          "results": [
+            {
+              "component": "system_output",
+              "interpretation": "",
+              "metric": "rmse",
+              "status": "fail",
+              "threshold": 2.098762636542684,
+              "value": 4.700904
+            }
+          ],
+          "score": 1.0,
+          "summary": "1 failing metric(s): rmse=4.701"
+        }
+      ],
+      "test": {
+        "bias": 0.07928635158711549,
+        "max_balance_error": 4.263256414560601e-14,
+        "nse": 0.0112452176625778,
+        "rmse": 3.6980683412885687
+      },
+      "validation": {
+        "bias": 1.4900111451047784,
+        "max_balance_error": 4.263256414560601e-14,
+        "nse": -4.017401802162679,
+        "rmse": 4.700903868271838
+      }
+    }
+  ],
+  "domain": "hydro",
+  "selected_index": 1
+}

@@ -1,0 +1,61 @@
+{
+  "retrieved_utc": "2026-09-05",
+  "sources": [
+    {
+      "file": "solar-env.csv.gz",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/data/9068_environment_data_20240101_20250430.csv",
+      "request_range": "bytes=0-999999",
+      "raw_bytes": 1000000,
+      "raw_sha256": "806a1bae9aadbd10f9b3661ce52acd1bf7bf8d0b60dafd24a96069c98b61ad80",
+      "stored_sha256": "f08b9cfce86e1cd1b8bb43ea5697c6da28a683932aaee0f54dd86630996d09ee",
+      "license": "CC BY 4.0",
+      "attribution": "Deline et al., NREL PVDAQ, OEDI submission 4568"
+    },
+    {
+      "file": "solar-irr.csv.gz",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/data/9068_irradiance_data_20240101_20250430.csv",
+      "request_range": "bytes=0-299999",
+      "raw_bytes": 300000,
+      "raw_sha256": "5d4968f9cb93bbd06ba24e5c8f0f972d3d97b34a539e0079ca39a2e6a6c0301e",
+      "stored_sha256": "769b56c39080a736cf1e898f6133e2b8a70847caf4fe5e5dec502f9a07667897",
+      "license": "CC BY 4.0",
+      "attribution": "Deline et al., NREL PVDAQ, OEDI submission 4568"
+    },
+    {
+      "file": "solar-ac.csv.gz",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/data/9068_ac_power_data_20240101_20250430.csv",
+      "request_range": "bytes=0-399999",
+      "raw_bytes": 400000,
+      "raw_sha256": "205009f70f1301198ce494f58abf99d91cf7a8df8f3d8e954694dbdecc557f07",
+      "stored_sha256": "ae8aa755465f7d39f614bc59ec3fd77d391d4ed7191dc9f579df4b0309539bf6",
+      "license": "CC BY 4.0",
+      "attribution": "Deline et al., NREL PVDAQ, OEDI submission 4568"
+    },
+    {
+      "file": "Hahn1.dat",
+      "url": "https://www.itl.nist.gov/div898/strd/nls/data/LINKS/DATA/Hahn1.dat",
+      "stored_sha256": "7e885af48e18a222033a66cb22b491f0f5bc761b652142c0d9b28132daf63956"
+    },
+    {
+      "file": "solar-metadata.json",
+      "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/9068_OEDI/metadata/9068_system_metadata.json",
+      "stored_sha256": "6861ae58145427dd790315257feef95b6ed5067fe5b5378dc5b2fa4acc23937f"
+    }
+  ],
+  "hydro": {
+    "cache_origin_revision": "16f730e",
+    "source_files": {
+      "examples/leaf_river/data/fetch_data.py": "0be3a6616b0be0c8a4ccd5eef2b1b2a67322c09d2de54b31867f8318e3fd2aba",
+      "examples/leaf_river/data/streamflow.csv": "fd513ec5616b66aa99dfb68b07aadb133ade916efc94aa991f1a1e3940d84d36",
+      "examples/leaf_river/data/weather.csv": "04d8ee04e042c4c91486a3e11b13af4fe29490b1c1e6893bda36331998b5bb01"
+    },
+    "usgs_station": "02472000",
+    "noaa_station": "USW00003940",
+    "period": [
+      "2019-01-01",
+      "2020-12-31"
+    ],
+    "source_response_status": "original HTTP responses and quality flags not retained by legacy cache",
+    "rights": "US federal observations; attribution to USGS and NOAA"
+  }
+}

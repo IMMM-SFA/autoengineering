@@ -1,0 +1,18 @@
+[
+  {
+    "component": "temperature",
+    "metric": "rmse",
+    "value": 0.6563061272180947,
+    "threshold": 1.0,
+    "status": "pass",
+    "interpretation": ""
+  },
+  {
+    "component": "inverter",
+    "metric": "rmse",
+    "value": 2.697657086989648,
+    "threshold": 1.0,
+    "status": "fail",
+    "interpretation": ""
+  }
+]

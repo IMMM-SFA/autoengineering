@@ -1,0 +1,72 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.1383257913403213,
+  "diagnostics": null,
+  "domain": "copper",
+  "evaluations": 4,
+  "method": "sobol",
+  "model_seconds": 0.02548904251307249,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 4,
+    "source_directory": "copper-sobol-3",
+    "source_ledger_sha256": "e305997930d9f039fe65dbc4769d79f18625ffffcbe4cd965e6d444d679eb7b5",
+    "source_observations": 4,
+    "source_trajectory_sha256": "2437a0b7b726cb5e2ca751e00173a2cfeed1327937fbd7b8edda2e6ece8125a2",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000003",
+    "config": {
+      "model": "rational3",
+      "ridge": 8.21917915015978e-06
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.20416668932215265
+    }
+  },
+  "seed": 3,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.1638148338533938,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0014470109167874594,
+    "rmse": 0.2566264096175495
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.5514373050779507,
+      "evaluations": 1,
+      "model_seconds": 0.007459708955138922,
+      "study_seconds": 0.05999383423477411,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.3571840415920821,
+      "evaluations": 2,
+      "model_seconds": 0.014976666774600744,
+      "study_seconds": 0.09590283408761024,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.3571840415920821,
+      "evaluations": 3,
+      "model_seconds": 0.018963333684951067,
+      "study_seconds": 0.12691508419811726,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.20416668932215265,
+      "evaluations": 4,
+      "model_seconds": 0.02548904251307249,
+      "study_seconds": 0.1638148338533938,
+      "target_reached": true
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+The benchmark contains 45 fixed-budget studies and 75 target studies.
+The target analysis retains 24,972 calls under a 2,000-call ceiling:
+64 studies reached their target and 11 were capped. The separate component-swap
+examples exercise solar, wind and hybrid energy chains. Figures retain unsuccessful
+runs and separate calibration gains from test performance.
+
+HYMOD illustrates the distinction: BO reached the validation target in 5/5 runs,
+with a median of 146 calls. Random and Sobol each reached it in
+0/5 and 0/5 runs, respectively.
+Yet median test RMSE was 2.6660 mm/day for BO, compared with
+2.5401 for random and 2.5591 for Sobol.
+This supports a distinction between target attainment and prediction, rather than a universal winner.

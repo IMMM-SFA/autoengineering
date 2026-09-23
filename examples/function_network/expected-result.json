@@ -1,0 +1,73 @@
+{
+  "component_outcomes": {
+    "score.utility_last": 5.0
+  },
+  "execution_order": [
+    "source",
+    "transform",
+    "score"
+  ],
+  "system_outcomes": {
+    "minimum_flow": 4.0,
+    "score.utility_last": 7.0,
+    "source.driver_mean": 2.0,
+    "transform.flow_mean": 4.0,
+    "utility": 7.0
+  },
+  "training_tables": {
+    "score": [
+      {
+        "action_id": "eval-000001",
+        "component": "score",
+        "inputs": {
+          "choice": "base",
+          "offset": 1.0,
+          "transform.flow_mean": 4.0
+        },
+        "outputs": {
+          "utility_last": 7.0
+        },
+        "scope": "system"
+      },
+      {
+        "action_id": "eval-000002",
+        "component": "score",
+        "inputs": {
+          "choice": "base",
+          "offset": -1.0,
+          "transform.flow_mean": 4.0
+        },
+        "outputs": {
+          "utility_last": 5.0
+        },
+        "scope": "component"
+      }
+    ],
+    "source": [
+      {
+        "action_id": "eval-000001",
+        "component": "source",
+        "inputs": {},
+        "outputs": {
+          "driver_mean": 2.0
+        },
+        "scope": "system"
+      }
+    ],
+    "transform": [
+      {
+        "action_id": "eval-000001",
+        "component": "transform",
+        "inputs": {
+          "choice": "base",
+          "gain": 2.0,
+          "source.driver_mean": 2.0
+        },
+        "outputs": {
+          "flow_mean": 4.0
+        },
+        "scope": "system"
+      }
+    ]
+  }
+}

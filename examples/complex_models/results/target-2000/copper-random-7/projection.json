@@ -1,0 +1,11 @@
+{
+  "controller_state": "not copied; this is a reporting projection, not a resumable study",
+  "discarded_from_analysis": 0,
+  "kind": "retrospective_prefix",
+  "retained_observations": 2,
+  "source_directory": "copper-random-7",
+  "source_ledger_sha256": "8c98ca431425e774daa965a7f1bac40864cd024351c16c1bfe5d8b08e6fb67ca",
+  "source_observations": 2,
+  "source_trajectory_sha256": "99b44181a15c770c6752725e7b155994aa7b2498e238e76f7db50e9399f74f18",
+  "timing": "cumulative trajectory timer at retained final call"
+}

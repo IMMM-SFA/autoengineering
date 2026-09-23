@@ -1,0 +1,9 @@
+[
+  {
+    "best_validation_rmse": 180.00165734869987,
+    "evaluations": 1,
+    "model_seconds": 0.011193708050996065,
+    "study_seconds": 0.07153158402070403,
+    "target_reached": true
+  }
+]

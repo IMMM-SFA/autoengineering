@@ -1,0 +1,105 @@
+system:
+  name: hydro
+  description: Real models coupled through BMI. See PROTOCOL.md.
+  components:
+  - name: pet
+    model_type: PetBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: air_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    - name: maximum_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    - name: minimum_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    - name: day_of_year
+      direction: in
+      data_type: float64
+      units: '1'
+      description: ''
+    outputs:
+    - name: potential_evaporation
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:PetBmi
+      configuration:
+        pet: hargreaves
+        capacity: 100.0
+        recession: 0.7
+  - name: soil_bucket
+    model_type: SoilBucketBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: precipitation
+      direction: in
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: potential_evaporation
+      direction: in
+      data_type: float64
+      units: mm d-1
+      description: ''
+    outputs:
+    - name: actual_evaporation
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: excess_water
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: soil_storage
+      direction: out
+      data_type: float64
+      units: mm
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:SoilBucketBmi
+  - name: routing
+    model_type: LinearReservoirBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: excess_water
+      direction: in
+      data_type: float64
+      units: mm d-1
+      description: ''
+    outputs:
+    - name: flow
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: reservoir_storage
+      direction: out
+      data_type: float64
+      units: mm
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:LinearReservoirBmi
+  connections:
+  - source: pet
+    target: soil_bucket
+    port_from: potential_evaporation
+    port_to: potential_evaporation
+    description: ''
+  - source: soil_bucket
+    target: routing
+    port_from: excess_water
+    port_to: excess_water
+    description: ''

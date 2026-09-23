@@ -1,0 +1,26 @@
+[
+  {
+    "id": "steady_faiman_ablation",
+    "component": "temperature",
+    "params": {
+      "method": "faiman"
+    },
+    "rationale": "Explicit ablation of thermal transience, not a weaker baseline"
+  },
+  {
+    "id": "sapm_module",
+    "component": "temperature",
+    "params": {
+      "method": "sapm_module"
+    },
+    "rationale": "Alternate module temperature law"
+  },
+  {
+    "id": "faiman_u0_30",
+    "component": "temperature",
+    "params": {
+      "u0": 30.0
+    },
+    "rationale": "Test a higher still-air heat loss coefficient"
+  }
+]

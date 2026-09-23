@@ -1,0 +1,80 @@
+system:
+  name: solar
+  description: Real models coupled through BMI. See PROTOCOL.md.
+  components:
+  - name: temperature
+    model_type: SolarTemperatureBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: irradiance
+      direction: in
+      data_type: float64
+      units: W m-2
+      description: ''
+    - name: air_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    outputs:
+    - name: module_temperature
+      direction: out
+      data_type: float64
+      units: degC
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:SolarTemperatureBmi
+      configuration:
+        temperature: ross
+        heat_loss: 25.0
+        loss: 1.0
+  - name: dc_power
+    model_type: PvWattsDcBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: irradiance
+      direction: in
+      data_type: float64
+      units: W m-2
+      description: ''
+    - name: module_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    outputs:
+    - name: dc_power
+      direction: out
+      data_type: float64
+      units: kW
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:PvWattsDcBmi
+  - name: inverter
+    model_type: PvWattsInverterBmi
+    description: CSDMS BMI 2.0 scalar component
+    inputs:
+    - name: dc_power
+      direction: in
+      data_type: float64
+      units: kW
+      description: ''
+    outputs:
+    - name: ac_power
+      direction: out
+      data_type: float64
+      units: kW
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:PvWattsInverterBmi
+  connections:
+  - source: temperature
+    target: dc_power
+    port_from: module_temperature
+    port_to: module_temperature
+    description: ''
+  - source: dc_power
+    target: inverter
+    port_from: dc_power
+    port_to: dc_power
+    description: ''

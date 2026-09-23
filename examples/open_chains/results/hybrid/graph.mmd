@@ -1,0 +1,9 @@
+```mermaid
+graph LR
+    dispatch["dispatch\n(dispatch)"]
+    revenue["revenue\n(revenue)"]
+    tariff["tariff\n(port_adapter)"]
+    dispatch -->|grid_kw| revenue
+    dispatch -->|price| tariff
+    tariff -->|price| revenue
+```

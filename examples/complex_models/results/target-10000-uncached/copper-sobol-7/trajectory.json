@@ -1,0 +1,86 @@
+[
+  {
+    "best_validation_rmse": 0.6288080403267428,
+    "evaluations": 1,
+    "model_seconds": 0.007137167267501354,
+    "study_seconds": 0.06256554089486599,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.6288080403267428,
+    "evaluations": 2,
+    "model_seconds": 0.011285709217190742,
+    "study_seconds": 0.09433233318850398,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.6288080403267428,
+    "evaluations": 3,
+    "model_seconds": 0.01826633419841528,
+    "study_seconds": 0.12857366586104035,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 4,
+    "model_seconds": 0.02937400108203292,
+    "study_seconds": 0.1676933327689767,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 5,
+    "model_seconds": 0.03591012628749013,
+    "study_seconds": 0.2017273330129683,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 6,
+    "model_seconds": 0.044235626235604286,
+    "study_seconds": 0.2382957497611642,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 7,
+    "model_seconds": 0.04802004341036081,
+    "study_seconds": 0.2702917908318341,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 8,
+    "model_seconds": 0.05591712612658739,
+    "study_seconds": 0.3064009160734713,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 9,
+    "model_seconds": 0.06266900105401874,
+    "study_seconds": 0.3416814999654889,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 10,
+    "model_seconds": 0.06644962634891272,
+    "study_seconds": 0.3731950828805566,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.22572901818157134,
+    "evaluations": 11,
+    "model_seconds": 0.07282083434984088,
+    "study_seconds": 0.4078275407664478,
+    "target_reached": false
+  },
+  {
+    "best_validation_rmse": 0.19598145919108328,
+    "evaluations": 12,
+    "model_seconds": 0.0793903754092753,
+    "study_seconds": 0.4437462082132697,
+    "target_reached": true
+  }
+]

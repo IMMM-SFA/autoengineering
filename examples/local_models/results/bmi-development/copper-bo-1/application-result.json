@@ -1,0 +1,36 @@
+{
+  "controller_and_optimizer_seconds": 4.940443830564618,
+  "diagnostics": {
+    "backend": "system",
+    "details": {
+      "ledger_entries": 12,
+      "ledger_fingerprint": "c896c2515e4c741abccbd4ddba4834e49beb20c1da094c7e34685cd124835651"
+    },
+    "fallback_reasons": [],
+    "fit_state": "not_fit_for_ledger",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "copper",
+  "evaluations": 12,
+  "method": "bo",
+  "model_seconds": 0.17626033630222082,
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "model": "rational3",
+      "ridge": 5.350829026856091e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19598389612508613
+    }
+  },
+  "seed": 1,
+  "study_seconds": 5.116704166866839,
+  "test": {
+    "bias": 0.0006082024001423889,
+    "rmse": 0.24773146422988165
+  }
+}

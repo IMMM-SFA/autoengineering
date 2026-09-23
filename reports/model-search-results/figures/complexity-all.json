@@ -1,0 +1,163 @@
+{
+  "data": [
+    {
+      "customdata": [
+        "Simple hydrology",
+        "Simple solar",
+        "Copper",
+        "HYMOD",
+        "Single-diode solar"
+      ],
+      "hovertemplate": "%{customdata}<br>%{x} parameters<br>%{y:.2f} ms/call<extra></extra>",
+      "marker": {
+        "color": "#4B737A",
+        "size": 12
+      },
+      "mode": "markers",
+      "x": [
+        3,
+        3,
+        2,
+        7,
+        7
+      ],
+      "y": [
+        16.1573150883972,
+        13.4119161569591,
+        8.47638754445749,
+        17.172881848334026,
+        160.33146566769574
+      ],
+      "type": "scatter"
+    }
+  ],
+  "layout": {
+    "template": {
+      "data": {
+        "scatter": [
+          {
+            "type": "scatter"
+          }
+        ]
+      }
+    },
+    "annotations": [
+      {
+        "showarrow": false,
+        "text": "Simple hydrology",
+        "x": 3,
+        "xanchor": "left",
+        "xshift": 12,
+        "y": 1.2083691943611803,
+        "yshift": 12
+      },
+      {
+        "showarrow": false,
+        "text": "Simple solar",
+        "x": 3,
+        "xanchor": "left",
+        "xshift": 12,
+        "y": 1.1274908298236015,
+        "yshift": -20
+      },
+      {
+        "showarrow": false,
+        "text": "Copper",
+        "x": 2,
+        "xanchor": "left",
+        "xshift": 12,
+        "y": 0.9282108046423142,
+        "yshift": 12
+      },
+      {
+        "showarrow": false,
+        "text": "HYMOD",
+        "x": 7,
+        "xanchor": "left",
+        "xshift": 12,
+        "y": 1.2348431819289876,
+        "yshift": 12
+      },
+      {
+        "showarrow": false,
+        "text": "Single-diode solar",
+        "x": 7,
+        "xanchor": "left",
+        "xshift": 12,
+        "y": 2.205018762683662,
+        "yshift": 12
+      }
+    ],
+    "xaxis": {
+      "title": {
+        "text": "Nominal search parameters",
+        "standoff": 12
+      },
+      "range": [
+        1,
+        10
+      ],
+      "tickvals": [
+        2,
+        3,
+        7
+      ],
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis": {
+      "title": {
+        "text": "Model time (ms/call, log scale)",
+        "standoff": 12
+      },
+      "type": "log",
+      "range": [
+        0.6989700043360189,
+        2.4771212547196626
+      ],
+      "tickmode": "array",
+      "tickvals": [
+        5,
+        10,
+        20,
+        50,
+        100,
+        200
+      ],
+      "minorloglabels": "none",
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "font": {
+      "family": "Arial, sans-serif",
+      "size": 13,
+      "color": "#333333"
+    },
+    "margin": {
+      "t": 35,
+      "r": 25,
+      "b": 85,
+      "l": 75
+    },
+    "legend": {
+      "orientation": "h",
+      "x": 0,
+      "y": -0.2,
+      "xanchor": "left",
+      "yanchor": "top"
+    },
+    "hoverlabel": {
+      "font": {
+        "size": 12
+      }
+    },
+    "title": {},
+    "height": 430,
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "showlegend": false
+  }
+}

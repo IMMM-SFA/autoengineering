@@ -1,0 +1,22 @@
+{
+  "files": [
+    {
+      "name": "35.2018863_-101.945027_psmv3_60_2012.csv",
+      "url": "https://raw.githubusercontent.com/NatLabRockies/HOPP/v3.4.2/hopp/simulation/resource_files/solar/35.2018863_-101.945027_psmv3_60_2012.csv",
+      "bytes": 449838,
+      "sha256": "4ff7ac353c3c0fdb5478e7e1ddad58c3696d5fb3f15d092f4b1d8f3e8eae190b"
+    },
+    {
+      "name": "35.2018863_-101.945027_windtoolkit_2012_60min_80m_100m.srw",
+      "url": "https://raw.githubusercontent.com/NatLabRockies/HOPP/v3.4.2/hopp/simulation/resource_files/wind/35.2018863_-101.945027_windtoolkit_2012_60min_80m_100m.srw",
+      "bytes": 384077,
+      "sha256": "39b950194db4665fbb3fc526c9a1341728fd25c7eb5706eb92eb1d883bd313d3"
+    },
+    {
+      "name": "pricing-data-2015-IronMtn-002_factors.csv",
+      "url": "https://raw.githubusercontent.com/NatLabRockies/HOPP/v3.4.2/hopp/simulation/resource_files/grid/pricing-data-2015-IronMtn-002_factors.csv",
+      "bytes": 104143,
+      "sha256": "c3d7afe0831d7e2b33f6b7f196380b51667367fd232f3f666c1f1bbaba598490"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+```mermaid
+graph LR
+    temperature["temperature\n(temperature)"]
+    dc["dc\n(dc)"]
+    inverter["inverter\n(inverter)"]
+    voltage["voltage\n(port_adapter)"]
+    temperature -->|module_temperature| dc
+    dc -->|p_dc| inverter
+    dc -->|v_dc| voltage
+    voltage -->|v_dc| inverter
+```

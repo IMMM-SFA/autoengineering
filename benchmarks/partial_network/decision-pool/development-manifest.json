@@ -1,0 +1,64 @@
+{
+  "command": "pixi run -e bayes bash autoresearch-decision-pool.sh development",
+  "decision_0007_sha256": "b6e408302a4a9ab7f03f468152eb4ba3720f831e00723c1d62995ef551fbd86f",
+  "decision_0008_sha256": "c0afe0891704189a44624021b52ff8fe37396b84659661073baa9d005be21b7c",
+  "decision_0009_sha256": "8313b0839af9cd392bc2fe793e533e93c177891cf170fd553e05b7954d4ef468",
+  "evidence_directory_sha256": "e8d4b415e20838a46aa5f3111393f881d81b29ea286b4adc5cfd762f88a8bca0",
+  "evidence_file_sha256": {
+    "component-selection.csv": "5cab330efe91182fc8fb9d15581c66bd3082ea3ffc3dd93e9ac7b3392280a0db",
+    "gate.json": "5bdf6035ccd56dc94006436cd79191bd0dacadbdf72d824534a2a6801e5b953f",
+    "raw-records.jsonl": "c2c7f20cf81d59e53ef2e06633cd16c7e195ece92aa89e34971450f5ef1accfe",
+    "report.md": "6ab5f8cdb671351447d08aec67e882e421a07f5ce2d4a5310f55efc951f3c04d",
+    "run-summary.csv": "15884d28be256a62cbee4023473a25ad19d87fe3e2501143ea771f887ba5106e",
+    "value-cost-diagnostics.json": "03277d26eab4ff68801926deb2bc4e3b40493eef5344b3c70417468c6ab063af"
+  },
+  "failed_criteria": [
+    "controlled_informative_component",
+    "random_component_control"
+  ],
+  "gate_passed": false,
+  "git_commit_signed": true,
+  "git_head_at_execution": "b1147bcf293af52eedbd2eeed64ae732357a7522",
+  "git_tree_clean_at_start": true,
+  "lock_file_sha256": {
+    "pixi.lock": "2a14a7a6c4c74870ee2820028f69140151e80efb897a825c8e3359c4e2d82fd5",
+    "pixi.toml": "580cda494db2678fa08ef08b3d383a0911f0696535e3a3b04dc25a90ad6241af",
+    "pyproject.toml": "50367045d7d43a42adb4a2d4ca90b5c9d642ed7babe512ac6a62800c194a2ca9"
+  },
+  "packages": {
+    "autoengineering": "0.1.0",
+    "botorch": "0.17.2",
+    "gpytorch": "1.15.2",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "torch": "2.13.0"
+  },
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "python": "3.12.13",
+  "raw_sha256": "c2c7f20cf81d59e53ef2e06633cd16c7e195ece92aa89e34971450f5ef1accfe",
+  "role": "development",
+  "schema_version": "1.0",
+  "source_file_sha256": {
+    "pixi.lock": "2a14a7a6c4c74870ee2820028f69140151e80efb897a825c8e3359c4e2d82fd5",
+    "pixi.toml": "580cda494db2678fa08ef08b3d383a0911f0696535e3a3b04dc25a90ad6241af",
+    "pyproject.toml": "50367045d7d43a42adb4a2d4ca90b5c9d642ed7babe512ac6a62800c194a2ca9",
+    "src/autoengineering/benchmarks/partial_network/__init__.py": "d9d515b2f1eda223057a4bbe9885c573de033ae63fd3d3b9b5bbb19dbc318d98",
+    "src/autoengineering/benchmarks/partial_network/__main__.py": "7431325523fdea9e8dae0e4c6c6149dc89d6db41f00775055d558b39aeae2f98",
+    "src/autoengineering/benchmarks/partial_network/problems.py": "a86e7e515fc6e8eec791ef46b7c5e8c813e8da90f9e1becfbf96da56ce117228",
+    "src/autoengineering/benchmarks/partial_network/runner.py": "45035273fc1b1970c45129be538c84bda651661464129a394a15be82089bd6b6",
+    "src/autoengineering/benchmarks/partial_network/summary.py": "efb059ec576d108bc940238965eb465ca79f9185ac2d603d29b70829c0e25bf9",
+    "src/autoengineering/optimization/backend.py": "db127fa7ae4a11adb3ee0bead65df198d74a1c445c707c0f89a00642b75f6d13",
+    "src/autoengineering/optimization/controller.py": "25f4b079cc6b52550a6d8f68c36f99dddf87b07ee1f486e0b632f8c2525de83c",
+    "src/autoengineering/optimization/full_network_backend.py": "54a18de88064d3d28666b11d33d2d1e9814a6f215e98f963dbdf062f90279a5e",
+    "src/autoengineering/optimization/function_network.py": "b076160c472aa6aeb9ddd33d06aa53badbf115764c27d57825463b1ca50f4376",
+    "src/autoengineering/optimization/function_network_evaluator.py": "ca31c606c62173c96cc28ae3768a422c002c0aea6603cdeae47706ddfb4c9ef4",
+    "src/autoengineering/optimization/ledger.py": "e137064014cc337a0643cc76b3cf7f4adc5772ca920ed5cd8c078310b3dbda63",
+    "src/autoengineering/optimization/partial_network_backend.py": "c44fca67a208578d4d1b2b07b0a257dc142fe1f516135b639003f43bf816adab",
+    "src/autoengineering/optimization/partial_network_baselines.py": "5080a99bf13cbaefb79a8f86fdb2a82906df2fd73bfa53d018be20ab8b867c15",
+    "src/autoengineering/optimization/records.py": "47f92d0c169c4026f813b5a8b58522e550eb4510c43f767351b6cd1de0ed8425",
+    "src/autoengineering/optimization/space.py": "7b8ebfb55ae072ea2e82f57a3f8ff00c6895be4bd4adc9d8bbc6ef4fc7e54652",
+    "src/autoengineering/optimization/spec.py": "87df5c77ed379718fa547add64233c02ff9551cde21426be23c7a7a6d46a597e",
+    "src/autoengineering/research/runner.py": "3c56db99d10bb90f5230e5c197a82721df00a4a454830755e8d9598735821fec"
+  },
+  "source_sha256": "3bace879fc84c9c35b5f10b444722399ca7ed66b41f3350fa792e1712c603330"
+}

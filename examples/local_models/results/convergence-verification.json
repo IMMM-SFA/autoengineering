@@ -1,0 +1,27 @@
+{
+  "command": "pixi run -e examples python -m pytest tests/test_local_convergence.py tests/test_local_models.py tests/test_local_bmi.py tests/test_optimization_boundaries.py -q -p no:cacheprovider",
+  "tests_passed": 34,
+  "test_seconds": 7.31,
+  "lint": "src tests examples scripts: passed",
+  "constraints": "8/8 passed",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "bmipy": "2.0.1",
+    "pvlib": "0.15.0",
+    "botorch": "0.17.2",
+    "torch": "2.13.0",
+    "pytest": "9.0.2"
+  },
+  "report_source_sha256": "9708c038dc7936db46452c0f304e16400628f99279bcc6f98c5912ed60b165f9",
+  "exact_original_prefixes_verified": 27,
+  "studies_verified": 72,
+  "notes": [
+    "Focused tests cover all changed behavior and BMI parity. Full repository test suite not rerun in this follow-up.",
+    "Markdown preview unavailable: doc.md-preview application bundle not found."
+  ],
+  "post_report_check_tests": "8 stopping/report tests passed after final frozen-recommendation check",
+  "independent_review": "No unresolved must-fix findings; convergence-review.md retains review history."
+}

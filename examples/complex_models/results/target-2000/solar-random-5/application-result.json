@@ -1,0 +1,123 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.31352008413523436,
+  "diagnostics": null,
+  "domain": "solar",
+  "evaluations": 11,
+  "method": "random",
+  "model_seconds": 0.10945412376895547,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 11,
+    "source_directory": "solar-random-5",
+    "source_ledger_sha256": "6d0d1892f552b558c9dbda8fd85f0aa14d808538a728b201234651f9d8652334",
+    "source_observations": 11,
+    "source_trajectory_sha256": "746bdf7ce63b33048cb6eaa860446b4952f7b08fe7401ed060c4690ce0140c63",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000010",
+    "config": {
+      "heat_loss": 58.01165594986735,
+      "loss": 0.6797804110318388,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.71562050793068
+    }
+  },
+  "seed": 5,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.4229742079041898,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -8.667776117018523,
+    "rmse": 114.10647691673698,
+    "temperature_rmse": 3275.984071656743
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 1,
+      "model_seconds": 0.010002374649047852,
+      "study_seconds": 0.06095812516286969,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 2,
+      "model_seconds": 0.019882041960954666,
+      "study_seconds": 0.09731000009924173,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 3,
+      "model_seconds": 0.029840709175914526,
+      "study_seconds": 0.13239545794203877,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 218.1574796505553,
+      "evaluations": 4,
+      "model_seconds": 0.04010487534105778,
+      "study_seconds": 0.1690596668049693,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 5,
+      "model_seconds": 0.050214958377182484,
+      "study_seconds": 0.20454262476414442,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 6,
+      "model_seconds": 0.06050387443974614,
+      "study_seconds": 0.24102175002917647,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 7,
+      "model_seconds": 0.07016887469217181,
+      "study_seconds": 0.2768312501721084,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 8,
+      "model_seconds": 0.07980354176834226,
+      "study_seconds": 0.3130115829408169,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 9,
+      "model_seconds": 0.0894670826382935,
+      "study_seconds": 0.35024541709572077,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 212.0081415519125,
+      "evaluations": 10,
+      "model_seconds": 0.09986237389966846,
+      "study_seconds": 0.3871042081154883,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.71562050793068,
+      "evaluations": 11,
+      "model_seconds": 0.10945412376895547,
+      "study_seconds": 0.4229742079041898,
+      "target_reached": true
+    }
+  ]
+}

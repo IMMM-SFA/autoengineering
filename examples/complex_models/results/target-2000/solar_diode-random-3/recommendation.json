@@ -1,0 +1,1 @@
+{"action_id":"eval-000002","config":{"a_scale":0.8181798393629074,"heat_loss":16.14930677995928,"io_scale":0.30007820507411803,"irradiance_scale":1.0729922243090857,"loss":0.8062496871841458,"rs_scale":1.5442248196247186,"rsh_scale":0.595623412728885},"feasible":true,"message":"best feasible observed configuration","outcomes":{"rmse":179.67599970223029}}

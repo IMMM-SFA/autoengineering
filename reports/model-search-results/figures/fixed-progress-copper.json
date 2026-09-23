@@ -1,0 +1,818 @@
+{
+  "data": [
+    {
+      "hovertemplate": "Random seed 0<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Random, seed 0",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19629171006005017,
+        0.1959753352224791,
+        0.19597447845574165,
+        0.19597447845574165
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Random seed 1<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Random, seed 1",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.2343206305505835,
+        0.19720155675856146,
+        0.195996003064471,
+        0.1959746119287382
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Random seed 2<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Random, seed 2",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19599552709823775,
+        0.19597480608250212,
+        0.19597480608250212,
+        0.19597480608250212
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Random median<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 3
+      },
+      "marker": {
+        "size": 7
+      },
+      "mode": "lines+markers",
+      "name": "Random",
+      "showlegend": true,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": {
+        "dtype": "f8",
+        "bdata": "u4eXNRYgyT8nNc1DuBXJP85te9OzFck/t0SKMrIVyT8="
+      },
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Sobol seed 0<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Sobol, seed 0",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19599344579277864,
+        0.19599344579277864,
+        0.1959768744819118,
+        0.1959768744819118
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Sobol seed 1<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Sobol, seed 1",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19598389612508613,
+        0.19598389612508613,
+        0.19598389612508613,
+        0.1959765784379049
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Sobol seed 2<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Sobol, seed 2",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19599479143277304,
+        0.19599479143277304,
+        0.19598345192658215,
+        0.19597453888695862
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Sobol median<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 3
+      },
+      "marker": {
+        "size": 7
+      },
+      "mode": "lines+markers",
+      "name": "Sobol",
+      "showlegend": true,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": {
+        "dtype": "f8",
+        "bdata": "y4X0L1AWyT/LhfQvUBbJP1d6Slr8Fck/qh2WscIVyT8="
+      },
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "BO seed 0<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "BO, seed 0",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19597569307340712,
+        0.19597569307340712,
+        0.19597569307340712,
+        0.19597569307340712
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "BO seed 1<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "BO, seed 1",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19598389612508613,
+        0.19598020929214044,
+        0.1959744354233358,
+        0.1959744354233358
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "BO seed 2<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "BO, seed 2",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.19597783815896805,
+        0.19597621865154757,
+        0.19597464174627352,
+        0.19597463060268888
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "BO median<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 3
+      },
+      "marker": {
+        "size": 7
+      },
+      "mode": "lines+markers",
+      "name": "BO",
+      "showlegend": true,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": {
+        "dtype": "f8",
+        "bdata": "HxjRQs0VyT9kefOsvxXJP7+hknKyFck/omGkWrIVyT8="
+      },
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "hovertemplate": "Random seed 0<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Random, seed 0",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.24887410387606654,
+        0.2478299646845037,
+        0.24788504991613308,
+        0.24788504991613308
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Random seed 1<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Random, seed 1",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.2950763985538411,
+        0.25014297659397117,
+        0.2476612152249118,
+        0.24789544074674605
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Random seed 2<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Random, seed 2",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.24766349906306936,
+        0.2479045880262787,
+        0.2479045880262787,
+        0.2479045880262787
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Random median<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#A96C2B",
+        "width": 3
+      },
+      "marker": {
+        "size": 7
+      },
+      "mode": "lines+markers",
+      "name": "Random",
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": {
+        "dtype": "f8",
+        "bdata": "mwh8TBvbzz/J9AxpVrvPP65PR4Oyus8/E9pqrQm7zz8="
+      },
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Sobol seed 0<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Sobol, seed 0",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.247673801336341,
+        0.247673801336341,
+        0.24780117540790292,
+        0.24780117540790292
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Sobol seed 1<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Sobol, seed 1",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.24773146422988165,
+        0.24773146422988165,
+        0.24773146422988165,
+        0.24794637388826074
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Sobol seed 2<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "Sobol, seed 2",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.2476670710704066,
+        0.2476670710704066,
+        0.24773476798627325,
+        0.24789071352625547
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "Sobol median<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#237F79",
+        "width": 3
+      },
+      "marker": {
+        "size": 7
+      },
+      "mode": "lines+markers",
+      "name": "Sobol",
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": {
+        "dtype": "f8",
+        "bdata": "HWVobsazzz8dZWhuxrPPPwSmStvFtc8/VOfJBeK6zz8="
+      },
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "BO seed 0<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "BO, seed 0",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.24792955648658446,
+        0.24792955648658446,
+        0.24792955648658446,
+        0.24792955648658446
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "BO seed 1<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "BO, seed 1",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.24773146422988165,
+        0.24799300902289462,
+        0.24787743172463195,
+        0.24787743172463195
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "BO seed 2<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 1
+      },
+      "marker": {
+        "size": 4
+      },
+      "mode": "lines+markers",
+      "name": "BO, seed 2",
+      "opacity": 0.35,
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": [
+        0.24796520730692856,
+        0.2478117430665755,
+        0.24789711889832164,
+        0.2478965155915147
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "hovertemplate": "BO median<br>Calls %{x}<br>RMSE %{y:.4f}<extra></extra>",
+      "line": {
+        "color": "#85506E",
+        "width": 3
+      },
+      "marker": {
+        "size": 7
+      },
+      "mode": "lines+markers",
+      "name": "BO",
+      "showlegend": false,
+      "x": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "y": {
+        "dtype": "f8",
+        "bdata": "USxp3Ce8zz9RLGncJ7zPP+dvOMEXu88/MAOhsRK7zz8="
+      },
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    }
+  ],
+  "layout": {
+    "template": {
+      "data": {
+        "scatter": [
+          {
+            "type": "scatter"
+          }
+        ]
+      }
+    },
+    "xaxis": {
+      "anchor": "y",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "title": {
+        "text": "Model calls",
+        "standoff": 12
+      },
+      "tickvals": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis": {
+      "anchor": "x",
+      "domain": [
+        0.6000000000000001,
+        1.0
+      ],
+      "title": {
+        "text": "RMSE (source units)",
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "xaxis2": {
+      "anchor": "y2",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "title": {
+        "text": "Model calls",
+        "standoff": 12
+      },
+      "tickvals": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis2": {
+      "anchor": "x2",
+      "domain": [
+        0.0,
+        0.4
+      ],
+      "title": {
+        "text": "RMSE (source units)",
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "annotations": [
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "Validation: used for selection",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 1.0,
+        "yanchor": "bottom",
+        "yref": "paper"
+      },
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "Test: revealed after selection",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 0.4,
+        "yanchor": "bottom",
+        "yref": "paper"
+      }
+    ],
+    "font": {
+      "family": "Arial, sans-serif",
+      "size": 13,
+      "color": "#333333"
+    },
+    "margin": {
+      "t": 35,
+      "r": 25,
+      "b": 160,
+      "l": 75
+    },
+    "legend": {
+      "orientation": "h",
+      "x": 0,
+      "y": -0.2,
+      "xanchor": "left",
+      "yanchor": "top"
+    },
+    "hoverlabel": {
+      "font": {
+        "size": 12
+      }
+    },
+    "title": {},
+    "height": 760,
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "showlegend": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "parent_sha256": "9a4137a8118d3654ab76ae1bc3c96eded26b8b354b2a9de4343b636005641c38",
+  "reused_power_matches_full": true,
+  "temperature_mean_difference": 0.0,
+  "mean_power_difference_kw": -7.8192442773736275,
+  "temperature_seconds": 2.0833685994148254e-06,
+  "power_seconds": 8.999835699796677e-06,
+  "full_seconds": 2.7999747544527054e-05,
+  "partial_bo_application_status": "unresolved_scalar_time_series_representation",
+  "scope": "component reuse and representation probe; no partial BO efficacy claim"
+}

@@ -1,0 +1,42 @@
+{
+  "controller_and_optimizer_seconds": 1.3289702460169792,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 24,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 24
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "hydro",
+  "evaluations": 24,
+  "method": "sobol",
+  "model_seconds": 0.5208231708966196,
+  "recommendation": {
+    "action_id": "eval-000021",
+    "config": {
+      "capacity": 171.2779064103961,
+      "pet": "hargreaves",
+      "recession": 0.8969658822752535
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 2.4836531747465003
+    }
+  },
+  "seed": 2,
+  "study_seconds": 1.8497934169135988,
+  "test": {
+    "bias": -0.16044948884635998,
+    "max_balance_error": 8.704148513061227e-14,
+    "nse": 0.43134211339792006,
+    "rmse": 2.804504670305184
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "config": {
+    "capacity": 100.0,
+    "pet": "hargreaves",
+    "recession": 0.7
+  },
+  "index": 1,
+  "model_seconds": 0.0027134581468999386,
+  "ranking": [
+    {
+      "component": "system_output",
+      "failing_metrics": [
+        "rmse"
+      ],
+      "results": [
+        {
+          "component": "system_output",
+          "interpretation": "",
+          "metric": "rmse",
+          "status": "fail",
+          "threshold": 2.098762636542684,
+          "value": 4.700904
+        }
+      ],
+      "score": 1.0,
+      "summary": "1 failing metric(s): rmse=4.701"
+    }
+  ],
+  "validation": {
+    "bias": 1.4900111451047784,
+    "max_balance_error": 4.263256414560601e-14,
+    "nse": -4.017401802162679,
+    "rmse": 4.700903868271838
+  }
+}

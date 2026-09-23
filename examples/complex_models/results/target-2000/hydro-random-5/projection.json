@@ -1,0 +1,11 @@
+{
+  "controller_state": "not copied; this is a reporting projection, not a resumable study",
+  "discarded_from_analysis": 0,
+  "kind": "retrospective_prefix",
+  "retained_observations": 168,
+  "source_directory": "hydro-random-5",
+  "source_ledger_sha256": "761afdb13acf175ae34e40c5d5718918e90a7bf7197a8ef4ec2ebcb2a1d72c1f",
+  "source_observations": 168,
+  "source_trajectory_sha256": "24a0d0e0704a9e58d66fecdabdf70bfadf65bc437b94bfb5c1005033a095ea99",
+  "timing": "cumulative trajectory timer at retained final call"
+}

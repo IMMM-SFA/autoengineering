@@ -1,0 +1,76 @@
+{
+  "cap": 10000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.13293941831216216,
+  "diagnostics": {
+    "backend": "sobol",
+    "details": {
+      "ledger_entries": 4,
+      "sequence_state": "derived_from_ledger",
+      "successful_entries": 4
+    },
+    "fallback_reasons": [
+      "baseline policy does not fit a surrogate"
+    ],
+    "fit_state": "stateless_baseline",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar",
+  "evaluations": 4,
+  "method": "sobol",
+  "model_seconds": 0.040443998761475086,
+  "recommendation": {
+    "action_id": "eval-000003",
+    "config": {
+      "heat_loss": 23.65127205848694,
+      "loss": 0.6594991609454155,
+      "temperature": "ross"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 176.8924972331747
+    }
+  },
+  "seed": 7,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.17338341707363725,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": -65.39662771407643,
+    "rmse": 138.32720258338153,
+    "temperature_rmse": 3258.735314723245
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 338.86854349850506,
+      "evaluations": 1,
+      "model_seconds": 0.010454250033944845,
+      "study_seconds": 0.06270324997603893,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 198.61816601622627,
+      "evaluations": 2,
+      "model_seconds": 0.020163290668278933,
+      "study_seconds": 0.09874841710552573,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 198.61816601622627,
+      "evaluations": 3,
+      "model_seconds": 0.03025516588240862,
+      "study_seconds": 0.1355856670998037,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 176.8924972331747,
+      "evaluations": 4,
+      "model_seconds": 0.040443998761475086,
+      "study_seconds": 0.17327333381399512,
+      "target_reached": true
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+.pixi/
+.quarto/
+report_files/
+__pycache__/

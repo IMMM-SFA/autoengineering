@@ -1,0 +1,34 @@
+{
+  "temperature_summary_checks": [
+    {
+      "heat_loss": 15.0,
+      "temperature_max_error_c": 1.4210854715202004e-14,
+      "ac_power_max_error_kw": 3.410605131648481e-13
+    },
+    {
+      "heat_loss": 25.0,
+      "temperature_max_error_c": 7.105427357601002e-15,
+      "ac_power_max_error_kw": 2.2737367544323206e-13
+    },
+    {
+      "heat_loss": 60.0,
+      "temperature_max_error_c": 3.552713678800501e-15,
+      "ac_power_max_error_kw": 2.2737367544323206e-13
+    }
+  ],
+  "attainable_dc_counterexample": {
+    "left": {
+      "heat_loss": 15.0,
+      "loss": 0.9
+    },
+    "right": {
+      "heat_loss": 60.0,
+      "loss": 0.8442768825788389
+    },
+    "dc_mean_difference_kw": -1.1368683772161603e-13,
+    "ac_mean_difference_kw": 0.06706825872333866
+  },
+  "application_partial_bo_status": "not_implemented_or_evaluated",
+  "interpretation": "Temperature mean preserves the registered Ross family on fixed forcing. Mean DC does not preserve inverter output for the demonstrated attainable configurations. Grouping DC and inverter is a candidate representation, not evidence of BO benefit.",
+  "probe_source_sha256": "9d3204d623b35e69e36851ad4fc93c524390b869aed5355a2018fa5e1ff67d5d"
+}

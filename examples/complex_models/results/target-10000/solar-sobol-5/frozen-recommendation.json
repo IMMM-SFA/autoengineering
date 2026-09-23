@@ -1,0 +1,13 @@
+{
+  "action_id": "eval-000003",
+  "config": {
+    "heat_loss": 40.118017424829304,
+    "loss": 0.6426604761276394,
+    "temperature": "ross"
+  },
+  "feasible": true,
+  "message": "best feasible observed configuration",
+  "outcomes": {
+    "rmse": 176.71567679731896
+  }
+}

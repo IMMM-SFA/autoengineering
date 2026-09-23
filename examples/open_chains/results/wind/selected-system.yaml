@@ -1,0 +1,154 @@
+system:
+  name: Horns Rev wind layout
+  description: ''
+  components:
+  - name: layout
+    model_type: layout
+    description: ''
+    inputs:
+    - name: x
+      direction: in
+      data_type: array
+      units: m
+      description: ''
+    - name: y
+      direction: in
+      data_type: array
+      units: m
+      description: ''
+    outputs:
+    - name: x
+      direction: out
+      data_type: array
+      units: m
+      description: ''
+    - name: y
+      direction: out
+      data_type: array
+      units: m
+      description: ''
+    - name: optimizer_diagnostics
+      direction: out
+      data_type: array
+      units: status code, count, count
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.wind.models:layout
+        inputs:
+        - x
+        - y
+        outputs:
+        - x
+        - y
+        - optimizer_diagnostics
+        params:
+          method: topfarm
+          maxiter: 20
+  - name: wakes
+    model_type: wakes
+    description: ''
+    inputs:
+    - name: x
+      direction: in
+      data_type: array
+      units: m
+      description: ''
+    - name: y
+      direction: in
+      data_type: array
+      units: m
+      description: ''
+    outputs:
+    - name: aep_gwh
+      direction: out
+      data_type: array
+      units: GWh
+      description: ''
+    - name: power_w
+      direction: out
+      data_type: array
+      units: W
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.wind.models:wakes
+        inputs:
+        - x
+        - y
+        outputs:
+        - aep_gwh
+        - power_w
+        params:
+          direction_step: 30
+  - name: energy
+    model_type: energy
+    description: ''
+    inputs:
+    - name: aep_gwh
+      direction: in
+      data_type: array
+      units: GWh
+      description: ''
+    outputs:
+    - name: total_gwh
+      direction: out
+      data_type: array
+      units: GWh
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.wind.models:annual_energy
+        inputs:
+        - aep_gwh
+        outputs:
+        - total_gwh
+        params: {}
+  - name: northing
+    model_type: port_adapter
+    description: Identity adapter for an additional edge port in a DiGraph.
+    inputs:
+    - name: value
+      direction: in
+      data_type: array
+      units: m
+      description: ''
+    outputs:
+    - name: y
+      direction: out
+      data_type: array
+      units: m
+      description: ''
+    metadata:
+      runnable:
+        kind: python
+        entry: examples.open_chains.common:passthrough
+        inputs:
+        - value
+        outputs:
+        - y
+        params: {}
+  connections:
+  - source: layout
+    target: wakes
+    port_from: x
+    port_to: x
+    description: ''
+  - source: layout
+    target: northing
+    port_from: y
+    port_to: value
+    description: ''
+  - source: wakes
+    target: energy
+    port_from: aep_gwh
+    port_to: aep_gwh
+    description: ''
+  - source: northing
+    target: wakes
+    port_from: y
+    port_to: y
+    description: ''

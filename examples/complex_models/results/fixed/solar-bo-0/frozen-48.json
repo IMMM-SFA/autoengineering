@@ -1,0 +1,16 @@
+{
+  "evaluations": 48,
+  "recommendation": {
+    "action_id": "eval-000036",
+    "config": {
+      "heat_loss": 51.432277803507205,
+      "loss": 0.6492841459603932,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 175.07752209494612
+    }
+  }
+}

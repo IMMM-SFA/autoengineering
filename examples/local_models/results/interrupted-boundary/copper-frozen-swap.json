@@ -1,0 +1,30 @@
+{
+  "config": {
+    "model": "rational3",
+    "ridge": 1e-06
+  },
+  "index": 2,
+  "model_seconds": 0.004527166951447725,
+  "ranking": [
+    {
+      "component": "system_output",
+      "failing_metrics": [],
+      "results": [
+        {
+          "component": "system_output",
+          "interpretation": "",
+          "metric": "rmse",
+          "status": "pass",
+          "threshold": 5.793287124166474,
+          "value": 0.196487
+        }
+      ],
+      "score": 0.0,
+      "summary": "All metrics passing"
+    }
+  ],
+  "validation": {
+    "bias": 0.008499191229419322,
+    "rmse": 0.19648714682949311
+  }
+}

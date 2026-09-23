@@ -1,0 +1,11 @@
+{
+  "controller_state": "not copied; this is a reporting projection, not a resumable study",
+  "discarded_from_analysis": 0,
+  "kind": "retrospective_prefix",
+  "retained_observations": 337,
+  "source_directory": "hydro-sobol-7",
+  "source_ledger_sha256": "ec6dfa7c3a4e448e24cf31d56b028d7e7f7877587f2ab740f676ac63c4ae77d0",
+  "source_observations": 337,
+  "source_trajectory_sha256": "8ab30041efd8962018fef4fef31a45c5830b245eb9f89e3649b9c20b7b112ca4",
+  "timing": "cumulative trajectory timer at retained final call"
+}

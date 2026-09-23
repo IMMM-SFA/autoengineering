@@ -1,0 +1,1121 @@
+{
+  "runs": [
+    {
+      "controller_and_optimizer_seconds": 3.8936584992334247,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.04172791773453355,
+      "recommendation": {
+        "action_id": "eval-000007",
+        "config": {
+          "capacity": 159.8829458888144,
+          "pet": "hargreaves",
+          "recession": 0.7692523218244088
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 3.5643115938853236
+        }
+      },
+      "seed": 0,
+      "study_seconds": 3.935386416967958,
+      "test": {
+        "bias": -0.13927501734371964,
+        "max_balance_error": 3.907985046680551e-14,
+        "nse": 0.2698900489903375,
+        "rmse": 3.177786883119426
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.109129833988845,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.045227374881505966,
+      "recommendation": {
+        "action_id": "eval-000010",
+        "config": {
+          "capacity": 192.63299442827702,
+          "pet": "hamon",
+          "recession": 0.8318980480544269
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 3.401117447201036
+        }
+      },
+      "seed": 0,
+      "study_seconds": 4.154357208870351,
+      "test": {
+        "bias": 0.492508747976154,
+        "max_balance_error": 4.263256414560601e-14,
+        "nse": 0.3666501869637774,
+        "rmse": 2.9597324740337205
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 10.979975709225982,
+      "diagnostics": {
+        "backend": "system",
+        "details": {
+          "ledger_entries": 12,
+          "ledger_fingerprint": "71dbd46c8766a9d57274f698bdaddebacb12dffd4639e50f593eed705c89986c"
+        },
+        "fallback_reasons": [],
+        "fit_state": "not_fit_for_ledger",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "bo",
+      "model_seconds": 0.0421458319760859,
+      "recommendation": {
+        "action_id": "eval-000006",
+        "config": {
+          "capacity": 200.0,
+          "pet": "hargreaves",
+          "recession": 0.95
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 2.0659955546313915
+        }
+      },
+      "seed": 0,
+      "study_seconds": 11.022121541202068,
+      "test": {
+        "bias": -0.20907361719947917,
+        "max_balance_error": 7.815970093361102e-14,
+        "nse": 0.39867949900159483,
+        "rmse": 2.8839228598885933
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.376719500869513,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.0517662069760263,
+      "recommendation": {
+        "action_id": "eval-000004",
+        "config": {
+          "capacity": 173.049956804522,
+          "pet": "hargreaves",
+          "recession": 0.8801238177977585
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 2.6104276849140033
+        }
+      },
+      "seed": 1,
+      "study_seconds": 4.428485707845539,
+      "test": {
+        "bias": -0.16565604925291294,
+        "max_balance_error": 5.684341886080802e-14,
+        "nse": 0.42741047950001876,
+        "rmse": 2.8141829785445234
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.311431583017111,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.05153620894998312,
+      "recommendation": {
+        "action_id": "eval-000009",
+        "config": {
+          "capacity": 66.96133969351649,
+          "pet": "hargreaves",
+          "recession": 0.9431581432931124
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 2.6076476742303027
+        }
+      },
+      "seed": 1,
+      "study_seconds": 4.362967791967094,
+      "test": {
+        "bias": 0.31897677626954796,
+        "max_balance_error": 4.884981308350689e-14,
+        "nse": 0.42938914519628557,
+        "rmse": 2.809316362939026
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 5.989262835588306,
+      "diagnostics": {
+        "backend": "system",
+        "details": {
+          "ledger_entries": 12,
+          "ledger_fingerprint": "8ef02e27d1b94c5e481acfe642c5e3a94f610bcd34278b76faf6ede603e80c28"
+        },
+        "fallback_reasons": [],
+        "fit_state": "not_fit_for_ledger",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "bo",
+      "model_seconds": 0.05820191418752074,
+      "recommendation": {
+        "action_id": "eval-000004",
+        "config": {
+          "capacity": 200.0,
+          "pet": "hargreaves",
+          "recession": 0.95
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 2.0659955546313915
+        }
+      },
+      "seed": 1,
+      "study_seconds": 6.047464749775827,
+      "test": {
+        "bias": -0.20907361719947917,
+        "max_balance_error": 7.815970093361102e-14,
+        "nse": 0.39867949900159483,
+        "rmse": 2.8839228598885933
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.160449542570859,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.050366499461233616,
+      "recommendation": {
+        "action_id": "eval-000007",
+        "config": {
+          "capacity": 156.27213061689056,
+          "pet": "hargreaves",
+          "recession": 0.8649656384990743
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 2.7875932684277474
+        }
+      },
+      "seed": 2,
+      "study_seconds": 4.210816042032093,
+      "test": {
+        "bias": -0.12465942797280476,
+        "max_balance_error": 5.5067062021407764e-14,
+        "nse": 0.42298603487561404,
+        "rmse": 2.825034763237747
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.1236334992572665,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.05023762537166476,
+      "recommendation": {
+        "action_id": "eval-000002",
+        "config": {
+          "capacity": 66.50056920945644,
+          "pet": "hargreaves",
+          "recession": 0.8646651983261108
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 3.548664124657178
+        }
+      },
+      "seed": 2,
+      "study_seconds": 4.173871124628931,
+      "test": {
+        "bias": 0.31182776660958017,
+        "max_balance_error": 3.197442310920451e-14,
+        "nse": 0.4221446094771111,
+        "rmse": 2.827093803569717
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 6.368041789159179,
+      "diagnostics": {
+        "backend": "system",
+        "details": {
+          "ledger_entries": 12,
+          "ledger_fingerprint": "cac6beb8e5898b447852a44173e0fc3fe136d22e647304e2a42617e1ae001a2c"
+        },
+        "fallback_reasons": [],
+        "fit_state": "not_fit_for_ledger",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "hydro",
+      "evaluations": 12,
+      "method": "bo",
+      "model_seconds": 0.05325733590871096,
+      "recommendation": {
+        "action_id": "eval-000006",
+        "config": {
+          "capacity": 200.0,
+          "pet": "hargreaves",
+          "recession": 0.95
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 2.0659955546313915
+        }
+      },
+      "seed": 2,
+      "study_seconds": 6.42129912506789,
+      "test": {
+        "bias": -0.20907361719947917,
+        "max_balance_error": 7.815970093361102e-14,
+        "nse": 0.39867949900159483,
+        "rmse": 2.8839228598885933
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.373982579447329,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.0070000034756958485,
+      "recommendation": {
+        "action_id": "eval-000008",
+        "config": {
+          "heat_loss": 49.915395676492835,
+          "loss": 0.667794243851693,
+          "temperature": "ambient"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 175.6803212316816
+        }
+      },
+      "seed": 0,
+      "study_seconds": 4.380982582923025,
+      "test": {
+        "bias": -20.629413018180895,
+        "rmse": 116.14072705964573,
+        "temperature_rmse": 3275.984071656743
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.840356331784278,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.00707671046257019,
+      "recommendation": {
+        "action_id": "eval-000007",
+        "config": {
+          "heat_loss": 27.149401218630373,
+          "loss": 0.6707330422941595,
+          "temperature": "ross"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 176.0199143850484
+        }
+      },
+      "seed": 0,
+      "study_seconds": 3.8474330422468483,
+      "test": {
+        "bias": -50.01379380356663,
+        "rmse": 129.29248816761807,
+        "temperature_rmse": 3260.956621518116
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.665563709568232,
+      "diagnostics": {
+        "backend": "system",
+        "details": {
+          "ledger_entries": 12,
+          "ledger_fingerprint": "125f85061dfa3a1fd439bd9ccb4abedc1436438a104570cb8a0a45e4c8914795"
+        },
+        "fallback_reasons": [],
+        "fit_state": "not_fit_for_ledger",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "bo",
+      "model_seconds": 0.006208498030900955,
+      "recommendation": {
+        "action_id": "eval-000010",
+        "config": {
+          "heat_loss": 60.0,
+          "loss": 0.6495612635362041,
+          "temperature": "ambient"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 175.0775599041313
+        }
+      },
+      "seed": 0,
+      "study_seconds": 4.671772207599133,
+      "test": {
+        "bias": -38.83087139815426,
+        "rmse": 121.94172206769069,
+        "temperature_rmse": 3275.984071656743
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.5448286258615553,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.00658729113638401,
+      "recommendation": {
+        "action_id": "eval-000000",
+        "config": {
+          "heat_loss": 57.77086633466709,
+          "loss": 0.6648718257238352,
+          "temperature": "ambient"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 175.50436318663702
+        }
+      },
+      "seed": 1,
+      "study_seconds": 3.5514159169979393,
+      "test": {
+        "bias": -23.546308335650217,
+        "rmse": 116.85769314377879,
+        "temperature_rmse": 3275.984071656743
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.4538565408438444,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.006352333817631006,
+      "recommendation": {
+        "action_id": "eval-000010",
+        "config": {
+          "heat_loss": 37.56953195203096,
+          "loss": 0.685922158928588,
+          "temperature": "ross"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 176.13317631180675
+        }
+      },
+      "seed": 1,
+      "study_seconds": 3.4602088746614754,
+      "test": {
+        "bias": -26.411743355129648,
+        "rmse": 118.96415957036201,
+        "temperature_rmse": 3265.1230174640978
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.919912628829479,
+      "diagnostics": {
+        "backend": "system",
+        "details": {
+          "ledger_entries": 12,
+          "ledger_fingerprint": "2f226e3fafcd4fb4ec4b762f874f79c369d4194c1daac6312aba5658ede61897"
+        },
+        "fallback_reasons": [],
+        "fit_state": "not_fit_for_ledger",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "bo",
+      "model_seconds": 0.006137245800346136,
+      "recommendation": {
+        "action_id": "eval-000006",
+        "config": {
+          "heat_loss": 19.828992363062167,
+          "loss": 0.6495652887781519,
+          "temperature": "ambient"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 175.0775624702757
+        }
+      },
+      "seed": 1,
+      "study_seconds": 4.926049874629825,
+      "test": {
+        "bias": -38.826852343778164,
+        "rmse": 121.94010649387852,
+        "temperature_rmse": 3275.984071656743
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.2023329990915954,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.005892959889024496,
+      "recommendation": {
+        "action_id": "eval-000008",
+        "config": {
+          "heat_loss": 19.34224258994512,
+          "loss": 0.6885614575252591,
+          "temperature": "ross"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 176.3887911981306
+        }
+      },
+      "seed": 2,
+      "study_seconds": 3.20822595898062,
+      "test": {
+        "bias": -46.46378200821671,
+        "rmse": 128.69507728154483,
+        "temperature_rmse": 3254.8954650410133
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.262711375951767,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.005310415755957365,
+      "recommendation": {
+        "action_id": "eval-000001",
+        "config": {
+          "heat_loss": 49.196209190413356,
+          "loss": 0.6946907972451299,
+          "temperature": "ross"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 177.05495208936324
+        }
+      },
+      "seed": 2,
+      "study_seconds": 3.2680217917077243,
+      "test": {
+        "bias": -12.250419728363543,
+        "rmse": 115.34815240454049,
+        "temperature_rmse": 3267.6891106048774
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 4.217172586359084,
+      "diagnostics": {
+        "backend": "system",
+        "details": {
+          "ledger_entries": 12,
+          "ledger_fingerprint": "97f8cbeef0e568e5f7ae4d2053033c66212a3186582ac2e1dc749a1cc55321e5"
+        },
+        "fallback_reasons": [],
+        "fit_state": "not_fit_for_ledger",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "solar",
+      "evaluations": 12,
+      "method": "bo",
+      "model_seconds": 0.006014663726091385,
+      "recommendation": {
+        "action_id": "eval-000011",
+        "config": {
+          "heat_loss": 52.081743410854834,
+          "loss": 0.6483360013326058,
+          "temperature": "ambient"
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 175.0794632912374
+        }
+      },
+      "seed": 2,
+      "study_seconds": 4.223187250085175,
+      "test": {
+        "bias": -40.05426597325371,
+        "rmse": 122.43997599063289,
+        "temperature_rmse": 3275.984071656743
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.4581329179927707,
+      "diagnostics": {
+        "backend": "random",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "copper",
+      "evaluations": 12,
+      "method": "random",
+      "model_seconds": 0.04973820736631751,
+      "recommendation": {
+        "action_id": "eval-000000",
+        "config": {
+          "model": "rational3",
+          "ridge": 7.735831408549065e-07
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 0.19629171006005017
+        }
+      },
+      "seed": 0,
+      "study_seconds": 3.507871125359088,
+      "test": {
+        "bias": 0.0007002345758390741,
+        "rmse": 0.24887410387606654
+      }
+    },
+    {
+      "controller_and_optimizer_seconds": 3.712837126571685,
+      "diagnostics": {
+        "backend": "sobol",
+        "details": {
+          "ledger_entries": 12,
+          "sequence_state": "derived_from_ledger",
+          "successful_entries": 12
+        },
+        "fallback_reasons": [
+          "baseline policy does not fit a surrogate"
+        ],
+        "fit_state": "stateless_baseline",
+        "optimizer_seconds": 0.0,
+        "warnings": []
+      },
+      "domain": "copper",
+      "evaluations": 12,
+      "method": "sobol",
+      "model_seconds": 0.05993929039686918,
+      "recommendation": {
+        "action_id": "eval-000007",
+        "config": {
+          "model": "rational3",
+          "ridge": 2.1078727842948533e-08
+        },
+        "feasible": true,
+        "message": "best feasible observed configuration",
+        "outcomes": {
+          "rmse": 0.19599344579277864
+        }
+      },
+      "seed": 0,
+      "study_seconds": 3.7727764169685543,
+      "test": {
+        "bias": 0.0006050325345651567,
+        "rmse": 0.247673801336341
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "candidates": [
+        {
+          "config": {
+            "capacity": 100.0,
+            "pet": "hamon",
+            "recession": 0.7
+          },
+          "index": 0,
+          "model_seconds": 0.004107958171516657,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [
+                "rmse"
+              ],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "fail",
+                  "threshold": 2.098762636542684,
+                  "value": 5.291468
+                }
+              ],
+              "score": 1.0,
+              "summary": "1 failing metric(s): rmse=5.291"
+            }
+          ],
+          "test": {
+            "bias": 0.6805338381326741,
+            "max_balance_error": 3.197442310920451e-14,
+            "nse": -0.15827711730321603,
+            "rmse": 4.002550983238024
+          },
+          "validation": {
+            "bias": 2.2142155627900846,
+            "max_balance_error": 3.197442310920451e-14,
+            "nse": -5.357238453642056,
+            "rmse": 5.2914680748184795
+          }
+        },
+        {
+          "config": {
+            "capacity": 100.0,
+            "pet": "hargreaves",
+            "recession": 0.7
+          },
+          "index": 1,
+          "model_seconds": 0.0027134581468999386,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [
+                "rmse"
+              ],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "fail",
+                  "threshold": 2.098762636542684,
+                  "value": 4.700904
+                }
+              ],
+              "score": 1.0,
+              "summary": "1 failing metric(s): rmse=4.701"
+            }
+          ],
+          "test": {
+            "bias": 0.07928635158711549,
+            "max_balance_error": 4.263256414560601e-14,
+            "nse": 0.0112452176625778,
+            "rmse": 3.6980683412885687
+          },
+          "validation": {
+            "bias": 1.4900111451047784,
+            "max_balance_error": 4.263256414560601e-14,
+            "nse": -4.017401802162679,
+            "rmse": 4.700903868271838
+          }
+        }
+      ],
+      "domain": "hydro",
+      "selected_index": 1
+    },
+    {
+      "candidates": [
+        {
+          "config": {
+            "heat_loss": 25.0,
+            "loss": 1.0,
+            "temperature": "ambient"
+          },
+          "index": 0,
+          "model_seconds": 0.3296236670576036,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 380.9490244249827,
+                  "value": 326.931745
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            },
+            {
+              "component": "temperature",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "temperature",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 3274.638279671233,
+                  "value": 3274.63828
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            }
+          ],
+          "test": {
+            "bias": 309.7780599707699,
+            "rmse": 358.5655331663784,
+            "temperature_rmse": 3275.984071656743
+          },
+          "validation": {
+            "bias": 264.3183170192709,
+            "rmse": 326.9317445199833,
+            "temperature_rmse": 3274.638279671233
+          }
+        },
+        {
+          "config": {
+            "heat_loss": 25.0,
+            "loss": 1.0,
+            "temperature": "ross"
+          },
+          "index": 1,
+          "model_seconds": 9.650038555264473e-05,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 380.9490244249827,
+                  "value": 298.250402
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            },
+            {
+              "component": "temperature",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "temperature",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 3274.638279671233,
+                  "value": 3263.43706
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            }
+          ],
+          "test": {
+            "bias": 257.8335864744147,
+            "rmse": 301.06035774186614,
+            "temperature_rmse": 3259.6653466828952
+          },
+          "validation": {
+            "bias": 237.4470536017045,
+            "rmse": 298.25040238863556,
+            "temperature_rmse": 3263.4370601741352
+          }
+        }
+      ],
+      "domain": "solar",
+      "selected_index": 1
+    },
+    {
+      "candidates": [
+        {
+          "config": {
+            "model": "polynomial",
+            "ridge": 1e-06
+          },
+          "index": 0,
+          "model_seconds": 0.00028299959376454353,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 5.793287124166474,
+                  "value": 0.992596
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            }
+          ],
+          "test": {
+            "bias": 0.03639263434842683,
+            "rmse": 1.0212363243064584
+          },
+          "validation": {
+            "bias": 0.0035932735337453323,
+            "rmse": 0.9925956222187637
+          }
+        },
+        {
+          "config": {
+            "model": "rational2",
+            "ridge": 1e-06
+          },
+          "index": 1,
+          "model_seconds": 0.005747166927903891,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 5.793287124166474,
+                  "value": 0.451636
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            }
+          ],
+          "test": {
+            "bias": -0.01892660064877648,
+            "rmse": 0.5364749330873405
+          },
+          "validation": {
+            "bias": 0.021138423181888792,
+            "rmse": 0.45163635326732143
+          }
+        },
+        {
+          "config": {
+            "model": "rational3",
+            "ridge": 1e-06
+          },
+          "index": 2,
+          "model_seconds": 0.004527166951447725,
+          "ranking": [
+            {
+              "component": "system_output",
+              "failing_metrics": [],
+              "results": [
+                {
+                  "component": "system_output",
+                  "interpretation": "",
+                  "metric": "rmse",
+                  "status": "pass",
+                  "threshold": 5.793287124166474,
+                  "value": 0.196487
+                }
+              ],
+              "score": 0.0,
+              "summary": "All metrics passing"
+            }
+          ],
+          "test": {
+            "bias": 0.0007311491178254026,
+            "rmse": 0.2491982704088654
+          },
+          "validation": {
+            "bias": 0.008499191229419322,
+            "rmse": 0.19648714682949311
+          }
+        }
+      ],
+      "domain": "copper",
+      "selected_index": 2
+    }
+  ]
+}

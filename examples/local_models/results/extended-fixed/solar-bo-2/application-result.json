@@ -1,0 +1,38 @@
+{
+  "controller_and_optimizer_seconds": 13.343715459108353,
+  "diagnostics": {
+    "backend": "system",
+    "details": {
+      "ledger_entries": 24,
+      "ledger_fingerprint": "13837ea9602296bff42977641368a81811e6f44465fcd1d01a127b822c13028d"
+    },
+    "fallback_reasons": [],
+    "fit_state": "not_fit_for_ledger",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar",
+  "evaluations": 24,
+  "method": "bo",
+  "model_seconds": 0.5861848327331245,
+  "recommendation": {
+    "action_id": "eval-000016",
+    "config": {
+      "heat_loss": 33.75701429456605,
+      "loss": 0.6496209935168424,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 175.07760391281883
+    }
+  },
+  "seed": 2,
+  "study_seconds": 13.929900291841477,
+  "test": {
+    "bias": -38.7712332689739,
+    "rmse": 121.91776318164365,
+    "temperature_rmse": 3275.984071656743
+  }
+}

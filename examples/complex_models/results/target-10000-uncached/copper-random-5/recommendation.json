@@ -1,0 +1,1 @@
+{"action_id":"eval-000002","config":{"model":"rational3","ridge":9.879823531088693e-06},"feasible":true,"message":"best feasible observed configuration","outcomes":{"rmse":0.20572891139796573}}

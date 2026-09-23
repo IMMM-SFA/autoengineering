@@ -1,0 +1,38 @@
+{
+  "cap": 60,
+  "controller_and_optimizer_seconds": 0.11102483281865716,
+  "domain": "copper",
+  "evaluations": 1,
+  "method": "bo",
+  "model_seconds": 0.01813008403405547,
+  "recommendation": {
+    "action_id": "eval-000000",
+    "config": {
+      "model": "rational3",
+      "ridge": 9.730441723600648e-07
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.19646264559703372
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.12915491685271263,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0007274816539056631,
+    "rmse": 0.2491603100541964
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 0.19646264559703372,
+      "evaluations": 1,
+      "model_seconds": 0.01813008403405547,
+      "study_seconds": 0.12891558278352022,
+      "target_reached": true
+    }
+  ]
+}

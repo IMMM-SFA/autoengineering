@@ -1,0 +1,119 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.8907823353074491,
+  "diagnostics": {
+    "backend": "system",
+    "details": {
+      "ledger_entries": 10,
+      "ledger_fingerprint": "880d6a7852952b6bf5e47525eb7c94545cef59d20d49c1025f0926ad45dba144"
+    },
+    "fallback_reasons": [],
+    "fit_state": "not_fit_for_ledger",
+    "optimizer_seconds": 0.0,
+    "warnings": []
+  },
+  "domain": "solar_diode",
+  "evaluations": 10,
+  "method": "bo",
+  "model_seconds": 2.2180419568903744,
+  "recommendation": {
+    "action_id": "eval-000009",
+    "config": {
+      "a_scale": 1.0378497857281792,
+      "heat_loss": 60.0,
+      "io_scale": 3.0,
+      "irradiance_scale": 1.0075429227347856,
+      "loss": 0.6,
+      "rs_scale": 1.8110041227693403,
+      "rsh_scale": 2.0
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 178.90082647304618
+    }
+  },
+  "seed": 3,
+  "stop_reason": "target_reached",
+  "study_seconds": 3.1088242921978235,
+  "target": 182.10662824491178,
+  "target_reached": true,
+  "test": {
+    "bias": -83.2201979635916,
+    "rmse": 157.6830098232833,
+    "temperature_rmse": 3269.1310872041595
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 206.70613137713892,
+      "evaluations": 1,
+      "model_seconds": 0.283098999876529,
+      "study_seconds": 0.4191325423307717,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 206.70613137713892,
+      "evaluations": 2,
+      "model_seconds": 0.4956709588877857,
+      "study_seconds": 0.6846680422313511,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.43370162183288,
+      "evaluations": 3,
+      "model_seconds": 0.7123596668243408,
+      "study_seconds": 0.9569390001706779,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.43370162183288,
+      "evaluations": 4,
+      "model_seconds": 0.9325157916173339,
+      "study_seconds": 1.2305587502196431,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.43370162183288,
+      "evaluations": 5,
+      "model_seconds": 1.1498906244523823,
+      "study_seconds": 1.5002474170178175,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.43370162183288,
+      "evaluations": 6,
+      "model_seconds": 1.346805916633457,
+      "study_seconds": 1.7491215830668807,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.43370162183288,
+      "evaluations": 7,
+      "model_seconds": 1.5263752918690443,
+      "study_seconds": 1.9836259172298014,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 195.43370162183288,
+      "evaluations": 8,
+      "model_seconds": 1.7259590825997293,
+      "study_seconds": 2.239565667230636,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 187.0171167052454,
+      "evaluations": 9,
+      "model_seconds": 1.9105396238155663,
+      "study_seconds": 2.585362832993269,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 178.90082647304618,
+      "evaluations": 10,
+      "model_seconds": 2.2180419568903744,
+      "study_seconds": 3.1085743331350386,
+      "target_reached": true
+    }
+  ]
+}

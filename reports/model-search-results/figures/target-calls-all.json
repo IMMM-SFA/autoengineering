@@ -1,0 +1,1492 @@
+{
+  "data": [
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          2.169295332362961,
+          2.1470511060312574
+        ],
+        [
+          4,
+          "target_reached",
+          2.169295332362961,
+          2.1363234888585785
+        ],
+        [
+          5,
+          "target_reached",
+          2.169295332362961,
+          2.0879260543352087
+        ],
+        [
+          6,
+          "evaluation_cap",
+          2.169295332362961,
+          2.1783949225998622
+        ],
+        [
+          7,
+          "target_reached",
+          2.169295332362961,
+          2.1521504582731623
+        ]
+      ],
+      "hovertemplate": "Random seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#A96C2B",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "triangle-right-open",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Random",
+      "showlegend": false,
+      "x": [
+        161,
+        199,
+        168,
+        2000,
+        89
+      ],
+      "y": [
+        -0.17,
+        -0.085,
+        0.0,
+        0.085,
+        0.17
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          2.169295332362961,
+          2.1594096362053903
+        ],
+        [
+          4,
+          "target_reached",
+          2.169295332362961,
+          2.1110336468254656
+        ],
+        [
+          5,
+          "target_reached",
+          2.169295332362961,
+          2.1028862464851716
+        ],
+        [
+          6,
+          "target_reached",
+          2.169295332362961,
+          2.158993279097928
+        ],
+        [
+          7,
+          "target_reached",
+          2.169295332362961,
+          2.128010893702043
+        ]
+      ],
+      "hovertemplate": "Sobol seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#237F79",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Sobol",
+      "showlegend": false,
+      "x": [
+        133,
+        324,
+        368,
+        208,
+        337
+      ],
+      "y": [
+        0.83,
+        0.915,
+        1.0,
+        1.085,
+        1.17
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          2.169295332362961,
+          2.0659955546313915
+        ],
+        [
+          4,
+          "target_reached",
+          2.169295332362961,
+          2.0659955546313915
+        ],
+        [
+          5,
+          "target_reached",
+          2.169295332362961,
+          2.0659955546313915
+        ],
+        [
+          6,
+          "target_reached",
+          2.169295332362961,
+          2.0659955546313915
+        ],
+        [
+          7,
+          "target_reached",
+          2.169295332362961,
+          2.0659955546313915
+        ]
+      ],
+      "hovertemplate": "BO seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#85506E",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "BO",
+      "showlegend": false,
+      "x": [
+        6,
+        6,
+        7,
+        6,
+        7
+      ],
+      "y": [
+        1.83,
+        1.915,
+        2.0,
+        2.085,
+        2.17
+      ],
+      "type": "scatter",
+      "xaxis": "x",
+      "yaxis": "y"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          183.83143789933789,
+          175.09818261672692
+        ],
+        [
+          4,
+          "target_reached",
+          183.83143789933789,
+          175.534471092378
+        ],
+        [
+          5,
+          "target_reached",
+          183.83143789933789,
+          176.71562050793068
+        ],
+        [
+          6,
+          "target_reached",
+          183.83143789933789,
+          176.5593466847721
+        ],
+        [
+          7,
+          "target_reached",
+          183.83143789933789,
+          176.34383678929535
+        ]
+      ],
+      "hovertemplate": "Random seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#A96C2B",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Random",
+      "showlegend": false,
+      "x": [
+        5,
+        2,
+        11,
+        3,
+        2
+      ],
+      "y": [
+        -0.17,
+        -0.085,
+        0.0,
+        0.085,
+        0.17
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          183.83143789933789,
+          176.4353468192891
+        ],
+        [
+          4,
+          "target_reached",
+          183.83143789933789,
+          180.00165734869987
+        ],
+        [
+          5,
+          "target_reached",
+          183.83143789933789,
+          176.71567679731896
+        ],
+        [
+          6,
+          "target_reached",
+          183.83143789933789,
+          180.38855162774908
+        ],
+        [
+          7,
+          "target_reached",
+          183.83143789933789,
+          176.8924972331747
+        ]
+      ],
+      "hovertemplate": "Sobol seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#237F79",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Sobol",
+      "showlegend": false,
+      "x": [
+        3,
+        1,
+        4,
+        2,
+        4
+      ],
+      "y": [
+        0.83,
+        0.915,
+        1.0,
+        1.085,
+        1.17
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          183.83143789933789,
+          176.4353468192891
+        ],
+        [
+          4,
+          "target_reached",
+          183.83143789933789,
+          180.00165734869987
+        ],
+        [
+          5,
+          "target_reached",
+          183.83143789933789,
+          176.71567679731896
+        ],
+        [
+          6,
+          "target_reached",
+          183.83143789933789,
+          180.38855162774908
+        ],
+        [
+          7,
+          "target_reached",
+          183.83143789933789,
+          176.8924972331747
+        ]
+      ],
+      "hovertemplate": "BO seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#85506E",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "BO",
+      "showlegend": false,
+      "x": [
+        3,
+        1,
+        4,
+        2,
+        4
+      ],
+      "y": [
+        1.83,
+        1.915,
+        2.0,
+        2.085,
+        2.17
+      ],
+      "type": "scatter",
+      "xaxis": "x2",
+      "yaxis": "y2"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          0.2057744777270775,
+          0.1960724758596784
+        ],
+        [
+          4,
+          "target_reached",
+          0.2057744777270775,
+          0.19830957458889473
+        ],
+        [
+          5,
+          "target_reached",
+          0.2057744777270775,
+          0.20572891139796573
+        ],
+        [
+          6,
+          "target_reached",
+          0.2057744777270775,
+          0.19971166313321398
+        ],
+        [
+          7,
+          "target_reached",
+          0.2057744777270775,
+          0.1959822510548131
+        ]
+      ],
+      "hovertemplate": "Random seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#A96C2B",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Random",
+      "showlegend": false,
+      "x": [
+        1,
+        8,
+        3,
+        7,
+        2
+      ],
+      "y": [
+        -0.17,
+        -0.085,
+        0.0,
+        0.085,
+        0.17
+      ],
+      "type": "scatter",
+      "xaxis": "x3",
+      "yaxis": "y3"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          0.2057744777270775,
+          0.20416668932215265
+        ],
+        [
+          4,
+          "target_reached",
+          0.2057744777270775,
+          0.19598354409531066
+        ],
+        [
+          5,
+          "target_reached",
+          0.2057744777270775,
+          0.1969853492470523
+        ],
+        [
+          6,
+          "target_reached",
+          0.2057744777270775,
+          0.19646264559703372
+        ],
+        [
+          7,
+          "target_reached",
+          0.2057744777270775,
+          0.19598145919108328
+        ]
+      ],
+      "hovertemplate": "Sobol seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#237F79",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Sobol",
+      "showlegend": false,
+      "x": [
+        4,
+        1,
+        5,
+        1,
+        12
+      ],
+      "y": [
+        0.83,
+        0.915,
+        1.0,
+        1.085,
+        1.17
+      ],
+      "type": "scatter",
+      "xaxis": "x3",
+      "yaxis": "y3"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          0.2057744777270775,
+          0.20416668932215265
+        ],
+        [
+          4,
+          "target_reached",
+          0.2057744777270775,
+          0.19598354409531066
+        ],
+        [
+          5,
+          "target_reached",
+          0.2057744777270775,
+          0.19597913769610728
+        ],
+        [
+          6,
+          "target_reached",
+          0.2057744777270775,
+          0.19646264559703372
+        ],
+        [
+          7,
+          "target_reached",
+          0.2057744777270775,
+          0.1965047198163146
+        ]
+      ],
+      "hovertemplate": "BO seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#85506E",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "BO",
+      "showlegend": false,
+      "x": [
+        4,
+        1,
+        5,
+        1,
+        7
+      ],
+      "y": [
+        1.83,
+        1.915,
+        2.0,
+        2.085,
+        2.17
+      ],
+      "type": "scatter",
+      "xaxis": "x3",
+      "yaxis": "y3"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.2321137319643258
+        ],
+        [
+          4,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.2609900050331424
+        ],
+        [
+          5,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.3142162350911126
+        ],
+        [
+          6,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.2004920763963522
+        ],
+        [
+          7,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.2399411265032836
+        ]
+      ],
+      "hovertemplate": "Random seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#A96C2B",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "triangle-right-open",
+          "triangle-right-open",
+          "triangle-right-open",
+          "triangle-right-open",
+          "triangle-right-open"
+        ]
+      },
+      "mode": "markers",
+      "name": "Random",
+      "showlegend": false,
+      "x": [
+        2000,
+        2000,
+        2000,
+        2000,
+        2000
+      ],
+      "y": [
+        -0.17,
+        -0.085,
+        0.0,
+        0.085,
+        0.17
+      ],
+      "type": "scatter",
+      "xaxis": "x4",
+      "yaxis": "y4"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.2409272271422602
+        ],
+        [
+          4,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.257656531637341
+        ],
+        [
+          5,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.2428524475972256
+        ],
+        [
+          6,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.1782878935588688
+        ],
+        [
+          7,
+          "evaluation_cap",
+          1.1382771629499375,
+          1.244145062404692
+        ]
+      ],
+      "hovertemplate": "Sobol seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#237F79",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "triangle-right-open",
+          "triangle-right-open",
+          "triangle-right-open",
+          "triangle-right-open",
+          "triangle-right-open"
+        ]
+      },
+      "mode": "markers",
+      "name": "Sobol",
+      "showlegend": false,
+      "x": [
+        2000,
+        2000,
+        2000,
+        2000,
+        2000
+      ],
+      "y": [
+        0.83,
+        0.915,
+        1.0,
+        1.085,
+        1.17
+      ],
+      "type": "scatter",
+      "xaxis": "x4",
+      "yaxis": "y4"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          1.1382771629499375,
+          1.136279936576662
+        ],
+        [
+          4,
+          "target_reached",
+          1.1382771629499375,
+          1.128073589616546
+        ],
+        [
+          5,
+          "target_reached",
+          1.1382771629499375,
+          1.1278788060587643
+        ],
+        [
+          6,
+          "target_reached",
+          1.1382771629499375,
+          1.1345313084975843
+        ],
+        [
+          7,
+          "target_reached",
+          1.1382771629499375,
+          1.132346243963679
+        ]
+      ],
+      "hovertemplate": "BO seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#85506E",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "BO",
+      "showlegend": false,
+      "x": [
+        158,
+        62,
+        146,
+        67,
+        313
+      ],
+      "y": [
+        1.83,
+        1.915,
+        2.0,
+        2.085,
+        2.17
+      ],
+      "type": "scatter",
+      "xaxis": "x4",
+      "yaxis": "y4"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          182.10662824491178,
+          179.67599970223029
+        ],
+        [
+          4,
+          "target_reached",
+          182.10662824491178,
+          174.52558844617283
+        ],
+        [
+          5,
+          "target_reached",
+          182.10662824491178,
+          180.53873600008328
+        ],
+        [
+          6,
+          "target_reached",
+          182.10662824491178,
+          175.414405410332
+        ],
+        [
+          7,
+          "target_reached",
+          182.10662824491178,
+          175.0871725624283
+        ]
+      ],
+      "hovertemplate": "Random seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#A96C2B",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Random",
+      "showlegend": false,
+      "x": [
+        3,
+        5,
+        8,
+        3,
+        13
+      ],
+      "y": [
+        -0.17,
+        -0.085,
+        0.0,
+        0.085,
+        0.17
+      ],
+      "type": "scatter",
+      "xaxis": "x5",
+      "yaxis": "y5"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          182.10662824491178,
+          181.21828026071273
+        ],
+        [
+          4,
+          "target_reached",
+          182.10662824491178,
+          181.736419852539
+        ],
+        [
+          5,
+          "target_reached",
+          182.10662824491178,
+          178.84804051742753
+        ],
+        [
+          6,
+          "target_reached",
+          182.10662824491178,
+          175.68712758920097
+        ],
+        [
+          7,
+          "target_reached",
+          182.10662824491178,
+          182.1031038282294
+        ]
+      ],
+      "hovertemplate": "Sobol seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#237F79",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "Sobol",
+      "showlegend": false,
+      "x": [
+        13,
+        9,
+        1,
+        5,
+        4
+      ],
+      "y": [
+        0.83,
+        0.915,
+        1.0,
+        1.085,
+        1.17
+      ],
+      "type": "scatter",
+      "xaxis": "x5",
+      "yaxis": "y5"
+    },
+    {
+      "customdata": [
+        [
+          3,
+          "target_reached",
+          182.10662824491178,
+          178.90082647304618
+        ],
+        [
+          4,
+          "target_reached",
+          182.10662824491178,
+          176.97847571102696
+        ],
+        [
+          5,
+          "target_reached",
+          182.10662824491178,
+          178.84804051742753
+        ],
+        [
+          6,
+          "target_reached",
+          182.10662824491178,
+          175.68712758920097
+        ],
+        [
+          7,
+          "target_reached",
+          182.10662824491178,
+          182.1031038282294
+        ]
+      ],
+      "hovertemplate": "BO seed %{customdata[0]}<br>%{x} calls<br>%{customdata[1]}<br>Target %{customdata[2]:.4f}<br>Validation %{customdata[3]:.4f}<extra></extra>",
+      "marker": {
+        "color": "#85506E",
+        "line": {
+          "width": 1.5
+        },
+        "size": 10,
+        "symbol": [
+          "circle",
+          "circle",
+          "circle",
+          "circle",
+          "circle"
+        ]
+      },
+      "mode": "markers",
+      "name": "BO",
+      "showlegend": false,
+      "x": [
+        10,
+        10,
+        1,
+        5,
+        4
+      ],
+      "y": [
+        1.83,
+        1.915,
+        2.0,
+        2.085,
+        2.17
+      ],
+      "type": "scatter",
+      "xaxis": "x5",
+      "yaxis": "y5"
+    }
+  ],
+  "layout": {
+    "template": {
+      "data": {
+        "scatter": [
+          {
+            "type": "scatter"
+          }
+        ]
+      }
+    },
+    "xaxis": {
+      "anchor": "y",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "matches": "x5",
+      "showticklabels": false,
+      "type": "log",
+      "range": [
+        -0.09691001300805639,
+        3.4913616938342726
+      ],
+      "tickmode": "array",
+      "tickvals": [
+        1,
+        10,
+        100,
+        1000,
+        2000
+      ],
+      "minorloglabels": "none",
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis": {
+      "anchor": "x",
+      "domain": [
+        0.844,
+        1.0
+      ],
+      "tickvals": [
+        0,
+        1,
+        2
+      ],
+      "ticktext": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "range": [
+        -0.4,
+        2.4
+      ],
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "xaxis2": {
+      "anchor": "y2",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "matches": "x5",
+      "showticklabels": false,
+      "type": "log",
+      "range": [
+        -0.09691001300805639,
+        3.4913616938342726
+      ],
+      "tickmode": "array",
+      "tickvals": [
+        1,
+        10,
+        100,
+        1000,
+        2000
+      ],
+      "minorloglabels": "none",
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis2": {
+      "anchor": "x2",
+      "domain": [
+        0.633,
+        0.789
+      ],
+      "tickvals": [
+        0,
+        1,
+        2
+      ],
+      "ticktext": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "range": [
+        -0.4,
+        2.4
+      ],
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "xaxis3": {
+      "anchor": "y3",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "matches": "x5",
+      "showticklabels": false,
+      "type": "log",
+      "range": [
+        -0.09691001300805639,
+        3.4913616938342726
+      ],
+      "tickmode": "array",
+      "tickvals": [
+        1,
+        10,
+        100,
+        1000,
+        2000
+      ],
+      "minorloglabels": "none",
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis3": {
+      "anchor": "x3",
+      "domain": [
+        0.422,
+        0.578
+      ],
+      "tickvals": [
+        0,
+        1,
+        2
+      ],
+      "ticktext": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "range": [
+        -0.4,
+        2.4
+      ],
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "xaxis4": {
+      "anchor": "y4",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "matches": "x5",
+      "showticklabels": false,
+      "type": "log",
+      "range": [
+        -0.09691001300805639,
+        3.4913616938342726
+      ],
+      "tickmode": "array",
+      "tickvals": [
+        1,
+        10,
+        100,
+        1000,
+        2000
+      ],
+      "minorloglabels": "none",
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis4": {
+      "anchor": "x4",
+      "domain": [
+        0.211,
+        0.367
+      ],
+      "tickvals": [
+        0,
+        1,
+        2
+      ],
+      "ticktext": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "range": [
+        -0.4,
+        2.4
+      ],
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "xaxis5": {
+      "anchor": "y5",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "type": "log",
+      "range": [
+        -0.09691001300805639,
+        3.4913616938342726
+      ],
+      "tickmode": "array",
+      "tickvals": [
+        1,
+        10,
+        100,
+        1000,
+        2000
+      ],
+      "minorloglabels": "none",
+      "title": {
+        "text": "Model calls (log scale)",
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "yaxis5": {
+      "anchor": "x5",
+      "domain": [
+        0.0,
+        0.156
+      ],
+      "tickvals": [
+        0,
+        1,
+        2
+      ],
+      "ticktext": [
+        "Random",
+        "Sobol",
+        "BO"
+      ],
+      "range": [
+        -0.4,
+        2.4
+      ],
+      "title": {
+        "standoff": 12
+      },
+      "automargin": true,
+      "gridcolor": "#dddddd",
+      "zeroline": false
+    },
+    "annotations": [
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "Simple hydrology",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 1.0,
+        "yanchor": "bottom",
+        "yref": "paper"
+      },
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "Simple solar",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 0.789,
+        "yanchor": "bottom",
+        "yref": "paper"
+      },
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "Copper",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 0.578,
+        "yanchor": "bottom",
+        "yref": "paper"
+      },
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "HYMOD",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 0.367,
+        "yanchor": "bottom",
+        "yref": "paper"
+      },
+      {
+        "font": {
+          "size": 16
+        },
+        "showarrow": false,
+        "text": "Single-diode solar",
+        "x": 0.5,
+        "xanchor": "center",
+        "xref": "paper",
+        "y": 0.156,
+        "yanchor": "bottom",
+        "yref": "paper"
+      }
+    ],
+    "shapes": [
+      {
+        "line": {
+          "color": "#888888",
+          "dash": "dot"
+        },
+        "type": "line",
+        "x0": 2000,
+        "x1": 2000,
+        "xref": "x",
+        "y0": 0,
+        "y1": 1,
+        "yref": "y domain"
+      },
+      {
+        "line": {
+          "color": "#888888",
+          "dash": "dot"
+        },
+        "type": "line",
+        "x0": 2000,
+        "x1": 2000,
+        "xref": "x2",
+        "y0": 0,
+        "y1": 1,
+        "yref": "y2 domain"
+      },
+      {
+        "line": {
+          "color": "#888888",
+          "dash": "dot"
+        },
+        "type": "line",
+        "x0": 2000,
+        "x1": 2000,
+        "xref": "x3",
+        "y0": 0,
+        "y1": 1,
+        "yref": "y3 domain"
+      },
+      {
+        "line": {
+          "color": "#888888",
+          "dash": "dot"
+        },
+        "type": "line",
+        "x0": 2000,
+        "x1": 2000,
+        "xref": "x4",
+        "y0": 0,
+        "y1": 1,
+        "yref": "y4 domain"
+      },
+      {
+        "line": {
+          "color": "#888888",
+          "dash": "dot"
+        },
+        "type": "line",
+        "x0": 2000,
+        "x1": 2000,
+        "xref": "x5",
+        "y0": 0,
+        "y1": 1,
+        "yref": "y5 domain"
+      }
+    ],
+    "font": {
+      "family": "Arial, sans-serif",
+      "size": 13,
+      "color": "#333333"
+    },
+    "margin": {
+      "t": 35,
+      "r": 25,
+      "b": 85,
+      "l": 75
+    },
+    "legend": {
+      "orientation": "h",
+      "x": 0,
+      "y": -0.2,
+      "xanchor": "left",
+      "yanchor": "top"
+    },
+    "hoverlabel": {
+      "font": {
+        "size": 12
+      }
+    },
+    "title": {},
+    "height": 1030,
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "showlegend": false
+  }
+}

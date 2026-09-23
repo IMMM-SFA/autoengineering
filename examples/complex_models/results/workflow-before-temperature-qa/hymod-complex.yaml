@@ -1,0 +1,101 @@
+system:
+  name: hymod
+  description: ''
+  components:
+  - name: pet
+    model_type: PetBmi
+    description: PetBmi
+    inputs:
+    - name: air_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    - name: maximum_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    - name: minimum_temperature
+      direction: in
+      data_type: float64
+      units: degC
+      description: ''
+    - name: day_of_year
+      direction: in
+      data_type: float64
+      units: '1'
+      description: ''
+    outputs:
+    - name: potential_evaporation
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    metadata:
+      bmi_class: examples.local_models.bmi_components:PetBmi
+  - name: soil
+    model_type: PdmSoilBmi
+    description: Pareto-distributed soil capacity with storage-limited evapotranspiration.
+    inputs:
+    - name: precipitation
+      direction: in
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: potential_evaporation
+      direction: in
+      data_type: float64
+      units: mm d-1
+      description: ''
+    outputs:
+    - name: excess_water
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: actual_evaporation
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: soil_storage
+      direction: out
+      data_type: float64
+      units: mm
+      description: ''
+    metadata:
+      bmi_class: examples.complex_models.models:PdmSoilBmi
+  - name: routing
+    model_type: ParallelRoutingBmi
+    description: One slow reservoir in parallel with a cascade of three fast reservoirs.
+    inputs:
+    - name: excess_water
+      direction: in
+      data_type: float64
+      units: mm d-1
+      description: ''
+    outputs:
+    - name: flow
+      direction: out
+      data_type: float64
+      units: mm d-1
+      description: ''
+    - name: routing_storage
+      direction: out
+      data_type: float64
+      units: mm
+      description: ''
+    metadata:
+      bmi_class: examples.complex_models.models:ParallelRoutingBmi
+  connections:
+  - source: pet
+    target: soil
+    port_from: potential_evaporation
+    port_to: potential_evaporation
+    description: ''
+  - source: soil
+    target: routing
+    port_from: excess_water
+    port_to: excess_water
+    description: ''

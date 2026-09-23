@@ -1,0 +1,45 @@
+{
+  "cap": 60,
+  "controller_and_optimizer_seconds": 0.16280720755457878,
+  "domain": "copper",
+  "evaluations": 2,
+  "method": "random",
+  "model_seconds": 0.02778425021097064,
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "model": "rational3",
+      "ridge": 6.07422269658425e-08
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 0.1959822510548131
+    }
+  },
+  "seed": 7,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.19059145776554942,
+  "target": 0.2057744777270775,
+  "target_reached": true,
+  "test": {
+    "bias": 0.0006089360862072957,
+    "rmse": 0.24774421748519634
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 1.0472359688285595,
+      "evaluations": 1,
+      "model_seconds": 0.011959959287196398,
+      "study_seconds": 0.12085104081779718,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 0.1959822510548131,
+      "evaluations": 2,
+      "model_seconds": 0.02778425021097064,
+      "study_seconds": 0.19039358291774988,
+      "target_reached": true
+    }
+  ]
+}

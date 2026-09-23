@@ -1,0 +1,60 @@
+{
+  "cap": 2000,
+  "checkpoints": [],
+  "controller_and_optimizer_seconds": 0.07933995872735977,
+  "diagnostics": null,
+  "domain": "solar",
+  "evaluations": 2,
+  "method": "bo",
+  "model_seconds": 0.0198764163069427,
+  "projection": {
+    "controller_state": "not copied; this is a reporting projection, not a resumable study",
+    "discarded_from_analysis": 0,
+    "kind": "retrospective_prefix",
+    "retained_observations": 2,
+    "source_directory": "solar-bo-6",
+    "source_ledger_sha256": "a415856540a3aa8c64fb80cb774cfc95e49cd40f8b16dd4ba5ebc4d6d367d814",
+    "source_observations": 2,
+    "source_trajectory_sha256": "74fa08216c2ce4804e83311ddd63159b558b41de73167ffe427b91919e8cc3a4",
+    "timing": "cumulative trajectory timer at retained final call"
+  },
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "heat_loss": 44.866151036694646,
+      "loss": 0.7044127462897449,
+      "temperature": "ambient"
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration",
+    "outcomes": {
+      "rmse": 180.38855162774908
+    }
+  },
+  "seed": 6,
+  "stop_reason": "target_reached",
+  "study_seconds": 0.09921637503430247,
+  "target": 183.83143789933789,
+  "target_reached": true,
+  "test": {
+    "bias": 15.904664737554103,
+    "rmse": 114.67762523601503,
+    "temperature_rmse": 3275.984071656743
+  },
+  "trajectory": [
+    {
+      "best_validation_rmse": 317.08980326569065,
+      "evaluations": 1,
+      "model_seconds": 0.010307541117072105,
+      "study_seconds": 0.06288433261215687,
+      "target_reached": false
+    },
+    {
+      "best_validation_rmse": 180.38855162774908,
+      "evaluations": 2,
+      "model_seconds": 0.0198764163069427,
+      "study_seconds": 0.09921637503430247,
+      "target_reached": true
+    }
+  ]
+}
