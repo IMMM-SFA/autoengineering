@@ -30,8 +30,9 @@ implementations or evaluator configuration today.
 
 `System.from_yaml()` loads components, ports, metadata, and directed connections.
 `topological_order()`, `upstream_of()`, `downstream_of()`, `describe()`, and `to_mermaid()` support
-inspection. `to_networkx()` returns a copy. Port type labels do not provide full unit, shape, or
-physical validation.
+inspection. Connections retain distinct port pairs between the same components;
+`to_networkx()` returns a structural `MultiDiGraph` copy. Reconnecting the same port pair updates
+that connection. Port type labels do not provide full unit, shape, or physical validation.
 
 ```python
 from autoengineering.system import System
@@ -44,10 +45,15 @@ print(system.to_mermaid())
 Numeric models can be called from a workflow script or through `research.run_component`. A
 component's `metadata["runnable"]` declares a Python `module:callable` or a command with NPZ inputs
 and outputs. `build_feedforward_runner(system, source_arrays)` builds a callable that walks an
-acyclic graph. Models with additional arithmetic can supply `run_chain(system)` directly.
+acyclic graph. It snapshots source arrays when constructed and isolates component state and input
+arrays on each execution, including inputs shared across branches. Rebuild the runner to change its
+source data. Python runnables also receive copied arrays and parameter dictionaries. Models with
+additional arithmetic can supply `run_chain(system)` directly; external callable or global state
+still requires explicit control.
 
 `swap_component(system, target_name, replacement)` returns a new system with the existing
-connections. Matching port names alone does not establish compatible units, timing, or semantics.
+connections and copied components, including the replacement. A rename to an occupied component
+name is rejected. Matching port names alone does not establish compatible units, timing, or semantics.
 Adapters and validation still carry that responsibility.
 
 ## Validate and prioritize
@@ -65,7 +71,11 @@ priorities = rank_opportunities(results)
 report = generate_report(system, results, format="markdown")
 ```
 
-This snippet assumes matching `observed` and `simulated` arrays and a loaded `system`.
+This snippet assumes a loaded `system` and matching, nonempty, finite, real-valued one-dimensional
+`observed` and `simulated` arrays. Validation rejects other shapes rather than broadcasting them,
+and raises an error when a selected metric is nonfinite or undefined (for example, NSE for constant
+observations). Thresholds must be finite. Direct metric functions enforce the same input-array
+contract, but retain their existing undefined-value sentinels.
 Available metrics are `rmse`, `bias`, `relative_bias`, `correlation`, `nse`, and `kge`.
 NSE, KGE, and correlation pass when they meet or exceed a threshold. Other metrics pass when their
 absolute value is at or below the threshold.
@@ -118,8 +128,11 @@ metric is available. Scores are rounded to six decimals. With none of those metr
 zero and trials cannot improve it.
 
 Thresholds annotate validation results. They are not hard constraints on retention. A kept trial
-can worsen another metric or fail a threshold. Targets stop the loop, and `max_iterations` bounds
-the number of candidates. Candidate errors become failed nodes. The loop does not provide the BO
+can worsen another metric or fail a threshold. Targets stop the loop only when the baseline or a
+retained trial meets them; a rejected trial cannot terminate the search. Target values must be
+finite. `max_iterations` bounds the number of candidates. Candidate errors, including invalid
+validation arrays or undefined metrics, become failed nodes. Supplied runners receive copies of
+the baseline and trial systems so component mutations cannot alter retained state. The loop does not provide the BO
 controller's cost accounting or durable resume contract, and it does not control stochastic model
 seeds. Use a fresh output directory and report all metric tradeoffs.
 

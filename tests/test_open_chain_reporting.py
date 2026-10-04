@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
+import subprocess
 
 import pytest
 
@@ -18,7 +19,29 @@ def wind_evidence(tmp_path, monkeypatch):
         (tmp_path / name).symlink_to(original / name)
     directory = tmp_path / "results/wind"
     shutil.copytree(original / "results/wind", directory)
+    # Artifact tests verify the historical run, not the behavior of revised core code.
+    # Keep the production live-source gate strict and materialize its exact old inputs.
+    repository = report.REPO
+    snapshot = tmp_path / "recorded-repository"
+    manifest = json.loads((directory / "manifest.json").read_text())
+    revision = "d2fe5b488aab15a2b896f8c6740d9ee79be9bba6"
+    expected_sources = {
+        **manifest["core_source_sha256"],
+        "pixi.toml": manifest["pixi_manifest_sha256"],
+        "pixi.lock": manifest["pixi_lock_sha256"],
+    }
+    for name, expected in expected_sources.items():
+        archived = subprocess.run(
+            ["git", "-C", str(repository), "show", f"{revision}:{name}"],
+            check=True,
+            capture_output=True,
+        ).stdout
+        destination = snapshot / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(archived)
+        assert report.digest(destination) == expected, f"Historical input differs: {name}"
     monkeypatch.setattr(report, "ROOT", tmp_path)
+    monkeypatch.setattr(report, "REPO", snapshot)
     return directory
 
 
@@ -29,9 +52,16 @@ def refresh_hash(directory: Path, name: str) -> None:
     path.write_text(json.dumps(hashes))
 
 
-def test_saved_wind_evidence_verifies(wind_evidence):
+def test_saved_wind_evidence_verifies_at_recorded_source(wind_evidence):
     summary, _, _ = report.verify("wind")
     assert summary["selected"] == "topfarm_20"
+
+
+def test_changed_core_source_is_rejected(wind_evidence):
+    path = report.REPO / "src/autoengineering/execute/swap.py"
+    path.write_bytes(path.read_bytes() + b"\n# changed source\n")
+    with pytest.raises(AssertionError, match="Changed core source"):
+        report.verify("wind")
 
 
 def test_changed_artifact_is_rejected(wind_evidence):

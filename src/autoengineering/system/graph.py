@@ -16,7 +16,7 @@ class System:
     def __init__(self, name: str, description: str = ""):
         self.name = name
         self.description = description
-        self._graph = nx.DiGraph()
+        self._graph = nx.MultiDiGraph()
 
     # --- Component management ---
 
@@ -79,7 +79,7 @@ class System:
         port_to: str = "",
         description: str = "",
     ):
-        """Connect two components (source -> target)."""
+        """Connect a port pair, updating only an identical existing connection."""
         if source not in self._graph:
             raise KeyError(f"Source component '{source}' not found")
         if target not in self._graph:
@@ -87,6 +87,7 @@ class System:
         self._graph.add_edge(
             source,
             target,
+            key=(port_from, port_to),
             port_from=port_from,
             port_to=port_to,
             description=description,
@@ -122,8 +123,8 @@ class System:
         """Components in execution order."""
         return list(nx.topological_sort(self._graph))
 
-    def to_networkx(self) -> nx.DiGraph:
-        """Return the underlying NetworkX graph."""
+    def to_networkx(self) -> nx.MultiDiGraph:
+        """Return a structural copy retaining every port-level connection."""
         return self._graph.copy()
 
     # --- Serialization ---
@@ -135,8 +136,7 @@ class System:
                 "name": self.name,
                 "description": self.description,
                 "components": [
-                    self._graph.nodes[n]["component"].to_dict()
-                    for n in self._graph.nodes
+                    self._graph.nodes[n]["component"].to_dict() for n in self._graph.nodes
                 ],
                 "connections": [
                     {
@@ -164,7 +164,7 @@ class System:
             system._graph.add_node(comp.name, component=comp)
 
         for conn in sys_data.get("connections", []):
-            system._graph.add_edge(
+            system.connect(
                 conn["source"],
                 conn["target"],
                 port_from=conn.get("port_from", ""),
