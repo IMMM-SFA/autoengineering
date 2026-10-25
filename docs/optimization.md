@@ -60,7 +60,7 @@ The example matrix uses a 2000-call ceiling. That is a benchmark setting, not a
 universal recommendation for other models. Physical detail, parameter count, target
 difficulty and evaluation cost are separate considerations. See the
 [figure report](../reports/model-search-results/report.html) and
-[saved references](../background_research/pilot-based-selection.md).
+[saved references](../background-research/pilot-based-selection.md).
 
 ### TODO
 
