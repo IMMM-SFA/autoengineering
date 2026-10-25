@@ -33,9 +33,7 @@ class ValidationResult:
         }
 
     def to_markdown(self) -> str:
-        icon = {"pass": "OK", "fail": "FAIL", "warn": "WARN", "info": "INFO"}.get(
-            self.status, ""
-        )
+        icon = {"pass": "OK", "fail": "FAIL", "warn": "WARN", "info": "INFO"}.get(self.status, "")
         line = f"[{icon}] **{self.metric}** = {self.value:.4f}"
         if self.threshold is not None:
             line += f" (threshold: {self.threshold})"
@@ -44,18 +42,38 @@ class ValidationResult:
         return line
 
 
+def _paired_arrays(observed: np.ndarray, simulated: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Require aligned, finite, nonempty real-valued time series."""
+    if np.iscomplexobj(observed) or np.iscomplexobj(simulated):
+        raise ValueError("validation arrays must be real-valued")
+    observed = np.asarray(observed, dtype=float)
+    simulated = np.asarray(simulated, dtype=float)
+    if observed.ndim != 1 or simulated.ndim != 1:
+        raise ValueError("validation arrays must be one-dimensional")
+    if observed.shape != simulated.shape:
+        raise ValueError("observed and simulated arrays must have identical shapes")
+    if observed.size == 0:
+        raise ValueError("validation arrays must be nonempty")
+    if not np.all(np.isfinite(observed)) or not np.all(np.isfinite(simulated)):
+        raise ValueError("validation arrays must contain only finite values")
+    return observed, simulated
+
+
 def rmse(observed: np.ndarray, simulated: np.ndarray) -> float:
     """Root Mean Squared Error."""
+    observed, simulated = _paired_arrays(observed, simulated)
     return float(np.sqrt(np.mean((observed - simulated) ** 2)))
 
 
 def bias(observed: np.ndarray, simulated: np.ndarray) -> float:
     """Mean bias (simulated - observed)."""
+    observed, simulated = _paired_arrays(observed, simulated)
     return float(np.mean(simulated - observed))
 
 
 def relative_bias(observed: np.ndarray, simulated: np.ndarray) -> float:
     """Relative bias as a fraction of mean observed."""
+    observed, simulated = _paired_arrays(observed, simulated)
     obs_mean = np.mean(observed)
     if obs_mean == 0:
         return float("inf")
@@ -64,6 +82,7 @@ def relative_bias(observed: np.ndarray, simulated: np.ndarray) -> float:
 
 def correlation(observed: np.ndarray, simulated: np.ndarray) -> float:
     """Pearson correlation coefficient."""
+    observed, simulated = _paired_arrays(observed, simulated)
     if np.std(observed) == 0 or np.std(simulated) == 0:
         return 0.0
     return float(np.corrcoef(observed, simulated)[0, 1])
@@ -71,6 +90,7 @@ def correlation(observed: np.ndarray, simulated: np.ndarray) -> float:
 
 def nse(observed: np.ndarray, simulated: np.ndarray) -> float:
     """Nash-Sutcliffe Efficiency."""
+    observed, simulated = _paired_arrays(observed, simulated)
     numerator = np.sum((observed - simulated) ** 2)
     denominator = np.sum((observed - np.mean(observed)) ** 2)
     if denominator == 0:
@@ -80,6 +100,7 @@ def nse(observed: np.ndarray, simulated: np.ndarray) -> float:
 
 def kge(observed: np.ndarray, simulated: np.ndarray) -> float:
     """Kling-Gupta Efficiency."""
+    observed, simulated = _paired_arrays(observed, simulated)
     r = correlation(observed, simulated)
     alpha = np.std(simulated) / np.std(observed) if np.std(observed) > 0 else 0.0
     beta = np.mean(simulated) / np.mean(observed) if np.mean(observed) != 0 else 0.0
@@ -103,28 +124,38 @@ def validate_arrays(
     metrics: list[str] | None = None,
     thresholds: dict[str, float] | None = None,
 ) -> list[ValidationResult]:
-    """Validate simulated data against observed data using specified metrics.
+    """Validate aligned, nonempty, finite one-dimensional arrays.
 
     Args:
         component_name: Name of the component being validated.
         observed: Observed/baseline data array.
-        simulated: Simulated/test data array.
+        simulated: Simulated/test data array of exactly the same shape.
         metrics: List of metric names to compute. Defaults to all.
-        thresholds: Optional dict of {metric_name: threshold_value}.
+        thresholds: Optional dict of {metric_name: finite threshold_value}.
 
     Returns:
         List of ValidationResult objects.
+
+    Raises:
+        ValueError: If inputs violate the array contract or a metric is nonfinite.
     """
+    observed, simulated = _paired_arrays(observed, simulated)
     if metrics is None:
         metrics = list(METRICS.keys())
     thresholds = thresholds or {}
+    for name, threshold in thresholds.items():
+        if name not in METRICS:
+            raise ValueError(f"Unknown threshold metric: {name}")
+        if not np.isfinite(threshold):
+            raise ValueError(f"threshold for {name} must be finite")
 
     results = []
     for metric_name in metrics:
         if metric_name not in METRICS:
             raise ValueError(f"Unknown metric: {metric_name}. Available: {list(METRICS.keys())}")
-        func = METRICS[metric_name]
-        value = func(observed, simulated)
+        value = METRICS[metric_name](observed, simulated)
+        if not np.isfinite(value):
+            raise ValueError(f"metric {metric_name} is undefined or nonfinite for these arrays")
         threshold = thresholds.get(metric_name)
 
         if threshold is not None:

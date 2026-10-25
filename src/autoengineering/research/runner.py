@@ -289,13 +289,13 @@ def _run_python(spec: dict, inputs: dict[str, np.ndarray]) -> dict[str, np.ndarr
     func = _load_callable(spec["entry"], spec.get("sys_path"))
     input_names = spec.get("inputs", [])
     output_names = spec.get("outputs", [])
-    params = spec.get("params", {}) or {}
+    params = copy.deepcopy(spec.get("params", {}) or {})
 
     missing = [n for n in input_names if n not in inputs]
     if missing:
         raise KeyError(f"missing input array(s) for runnable: {missing}")
 
-    args = [inputs[n] for n in input_names]
+    args = [np.array(inputs[n], copy=True) for n in input_names]
     result = func(*args, **params)
     return _as_output_dict(result, output_names)
 
@@ -378,7 +378,8 @@ def build_feedforward_runner(
             and port names are read here; the callable re-reads components from
             whatever system it is handed, so swaps take effect.
         source_arrays: Arrays feeding the source components' output ports, keyed
-            by ``"<component>.<port>"`` or by bare port name.
+            by ``"<component>.<port>"`` or by bare port name. Snapshotted at construction;
+            each execution isolates component state, inputs, and recorded outputs.
         runner: Component execution backend (defaults to :func:`run_component`).
 
     Returns:
@@ -387,11 +388,12 @@ def build_feedforward_runner(
     # Freeze the wiring from the reference system's topology.
     order = system.topological_order()
     edges = system.connections
+    source_arrays = {name: np.array(arr, copy=True) for name, arr in source_arrays.items()}
 
     def _source_value(comp_name: str, port: str) -> np.ndarray:
         for key in (f"{comp_name}.{port}", port):
             if key in source_arrays:
-                return np.asarray(source_arrays[key])
+                return source_arrays[key].copy()
         raise KeyError(
             f"no source array for '{comp_name}.{port}'. Provide it in "
             "source_arrays keyed by '<component>.<port>' or by bare port name."
@@ -402,7 +404,7 @@ def build_feedforward_runner(
         available: dict[str, np.ndarray] = {}
 
         for comp_name in order:
-            comp = sys_to_run.get_component(comp_name)
+            comp = copy.deepcopy(sys_to_run.get_component(comp_name))
             spec = comp.metadata.get("runnable")
 
             if not spec:
@@ -417,7 +419,7 @@ def build_feedforward_runner(
             for edge in incoming:
                 src_key = f"{edge['source']}.{edge['port_from']}"
                 if src_key in available:
-                    inputs[edge["port_to"]] = available[src_key]
+                    inputs[edge["port_to"]] = available[src_key].copy()
             # Any declared input not satisfied by an edge is pulled from sources
             # (covers extra driver arrays like day-of-year).
             for name in spec.get("inputs", []):
@@ -430,7 +432,7 @@ def build_feedforward_runner(
             outputs = runner(comp, inputs)
             _validate_declared_outputs(comp, outputs)
             for port_name, arr in outputs.items():
-                available[f"{comp_name}.{port_name}"] = arr
+                available[f"{comp_name}.{port_name}"] = np.array(arr, copy=True)
 
         # Expose bare port names too, last-writer-wins, for convenient scoring.
         flat = dict(available)

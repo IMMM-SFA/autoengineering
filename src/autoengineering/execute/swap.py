@@ -30,6 +30,9 @@ def swap_component(
 
     if isinstance(replacement, dict):
         replacement = Component.from_dict(replacement)
+    if replacement.name != target_name and replacement.name in system.component_names:
+        raise ValueError(f"Replacement component name '{replacement.name}' already exists")
+    replacement = copy.deepcopy(replacement)
 
     # Build a new system
     new_system = System(name=system.name, description=system.description)
@@ -37,9 +40,7 @@ def swap_component(
     # Copy all components, replacing the target
     for name in system.component_names:
         if name == target_name:
-            new_system._graph.add_node(
-                replacement.name, component=replacement
-            )
+            new_system._graph.add_node(replacement.name, component=replacement)
         else:
             comp = copy.deepcopy(system.get_component(name))
             new_system._graph.add_node(name, component=comp)
@@ -49,7 +50,7 @@ def swap_component(
     for conn in system.connections:
         source = new_name if conn["source"] == target_name else conn["source"]
         target = new_name if conn["target"] == target_name else conn["target"]
-        new_system._graph.add_edge(
+        new_system.connect(
             source,
             target,
             port_from=conn.get("port_from", ""),

@@ -25,6 +25,7 @@ met, matching feynman's bounded-loop discipline. Artifacts (``autoresearch.md``,
 
 from __future__ import annotations
 
+import copy
 from pathlib import Path
 from typing import Callable
 
@@ -69,6 +70,11 @@ def _metric_dict(results: list[ValidationResult]) -> dict:
 def _target_met(results: list[ValidationResult], target: dict[str, float]) -> bool:
     """True when every target metric passes (direction-aware, matching validate)."""
     by_metric = {r.metric: r.value for r in results}
+    for metric, want in target.items():
+        if not np.isfinite(want):
+            raise ValueError(f"target for {metric} must be finite")
+    if any(not np.isfinite(result.value) for result in results):
+        return False
     for metric, want in target.items():
         if metric not in by_metric:
             return False
@@ -126,8 +132,10 @@ def auto_improve(
     workdir = Path(workdir)
     workdir.mkdir(parents=True, exist_ok=True)
 
+    # Isolate observations and system state from mutations by supplied runners.
+    observed = np.array(observed, copy=True)
     # --- Baseline (immutable root) ---
-    base_out = run_chain(system)
+    base_out = run_chain(copy.deepcopy(system))
     base_sim = _resolve_output(base_out, validate_output)
     base_results = validate_arrays(
         validate_output, observed, base_sim, metrics=metrics, thresholds=thresholds
@@ -166,10 +174,8 @@ def auto_improve(
             node_id = tree.new_id()
 
             try:
-                trial_system = swap_component(
-                    parent_system, cand.name, cand.to_component()
-                )
-                trial_out = run_chain(trial_system)
+                trial_system = swap_component(parent_system, cand.name, cand.to_component())
+                trial_out = run_chain(copy.deepcopy(trial_system))
                 trial_sim = _resolve_output(trial_out, validate_output)
                 trial_results = validate_arrays(
                     validate_output,
@@ -191,9 +197,7 @@ def auto_improve(
                         notes=f"{type(exc).__name__}: {exc}",
                     ),
                 )
-                log.append(
-                    f"## Iter {i}: {cand.name} — FAILED ({type(exc).__name__}: {exc})"
-                )
+                log.append(f"## Iter {i}: {cand.name} — FAILED ({type(exc).__name__}: {exc})")
                 log.append("")
                 continue
 
@@ -215,22 +219,14 @@ def auto_improve(
             tree.add_child(parent.id, node)
             systems[node_id] = trial_system
 
-            log.append(
-                f"## Iter {i}: swap `{cand.name}` (from `{parent.candidate}`)"
-            )
-            log.append(
-                "Result: "
-                + ", ".join(f"{r.metric}={r.value:.4f}" for r in trial_results)
-            )
-            log.append(
-                f"Fitness {score:.4f} vs parent {parent.score:.4f} -> "
-                f"**{status.upper()}**"
-            )
+            log.append(f"## Iter {i}: swap `{cand.name}` (from `{parent.candidate}`)")
+            log.append("Result: " + ", ".join(f"{r.metric}={r.value:.4f}" for r in trial_results))
+            log.append(f"Fitness {score:.4f} vs parent {parent.score:.4f} -> **{status.upper()}**")
             if cand.rationale:
                 log.append(f"Rationale: {cand.rationale}")
             log.append("")
 
-            if target and _target_met(trial_results, target):
+            if improved and target and _target_met(trial_results, target):
                 log.append(f"Target {target} met at iteration {i}; stopping early.")
                 log.append("")
                 break
@@ -256,9 +252,7 @@ def _resolve_output(out: dict[str, np.ndarray], key: str) -> np.ndarray:
     for k, v in out.items():
         if k.split(".", 1)[-1] == key:
             return np.asarray(v)
-    raise KeyError(
-        f"run_chain output has no key '{key}'. Available: {sorted(out)[:12]}"
-    )
+    raise KeyError(f"run_chain output has no key '{key}'. Available: {sorted(out)[:12]}")
 
 
 def _metric_fmt(v) -> str:
@@ -268,9 +262,7 @@ def _metric_fmt(v) -> str:
         return str(v)
 
 
-def _append_changelog(
-    workdir: Path, slug: str, tree: ExperimentTree, output: str
-) -> None:
+def _append_changelog(workdir: Path, slug: str, tree: ExperimentTree, output: str) -> None:
     baseline = tree.nodes[tree.root_id]
     best = tree.best()
     kept = [n for n in tree.nodes.values() if n.status == "kept"]
