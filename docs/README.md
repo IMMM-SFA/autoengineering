@@ -10,6 +10,7 @@ working interfaces from research results and planned features.
 | [Workflow and architecture](workflow.md) | Deep research, model execution, replacement experiments, and optimization handoffs. |
 | [Model improvement criteria](model-improvement.md) | Proposed assessment of data, compute, and potential gain across modeling methods. |
 | [Roadmap](roadmap.md) | Model DAG, harness, dynamic web app, examples, visualizations, and method selection. |
+| [Local campaigns](campaigns.md) | Experimental trusted-adapter workflow, scientific acceptance, physical attempt accounting, CLI and recovery. |
 | [Optimization guide](optimization.md) | Run configuration, APIs, recovery, and research backend limits. |
 | [BO status](bayesian-optimization-status.md) | Passing and adverse evidence at the reviewed revision. |
 | [Examples](../examples/README.md) | Checked examples, commands, inputs, and outputs. |

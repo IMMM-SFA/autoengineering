@@ -270,6 +270,8 @@ class OptimizationStudy:
         target_value: float | None = None,
         target_predicate: Callable[[Recommendation], bool] | None = None,
         input_artifact_hashes: Mapping[str, str] | None = None,
+        pending_result_resolver: Callable[[EvaluationAction], EvaluationResult | None]
+        | None = None,
     ) -> None:
         if not isinstance(spec, StudySpec) or not isinstance(space, SearchSpace):
             raise TypeError("spec and space must be immutable StudySpec and SearchSpace instances")
@@ -337,6 +339,9 @@ class OptimizationStudy:
         self.target_value = None if target_value is None else float(target_value)
         self.target_predicate = target_predicate
         self.input_artifact_hashes = hashes
+        if pending_result_resolver is not None and not callable(pending_result_resolver):
+            raise TypeError("pending_result_resolver must be callable or None")
+        self.pending_result_resolver = pending_result_resolver
         self.start_timestamp = ""
         self.end_timestamp: str | None = None
         self.stop_reason: str | None = None
@@ -651,12 +656,27 @@ class OptimizationStudy:
             self._validate_manifest_metrics(manifest, entries)
             self._validate_replaceable_artifacts(manifest, identity, allow_transition=False)
             if pending.result is None:
-                result = EvaluationResult.infrastructure_failure(
-                    pending.action.id,
-                    "interrupted evaluation recovered before a result was persisted",
-                    cost=0.0,
-                    cost_unit=self.spec.budget.cost_unit,
+                # A trusted outer controller may already have a durable, verified
+                # result. Resolve it through this public hook rather than editing
+                # pending files or appending synthetic ledger observations.
+                result = (
+                    self.pending_result_resolver(pending.action)
+                    if self.pending_result_resolver is not None
+                    else None
                 )
+                if result is None:
+                    result = EvaluationResult.infrastructure_failure(
+                        pending.action.id,
+                        "interrupted evaluation recovered before a result was persisted",
+                        cost=0.0,
+                        cost_unit=self.spec.budget.cost_unit,
+                    )
+                if (
+                    not isinstance(result, EvaluationResult)
+                    or result.action_id != pending.action.id
+                ):
+                    raise StudyRecoveryError("resolved pending result must match its action")
+                self._validate_result(result)
                 pending = self._write_pending(
                     pending.action,
                     result,

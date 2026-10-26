@@ -12,7 +12,11 @@ Autoengineering 0.2.0 is a work-in-progress Python toolkit for evaluating and im
 
 The package and Click CLI run locally and offline once dependencies and input data are available. The Python package does **not** call an LLM or search the literature. Agent skills under `.claude/skills/` and `.agents/skills/feynman/` handle research and propose candidates; executable implementations must be supplied separately.
 
-There is no web application or common orchestration layer yet. A unified model DAG, general harness interface, interactive app, and automatic selection/training of statistical, ML, or deep-surrogate replacements remain planned. Do not describe those as implemented.
+The experimental local campaign layer shares lifecycle, scientific acceptance and durable decisions
+across supplied trusted replacements and parameter searches. See `docs/campaigns.md` for its qualified
+scope. There is no web application or production agent/host orchestration layer yet. A unified model
+DAG, general harness interface, interactive app, and automatic selection/training of statistical,
+ML, or deep-surrogate replacements remain planned. Do not describe those as implemented.
 
 **All BO backends are experimental.** Existing examples do not show consistent gains across problems, held-out prediction, and total runtime. A passing frozen benchmark gate is not evidence of general improvement on a new model.
 

@@ -1,0 +1,221 @@
+{
+  "comparison_evaluations": [
+    {
+      "configuration": {
+        "capacity": 100.0,
+        "pet": "hamon",
+        "recession": 0.7
+      },
+      "id": "evaluation-attempt-000001-comparison",
+      "max_balance_error": 3.197442310920451e-14,
+      "metrics": {
+        "bias": 2.2142155627900846,
+        "correlation": 0.6117805039644203,
+        "kge": -1.1631375897821865,
+        "nse": -5.357238453642056,
+        "relative_bias": 1.1949783144774113,
+        "rmse": 5.2914680748184795
+      },
+      "split": "comparison"
+    },
+    {
+      "configuration": {
+        "capacity": 52.2937985509634,
+        "pet": "hamon",
+        "recession": 0.9148484857752919
+      },
+      "id": "evaluation-attempt-000018-comparison",
+      "max_balance_error": 4.263256414560601e-14,
+      "metrics": {
+        "bias": 2.162554264094522,
+        "correlation": 0.612079807443787,
+        "kge": -0.37758211951979304,
+        "nse": -1.7042724081908673,
+        "relative_bias": 1.1670975007588285,
+        "rmse": 3.4511763201836665
+      },
+      "split": "comparison"
+    },
+    {
+      "configuration": {
+        "capacity": 100.0,
+        "pet": "hargreaves",
+        "recession": 0.7
+      },
+      "id": "evaluation-attempt-000019-comparison",
+      "max_balance_error": 4.263256414560601e-14,
+      "metrics": {
+        "bias": 1.4900111451047784,
+        "correlation": 0.620507753006712,
+        "kge": -0.826050942752329,
+        "nse": -4.017401802162679,
+        "relative_bias": 0.8041362533312961,
+        "rmse": 4.700903868271838
+      },
+      "split": "comparison"
+    },
+    {
+      "configuration": {
+        "capacity": 52.2937985509634,
+        "pet": "hargreaves",
+        "recession": 0.9148484857752919
+      },
+      "id": "evaluation-attempt-000036-comparison",
+      "max_balance_error": 4.3520742565306136e-14,
+      "metrics": {
+        "bias": 1.6292225942373406,
+        "correlation": 0.5743297818908718,
+        "kge": -0.12377987304518712,
+        "nse": -1.2354999304967524,
+        "relative_bias": 0.8792665458086768,
+        "rmse": 3.1378289080395643
+      },
+      "split": "comparison"
+    }
+  ],
+  "confirmation": "confirmation_not_attempted",
+  "cumulative_executions": 240,
+  "current_source_matches": true,
+  "decisions": [
+    {
+      "comparator_id": "evaluation-attempt-000001-comparison",
+      "eligible_alternatives": [
+        "evaluation-attempt-000001-comparison",
+        "evaluation-attempt-000018-comparison"
+      ],
+      "evidence": [],
+      "outcome": "accepted_candidate",
+      "reasons": [
+        "Applied frozen eligibility and ranking rules"
+      ],
+      "rules_digest": "a44844ecff23635457d198451c70ac43e86a20276aa88306c95352a6245ce275",
+      "selected_configuration": {
+        "capacity": 52.2937985509634,
+        "pet": "hamon",
+        "recession": 0.9148484857752919
+      },
+      "selected_id": "evaluation-attempt-000018-comparison"
+    },
+    {
+      "comparator_id": "evaluation-attempt-000001-comparison",
+      "eligible_alternatives": [
+        "evaluation-attempt-000001-comparison",
+        "evaluation-attempt-000019-comparison"
+      ],
+      "evidence": [],
+      "outcome": "accepted_candidate",
+      "reasons": [
+        "Applied frozen eligibility and ranking rules"
+      ],
+      "rules_digest": "a44844ecff23635457d198451c70ac43e86a20276aa88306c95352a6245ce275",
+      "selected_configuration": {
+        "capacity": 100.0,
+        "pet": "hargreaves",
+        "recession": 0.7
+      },
+      "selected_id": "evaluation-attempt-000019-comparison"
+    },
+    {
+      "comparator_id": "evaluation-attempt-000018-comparison",
+      "eligible_alternatives": [
+        "evaluation-attempt-000018-comparison",
+        "evaluation-attempt-000036-comparison"
+      ],
+      "evidence": [],
+      "outcome": "accepted_candidate",
+      "reasons": [
+        "Applied frozen eligibility and ranking rules"
+      ],
+      "rules_digest": "a44844ecff23635457d198451c70ac43e86a20276aa88306c95352a6245ce275",
+      "selected_configuration": {
+        "capacity": 52.2937985509634,
+        "pet": "hargreaves",
+        "recession": 0.9148484857752919
+      },
+      "selected_id": "evaluation-attempt-000036-comparison"
+    },
+    {
+      "comparator_id": "evaluation-attempt-000001-comparison",
+      "eligible_alternatives": [
+        "evaluation-attempt-000001-comparison",
+        "evaluation-attempt-000018-comparison",
+        "evaluation-attempt-000019-comparison",
+        "evaluation-attempt-000036-comparison"
+      ],
+      "evidence": [],
+      "outcome": "accepted_candidate",
+      "reasons": [
+        "Applied frozen eligibility and ranking rules"
+      ],
+      "rules_digest": "a44844ecff23635457d198451c70ac43e86a20276aa88306c95352a6245ce275",
+      "selected_configuration": {
+        "capacity": 52.2937985509634,
+        "pet": "hargreaves",
+        "recession": 0.9148484857752919
+      },
+      "selected_id": "evaluation-attempt-000036-comparison"
+    }
+  ],
+  "evidence_directory": "outputs/campaign-qualification-v3",
+  "execution_ceiling": 320,
+  "git_base_revision": "63f264dcf51539f046c6df3c5ebb6eea5c6c5543",
+  "incompatible_old_resume_byte_preserving": true,
+  "limits": [
+    "macOS ARM64 qualification only",
+    "all hydrology observations previously exposed",
+    "no scientific generalization claim",
+    "strict tokens and new providers deferred"
+  ],
+  "lock_sha256": "c31d872efd60b477395fac9e0a3690841b6e0e77971e0eecc2ddb0d70b864236",
+  "max_daily_balance_error": 2.1316282072803006e-13,
+  "not_run": [
+    "Linux x86-64 qualification",
+    "optional bayes suite (environment absent)",
+    "frozen benchmark matrices"
+  ],
+  "outcome": "accepted_candidate",
+  "packages": {
+    "PyYAML": "6.0.3",
+    "autoengineering": "0.2.0",
+    "click": "8.3.1",
+    "networkx": "3.6.1",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.0"
+  },
+  "passed": true,
+  "physical_executions": {
+    "hydrology_cli": 38,
+    "hydrology_direct": 38,
+    "kernel_oracles": 2,
+    "routing": 2,
+    "total": 80
+  },
+  "platform": {
+    "machine": "arm64",
+    "python": "3.12.13",
+    "system": "Darwin"
+  },
+  "preserved_rounds": [
+    "outputs/campaign-qualification-v1",
+    "outputs/campaign-qualification-v2"
+  ],
+  "prior_executions": 160,
+  "report_links_verified": {
+    "hydrology-cli": 39,
+    "hydrology-direct": 39,
+    "routing": 3
+  },
+  "reserved_this_round": 80,
+  "runner_sha256": "e5d73b0fe0da91db8e37d41abcdceaff432fe23851a071119f00e6cc02c82eab",
+  "source_identities": {
+    "hydrology": "26d5b972c1d800bcf548fa129a8c2a0e75b06d81709deaab12c5e9c95ce862ea",
+    "routing": "d6751f8867d229e9c78aec2a7e661f6e05d090113f1ff1cb2cfdbd18241bf090"
+  },
+  "source_snapshot": "uncommitted worktree; archived file hashes identify qualified code",
+  "tests": {
+    "passed": 609,
+    "seconds": 130.53,
+    "skipped": 65
+  }
+}

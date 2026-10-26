@@ -13,6 +13,7 @@ water, solar energy and materials comparisons on measured observations.
 | [`leaf_river`](leaf_river/) | Rainfall-runoff workflow using USGS and NOAA observations. | No with checked cache | `pixi run python examples/leaf_river/run_workflow.py` |
 | [`optimization_chain`](optimization_chain/) | Deterministic mixed-space whole-system optimization with resume. | No | See below. |
 | [`function_network`](function_network/) | NPZ-backed system and component evaluation with deterministic training-table replay. | No | See below. |
+| [`campaign_contracts`](campaign_contracts/) | Experimental campaign schemas, synthetic lifecycle checks, and an audited hydrology development profile. Implementation is in progress. | No | See its README. |
 | [`local_models`](local_models/) | Real water, solar and materials models with swaps, random/Sobol/BO comparisons and component reuse tests. | No after environment setup | `pixi run -e examples python -m examples.local_models.run --output outputs/local-models` |
 | [`complex_models`](complex_models/) | Larger BMI hydrology and single-diode solar models, 12/24/48/96-call checkpoints and 2,000-call target tests. | No after environment setup | See its README. |
 

@@ -238,3 +238,6 @@ autoresearch.jsonl
 # Preserve benchmark evidence despite the generic build target exclusion.
 !examples/complex_models/results/target/
 !examples/complex_models/results/target/**
+
+# Local campaign qualification evidence is retained on disk, summarized in docs.
+/outputs/campaign-*/

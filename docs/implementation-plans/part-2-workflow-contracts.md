@@ -1,7 +1,8 @@
 # Part 2 implementation plan: workflow and shared contracts
 
-__Status:__ ready for implementation planning review. This document specifies proposed behavior;
-Part 2 package code has not been implemented.
+__Status:__ implemented and verified on macOS ARM64. Linux qualification remains outstanding
+under the platform exception in Section 11. See the [completion audit](../reviews/part-2-workflow-contracts-audit.md)
+and [verification record](../reviews/part-2-workflow-contracts-progress.md).
 
 __Parent:__ [Development plan, Part 2](../development-plan.md#2-codify-the-workflow-and-shared-contracts).
 __Starting evidence:__ [Part 1 results](../../background-research/agentic-architecture/README.md),

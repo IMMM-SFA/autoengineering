@@ -51,6 +51,7 @@ def test_local_markdown_links_resolve(document: Path):
 def test_documented_cli_commands_match_click_registry():
     registered = set(cli.commands)
     expected = {
+        "campaign",
         "candidates",
         "components",
         "describe",
@@ -276,6 +277,7 @@ def test_example_index_matches_checked_system_examples():
         if path.parent.is_dir()
     }
     expected_network = {
+        "campaign_contracts": "No",
         "function_network": "No",
         "hydro_chain": "No",
         "leaf_river": "No with checked cache",

@@ -35,6 +35,7 @@ Run commands from the repository root with `pixi run autoengineering`.
 | `improve system.yaml -C candidates.yaml --chain <module:factory> -b <observed.csv> -O <output>` | Test executable replacements. |
 | `experiments <autoresearch.jsonl>` | Inspect the experiment tree. |
 | `optimize system.yaml optimization.yaml --workdir <path>` | Run or resume whole-system search. |
+| `campaign` | Run or inspect deterministic local campaigns with supplied trusted adapters. See `docs/campaigns.md`. |
 
 Python interfaces and example commands are documented in `docs/workflow.md`, `docs/optimization.md`,
 and `examples/README.md`. Use the existing package rather than rebuilding its loop in agent code.

@@ -315,5 +315,10 @@ def experiments(tree_file):
     click.echo(tree.to_markdown())  # pre-formatted tree; echo verbatim to keep indentation
 
 
+from autoengineering.campaign.command import campaign  # noqa: E402
+
+cli.add_command(campaign)
+
+
 if __name__ == "__main__":
     cli()

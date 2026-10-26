@@ -457,3 +457,19 @@ The Release A command still accepts only whole-system optimization. Do not descr
 `SystemBayesBackend` run as function-network optimization, component Bayesian optimization,
 multi-fidelity optimization, or partial-observability optimization. The blocked research work is
 tracked in the [`Bayesian optimization plan`](bayesian-optimization-plan.md).
+
+## Campaign recovery bridge
+
+The experimental [campaign broker](campaigns.md) uses the existing study records and public
+`OptimizationStudy` API. It reserves a complete child allowance and supervises each action
+separately. Its outer attempt journal remains separate from the optimization ledger.
+
+The optional constructor argument `pending_result_resolver` accepts a trusted callable from an
+outer controller. Given a pending action, it may return a durable, verified `EvaluationResult`
+for that exact action, or `None`. The controller validates the result and commits it through
+normal recovery. Callers must verify their saved evidence before supplying it. The callback
+does not authorize replacing committed observations.
+
+Without a verified result, pending-action recovery retains its established zero-cost
+`infrastructure_failure`. A campaign still retains the associated physical attempt and unknown
+cost. The child zero is not proof that no model executed.

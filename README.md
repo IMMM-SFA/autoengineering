@@ -23,6 +23,7 @@ for improving models are also needed.
 | Validate and prioritize | Array metrics and a heuristic ranking of component weaknesses. The ranking does not estimate the gain from replacing a component. |
 | Deep research | Agent skills investigate alternatives and record citations, rationale, and executable candidates. The Python package makes no LLM calls. |
 | Test replacements | `auto_improve` tries candidates in order, records failures and reversions, and retains changes that improve its fitness score. |
+| Local campaigns | Experimental immutable contracts, trusted adapter lifecycle, scientific checks, sequential calibration, event replay, and local CLI. See [campaigns](docs/campaigns.md) for current qualification limits. |
 | Whole-system BO | The Release A workflow runs sequential, constrained optimization with durable records and resume. Random and Sobol search are available alongside optional BoTorch. |
 | Function-network research | A component representation and full-observability BO backend have checked evidence. Partial-observability BO remains experimental after failed comparison gates. |
 
@@ -114,6 +115,7 @@ Run commands with `pixi run autoengineering`.
 | `improve <system.yaml> -C <candidates.yaml> --chain <module:factory> -b <observed.csv> -O <output>` | Run the bounded replacement loop. |
 | `experiments <autoresearch.jsonl>` | Render an experiment tree. |
 | `optimize <system.yaml> <optimization.yaml> --workdir <path>` | Start or resume whole-system optimization. |
+| `campaign` | Run experimental deterministic campaigns with supplied trusted adapters. See [the campaign guide](docs/campaigns.md). |
 
 The [workflow guide](docs/workflow.md) describes the Python interfaces. The Claude agent and
 research skills under `.claude/` provide an agent entry point to the same package.

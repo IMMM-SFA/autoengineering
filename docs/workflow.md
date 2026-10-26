@@ -5,9 +5,10 @@ the examples do not show consistent gains across problems, test prediction, and 
 More testing is needed before broader recommendations. Passing a frozen benchmark gate does not
 change this experimental status.
 
-Autoengineering has working research, replacement, and optimization paths. A common orchestration
-layer is still missing. This guide describes the current interfaces and where a user or agent must
-connect them.
+Autoengineering has working research, replacement, and optimization paths. The experimental
+[campaign layer](campaigns.md) connects supplied trusted replacements and parameter searches to
+shared lifecycle, scientific acceptance, and durable decisions. Research and implementation handoffs
+still require supplied artifacts. A general model DAG and harness remain planned.
 
 ```mermaid
 flowchart TD
