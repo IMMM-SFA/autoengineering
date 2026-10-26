@@ -241,3 +241,8 @@ autoresearch.jsonl
 
 # Local campaign qualification evidence is retained on disk, summarized in docs.
 /outputs/campaign-*/
+
+# Runtime coordination locks for campaigns, studies, and observation ledgers.
+.campaign.lock
+.study.lock
+observations.jsonl.lock
