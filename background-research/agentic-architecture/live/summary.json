@@ -1,0 +1,13 @@
+{
+  "handoffs_completed": 3,
+  "complete_fresh_campaigns": 1,
+  "replayed_campaigns": 0,
+  "stop_reason": "observed_token_limit_reached",
+  "observed_tokens": 56128,
+  "token_limit": 50000,
+  "token_overrun": 6128,
+  "new_scientific_executions": 38,
+  "paid_api_calls": 0,
+  "subscription_cost_usd": null,
+  "second_host": "not_attempted"
+}

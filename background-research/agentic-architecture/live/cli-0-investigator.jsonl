@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a17595-e1d4-7322-9438-453ac942f09d"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"candidate\":\"supplied-gamma-v1\",\"decision\":\"request_calibration\",\"rationale\":\"Request equal calibration before comparing the supplied routing. The adapter accepts runoff and recharge arrays plus gamma_shape, gamma_scale, k_base, and recharge_frac. Evidence status is ok, but its scope is an engineering fixture, not catchment validation, and it does not establish whole-catchment conservation.\",\"role\":\"investigator\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":18401,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":93,"reasoning_output_tokens":0}}

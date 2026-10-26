@@ -1,0 +1,65 @@
+[
+  {
+    "mode": "fresh",
+    "repeat": 0,
+    "response": {
+      "candidate": "supplied-gamma-v1",
+      "decision": "request_calibration",
+      "rationale": "Request equal calibration before comparing the supplied routing. The adapter accepts runoff and recharge arrays plus gamma_shape, gamma_scale, k_base, and recharge_frac. Evidence status is ok, but its scope is an engineering fixture, not catchment validation, and it does not establish whole-catchment conservation.",
+      "role": "investigator"
+    },
+    "role": "investigator",
+    "route": "cli",
+    "seconds": 5.245141874998808,
+    "trace": "cli-0-investigator.jsonl",
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "input_tokens": 18401,
+      "output_tokens": 93,
+      "reasoning_output_tokens": 0
+    }
+  },
+  {
+    "mode": "fresh",
+    "repeat": 0,
+    "response": {
+      "candidate": "supplied-gamma-v1",
+      "decision": "request_calibration",
+      "rationale": "Request equal calibration before comparing the supplied routing. The adapter accepts runoff and recharge arrays plus gamma_shape, gamma_scale, k_base, and recharge_frac. Evidence is limited to an engineering fixture and does not establish catchment validation or whole-catchment conservation.",
+      "role": "implementer"
+    },
+    "role": "implementer",
+    "route": "cli",
+    "seconds": 7.759885041974485,
+    "trace": "cli-0-implementer.jsonl",
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "input_tokens": 18463,
+      "output_tokens": 85,
+      "reasoning_output_tokens": 0
+    }
+  },
+  {
+    "mode": "fresh",
+    "repeat": 0,
+    "response": {
+      "candidate": "supplied-gamma-v1",
+      "decision": "retain_gamma",
+      "rationale": "The evaluator retains gamma: comparison RMSE is 2.5933 versus triangular's 2.8113, a gain of 0.2180. All listed engineering checks pass. Evidence is limited to a development engineering fixture, not catchment validation or independent scientific validation.",
+      "role": "reviewer"
+    },
+    "role": "reviewer",
+    "route": "cli",
+    "seconds": 6.543597667012364,
+    "trace": "cli-0-reviewer.jsonl",
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "input_tokens": 18997,
+      "output_tokens": 89,
+      "reasoning_output_tokens": 0
+    }
+  }
+]

@@ -1,0 +1,1 @@
+{"action_id":"eval-000002","config":{"k_base":0.8099801635742188,"recharge_frac":0.04457894548773765,"uh_peak":3},"feasible":true,"message":"best feasible observed configuration","outcomes":{"bias":-0.5243216075962523,"kge":0.46806291876626294,"nse":0.48973817397633634,"rmse":2.090230749969821}}

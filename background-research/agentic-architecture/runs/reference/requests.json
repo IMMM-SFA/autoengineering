@@ -1,0 +1,28 @@
+[
+  {
+    "request": {
+      "id": "diagnose",
+      "payload": {},
+      "tool": "diagnose"
+    },
+    "response": {
+      "hypothesis": "compare supplied routing after equal calibration",
+      "scope": "engineering_fixture_not_catchment_validation",
+      "status": "ok"
+    }
+  },
+  {
+    "request": {
+      "id": "submit",
+      "payload": {
+        "candidate": "supplied-gamma-v1"
+      },
+      "tool": "submit"
+    },
+    "response": {
+      "candidate": "supplied-gamma-v1",
+      "candidate_sha256": "b463adcafe35f81b7fb9bba0888a522d59b9c495acd8deefb79d8bfec36b832f",
+      "status": "admitted"
+    }
+  }
+]

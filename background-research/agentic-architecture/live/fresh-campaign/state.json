@@ -1,0 +1,233 @@
+{
+  "cancelled": false,
+  "hashes": {
+    "background-research/agentic-architecture/task.yaml": "1ed7179abbf25655da6c15fc98a5b85ab20632f4cf68f635a1cfa19cda82bfb6",
+    "examples/agentic_architecture_pilot/__init__.py": "4b2cdce8294979092de4c8a21146de15da18342617317ef202363422139abb41",
+    "examples/agentic_architecture_pilot/boundary.py": "77cbed4f2743a28650f329853b75408334afc3b3abaf77e5071307f303a7dfeb",
+    "examples/agentic_architecture_pilot/compare.py": "b867376dc166867cf7880b098df4f5a6742cf13cf7e3a4adb22fd568f94f7604",
+    "examples/agentic_architecture_pilot/control.py": "3e97cac1d0bf64b3052ce14bfcda676c61c8104878d882dcf8198ede1d17e540",
+    "examples/agentic_architecture_pilot/science.py": "bc54fb8438f93bad41212fb50f5fcdb6e72546727a5e1f5b6360b3540cba10c6",
+    "examples/agentic_architecture_pilot/verify.py": "084d11ca29581205a94b7f755f7bd8fc69ca4948816eb496ddd4edb943a41a40",
+    "examples/leaf_river/candidates.yaml": "177ab8fba4fe42145ecf9b40a843708f35d97e14cb6c8c78bdd997c189c17874",
+    "examples/leaf_river/data/fetch_data.py": "0be3a6616b0be0c8a4ccd5eef2b1b2a67322c09d2de54b31867f8318e3fd2aba",
+    "examples/leaf_river/data/streamflow.csv": "fd513ec5616b66aa99dfb68b07aadb133ade916efc94aa991f1a1e3940d84d36",
+    "examples/leaf_river/data/weather.csv": "04d8ee04e042c4c91486a3e11b13af4fe29490b1c1e6893bda36331998b5bb01",
+    "examples/leaf_river/models/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "examples/leaf_river/models/pet_hamon.py": "2ad68c49aa44034f8c72a6e17dc40752f8b37b60cbba4a0b2bae20f8c941537a",
+    "examples/leaf_river/models/pet_hargreaves.py": "125c061a4e6f496bee8078fc034fd731f4ab6510f9095a0eed7bade4778df6e8",
+    "examples/leaf_river/models/routing.py": "a67b4b9d37f0836649d3c57d428751534e5016a71a0a1ed6aa4104b788d5dcef",
+    "examples/leaf_river/models/routing_calibrated.py": "b463adcafe35f81b7fb9bba0888a522d59b9c495acd8deefb79d8bfec36b832f",
+    "examples/leaf_river/models/routing_runnable.py": "91c78d23af4547029f392bf54f78f51c8b5a25debb1002a19f8e617f09ed88e2",
+    "examples/leaf_river/models/scs_runoff.py": "116addcd3ae5e5ad66e23c3d2bc80f4e28eefec0e55f1abfaafcbbc7f01db960",
+    "examples/leaf_river/models/scs_runoff_amc.py": "0294954176b7244abc29becd965d564a1994673f1dadcc127df49181140f3dff",
+    "examples/leaf_river/models/soil_moisture.py": "b54f046468f7062ba6c01252edd082e25020b24ea8271c2f6799013cf7785c52",
+    "examples/leaf_river/run_auto_research.py": "053e8d0731e3b9841219421ef22bdf6b796e2c8b2bf3e62ddf31580506ea9f6a",
+    "examples/leaf_river/run_workflow.py": "ef57ca6d65a68cd5ec25c41a3ef378abc93c9a0f77af3ddd3e53e41f80c48563",
+    "examples/leaf_river/system.yaml": "3b1fca02075e73f0a01854828cf1e5a89e37ec1b95eb6fe8382703b0512b160e",
+    "pixi.lock": "c31d872efd60b477395fac9e0a3690841b6e0e77971e0eecc2ddb0d70b864236",
+    "src/autoengineering/__init__.py": "7a7f1db3ba71ef24439f6b7a560266d174dc1a039800694acc51dad16bbea8fb",
+    "src/autoengineering/analyze/__init__.py": "d21317e2274037159d4eb1bd38c627ff33832915179af46c77e5e2bf4b83157f",
+    "src/autoengineering/analyze/metrics.py": "49e209c096340a178c9fd7f8265d89dc73ec7eede0c32e0547e41800abb6fcf1",
+    "src/autoengineering/analyze/report.py": "694b95ba715f93163482ff083665468d7f47a8e04e0b35248f1062ff396fd4d9",
+    "src/autoengineering/benchmarks/__init__.py": "399c0cc618ce6492b02fac24d4f6544a3ab5c006287324e06aafbff28943bb0b",
+    "src/autoengineering/benchmarks/full_network/__init__.py": "6c00c1757a15bd7faf1e01bd5740a0a47274c27df32312301aca7165843a8b4c",
+    "src/autoengineering/benchmarks/full_network/__main__.py": "3f4212bd6d2ed02ccb2c2864965e2850e76eef4fd52a61ca474be19af54059d5",
+    "src/autoengineering/benchmarks/full_network/problems.py": "8e7fc03a382b293617fbedf5c68397ca51257c123de0c00ada3b2f68277fa5df",
+    "src/autoengineering/benchmarks/full_network/runner.py": "49b403a80683b857e2130b40d7249ece0609871ae9009301268cc0eb801a4df8",
+    "src/autoengineering/benchmarks/full_network/summary.py": "8592c48dd075a1a3c0f585c37f349b4f6704bbb89acdfa3c27fcd7d3f31e6c87",
+    "src/autoengineering/benchmarks/partial_network/__init__.py": "d9d515b2f1eda223057a4bbe9885c573de033ae63fd3d3b9b5bbb19dbc318d98",
+    "src/autoengineering/benchmarks/partial_network/__main__.py": "7431325523fdea9e8dae0e4c6c6149dc89d6db41f00775055d558b39aeae2f98",
+    "src/autoengineering/benchmarks/partial_network/problems.py": "a86e7e515fc6e8eec791ef46b7c5e8c813e8da90f9e1becfbf96da56ce117228",
+    "src/autoengineering/benchmarks/partial_network/runner.py": "45035273fc1b1970c45129be538c84bda651661464129a394a15be82089bd6b6",
+    "src/autoengineering/benchmarks/partial_network/summary.py": "efb059ec576d108bc940238965eb465ca79f9185ac2d603d29b70829c0e25bf9",
+    "src/autoengineering/benchmarks/release_a/__init__.py": "5617deea39798d86d3488d12f0b22e89def156da9f10d8ba875831d76fb7cc03",
+    "src/autoengineering/benchmarks/release_a/__main__.py": "6111cdb6c6e77da0e948bab2c0d85f86badc1f2181c2b955f5c3bf2d82221f40",
+    "src/autoengineering/benchmarks/release_a/methods.py": "c92af9a017ae9d9e1fbddcb33d2974a187e16bb3e30a0e693770b01d7625b555",
+    "src/autoengineering/benchmarks/release_a/problems.py": "ca580e29d729b03cf5e0d78aa3ed27d1597c92831823e1e20f4f3ef5194e38e4",
+    "src/autoengineering/benchmarks/release_a/runner.py": "caf2669f633d2ad79784809536cf8b21df96d06ec899d0cd37cbdbfdb88b541b",
+    "src/autoengineering/benchmarks/release_a/summary.py": "ec866ba371aa9d7ad7e6df1857c566e9af212c60b3ef26a1d855f264ef64cc9e",
+    "src/autoengineering/cli.py": "7718eed29b0fd93d01b561e123194bc226efb459ca8ac4035abb6c864ac2de7d",
+    "src/autoengineering/execute/__init__.py": "84ba4a97242812af8c6ad04723e083a87619068c1fe188897a19653266e247d4",
+    "src/autoengineering/execute/swap.py": "9e7b52f476eb79f255f10abe18bee560ea79111d8c7a6cea65c5d30963f50e76",
+    "src/autoengineering/optimization/__init__.py": "97193d3c095d839ef4b4d086b63b111caa247b68564fe79de4c4bf56c669a0c4",
+    "src/autoengineering/optimization/backend.py": "db127fa7ae4a11adb3ee0bead65df198d74a1c445c707c0f89a00642b75f6d13",
+    "src/autoengineering/optimization/command.py": "40df98e4cd38afbcc51477638aee2cfcf949faf955c5deec8572d25ef8eb6038",
+    "src/autoengineering/optimization/controller.py": "25f4b079cc6b52550a6d8f68c36f99dddf87b07ee1f486e0b632f8c2525de83c",
+    "src/autoengineering/optimization/full_network_backend.py": "54a18de88064d3d28666b11d33d2d1e9814a6f215e98f963dbdf062f90279a5e",
+    "src/autoengineering/optimization/function_network.py": "b076160c472aa6aeb9ddd33d06aa53badbf115764c27d57825463b1ca50f4376",
+    "src/autoengineering/optimization/function_network_evaluator.py": "ca31c606c62173c96cc28ae3768a422c002c0aea6603cdeae47706ddfb4c9ef4",
+    "src/autoengineering/optimization/ledger.py": "e137064014cc337a0643cc76b3cf7f4adc5772ca920ed5cd8c078310b3dbda63",
+    "src/autoengineering/optimization/partial_network_backend.py": "22eb05dfdbbd7f8f191f9048c5c22855c6157f494aa71db5af6e79f4ef651939",
+    "src/autoengineering/optimization/partial_network_baselines.py": "5080a99bf13cbaefb79a8f86fdb2a82906df2fd73bfa53d018be20ab8b867c15",
+    "src/autoengineering/optimization/provenance.py": "a9548977481d8484a683aeba343db0f6c439456a0dc49d07b5f7a6aaa0272ab4",
+    "src/autoengineering/optimization/records.py": "47f92d0c169c4026f813b5a8b58522e550eb4510c43f767351b6cd1de0ed8425",
+    "src/autoengineering/optimization/run_spec.py": "44d28685d8f0b3f35acd286711f4f5014f3f552ad88ec2fb11729f6cef8d9ab1",
+    "src/autoengineering/optimization/space.py": "2de22c1202bd42d1c14446f1d7ecbac619a948e8bac2bf9af9b6380b986a0bb5",
+    "src/autoengineering/optimization/spec.py": "87df5c77ed379718fa547add64233c02ff9551cde21426be23c7a7a6d46a597e",
+    "src/autoengineering/optimization/system_backend.py": "d24a83776010691d425b9aabfd6b3abf03e44423396796ea434c45a75624d0cf",
+    "src/autoengineering/optimization/yaml_utils.py": "8300644dade9cd59e59fa2b5eda20fa0562f734cb102c51524085f2b3734040c",
+    "src/autoengineering/research/__init__.py": "63353335d3cabf3b5986dd3a92e72b629b9357948bc09f4574a34a027842ffb4",
+    "src/autoengineering/research/candidates.py": "aebb89ab0593057cdb780b465ef8e785bd3e96d74b15f0a95e7288ad7bd5f042",
+    "src/autoengineering/research/experiment.py": "ce87023ae07df78b906054cf069ae172a73c7dd694ad7f9c292f79f5fce48ce7",
+    "src/autoengineering/research/loop.py": "ff66e424cd31a0720a4cfd012275643bdcac0c9cfdedb0a3215c038eaffbf0a9",
+    "src/autoengineering/research/provenance.py": "09150f9f74dedc2cc0824bac431fd6bca861171d8f54360b2550410c0adfff08",
+    "src/autoengineering/research/runner.py": "8db521b45e01aeaa983b91befda2d9647726e447a69456fd755dd71aa7b43e1e",
+    "src/autoengineering/system/__init__.py": "c12b58ce45d8afb4f5daa10e6792d02e8ffbcdfaea99004fb466805c94ec5269",
+    "src/autoengineering/system/component.py": "ae25520cfe200cbbe9b6df6ae20e983e7573e3c2a7c83cbe35378669e1921122",
+    "src/autoengineering/system/graph.py": "6f1ec0ea627f51d250e6741aca8e37454331655a5296228e0d02588638edea18",
+    "src/autoengineering/validate/__init__.py": "74e11ca613eb0610bbf7131effa082e4165d2f421ac8c1eaade711bb9e6c0e66",
+    "src/autoengineering/validate/baseline.py": "60830bd41c1b077ff595b7b1871b1d5530a5694993e500204c6219983f85dd4f",
+    "src/autoengineering/validate/compare.py": "f657e26837d20020f1a78f79f8094746601ef60436acdfbe8c095303a79bf5b5"
+  },
+  "pending": null,
+  "requests": {
+    "decide": {
+      "request": {
+        "id": "decide",
+        "payload": {
+          "decision": "retain_gamma"
+        },
+        "tool": "decide"
+      },
+      "response": {
+        "decision": "retain_gamma",
+        "scope": "engineering_fixture_not_catchment_validation",
+        "status": "ok"
+      }
+    },
+    "diagnose": {
+      "request": {
+        "id": "diagnose",
+        "payload": {},
+        "tool": "diagnose"
+      },
+      "response": {
+        "hypothesis": "compare supplied routing after equal calibration",
+        "scope": "engineering_fixture_not_catchment_validation",
+        "status": "ok"
+      }
+    },
+    "evaluate": {
+      "request": {
+        "id": "evaluate",
+        "payload": {},
+        "tool": "evaluate"
+      },
+      "response": {
+        "decision": "retain_gamma",
+        "diagnostic_executions": 2,
+        "families": {
+          "gamma": {
+            "action_id": "eval-000001",
+            "checks": {
+              "aligned": true,
+              "causal": true,
+              "finite": true,
+              "nonnegative": true,
+              "normalized_kernel": true,
+              "routing_accounting": true,
+              "tail_accounting": true
+            },
+            "comparison": {
+              "bias": -0.02453719358479751,
+              "kge": 0.5310754871681644,
+              "nse": 0.5137700034954613,
+              "rmse": 2.5932925246121195
+            },
+            "default_comparison": {
+              "bias": -0.02453719358479751,
+              "kge": 0.5310754871681644,
+              "nse": 0.5137700034954613,
+              "rmse": 2.5932925246121195
+            },
+            "evaluations": 16,
+            "fit": {
+              "bias": 0.005509299909219862,
+              "kge": 0.5553855667363086,
+              "nse": 0.448585875569402,
+              "rmse": 2.172884471271197
+            },
+            "parameters": {
+              "gamma_scale": 1.5,
+              "gamma_shape": 2.5,
+              "k_base": 0.92,
+              "recharge_frac": 0.03
+            }
+          },
+          "triangular": {
+            "action_id": "eval-000002",
+            "checks": {
+              "aligned": true,
+              "causal": true,
+              "finite": true,
+              "nonnegative": true,
+              "normalized_kernel": true,
+              "routing_accounting": true,
+              "tail_accounting": true
+            },
+            "comparison": {
+              "bias": -0.6486952803017678,
+              "kge": 0.3904548586984271,
+              "nse": 0.4285953056700965,
+              "rmse": 2.8112698582496645
+            },
+            "default_comparison": {
+              "bias": 1.2642104999595665,
+              "kge": 0.33941780274798383,
+              "nse": 0.29333088497596227,
+              "rmse": 3.1263578703224026
+            },
+            "evaluations": 16,
+            "fit": {
+              "bias": -0.5243216075962523,
+              "kge": 0.46806291876626294,
+              "nse": 0.48973817397633634,
+              "rmse": 2.090230749969821
+            },
+            "parameters": {
+              "k_base": 0.8099801635742188,
+              "recharge_frac": 0.04457894548773765,
+              "uh_peak": 3
+            }
+          }
+        },
+        "rmse_gain": 0.217977333637545,
+        "scientific_executions": 36,
+        "scope": "engineering_fixture_not_catchment_validation",
+        "total_executions": 38
+      }
+    },
+    "review": {
+      "request": {
+        "id": "review",
+        "payload": {
+          "decision": "retain_gamma"
+        },
+        "tool": "review"
+      },
+      "response": {
+        "decision": "retain_gamma",
+        "scope": "engineering_fixture_not_catchment_validation",
+        "status": "ok"
+      }
+    },
+    "submit": {
+      "request": {
+        "id": "submit",
+        "payload": {
+          "candidate": "supplied-gamma-v1"
+        },
+        "tool": "submit"
+      },
+      "response": {
+        "candidate": "supplied-gamma-v1",
+        "candidate_sha256": "b463adcafe35f81b7fb9bba0888a522d59b9c495acd8deefb79d8bfec36b832f",
+        "status": "admitted"
+      }
+    }
+  },
+  "reserved_executions": 40,
+  "started": 1792974119.0682821,
+  "step": 5,
+  "tool_calls": 5
+}

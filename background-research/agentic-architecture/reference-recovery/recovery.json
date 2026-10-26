@@ -1,0 +1,8 @@
+{
+  "ack_recovered": true,
+  "decision": "retain_gamma",
+  "duplicate_identical": true,
+  "execution_count": 38,
+  "injected": "injected result-before-ack crash",
+  "reserved_before_ack": 40
+}

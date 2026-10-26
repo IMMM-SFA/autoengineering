@@ -1,0 +1,23 @@
+case,evidence,observed_result,scope
+finite and aligned output,test_bad_or_attractive_nonphysical_arrays_fail,pass,synthetic evaluator contract
+nonfinite or wrong shape,test_bad_or_attractive_nonphysical_arrays_fail,pass,synthetic evaluator contract
+attractive invalid output,test_bad_or_attractive_nonphysical_arrays_fail,pass,synthetic zero-flow accounting violation
+unsupported requests,test_malformed_and_untrusted_requests_rejected,pass,shared control function
+request deduplication,test_transitions_and_duplicate_result_do_not_evaluate_twice,pass,shared control function and live CLI duplicates not needed
+worker disappearance,test_worker_disappearance_resumes_from_admitted_candidate,pass,fixture restart
+real result before acknowledgment,reference-recovery/recovery.json,pass,real Leaf River shared control function
+uncertain physical execution,test_uncertain_execution_keeps_reservation,pass,fixture reservation retained without rerun
+cancellation before next action,test_cancellation_and_conflicting_request_id,pass,fixture
+active child termination,decision.md,not_tested,both routes
+execution and request budgets,test_budget_exhaustion,pass,fixture pre-start checks
+hard token budget,live/summary.json,fail,one live CLI campaign crossed observed threshold
+source task or data changed,test_changed_identity_refused,pass,all bound through one identity mapping
+protected read and write,boundary.json,pass,macOS cat/touch probes and same profile used for Codex
+concurrent writer,test_concurrent_writer_refused,pass,POSIX advisory lock fixture
+unsupported conclusion,test_unsupported_conclusion_is_rejected,pass,fixture structured decision
+numeric reconstruction,verify.py,pass,six saved real comparison arrays
+transport parity,comparison/parity.json,pass,six deterministic campaigns
+live roles,live/handoffs.json,pass,one fresh CLI campaign only
+second live host,host-capabilities.csv,not_tested,stopped at observed token limit
+malformed-request retry limit,responsibilities.md,not_implemented,Part 2 journal requirement
+arbitrary generated code isolation,responsibilities.md,not_tested,only supplied allowlisted functions admitted

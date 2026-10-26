@@ -1,0 +1,146 @@
+[
+  {
+    "request": {
+      "id": "diagnose",
+      "payload": {},
+      "tool": "diagnose"
+    },
+    "response": {
+      "hypothesis": "compare supplied routing after equal calibration",
+      "scope": "engineering_fixture_not_catchment_validation",
+      "status": "ok"
+    }
+  },
+  {
+    "request": {
+      "id": "evaluate",
+      "payload": {},
+      "tool": "evaluate"
+    },
+    "response": {
+      "decision": "retain_gamma",
+      "diagnostic_executions": 2,
+      "families": {
+        "gamma": {
+          "action_id": "eval-000001",
+          "checks": {
+            "aligned": true,
+            "causal": true,
+            "finite": true,
+            "nonnegative": true,
+            "normalized_kernel": true,
+            "routing_accounting": true,
+            "tail_accounting": true
+          },
+          "comparison": {
+            "bias": -0.02453719358479751,
+            "kge": 0.5310754871681644,
+            "nse": 0.5137700034954613,
+            "rmse": 2.5932925246121195
+          },
+          "default_comparison": {
+            "bias": -0.02453719358479751,
+            "kge": 0.5310754871681644,
+            "nse": 0.5137700034954613,
+            "rmse": 2.5932925246121195
+          },
+          "evaluations": 16,
+          "fit": {
+            "bias": 0.005509299909219862,
+            "kge": 0.5553855667363086,
+            "nse": 0.448585875569402,
+            "rmse": 2.172884471271197
+          },
+          "parameters": {
+            "gamma_scale": 1.5,
+            "gamma_shape": 2.5,
+            "k_base": 0.92,
+            "recharge_frac": 0.03
+          }
+        },
+        "triangular": {
+          "action_id": "eval-000002",
+          "checks": {
+            "aligned": true,
+            "causal": true,
+            "finite": true,
+            "nonnegative": true,
+            "normalized_kernel": true,
+            "routing_accounting": true,
+            "tail_accounting": true
+          },
+          "comparison": {
+            "bias": -0.6486952803017678,
+            "kge": 0.3904548586984271,
+            "nse": 0.4285953056700965,
+            "rmse": 2.8112698582496645
+          },
+          "default_comparison": {
+            "bias": 1.2642104999595665,
+            "kge": 0.33941780274798383,
+            "nse": 0.29333088497596227,
+            "rmse": 3.1263578703224026
+          },
+          "evaluations": 16,
+          "fit": {
+            "bias": -0.5243216075962523,
+            "kge": 0.46806291876626294,
+            "nse": 0.48973817397633634,
+            "rmse": 2.090230749969821
+          },
+          "parameters": {
+            "k_base": 0.8099801635742188,
+            "recharge_frac": 0.04457894548773765,
+            "uh_peak": 3
+          }
+        }
+      },
+      "rmse_gain": 0.217977333637545,
+      "scientific_executions": 36,
+      "scope": "engineering_fixture_not_catchment_validation",
+      "total_executions": 38
+    }
+  },
+  {
+    "request": {
+      "id": "review",
+      "payload": {
+        "decision": "retain_gamma"
+      },
+      "tool": "review"
+    },
+    "response": {
+      "decision": "retain_gamma",
+      "scope": "engineering_fixture_not_catchment_validation",
+      "status": "ok"
+    }
+  },
+  {
+    "request": {
+      "id": "submit",
+      "payload": {
+        "candidate": "supplied-gamma-v1"
+      },
+      "tool": "submit"
+    },
+    "response": {
+      "candidate": "supplied-gamma-v1",
+      "candidate_sha256": "b463adcafe35f81b7fb9bba0888a522d59b9c495acd8deefb79d8bfec36b832f",
+      "status": "admitted"
+    }
+  },
+  {
+    "request": {
+      "id": "decide",
+      "payload": {
+        "decision": "retain_gamma"
+      },
+      "tool": "decide"
+    },
+    "response": {
+      "decision": "retain_gamma",
+      "scope": "engineering_fixture_not_catchment_validation",
+      "status": "ok"
+    }
+  }
+]

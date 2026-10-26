@@ -1,0 +1,5 @@
+host,installed_version,structured_output,noninteractive,delegation,cancellation,transcript,permissions,provider_portability,evidence
+Codex,0.164.0,output-schema and JSON events,exec,serial roles via runner,parent timeout only,JSONL with usage,read-only plus tested external repository denial,official OpenAI plus configurable providers not tested,one live three-role supplied-candidate campaign
+Claude Code,2.1.310,documented JSON/headless,print mode,not tested,not tested,documented not executed,not tested,not tested,installed help and official documentation only
+Pi,1.4.0,not inspected,not inspected,not tested,not tested,not tested,not tested,not tested,version only
+OpenCode,1.18.23,not inspected,not inspected,not tested,not tested,not tested,not tested,not tested,version only

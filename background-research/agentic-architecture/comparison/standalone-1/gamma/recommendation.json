@@ -1,0 +1,1 @@
+{"action_id":"eval-000001","config":{"gamma_scale":1.5,"gamma_shape":2.5,"k_base":0.92,"recharge_frac":0.03},"feasible":true,"message":"best feasible observed configuration","outcomes":{"bias":0.005509299909219862,"kge":0.5553855667363086,"nse":0.448585875569402,"rmse":2.172884471271197}}

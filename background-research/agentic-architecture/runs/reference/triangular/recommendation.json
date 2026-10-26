@@ -1,0 +1,1 @@
+{"action_id":"default","config":{"k_base":0.85,"recharge_frac":0.1,"uh_peak":3},"feasible":true,"message":"best feasible observed configuration","outcomes":{"bias":1.166833561246644,"kge":0.2715076757145758,"nse":0.08204133776209976,"rmse":2.8035561280232284}}

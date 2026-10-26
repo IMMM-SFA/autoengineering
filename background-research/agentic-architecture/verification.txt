@@ -1,0 +1,18 @@
+Platform: macOS ARM64; existing Pixi Python 3.12.13.
+PYTHONPATH=src:. with the existing Pixi default environment bin directory on PATH.
+Ruff: all checks passed for src, tests, examples, and the live worker script.
+....................................................sssssssss........... [ 12%]
+................................sssssss...s..........................s.. [ 25%]
+........................................................................ [ 37%]
+........................................................................ [ 50%]
+........................................................ssssssssssssssss [ 63%]
+sssssssssssssssssssss.ssss...........s.................................. [ 75%]
+........................................................................ [ 88%]
+..................................................................       [100%]
+510 passed, 65 skipped in 36.98s
+
+Focused pilot contracts: 23 passed.
+Saved numerical verification: 6 runs; parity true; independently reconstructed metrics true.
+No Bayes, Linux, or fresh frozen benchmark matrices were run.
+artifact-manifest.v1.json preserves the first seal before final provenance notes.
+artifact-manifest.json seals the reviewed artifact set.

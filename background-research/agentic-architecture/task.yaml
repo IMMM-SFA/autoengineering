@@ -1,0 +1,49 @@
+schema_version: 1
+task_id: leaf-routing-architecture-v1
+scope: engineering_fixture_not_catchment_validation
+source_revision: eab63677396c2f2be2f22196339e47f5e8ad737c
+prior_exposure: both years used in repository development
+intervention: supplied routing families only; no imported worker code
+state:
+  initial_soil_mm: 50
+  initial_baseflow_mm_day: 0.5
+  simulation: 2019-01-01 through 2020-12-31, causal continuous state
+  fitting: 2019-04-01 through 2019-12-31
+  warmup: 2019-01-01 through 2019-03-31
+  comparison: 2020-01-01 through 2020-12-31
+  missing_day_policy: reject; never compress gaps
+seed: 17
+policy: default_then_scrambled_sobol
+families:
+  triangular:
+    default: {uh_peak: 3, k_base: 0.85, recharge_frac: 0.10}
+    bounds: {uh_peak: [1, 8], k_base: [0.5, 0.98], recharge_frac: [0.0, 0.12]}
+    fixed: {uh_length: 10, baseflow_init: 0.5}
+  gamma:
+    default: {gamma_shape: 2.5, gamma_scale: 1.5, k_base: 0.92, recharge_frac: 0.03}
+    bounds: {gamma_shape: [1.1, 5.0], gamma_scale: [0.5, 3.0], k_base: [0.5, 0.98], recharge_frac: [0.0, 0.12]}
+    fixed: {uh_length: 15, baseflow_init: 0.5}
+objective: minimize fitting RMSE in mm/day
+acceptance:
+  min_rmse_gain: 0.01
+  max_kge_loss: 0.02
+  max_absolute_bias_increase: 0.05
+  tie: retain_triangular
+  array_tolerance: 1.0e-10
+  nonnegative_tolerance: 1.0e-12
+  tail_accounting_tolerance: 1.0e-8
+resources:
+  family_evaluations: 16
+  max_system_executions: 40
+  max_wall_seconds: 1800
+  handoff_repairs: 2
+  max_tool_requests: 12
+  live_worker_token_limit: 0
+  live_worker_usd_limit: 0
+  total_investigation_execution_limit: 320
+access:
+  worker: staged task summary, supplied candidate manifest, fitting diagnostics, tool responses
+  evaluator: cached data and frozen acceptance
+  execution: trusted allowlist only; arbitrary code rejected
+  network: no scientific evaluator network access required
+outputs: [candidate, child_studies, comparison_arrays, decision, source_hashes, request_history]

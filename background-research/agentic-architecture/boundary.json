@@ -1,0 +1,22 @@
+{
+  "mechanism": "macOS sandbox-exec deny repository reads/writes",
+  "passed": true,
+  "scope": "cat/touch probes only; no live agent or generated code executed",
+  "staged_manifest": {
+    "brief.json": "773c5a5eee612b49500b4ccf27a7d5e4adc47c7e29ccc6655240b1ace6f9d0b1"
+  },
+  "tests": {
+    "protected_read": {
+      "returncode": 1,
+      "stderr": "cat: /Users/cam/projects/autoengineering/.worktrees/agentic-architecture-part1/examples/leaf_river/data/streamflow.csv: Operation not permitted"
+    },
+    "protected_write": {
+      "returncode": 1,
+      "stderr": "touch: background-research/agentic-architecture/forbidden-write: Operation not permitted"
+    },
+    "staged_read": {
+      "returncode": 0,
+      "stderr": ""
+    }
+  }
+}

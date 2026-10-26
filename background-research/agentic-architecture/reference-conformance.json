@@ -1,0 +1,32 @@
+{
+  "pending": {
+    "passed": null,
+    "compiler": {
+      "passed": true
+    },
+    "reading": {
+      "passed": null,
+      "reason": "reading pending"
+    }
+  },
+  "rejected": {
+    "passed": false,
+    "compiler": {
+      "passed": true
+    },
+    "reading": {
+      "passed": false,
+      "reason": "fixture violation"
+    }
+  },
+  "accepted": {
+    "passed": true,
+    "compiler": {
+      "passed": true
+    },
+    "reading": {
+      "passed": true,
+      "reason": "fixture admissible"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "fresh_campaigns": 1,
+  "max_calls": 18,
+  "max_total_observed_tokens": 50000,
+  "mode": "subscription_only",
+  "paid_api_usd_limit": 0,
+  "per_call_timeout_seconds": 90,
+  "replayed_campaigns": 5,
+  "token_enforcement": "stop before next call after reported usage; no in-flight hard cap",
+  "version": 2,
+  "worker_script_sha256": "62e06607e50a7eb1545fd32fd9bbaecc7c34490c9a48cbe7028b3eed33cbd49a"
+}

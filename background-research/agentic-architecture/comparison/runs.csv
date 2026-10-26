@@ -1,0 +1,7 @@
+route,worker,seconds,decision,executions,tool_calls,tokens,usd,candidate,repeat,artifact
+cli,deterministic_stub,8.88452774984762,retain_gamma,38,5,0,0,supplied-gamma-v1,0,cli-0/evaluation.json
+cli,deterministic_stub,9.78912420803681,retain_gamma,38,5,0,0,supplied-gamma-v1,1,cli-1/evaluation.json
+cli,deterministic_stub,10.470275624655187,retain_gamma,38,5,0,0,supplied-gamma-v1,2,cli-2/evaluation.json
+standalone,deterministic_stub,5.591234291903675,retain_gamma,38,5,0,0,supplied-gamma-v1,0,standalone-0/evaluation.json
+standalone,deterministic_stub,5.38611612515524,retain_gamma,38,5,0,0,supplied-gamma-v1,1,standalone-1/evaluation.json
+standalone,deterministic_stub,5.319062875118107,retain_gamma,38,5,0,0,supplied-gamma-v1,2,standalone-2/evaluation.json
