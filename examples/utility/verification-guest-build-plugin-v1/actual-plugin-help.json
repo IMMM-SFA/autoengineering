@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "installed_plugin": {
+    "path_digest": "130e8afc7557216509554b0e2045f2f520ed6cfe13925965c73d7dd84223679a",
+    "resolved_digest": "cb26684320496524df0cb02c26d92443a40e4e367e37cf674b1cda20986537aa",
+    "sha256": "4a728ee98f89005a90198a9be791e8fdaebbcb5e6af9721251efe0113df37759",
+    "size_bytes": 74041344
+  },
+  "private_plugin_verified": true,
+  "configuration": {},
+  "command": "docker --config PRIVATE_CONFIG --host unix://ABSENT_SOCKET buildx --help",
+  "daemon_endpoint_deliberately_absent": true,
+  "image_operations": 0,
+  "base_pull_attempted": false,
+  "image_build_attempted": false,
+  "private_copy_scope": "/private/tmp/autoengineering-buildx-discovery-x508h64n",
+  "output_sha256": "fc2c8b3aa53ca86391c4033ffe32a5ab699dcd1ed29402835275cd6b2a775f53"
+}

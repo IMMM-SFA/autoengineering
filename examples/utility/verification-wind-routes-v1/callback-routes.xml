@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="43.193" timestamp="2026-10-28T17:14:11.388539-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_callback_native" name="test_callback_original_process_receipt_recovery_and_costs" time="1.265" /><testcase classname="tests.test_utility_callback_native" name="test_callback_failures_keep_original_charge_and_unknown_work[timeout-timeout]" time="0.502" /><testcase classname="tests.test_utility_callback_native" name="test_callback_failures_keep_original_charge_and_unknown_work[error-model_failure]" time="1.177" /><testcase classname="tests.test_utility_callback_native" name="test_callback_failures_keep_original_charge_and_unknown_work[overflow-model_failure]" time="1.289" /><testcase classname="tests.test_utility_callback_native" name="test_callback_failures_keep_original_charge_and_unknown_work[exhausted-model_failure]" time="1.508" /><testcase classname="tests.test_utility_callback_native" name="test_callback_saved_process_recovers_without_another_launch" time="1.296" /><testcase classname="tests.test_utility_callback_native" name="test_callback_spec_and_trace_reject_changed_caps_options_indices_and_unresolved" time="0.208" /><testcase classname="tests.test_utility_callback_native" name="test_callback_campaign_requires_fresh_checks_before_selection" time="6.008" /><testcase classname="tests.test_utility_callback_native" name="test_callback_verifier_rejects_changed_original_output" time="1.140" /><testcase classname="tests.test_utility_callback_native" name="test_callback_wind_task_runs_shared_baseline_conventional_and_single_agent" time="27.713"><failure message="AttributeError: 'CallbackDriverResult' object has no attribute 'solves'">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4330/test_callback_wind_task_runs_s0')
+
+    def test_callback_wind_task_runs_shared_baseline_conventional_and_single_agent(tmp_path):
+        from examples.utility.rehearse_engineering_plan import build_plan
+        from autoengineering.utility.engineering_execution import (
+            ScriptedEngineeringPlan,
+            ScriptedEngineeringCoordinator,
+        )
+    
+        campaign, _, source = campaign_setup(tmp_path)
+        output = tmp_path / "route-plan"
+        output.mkdir()
+        _, _, plan, store = build_plan(output, source, campaign.spec, task_id="wind", family="wind")
+        assert ScriptedEngineeringPlan.from_json(plan.to_json()) == plan
+        assert store.spec.tasks[0].family == "wind"
+        coordinator = ScriptedEngineeringCoordinator(store, plan, source)
+&gt;       result = coordinator.run(max_new_cells=3)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_callback_native.py:265: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/autoengineering/utility/engineering_execution.py:251: in run
+    return super().run(max_new_cells=max_new_cells)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/execution.py:357: in run
+    self.runtime.dispatch(child.root.name, cell.digest,
+src/autoengineering/utility/controller.py:142: in dispatch
+    runner(child, case.id)
+src/autoengineering/utility/execution.py:358: in &lt;lambda&gt;
+    lambda batch, case_id: self._execute(batch, case_id, cell))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_execution.py:333: in _execute
+    final = broker.advance(resume_scenarios=self._resume_scenarios if recover else False)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_broker.py:506: in advance
+    return self._advance()
+           ^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_broker.py:585: in _advance
+    self._coordinate("review:" + row["id"], "reviewer")
+src/autoengineering/utility/engineering_broker.py:467: in _coordinate
+    handoff = self._role(
+src/autoengineering/utility/engineering_broker.py:452: in _role
+    return CampaignBroker._role(
+src/autoengineering/agents/broker.py:466: in _role
+    summary = self.summary()
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;autoengineering.utility.engineering_broker.EngineeringBroker object at 0x144d8b980&gt;
+
+    def summary(self):
+        state = self.controller.state()
+        rules = self.controller.spec.execution.study.rules
+        summary = {
+            "schema": "engineering-advice-v1",
+            "campaign_id": self.controller.spec.name,
+            "revision": state["projection"].revision,
+            "state": self.phase,
+            "scientific_state": state["projection"].state,
+            "objective": {
+                "metric": rules.primary_metric,
+                "direction": rules.direction,
+                "minimum_gain": rules.minimum_gain,
+                "outcomes": [o.to_dict() for o in rules.outcomes],
+                "secondary_limits": dict(rules.secondary_limits),
+            },
+            "parameter_domain": self.controller.spec.execution.study.run.search_space.to_dict(),
+            "scenarios": [s.to_dict() for s in self.controller.spec.execution.scenarios],
+            "interface": {
+                kind: [
+                    {"name": p.name, "units": p.units, "dimensions": list(p.dimensions)}
+                    for p in ports
+                ]
+                for kind, ports in (
+                    ("inputs", self.controller.spec.model.inputs),
+                    ("outputs", self.controller.spec.model.outputs),
+                )
+            },
+            "numerical_recipe": {
+                "policy": self.controller.spec.execution.study.run.policy,
+                "options": dict(self.controller.spec.execution.study.run.policy_options),
+                "budget": self.controller.spec.execution.study.run.study.to_dict()["budget"],
+                "paired_seed": self.controller.spec.execution.study.run.study.seed,
+                "study_digest": self.controller.spec.execution.study.digest,
+            },
+            "native_recipe": None
+            if not isinstance(self.controller.spec, EngineeringNativeCampaignSpec)
+            else (
+                {
+                    "callback_limits": dict(self.controller.spec.native.callback_limits),
+                    "registered_options_digest": digest(self.controller.spec.native.options_json),
+                    "timeout_seconds": self.controller.spec.native.timeout_seconds,
+                }
+                if isinstance(self.controller.spec.native, CallbackDriverSpec)
+                else {
+                    "max_iterations": self.controller.spec.native.max_iterations,
+                    "max_model_solves": self.controller.spec.native.max_model_solves,
+                    "timeout_seconds": self.controller.spec.native.timeout_seconds,
+                }
+            ),
+            "catalogue": list(self.catalogue),
+            "proposed_interventions": [
+                {"target": p.target, "implementation_id": p.implementation_id}
+                for p in self.proposals
+            ],
+            "evaluations": [_public_evaluation(v) for v in state["evaluations"]],
+            "mandatory_checks": [c.to_dict() for c in rules.checks if c.required],
+            "native_jobs": [
+                {
+                    "id": "native-report-" + r.digest[:24],
+                    "status": r.status,
+&gt;                   "inner_model_calls": len(r.result.solves) if r.result else None,
+                                             ^^^^^^^^^^^^^^^
+                }
+                for r in state["native_reports"]
+            ],
+            "limits": {
+                "independent_confirmation": "not_admitted",
+                "training": "not_admitted",
+                "execution": "trusted_supplied_only",
+            },
+        }
+E       AttributeError: 'CallbackDriverResult' object has no attribute 'solves'
+
+src/autoengineering/utility/engineering_broker.py:343: AttributeError</failure></testcase></testsuite></testsuites>

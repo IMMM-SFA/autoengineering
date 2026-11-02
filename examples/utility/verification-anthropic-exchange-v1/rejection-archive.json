@@ -1,0 +1,7 @@
+{
+  "archive": "examples/utility/development/anthropic-rejection-evidence-v1",
+  "index_sha256": "fbb37658009e7fda1fa2a32fecd6ced5d208a1a675f8837007faf5fb8fc6b22d",
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "production_admission": false
+}

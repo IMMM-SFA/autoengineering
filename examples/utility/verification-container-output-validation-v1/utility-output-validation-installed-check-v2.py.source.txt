@@ -1,0 +1,47 @@
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import socket
+import subprocess
+import sys
+import ssl  # Resolve stdlib socket subclasses before replacing the constructor.
+
+base=Path(sys.argv[1]);configuration=json.loads((base/'installed-configuration.json').read_bytes())
+sys.path.insert(0,configuration['installed_root'])
+def denied(*args,**kwargs):
+    raise AssertionError('offline recovery attempted daemon, network or a process')
+socket.socket=denied;subprocess.Popen=denied
+from autoengineering.utility import private_container_runtime as module
+module.API.request=denied
+candidate=module.FixedScorerRuntime(Path(configuration['socket_path']),server_sha256=configuration['server_sha256'])
+assert candidate.identity==configuration['runtime_digest']
+assert str(Path(module.__file__)).startswith(configuration['installed_root']+'/')
+summary=json.loads((base/'normal/actual-recovery.json').read_bytes())
+grant=summary['receipt']['grant_digest']
+original=base/'original-private-evidence'/grant
+plan=json.loads((original/'container/plan.json').read_bytes())
+assert not list((base/'original-private-evidence').rglob('labels.json'))
+score=candidate.recover(original,job_sha256=plan['job_sha256'],labels_sha256=plan['labels_sha256'])
+assert score['value']==1.0
+assert candidate.execution_evidence(original,job_sha256=plan['job_sha256'],labels_sha256=plan['labels_sha256'])['container_id']==summary['container_id']
+mutated=Path('/private/tmp/utility-output-validation-tampered-v1')
+shutil.copytree(original,mutated)
+folder=mutated/'container';raw=(folder/'stdout.bin').read_bytes()
+# Both the response hash and saved projection agree with the malicious response.
+# Duplicate detection must still refuse it before it can be used as a score.
+raw=raw.replace(b'"child_exit_code": 0',b'"child_exit_code": 70, "child_exit_code": 0')
+assert raw!=(folder/'stdout.bin').read_bytes()
+(folder/'stdout.bin').write_bytes(raw)
+result=json.loads((folder/'result.json').read_bytes())
+result.update(stdout_sha256=hashlib.sha256(raw).hexdigest(),result=json.loads(raw))
+(folder/'result.json').write_text(json.dumps(result))
+try:
+    candidate.recover(mutated,job_sha256=plan['job_sha256'],labels_sha256=plan['labels_sha256'])
+except module.Refused:
+    pass
+else:
+    raise AssertionError('installed recovery accepted ambiguous output')
+report={'schema':'utility-output-validation-installed-check-v1','installed_core_files':199,'runtime_digest':candidate.identity,'original_container_id':summary['container_id'],'original_score':score,'labels_absent':True,'daemon_network_and_process_denied':True,'relocated_recovery':True,'rehashed_duplicate_output_rejected':True,'new_starts':0,'private_scoring_qualified':False}
+(base/'installed-check.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps(report))

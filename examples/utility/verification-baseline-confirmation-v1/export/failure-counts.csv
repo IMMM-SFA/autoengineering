@@ -1,0 +1,3 @@
+task_id,regime,route_id,comparator_id,outcome,units,counted_route,status,count,assigned,successful_feasible,target_reached,target_censored,target_unknown
+task,fixed_evaluations,multi,conventional,power,W,multi,success,1,1,1,0,0,1
+task,fixed_evaluations,multi,conventional,power,W,conventional,success,1,1,1,0,0,1

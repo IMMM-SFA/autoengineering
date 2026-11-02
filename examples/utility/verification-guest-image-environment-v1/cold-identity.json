@@ -1,0 +1,23 @@
+{
+  "bytes": 117131,
+  "exit_code": 0,
+  "file_count": 12,
+  "files": [
+    "bindings.json",
+    "cleanup-intent.json",
+    "cleanup.json",
+    "client-result.json",
+    "complete.json",
+    "completion.json",
+    "container.id",
+    "environment.json",
+    "intent.json",
+    "output.log",
+    "request.json",
+    "runner.py"
+  ],
+  "imports_before_guard": true,
+  "inherited_dependencies": true,
+  "installed_package_qualification": false,
+  "reader_sha256": "ac1edb44353e4628e6a0e3e7e92566637b2d03a8316cf5c99ee71e0cf0b851c2"
+}

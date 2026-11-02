@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autoengineering"
+version = "0.2.0"
+description = "AI-assisted systems engineering for complex model chains"
+license = "BSD-3-Clause"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "networkx>=3.0",
+    "pyyaml>=6.0",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "pandas>=2.0",
+    "click>=8.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+optuna = ["optuna==4.5.0"]
+interoperability = ["optuna==4.5.0", "bmipy==2.0.1", "openmdao==3.41.0", "pvlib==0.15.2", "psutil==7.2.2"]
+bayes = [
+    "botorch==0.17.2",
+]
+benchmark = [
+    "smac>=2.3,<3",
+]
+
+[project.scripts]
+autoengineering = "autoengineering.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = [
+    "autoengineering", "autoengineering.*",
+    "examples.utility", "examples.campaign_contracts",
+    "examples.interoperability", "examples.interoperability.circuit",
+    "examples.interoperability.solar", "examples.interoperability.optimizer_comparison",
+    "examples.interoperability.bmi", "examples.local_models",
+    "examples.leaf_river", "examples.leaf_river.models",
+    "examples.open_chains", "examples.open_chains.solar",
+]
+
+[tool.setuptools.package-data]
+"examples.utility" = ["fixtures/*.json", "tasks/*.json", "README.md"]
+"examples.campaign_contracts" = ["*.json", "*.yaml"]
+"autoengineering.campaign" = ["scientific-closure-v1.json", "scientific-closure-v2.json", "scientific-closure-v3.json"]
+"autoengineering.agents" = ["prompts/*.txt"]
+"examples.interoperability.circuit" = ["protocol.json"]
+"examples.interoperability.bmi" = ["protocol.json"]
+"examples.interoperability.solar" = ["protocol.json"]
+"examples.interoperability.optimizer_comparison" = ["protocol.json", "pixi.toml", "pixi.lock"]
+"examples.open_chains.solar" = ["system.yaml", "sources.json", "candidates.json", "README.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100

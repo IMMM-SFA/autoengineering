@@ -1,0 +1,19 @@
+{
+  "schema": "utility-output-validation-installed-check-v1",
+  "installed_core_files": 199,
+  "runtime_digest": "693a07f72875360d1efba34e39f831297ab892ce7f28377fa607f9ddaf079ac3",
+  "original_container_id": "80dc505f778caa6577495b0b3b535a32f6187ccb5769d6893a8d7b325a1a6eb6",
+  "original_score": {
+    "feasible": true,
+    "outcome": "rmse",
+    "status": "success",
+    "units": "W",
+    "value": 1.0
+  },
+  "labels_absent": true,
+  "daemon_network_and_process_denied": true,
+  "relocated_recovery": true,
+  "rehashed_duplicate_output_rejected": true,
+  "new_starts": 0,
+  "private_scoring_qualified": false
+}

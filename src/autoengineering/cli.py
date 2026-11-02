@@ -14,6 +14,25 @@ from autoengineering.system.graph import System
 console = Console()
 
 
+class _LazyGroup(click.Group):
+    """Register help and names without importing execution backends."""
+
+    def __init__(self, name, module, help):
+        super().__init__(name=name, help=help)
+        self.module = module
+
+    def _load(self):
+        from importlib import import_module
+
+        return getattr(import_module(self.module), self.name)
+
+    def list_commands(self, ctx):
+        return self._load().list_commands(ctx)
+
+    def get_command(self, ctx, name):
+        return self._load().get_command(ctx, name)
+
+
 @click.group()
 @click.version_option(package_name="autoengineering")
 def cli():
@@ -315,9 +334,26 @@ def experiments(tree_file):
     click.echo(tree.to_markdown())  # pre-formatted tree; echo verbatim to keep indentation
 
 
-from autoengineering.campaign.command import campaign  # noqa: E402
+cli.add_command(
+    _LazyGroup(
+        "campaign",
+        "autoengineering.campaign.command",
+        "Run deterministic campaigns with supplied trusted adapters.",
+    )
+)
+cli.add_command(
+    _LazyGroup(
+        "agents",
+        "autoengineering.agents.command",
+        "Run bounded worker workflows with fake or explicitly configured Codex hosts.",
+    )
+)
 
-cli.add_command(campaign)
+
+cli.add_command(
+    _LazyGroup("utility", "autoengineering.utility.command",
+               "Prepare utility suites and verify offline comparison evidence.")
+)
 
 
 if __name__ == "__main__":

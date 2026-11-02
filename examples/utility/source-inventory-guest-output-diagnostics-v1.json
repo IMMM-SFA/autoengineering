@@ -1,0 +1,14 @@
+{
+  "scope": "Two separately named fixed output producers on the real cached-image daemon; production attach and bootstrap readers; not model-worker or owner-loss qualification",
+  "predecessor": "examples/utility/source-inventory-guest-numeric-control.json",
+  "predecessor_sha256": "24290cbfa60e6f368427fb3c05517ac284ffe9abe631de74a1d5c3cd10515861",
+  "source_sha256": {
+    "examples/utility/guest_output_diagnostics.py": "4f2fd141e80cbf4c92eee01ba80c8093d1c1d6691c7d762a8b1d7f40113c84cc",
+    "examples/utility/guest_output_reader.py": "c3f116e78766fd7156df5831dc3ec8204ae61e6ba441621b5bdc71ecd7d8136b",
+    "tests/test_utility_guest_output_diagnostics.py": "80926b39767bf104f0af0bdd1425833bf9188e6850f786d91503548597499e35",
+    "tests/test_utility_guest_output_reader.py": "f9d1e93a789ed88990389d8af37aef25401828a6f24ca1258af585cbbbe04caf"
+  },
+  "verification": "examples/utility/verification-guest-output-diagnostics-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315
+}

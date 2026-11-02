@@ -1,0 +1,78 @@
+{
+  "identity": {
+    "schema_version": 1,
+    "framework": "pvlib",
+    "framework_version": "0.15.2",
+    "implementation_id": "solar-qualified-v6",
+    "mode": "model",
+    "configuration_digest": "6e07a73f1b429d16525da9d036423dd5b6304bb5dbb065709d869119f2e358b0",
+    "environment_digest": "b9486dfc6918ddf465302f71692c9f1dedcaa566add8828b1a6e6995fb25b226",
+    "source_digest": "d082168e2344233487c97926e77b225938f86048b51845620e58d45347a27d51",
+    "capabilities": [
+      "utc_five_minute",
+      "verified_cache",
+      "fitting_only_search"
+    ],
+    "seed": 17,
+    "checkpoint_format": "fresh-attempt-only"
+  },
+  "receipt": {
+    "schema_version": 1,
+    "integration_digest": "8fa27c9b22898ff25c085638bb08685a4aa21f84fd776c656d83a02b4985d2f4",
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "direct_reference": [
+      {
+        "path": "outputs/part-4-installed-solar-parity-v6/result/manifest.json",
+        "sha256": "9f8c6ab88fbe776e224c4be932e85db293583ba3978aa11534d361de32ad7e34",
+        "size_bytes": 643822,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "outputs/part-4-installed-solar-parity-v6/result/outputs.npz",
+        "sha256": "186778fced1d73ed44839b3757742846636abb6a6db2491ec038557defa29892",
+        "size_bytes": 20939,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "outputs/part-4-installed-solar-parity-v6/result/report.json",
+        "sha256": "7d2421a5527c561ce7ca94d3e8e02bbf68d140744ec081bbd09bc889124ea3cf",
+        "size_bytes": 221,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "examples/interoperability/evidence/solar-campaign-installed-v6/index.json",
+        "sha256": "dc899348a31fcf6b0ec67233afc593867ea70e39dc4ceab7b375851dbcfffae5",
+        "size_bytes": 14696,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      }
+    ],
+    "tolerance_definition": {
+      "path": "examples/interoperability/solar/protocol.json",
+      "sha256": "cda0063142068f0fbf866c14cde433cba587d152d551db57f77771c7dacdeae0",
+      "size_bytes": 1146,
+      "media_type": "application/octet-stream",
+      "producer": "part-4-qualification",
+      "metadata": {}
+    },
+    "capability_checks": [
+      "parity_or_translation",
+      "failure_recovery",
+      "installed_execution"
+    ],
+    "limitations": [
+      "previously exposed June 2018 development data",
+      "confirmation not attempted",
+      "power samples are not interval energy",
+      "macOS ARM64 only; Linux runtime unverified"
+    ],
+    "qualification": "verified"
+  }
+}

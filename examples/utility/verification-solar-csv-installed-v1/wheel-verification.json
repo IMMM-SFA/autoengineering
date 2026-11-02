@@ -1,0 +1,12 @@
+{
+  "python_files": 231,
+  "fixture_resources": [
+    "examples/utility/fixtures/solar-csv-plan-v1.json",
+    "examples/utility/fixtures/solar-csv-rows-v1.json"
+  ],
+  "sha256": "812459ca5c944bf8fb027ef44b8244b31613bf0510142be52e43419a20e2b7db",
+  "copied_input_pins": 245,
+  "all_package_payloads_match_inputs": true,
+  "build_exit_code": 0,
+  "network_or_dependency_installation": false
+}

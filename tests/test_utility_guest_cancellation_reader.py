@@ -1,0 +1,79 @@
+"""Actual saved cancellation proofs replay without transport or model execution."""
+
+from pathlib import Path
+import shutil
+import socket
+import subprocess
+import time
+
+import numpy as np
+import pytest
+
+from examples.utility import guest_cancellation_reader as module
+
+ROOT = Path(__file__).parents[1] / "examples/utility/verification-guest-cancellation-controls-v1"
+DIGEST = "a75833654e13b948e2a7c279528d045ebedad20fd3a451d3ed5f05787ab3bcba"
+
+
+def relocated(tmp_path):
+    target = tmp_path / "proof"
+    shutil.copytree(ROOT, target)
+    target.chmod(0o700)
+    for path in target.rglob("*"):
+        if path.is_dir():
+            path.chmod(0o700)
+    return target
+
+
+def test_saved_cancellation_replays_without_execution_arrays_or_clocks(tmp_path, monkeypatch):
+    proof = relocated(tmp_path)
+    # Initialize optional metadata readers before forbidding clocks and execution.
+    expected = module.read_completion(proof, expected_digest=DIGEST)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("saved cancellation used execution, network, arrays or clock")
+
+    with monkeypatch.context() as patch:
+        for owner, name in (
+            (subprocess, "Popen"),
+            (socket, "socket"),
+            (np, "load"),
+            (time, "monotonic"),
+            (time, "time"),
+        ):
+            patch.setattr(owner, name, forbidden)
+        assert module.read_completion(proof, expected_digest=DIGEST) == expected
+    assert [v["phase"] for v in expected["results"]] == ["created", "start_intent"]
+    assert all(v["container_starts"] == 0 for v in expected["results"])
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "cancel_after_create/cancellation-trigger.json",
+        "cancel_before_start/post-cleanup-observation.json",
+        "cancel_before_start/owner/control/guest-watchdog/delete-intent.json",
+        "cancel_after_create/owner/control/creation-cleanup/target.json",
+    ],
+)
+def test_changed_original_cancellation_evidence_refuses(tmp_path, name):
+    proof = relocated(tmp_path)
+    path = proof / name
+    value = module.fixture.read(proof, name)
+    for field in ("container_id", "event_digest"):
+        if field in value:
+            value[field] = "0" * 64
+    path.unlink()
+    module.fixture.save(path.parent, path.name, value)
+    with pytest.raises(ValueError):
+        module.read_completion(proof, expected_digest=DIGEST)
+
+
+def test_changed_transfer_bytes_refuse_even_when_cancellation_preceded_dispatch(tmp_path):
+    proof = relocated(tmp_path)
+    owner = proof / "cancel_after_create/owner"
+    package = module.fixture.read(owner, "input-package.json")
+    archive = owner / package["archive"]["path"]
+    archive.write_bytes(archive.read_bytes() + b"unexpected transfer bytes")
+    with pytest.raises(ValueError):
+        module.read_completion(proof, expected_digest=DIGEST)

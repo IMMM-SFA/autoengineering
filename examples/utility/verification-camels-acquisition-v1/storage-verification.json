@@ -1,0 +1,11 @@
+{
+  "schema": "utility-camels-private-storage-verification-v1",
+  "directory_mode": "0700",
+  "archive_mode": "0600",
+  "private_source_path": "outputs/camels-acquisition-v1/archive.zip",
+  "git_ignore_rule": "/outputs/camels-acquisition-v*/",
+  "public_metadata_scope": "examples/utility/verification-camels-acquisition-v1",
+  "private_archive_copied_to_public_metadata": false,
+  "original_git_ignore_check": "No rule existed for this new scope; added a narrow raw-acquisition rule",
+  "same_user_OS_privacy_qualified": false
+}

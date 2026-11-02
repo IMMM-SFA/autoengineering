@@ -1,0 +1,15 @@
+{
+  "scope": "Two separately named fixed output producers on the real cached-image daemon; production attach and bootstrap readers; not model-worker or owner-loss qualification",
+  "predecessor": "examples/utility/source-inventory-guest-output-diagnostics-v1.json",
+  "predecessor_sha256": "42c8963db7b64857f624debc61e93ad08b6b96fa2d9a95a2d9e5a5b1906342cd",
+  "source_sha256": {
+    "examples/utility/guest_output_diagnostics.py": "4f2fd141e80cbf4c92eee01ba80c8093d1c1d6691c7d762a8b1d7f40113c84cc",
+    "examples/utility/guest_output_reader.py": "537c137be4f6a2babb2d08fa9c6b09d361fd1f30720a2798578cd64e5e237005",
+    "tests/test_utility_guest_output_diagnostics.py": "80926b39767bf104f0af0bdd1425833bf9188e6850f786d91503548597499e35",
+    "tests/test_utility_guest_output_reader.py": "dd0435370c0ad709655dff0c8896650f578f4d792efded9f5c806f86b4a1a591"
+  },
+  "verification": "examples/utility/verification-guest-output-diagnostics-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "checkpoint_note": "166-test regression used source-snapshot; final reader adds duplicate-container refusal, covered by 20 final controller/reader tests and final cold replay; source-final preserves current bytes"
+}

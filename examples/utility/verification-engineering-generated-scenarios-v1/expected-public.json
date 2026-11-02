@@ -1,0 +1,14 @@
+{
+  "suite_digest": "c0ff35ef7b9f269c2f3959528a09abbf758d2e252e5a9a8cc07ecaf4103019a8",
+  "public_manifest_digest": "944feab170537ade43c5b6db10779807b7c1c8f21d6f668406228340f1822aa6",
+  "selection_barrier_digest": "fc459efd5940d57ea39462bb251947ae2cfe8df63033df0df4466f42806c30cc",
+  "files": {
+    "metadata/manifest.json": "944feab170537ade43c5b6db10779807b7c1c8f21d6f668406228340f1822aa6",
+    "metadata/preparation-claim.json": "84c3ede903a887803937942db36f78eaa4fe01ed4d332dd266591a4260877b2a",
+    "suite/.campaign.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "suite/artifacts/fc459efd5940d57ea39462bb251947ae2cfe8df63033df0df4466f42806c30cc/selection.json": "fc459efd5940d57ea39462bb251947ae2cfe8df63033df0df4466f42806c30cc",
+    "suite/engineering-scenario-preparations/engineering.json": "84c3ede903a887803937942db36f78eaa4fe01ed4d332dd266591a4260877b2a",
+    "suite/events/000000000001.json": "2bc959849f331474b8ec0aa3edef0bf449ee79e525fb76f1d5a427ce9d7b584d",
+    "suite/suite.json": "020cc6e61e0f7b5163b559bfd4067eed71118b63b3d38f1b5a000e3a59305585"
+  }
+}

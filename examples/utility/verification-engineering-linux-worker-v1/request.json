@@ -1,0 +1,117 @@
+{
+  "scope": "one fixed Linux worker control with exposed authored packet",
+  "configuration": {
+    "Image": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+    "User": "1000:1000",
+    "WorkingDir": "/work",
+    "Entrypoint": [
+      "/opt/inference/bin/python",
+      "-I",
+      "-S",
+      "-B",
+      "/opt/coupled-worker/entrypoint.py"
+    ],
+    "Cmd": [
+      "99d825e159dd93bc72653f55e83acb168c918f80953d8ccd15f6981447150ae7"
+    ],
+    "Env": [
+      "PATH=/opt/inference/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "LANG=C.UTF-8",
+      "OMP_NUM_THREADS=1",
+      "MKL_NUM_THREADS=1",
+      "OPENBLAS_NUM_THREADS=1",
+      "NUMEXPR_NUM_THREADS=1",
+      "PYTHONNOUSERSITE=1"
+    ],
+    "NetworkDisabled": true,
+    "AttachStdout": true,
+    "AttachStderr": true,
+    "AttachStdin": true,
+    "OpenStdin": true,
+    "StdinOnce": true,
+    "Tty": false,
+    "Labels": {
+      "org.autoengineering.purpose": "utility-coupled-worker-candidate-v1",
+      "org.autoengineering.environment": "1567a187b04e1e2d1fe3dd164098ee22579b79c78dd58b62d40dbbb1f2dc5afe",
+      "org.autoengineering.wheel": "52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7",
+      "org.autoengineering.source-image": "sha256:39fb6f877a99e384ec2af08363a598ea23fd6ef7ec3bae076e0ab1ffe99508b0",
+      "org.autoengineering.environment-recipe": "fixed-coupled-source-overlay-v1",
+      "org.autoengineering.nonce": "bea2e908fdfb4be2876b93990c232b11",
+      "org.autoengineering.packet": "99d825e159dd93bc72653f55e83acb168c918f80953d8ccd15f6981447150ae7"
+    },
+    "Volumes": {},
+    "Healthcheck": {
+      "Test": [
+        "NONE"
+      ]
+    },
+    "StopSignal": "SIGTERM",
+    "StopTimeout": 5,
+    "HostConfig": {
+      "NetworkMode": "none",
+      "ReadonlyRootfs": true,
+      "Memory": 1073741824,
+      "MemorySwap": 1073741824,
+      "NanoCpus": 1000000000,
+      "PidsLimit": 16,
+      "CapDrop": [
+        "ALL"
+      ],
+      "CapAdd": [],
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "Privileged": false,
+      "CgroupnsMode": "private",
+      "IpcMode": "private",
+      "PidMode": "",
+      "Binds": [],
+      "Mounts": [],
+      "VolumesFrom": [],
+      "Devices": [],
+      "DeviceRequests": [],
+      "PublishAllPorts": false,
+      "PortBindings": {},
+      "AutoRemove": false,
+      "RestartPolicy": {
+        "Name": "no",
+        "MaximumRetryCount": 0
+      },
+      "Tmpfs": {
+        "/work": "rw,noexec,nosuid,nodev,size=134217728,mode=0700,uid=1000,gid=1000"
+      },
+      "LogConfig": {
+        "Type": "none",
+        "Config": {}
+      }
+    }
+  },
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "image_environment_digest": "1567a187b04e1e2d1fe3dd164098ee22579b79c78dd58b62d40dbbb1f2dc5afe",
+  "nonce": "bea2e908fdfb4be2876b93990c232b11",
+  "container_name": "ae-guest-resource-bea2e908fdfb4be2876b93990c232b11",
+  "packet_sha256": "99d825e159dd93bc72653f55e83acb168c918f80953d8ccd15f6981447150ae7",
+  "packet_bytes": 3800,
+  "expected_score": {
+    "feasible": true,
+    "outcome": "mean_source_power",
+    "status": "success",
+    "units": "W",
+    "value": 0.27174569156641054
+  },
+  "atol": 1e-10,
+  "rtol": 1e-12,
+  "expected_model_starts": 24,
+  "max_creations": 1,
+  "max_starts": 1,
+  "active_seconds": 60,
+  "cleanup_seconds": 10,
+  "max_output_bytes": 16384,
+  "api_version": "1.56",
+  "server_digest": "c2a4ccf2e2612d656d3d12c0776cd4a42328567f29383d2a31c77cf699c43082",
+  "entrypoint_source_sha256": "4f8df511204e3625c2662eb38a5da90bb556ac78a4da9dacd00e47ae07f359f9",
+  "worker_source_sha256": "cb8ccb30ec38cded2cade797d5e971bd222b506ef8a100184490ceb59e5d9c82",
+  "automatic_retries": 0,
+  "private_source_reads": 0,
+  "private_boundary_qualified": false
+}

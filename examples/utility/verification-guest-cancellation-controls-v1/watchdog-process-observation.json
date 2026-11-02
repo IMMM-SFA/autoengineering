@@ -1,0 +1,6 @@
+{
+  "watchdog_pid": 62524,
+  "plan_digest": "7a650b32aaa829db9bfc72aaa0ddc2ee4c47e61f27f80c97331d6118b9f36463",
+  "pid_absent": true,
+  "operation": "signal 0 existence check; no signal delivered"
+}

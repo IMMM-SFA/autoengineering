@@ -1,0 +1,22 @@
+{
+  "version": "claude-saved-completion-loss-probe-1.0",
+  "source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "status": "passed_limited_scope",
+  "parent_returncode": 77,
+  "prelaunch_binding": {
+    "job_sha256": "16ea7cd6e4267f72d8d950f1e5ef9cf5857827fa56c2dfe6898401f0cdf59038",
+    "model": "claude-sonnet-4-6",
+    "nonce": "claude-controlled-peer"
+  },
+  "caller_result_missing": true,
+  "original_completion_present": true,
+  "native_outcome": "completed_saved",
+  "handoff": "{\"handoff_json\":\"synthetic controlled peer\"}",
+  "stop_verified": true,
+  "extra_native_jobs": 0,
+  "original_peer_requests": 1,
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "production_admission": false,
+  "scope": "caller exit after native durable completion; authored local peer only"
+}

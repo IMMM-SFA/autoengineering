@@ -1,0 +1,1 @@
+{"action_id":"eval-000000","config":{"dc_loss_scale":0.9181207608391662,"u0":33.89557317434781,"u1":7.676257100093625},"feasible":true,"message":"best feasible observed configuration","outcomes":{"bias":26.262527739209403,"correlation":0.9654761095387081,"kge":0.9611391880375355,"nse":0.9284782828344323,"relative_bias":0.017783088464538983,"rmse":138.5395705820532}}

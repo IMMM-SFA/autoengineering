@@ -1,0 +1,62 @@
+{
+  "optuna": {
+    "version": "4.5.0",
+    "files": [
+      {
+        "path": "optuna-4.5.0.dist-info/licenses/LICENSE",
+        "sha256": "c3df8e8523cf46be4b366ee7dd11578454b10ea5ec5159e57df849513aafe059",
+        "text": "MIT License\n\nCopyright (c) 2018 Preferred Networks, Inc.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      {
+        "path": "optuna-4.5.0.dist-info/licenses/LICENSE_THIRD_PARTY",
+        "sha256": "dbff6df3cb59b7fb11de7e234630e139318ee8cada55e2f14a24d184c48954a8",
+        "text": "Optuna contains code that is licensed by third-party developers.\n\n==\nSciPy\n\n\nThe Optuna contains the codes from SciPy project.\n\n\nCopyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\n1. Redistributions of source code must retain the above copyright\n   notice, this list of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above\n   copyright notice, this list of conditions and the following\n   disclaimer in the documentation and/or other materials provided\n   with the distribution.\n\n3. Neither the name of the copyright holder nor the names of its\n   contributors may be used to endorse or promote products derived\n   from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\nLIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\nA PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\nOWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\nSPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\nLIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\nDATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\nTHEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n==\n\nfdlibm\n\n Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.\n\n Developed at SunPro, a Sun Microsystems, Inc. business.\n Permission to use, copy, modify, and distribute this\n software is freely granted, provided that this notice\n is preserved.\n\n"
+      }
+    ]
+  },
+  "ax-platform": {
+    "version": "1.1.2",
+    "files": [
+      {
+        "path": "ax_platform-1.1.2.dist-info/licenses/LICENSE",
+        "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+        "text": "MIT License\n\nCopyright (c) Meta Platforms, Inc. and affiliates.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      }
+    ]
+  },
+  "bmipy": {
+    "version": "2.0.1",
+    "files": [
+      {
+        "path": "bmipy-2.0.1.dist-info/LICENSE",
+        "sha256": "f7f7951a62f9d58290719a426f9ba91b862e2fe16198e9617ac854b2f99117e5",
+        "text": "The MIT License (MIT)\n\nCopyright (c) 2016 Community Surface Dynamics Modeling System\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      }
+    ]
+  },
+  "openmdao": {
+    "version": "3.41.0",
+    "files": [
+      {
+        "path": "openmdao-3.41.0.dist-info/licenses/LICENSE.txt",
+        "sha256": "2d68d0a5a6cc3de34dd05585b1350934687cb129657cf9796a6b84c1510ff1eb",
+        "text": "OpenMDAO Open Source License:\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this software except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License."
+      }
+    ]
+  },
+  "pvlib": {
+    "version": "0.15.2",
+    "files": [
+      {
+        "path": "pvlib-0.15.2.dist-info/licenses/AUTHORS.md",
+        "sha256": "171938a7f95794c790ea0d80d7eee83eb82950b0f1b89b82f446dcfb7cb28ffa",
+        "text": "About the Copyright Holders\n===========================\n\n*   Copyright (c) 2023 pvlib python Contributors\n*   Copyright (c) 2014 PVLIB python Development Team\n*   Copyright (c) 2013 Sandia National Laboratories\n\n    The pvlib python Contributors comprises all authors of content of the pvlib python project.\n    A complete list of contributors can be found in the documentation.\n\n    The PVLIB python Development Team is the collection of developers of the\n    pvlib python project. Members of this team are included in the pvlib python Contributors.\n\n    Sandia National Laboratories originally developed pvlib python based on code in\n    PVLib MATLAB.\n\n\nOur Copyright Policy\n====================\n\npvlib python uses a shared copyright model. Each contributor maintains copyright\nover their contributions to pvlib python. However, it is important to note that\nthese contributions are typically only changes to the repositories. Thus,\nthe pvlib python source code, in its entirety, is not the copyright of any single\nperson or institution. Instead, it is the collective copyright of the\nContributors. If individual contributors want to make explicit their copyright\nof the contributions they have made,\nthey should indicate their copyright using in-line comments in the code submitted\nto the pvlib python repository, with the understanding that by contributing, they\ngrant the pvlib-python license.\n\nLicense\n=======\n\npvlib python is distributed under a 3-clause BSD license.\n"
+      },
+      {
+        "path": "pvlib-0.15.2.dist-info/licenses/LICENSE",
+        "sha256": "a02e12ddaada3cf0d5dbdd8affdd577c2eec640758a95842a304f7513b8c0be4",
+        "text": "BSD 3-Clause License\n\nCopyright (c) 2023 pvlib python Contributors\nCopyright (c) 2014 PVLIB python Development Team\nCopyright (c) 2013 Sandia National Laboratories\n\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without modification,\nare permitted provided that the following conditions are met:\n\n  Redistributions of source code must retain the above copyright notice, this\n  list of conditions and the following disclaimer.\n\n  Redistributions in binary form must reproduce the above copyright notice, this\n  list of conditions and the following disclaimer in the documentation and/or\n  other materials provided with the distribution.\n\n  Neither the name of the copyright holder nor the names of its\n  contributors may be used to endorse or promote products derived from\n  this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\nWARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\nANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON\nANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+      }
+    ]
+  }
+}

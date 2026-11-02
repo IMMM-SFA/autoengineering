@@ -1,0 +1,106 @@
+{
+  "source": "retained results-v2; no new model starts",
+  "platform": "macOS ARM64",
+  "rss_units": "bytes (Darwin ru_maxrss)",
+  "timing_scope": "Completed cells only; failed cells retained separately; process timings include reconstruction and durability overhead",
+  "policies": {
+    "sobol": {
+      "cells": 9,
+      "cells_with_summary": 9,
+      "failed_without_summary": [],
+      "import_seconds": {
+        "n": 9,
+        "median": 7.917173206806183e-06,
+        "min": 6.750226020812988e-06,
+        "max": 1.0082963854074478e-05
+      },
+      "suggest_seconds": {
+        "n": 108,
+        "median": 0.00437343749217689,
+        "min": 0.0009515830315649509,
+        "max": 0.008520332630723715
+      },
+      "tell_seconds": {
+        "n": 108,
+        "median": 0.004745250102132559,
+        "min": 0.0013423752970993519,
+        "max": 0.010282875038683414
+      },
+      "peak_rss_bytes": {
+        "n": 9,
+        "median": 126091264,
+        "min": 124878848,
+        "max": 128761856
+      },
+      "physical_starts_all_cells": 108
+    },
+    "optuna": {
+      "cells": 9,
+      "cells_with_summary": 9,
+      "failed_without_summary": [],
+      "import_seconds": {
+        "n": 9,
+        "median": 0.025891041848808527,
+        "min": 0.02470212522894144,
+        "max": 0.03892350010573864
+      },
+      "suggest_seconds": {
+        "n": 108,
+        "median": 0.005155062535777688,
+        "min": 0.0015134168788790703,
+        "max": 0.025689749978482723
+      },
+      "tell_seconds": {
+        "n": 108,
+        "median": 0.0054822496604174376,
+        "min": 0.001516374759376049,
+        "max": 0.015250457916408777
+      },
+      "peak_rss_bytes": {
+        "n": 9,
+        "median": 133808128,
+        "min": 130744320,
+        "max": 136462336
+      },
+      "physical_starts_all_cells": 108
+    },
+    "ax": {
+      "cells": 9,
+      "cells_with_summary": 2,
+      "failed_without_summary": [
+        "ax-conditional-0",
+        "ax-conditional-1",
+        "ax-conditional-2",
+        "ax-continuous-2",
+        "ax-mixed-0",
+        "ax-mixed-1",
+        "ax-mixed-2"
+      ],
+      "import_seconds": {
+        "n": 2,
+        "median": 0.0003255833871662617,
+        "min": 0.00024579185992479324,
+        "max": 0.0004053749144077301
+      },
+      "suggest_seconds": {
+        "n": 19,
+        "median": 0.4405906656756997,
+        "min": 0.001883958000689745,
+        "max": 2.075787417124957
+      },
+      "tell_seconds": {
+        "n": 19,
+        "median": 0.2518532080575824,
+        "min": 0.0019179577939212322,
+        "max": 1.6916357497684658
+      },
+      "peak_rss_bytes": {
+        "n": 2,
+        "median": 487686144.0,
+        "min": 484769792,
+        "max": 490602496
+      },
+      "physical_starts_all_cells": 35
+    }
+  }
+}

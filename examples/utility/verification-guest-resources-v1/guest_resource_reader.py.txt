@@ -1,0 +1,244 @@
+"""Replay original resource diagnostic evidence without a daemon or execution."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import math
+from pathlib import Path
+
+from autoengineering.campaign.artifacts import confined_file
+from autoengineering.campaign.serialization import canonical_json, digest, unique_json
+from autoengineering.campaign.store import checked_directory
+from autoengineering.utility.inference_guest import FrozenGuestProfile
+from examples.utility import guest_resources as policy
+
+
+def read(root, name, limit=1024**2):
+    path = confined_file(root, name)
+    if path.stat().st_size > limit:
+        raise ValueError("saved diagnostic metadata exceeds envelope")
+    return unique_json(path.read_text())
+
+
+def finite(value):
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def read_completion(work, *, expected_digest):
+    """Verify saved producer observations. Never renew an attempt or allowance."""
+    work = checked_directory(work)
+    complete = read(work, "complete.json")
+    if digest(complete) != expected_digest:
+        raise ValueError("saved diagnostic completion differs from explicit pin")
+    request, bindings = read(work, "request.json"), read(work, "bindings.json")
+    if (
+        request["schema"] != "utility-guest-resource-request-v1"
+        or complete["request_digest"] != digest(request)
+        or request["bindings_digest"] != digest(bindings)
+    ):
+        raise ValueError("saved diagnostic request or bindings changed")
+    if (
+        request["active_seconds"],
+        request["cleanup_seconds"],
+        request["creations_reserved"],
+        request["starts_reserved"],
+        request["automatic_retries"],
+        request["scientific_starts"],
+        request["runtime_qualified"],
+    ) != (60, 10, 6, 6, 0, 0, False):
+        raise ValueError("saved diagnostic bounds differ")
+    profile = FrozenGuestProfile.from_dict(request["profile"])
+    if profile.image_id != policy.IMAGE or profile.python.build_digest != policy.probe.PYTHON_BUILD:
+        raise ValueError("saved diagnostic guest identity differs")
+    if [case["mode"] for case in request["cases"]] != list(policy.probe.MODES) or len(
+        {case["nonce"] for case in request["cases"]}
+    ) != 6:
+        raise ValueError("saved diagnostic cases differ")
+    expected_names = {"guest_resource_runner.py", "guest_resources.py", "guest_resource_probe.py"}
+    if set(request["sources"]) != expected_names:
+        raise ValueError("saved diagnostic source closure differs")
+    texts = {}
+    for name, wanted in request["sources"].items():
+        path = confined_file(work, "producer-sources/" + name + ".txt")
+        if path.stat().st_size > 65536:
+            raise ValueError("saved diagnostic source exceeds envelope")
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != wanted:
+            raise ValueError("saved diagnostic source changed")
+        texts[name] = raw.decode("utf-8")
+    source = texts["guest_resource_probe.py"]
+    results = []
+    seen_cids = set()
+    for case in request["cases"]:
+        mode, nonce = case["mode"], case["nonce"]
+        root = checked_directory(work / mode)
+        canary = bindings["canaries"].get(nonce)
+        config = policy._configuration(mode, nonce, source, canary=canary)
+        if digest(config) != case["configuration_digest"]:
+            raise ValueError("saved diagnostic configuration changed")
+        intent = read(root, "intent.json")
+        began, deadline = intent["began_at"], intent["deadline"]
+        if (
+            not finite(began)
+            or not finite(deadline)
+            or deadline - began != 60
+            or intent
+            != {
+                "request_digest": digest(request),
+                "began_at": began,
+                "deadline": deadline,
+                "creations_reserved": 1,
+                "starts_reserved": 1,
+            }
+        ):
+            raise ValueError("saved diagnostic original allowance changed")
+        if read(root, "create-intent.json") != {
+            "configuration_digest": digest(config),
+            "nonce": nonce,
+        }:
+            raise ValueError("saved diagnostic creation intent changed")
+        created = read(root, "created.json")
+        cid = created["Id"]
+        if cid in seen_cids:
+            raise ValueError("saved diagnostic container ID reused across cases")
+        seen_cids.add(cid)
+        before = policy.verify_owned(
+            read(root, "before.json"), mode, nonce, cid=cid, canary=canary, source=source
+        )
+        if (
+            before.get("Status") != "created"
+            or before.get("Running") is not False
+            or type(before.get("Pid")) is not int
+            or before["Pid"] != 0
+            or before.get("OOMKilled") is not False
+            or type(before.get("ExitCode")) is not int
+            or before["ExitCode"] != 0
+            or before.get("Dead") is not False
+            or any(
+                before.get(key) not in (None, "", "0001-01-01T00:00:00Z")
+                for key in ("StartedAt", "FinishedAt")
+            )
+        ):
+            raise ValueError("saved diagnostic was already started before intent")
+        if read(root, "start-intent.json") != {"container_id": cid, "nonce": nonce, "starts": 1}:
+            raise ValueError("saved diagnostic start identity differs")
+        ready = read(root, "watchdog-ready.json")
+        if (
+            ready["request_digest"] != digest(request)
+            or type(ready["pid"]) is not int
+            or ready["pid"] <= 0
+        ):
+            raise ValueError("saved diagnostic watchdog readiness is unverified")
+        if digest(read(root, "server.json")) != request["daemon"]["server_digest"]:
+            raise ValueError("saved diagnostic server differs")
+        image = read(root, "image.json")
+        if (image.get("Id"), image.get("Os"), image.get("Architecture")) != (
+            policy.IMAGE,
+            "linux",
+            "amd64",
+        ):
+            raise ValueError("saved diagnostic image differs")
+        output = confined_file(root, "output.log")
+        if output.stat().st_size > policy.MAX_OUTPUT:
+            raise ValueError("saved diagnostic output exceeds envelope")
+        observation = policy.verify_terminal(
+            read(root, "terminal.json"),
+            output.read_bytes(),
+            mode,
+            nonce,
+            cid=cid,
+            canary=canary,
+            source=source,
+        )
+        if read(root, "observation.json") != observation:
+            raise ValueError("saved diagnostic observation changed")
+        original_work = Path(bindings["work"])
+        argv = [
+            bindings["cli"],
+            "--config",
+            str(original_work / "config"),
+            "--host",
+            "unix://" + bindings["endpoint"],
+            "start",
+            "--attach",
+            cid,
+        ]
+        client = read(root, "client.json")
+        if client["argv_digest"] != digest(argv) or type(client["exit_code"]) is not int:
+            raise ValueError("saved diagnostic client identity differs")
+        trigger = read(root, "watchdog-trigger.json")
+        cleanup_intent = read(root, "cleanup-intent.json")
+        cleanup_deadline = cleanup_intent["deadline"]
+        if (
+            trigger["reason"] != "owner_pipe_closed"
+            or not finite(trigger["at"])
+            or not finite(cleanup_deadline)
+            or cleanup_intent["nonce"] != nonce
+            or not began
+            <= trigger["at"]
+            <= cleanup_deadline
+            <= min(trigger["at"] + 10.1, deadline + 10)
+        ):
+            raise ValueError("saved diagnostic cleanup allowance changed")
+        if read(root, "delete-intent.json") != {"container_id": cid, "nonce": nonce}:
+            raise ValueError("saved diagnostic deletion identity differs")
+        cleanup = {
+            "container_id": cid,
+            "absent": True,
+            "nonce": nonce,
+            "delete_attempts": 1,
+            "owner_loss_qualified": False,
+        }
+        if read(root, "cleanup.json") != cleanup:
+            raise ValueError("saved diagnostic cleanup is unverified")
+        result = read(root, "complete.json")
+        elapsed = result["elapsed_seconds"]
+        if (
+            not finite(elapsed)
+            or not 0 <= elapsed <= 70
+            or result
+            != {
+                "observation": observation,
+                "cleanup": cleanup,
+                "elapsed_seconds": elapsed,
+            }
+        ):
+            raise ValueError("saved diagnostic completion differs")
+        for name in ("cleanup-unknown.json", "watchdog-unobserved.json"):
+            if (root / name).exists() or (root / name).is_symlink():
+                raise ValueError("saved diagnostic lifecycle is uncertain")
+        results.append(result)
+    expected = {
+        "schema": "utility-guest-resource-completion-v1",
+        "request_digest": digest(request),
+        "cases": results,
+        "physical_container_starts": 6,
+        "scientific_starts": 0,
+        "runtime_qualified": False,
+        "owner_loss_qualified": False,
+    }
+    if complete != expected:
+        raise ValueError("saved diagnostics cannot grant runtime admission")
+    return complete
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("work", type=Path)
+    parser.add_argument("--expected-digest", required=True)
+    args = parser.parse_args()
+    result = read_completion(args.work, expected_digest=args.expected_digest)
+    print(
+        canonical_json(
+            {
+                "digest": digest(result),
+                "cases_verified": len(result["cases"]),
+                "runtime_qualified": False,
+            }
+        )
+    )
+
+
+if __name__ == "__main__":
+    main()

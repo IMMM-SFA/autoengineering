@@ -1,0 +1,522 @@
+"""Candidate guest execution records and cold verification of producer claims.
+
+No daemon access, execution, image qualification or private input access occurs.
+An eventual trusted launcher must verify original API observations before exporting
+these projections. Hash consistency cannot independently attest OS enforcement.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+import math
+from typing import Literal
+
+from autoengineering.campaign.artifacts import confined_file, read_bytes
+from autoengineering.campaign.records import ArtifactRef, ExecutionStatus
+from autoengineering.campaign.serialization import Record, digest, unique_json
+from autoengineering.campaign.store import StoreError
+from .contracts import sha256
+from .inference_execution import FrozenInferenceJob, FrozenGuestInferenceJob, FrozenInferenceResult
+
+COMMAND = (
+    "/opt/inference/bin/python",
+    "-I",
+    "-m",
+    "autoengineering.utility.inference_worker",
+    "/work/job.json",
+)
+ENVIRONMENT = (
+    ("OMP_NUM_THREADS", "1"),
+    ("MKL_NUM_THREADS", "1"),
+    ("OPENBLAS_NUM_THREADS", "1"),
+    ("NUMEXPR_NUM_THREADS", "1"),
+    ("PYTHONNOUSERSITE", "1"),
+)
+
+
+def _nonce(value):
+    import re
+
+    if not re.fullmatch(r"[0-9a-f]{32}", value):
+        raise ValueError("guest execution needs its original nonce")
+
+
+def _timestamp(value):
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.year < 1970 or parsed.utcoffset() != timedelta(0):
+        raise ValueError("guest lifecycle requires a nonzero UTC timestamp")
+    return parsed
+
+
+@dataclass(frozen=True)
+class GuestContainerPolicy(Record):
+    """Fixed candidate policy projection; these defaults are not enforced here."""
+
+    schema: Literal["utility-guest-container-policy-v1"] = "utility-guest-container-policy-v1"
+    memory_bytes: Literal[1073741824] = 1073741824
+    memory_swap_bytes: Literal[1073741824] = 1073741824
+    nano_cpus: Literal[1000000000] = 1000000000
+    pids: Literal[16] = 16
+    workspace_bytes: Literal[134217728] = 134217728
+    maximum_timeout_seconds: Literal[60] = 60
+    network: Literal["none"] = "none"
+    read_only_root: Literal[True] = True
+    privileged: Literal[False] = False
+    drop_all_capabilities: Literal[True] = True
+    no_new_privileges: Literal[True] = True
+    default_seccomp: Literal[True] = True
+    private_pid_namespace: Literal[True] = True
+    private_ipc_namespace: Literal[True] = True
+    host_mounts: tuple[str, ...] = ()
+    devices: tuple[str, ...] = ()
+    user: Literal["1000:1000"] = "1000:1000"
+    workspace: Literal["/work"] = "/work"
+    workspace_mode: Literal["0700"] = "0700"
+    workspace_noexec: Literal[True] = True
+    stdin: Literal[False] = False
+    log_driver: Literal["none"] = "none"
+    command: tuple[str, ...] = COMMAND
+    environment: tuple[tuple[str, str], ...] = ENVIRONMENT
+
+    def _validate(self):
+        if (
+            self.host_mounts
+            or self.devices
+            or self.command != COMMAND
+            or self.environment != ENVIRONMENT
+        ):
+            raise ValueError("guest policy permits only the fixed isolated command/environment")
+
+    @property
+    def inference_limits_digest(self):
+        return digest(
+            {
+                "memory_bytes": self.memory_bytes,
+                "cpu_count": 1,
+                "pids": self.pids,
+                "workspace_bytes": self.workspace_bytes,
+                "network": self.network,
+                "read_only_root": self.read_only_root,
+                "timeout_seconds": self.maximum_timeout_seconds,
+            }
+        )
+
+
+BOOTSTRAP_COMMAND = (
+    "/opt/inference/bin/python",
+    "-I",
+    "-m",
+    "autoengineering.utility.guest_bootstrap",
+    "/work/job.json",
+)
+
+
+@dataclass(frozen=True)
+class GuestStdinPolicy(GuestContainerPolicy):
+    """Candidate one-shot stdin bootstrap, with the original isolation limits."""
+
+    schema: Literal["utility-guest-container-policy-v2"] = "utility-guest-container-policy-v2"
+    stdin: Literal[True] = True
+    command: tuple[str, ...] = BOOTSTRAP_COMMAND
+
+    def _validate(self):
+        if (
+            self.host_mounts
+            or self.devices
+            or self.command != BOOTSTRAP_COMMAND
+            or self.environment != ENVIRONMENT
+        ):
+            raise ValueError("guest stdin policy permits only the fixed bootstrap")
+
+
+@dataclass(frozen=True)
+class GuestLaunchIntent(Record):
+    schema: Literal["utility-guest-launch-intent-v1"]
+    job_digest: str
+    grant_digest: str
+    executor_digest: str
+    runtime_digest: str
+    claim_digest: str
+    nonce: str
+    image_id: str
+    timeout_seconds: float
+    policy: GuestContainerPolicy | GuestStdinPolicy
+
+    def _validate(self):
+        for value in (
+            self.job_digest,
+            self.grant_digest,
+            self.executor_digest,
+            self.runtime_digest,
+            self.claim_digest,
+        ):
+            sha256(value)
+        _nonce(self.nonce)
+        if not self.image_id.startswith("sha256:"):
+            raise ValueError("guest launch requires an immutable image identity")
+        sha256(self.image_id.removeprefix("sha256:"))
+        if not 0 < self.timeout_seconds <= self.policy.maximum_timeout_seconds:
+            raise ValueError("guest launch timeout exceeds the fixed policy")
+
+
+@dataclass(frozen=True)
+class GuestContainerStart(Record):
+    schema: Literal["utility-guest-container-start-v1"]
+    launch_digest: str
+    container_id: str
+    nonce: str
+    image_id: str
+    policy_digest: str
+    started_at: str
+    original_creation_digest: str
+    original_start_digest: str
+    container_starts: Literal[1]
+
+    def _validate(self):
+        for value in (
+            self.launch_digest,
+            self.container_id,
+            self.policy_digest,
+            self.original_creation_digest,
+            self.original_start_digest,
+        ):
+            sha256(value)
+        _nonce(self.nonce)
+        if not self.image_id.startswith("sha256:"):
+            raise ValueError("guest start requires a pinned image")
+        sha256(self.image_id.removeprefix("sha256:"))
+        _timestamp(self.started_at)
+
+
+@dataclass(frozen=True)
+class GuestContainerStop(Record):
+    schema: Literal["utility-guest-container-stop-v1"]
+    start_digest: str
+    container_id: str
+    nonce: str
+    started_at: str
+    finished_at: str
+    running: Literal[False]
+    pid: Literal[0]
+    exit_code: int
+    oom_killed: bool
+    dead: bool
+    reason: Literal["timeout", "cancelled"] | None
+    elapsed_seconds: float | None
+    original_stop_digest: str
+
+    def _validate(self):
+        for value in (self.start_digest, self.container_id, self.original_stop_digest):
+            sha256(value)
+        _nonce(self.nonce)
+        if _timestamp(self.finished_at) < _timestamp(self.started_at):
+            raise ValueError("guest completion precedes its original start")
+        if not 0 <= self.exit_code <= 255 or (
+            self.elapsed_seconds is not None and self.elapsed_seconds < 0
+        ):
+            raise ValueError("guest stop status or duration is invalid")
+
+
+@dataclass(frozen=True)
+class GuestContainerCleanup(Record):
+    schema: Literal["utility-guest-container-cleanup-v1"]
+    stop_digest: str
+    container_id: str
+    nonce: str
+    removed: Literal[True]
+    observed_absent: Literal[True]
+    original_cleanup_digest: str
+
+    def _validate(self):
+        for value in (self.stop_digest, self.container_id, self.original_cleanup_digest):
+            sha256(value)
+        _nonce(self.nonce)
+
+
+@dataclass(frozen=True)
+class GuestResultCapture(Record):
+    schema: Literal["utility-guest-result-capture-v1"]
+    job_digest: str
+    nonce: str
+    state: Literal["complete", "missing", "malformed", "limited"]
+    worker_result: ArtifactRef | None
+    original_capture_digest: str | None
+
+    def _validate(self):
+        sha256(self.job_digest)
+        _nonce(self.nonce)
+        if self.original_capture_digest is not None:
+            sha256(self.original_capture_digest)
+        if self.state == "complete":
+            if (
+                self.worker_result is None
+                or self.original_capture_digest != self.worker_result.sha256
+            ):
+                raise ValueError("complete guest capture requires its original result bytes")
+        elif self.worker_result is not None or (
+            (self.state == "missing") != (self.original_capture_digest is None)
+        ):
+            raise ValueError("incomplete guest capture cannot invent a worker result")
+
+
+@dataclass(frozen=True)
+class GuestInferenceArchive(Record):
+    schema: Literal["utility-guest-inference-archive-v1"]
+    job: ArtifactRef
+    intent: ArtifactRef
+    claim: ArtifactRef
+    launch: ArtifactRef
+    start: ArtifactRef
+    stop: ArtifactRef
+    cleanup: ArtifactRef
+    capture: ArtifactRef
+    outputs: ArtifactRef | None
+    predictions: ArtifactRef | None
+
+    @classmethod
+    def from_dict(cls, value):
+        if (
+            cls is GuestInferenceArchive
+            and isinstance(value, Mapping)
+            and value.get("schema") == ("utility-guest-inference-archive-v2")
+        ):
+            return GuestDispatchInferenceArchive.from_dict(value)
+        return super().from_dict(value)
+
+
+@dataclass(frozen=True)
+class GuestDispatchInferenceArchive(GuestInferenceArchive):
+    schema: Literal["utility-guest-inference-archive-v2"]
+    dispatch: ArtifactRef
+
+
+@dataclass(frozen=True)
+class VerifiedGuestExecution(Record):
+    schema: Literal["utility-verified-guest-execution-v1"]
+    archive_digest: str
+    job_digest: str
+    grant_digest: str
+    executor_digest: str
+    runtime_digest: str
+    container_id: str
+    image_id: str
+    nonce: str
+    status: ExecutionStatus
+    result: FrozenInferenceResult | None
+    lifecycle_seconds: float | None
+    container_starts: Literal[1]
+    boundary: Literal["unqualified-candidate"]
+
+    def _validate(self):
+        for value in (
+            self.archive_digest,
+            self.job_digest,
+            self.grant_digest,
+            self.executor_digest,
+            self.runtime_digest,
+            self.container_id,
+        ):
+            sha256(value)
+        _nonce(self.nonce)
+        if self.lifecycle_seconds is not None and self.lifecycle_seconds < 0:
+            raise ValueError("guest lifecycle time must be nonnegative")
+        if not self.image_id.startswith("sha256:"):
+            raise ValueError("verified guest record requires its original image")
+        sha256(self.image_id.removeprefix("sha256:"))
+        if self.result is not None and (
+            self.result.status,
+            self.result.grant_digest,
+            self.result.executor_digest,
+            self.result.nonce,
+        ) != (self.status, self.grant_digest, self.executor_digest, self.nonce):
+            raise ValueError("verified guest record differs from its original worker result")
+        if self.status == "success" and self.result is None:
+            raise ValueError("guest success requires its original successful result")
+
+
+def _json(root, ref, kind=None, *, maximum=262144):
+    raw = read_bytes(root, ref, max_bytes=maximum).decode()
+    return kind.from_json(raw) if kind else unique_json(raw)
+
+
+def _same_bytes(first, second):
+    return (
+        first is not None
+        and second is not None
+        and (first.sha256, first.size_bytes, first.media_type)
+        == (second.sha256, second.size_bytes, second.media_type)
+    )
+
+
+def verify_guest_archive(
+    root,
+    ref,
+    grant,
+    *,
+    source_digest,
+    lock_digest,
+    executor_digest,
+    runtime_digest,
+    publisher_digest=None,
+):
+    """Verify explicit pins and original projections, without observing a daemon."""
+    for value in (source_digest, lock_digest, executor_digest, runtime_digest):
+        sha256(value)
+    archive = _json(root, ref, GuestInferenceArchive)
+    job = _json(root, archive.job, FrozenInferenceJob, maximum=4 * 1024 * 1024)
+    if not isinstance(job, FrozenGuestInferenceJob) or (
+        job.grant,
+        job.source_digest,
+        job.lock.sha256,
+        job.executor_digest,
+    ) != (grant, source_digest, lock_digest, executor_digest):
+        raise StoreError("guest archive differs from its original job/source/grant")
+    job.guest.validate_environment(_json(root, job.environment, maximum=4 * 1024 * 1024))
+    binding = {
+        "grant": grant.digest,
+        "executor": executor_digest,
+        "nonce": job.nonce,
+        "job": job.digest,
+    }
+    if _json(root, archive.intent) != binding:
+        raise StoreError("guest archive intent differs")
+    original_claim = ArtifactRef.from_json(
+        confined_file(root, f"inference-claims/{grant.digest}.json").read_text()
+    )
+    if archive.claim != original_claim or _json(root, archive.claim) != (
+        binding | {"scope": job.claim_scope(None)}
+    ):
+        raise StoreError("guest archive differs from the original suite claim")
+    launch = _json(root, archive.launch, GuestLaunchIntent)
+    if (
+        launch.job_digest,
+        launch.grant_digest,
+        launch.executor_digest,
+        launch.runtime_digest,
+        launch.claim_digest,
+        launch.nonce,
+        launch.image_id,
+        launch.timeout_seconds,
+    ) != (
+        job.digest,
+        grant.digest,
+        executor_digest,
+        runtime_digest,
+        archive.claim.sha256,
+        job.nonce,
+        job.guest.image_id,
+        grant.inference.timeout_seconds,
+    ) or job.guest.limits_digest != launch.policy.inference_limits_digest:
+        raise StoreError("guest launch differs from registered inputs/runtime/policy")
+    start = _json(root, archive.start, GuestContainerStart)
+    stop = _json(root, archive.stop, GuestContainerStop)
+    cleanup = _json(root, archive.cleanup, GuestContainerCleanup)
+    capture = _json(root, archive.capture, GuestResultCapture)
+    if (
+        (start.launch_digest, start.nonce, start.image_id, start.policy_digest)
+        != (launch.digest, job.nonce, job.guest.image_id, launch.policy.digest)
+        or (stop.start_digest, stop.container_id, stop.nonce, stop.started_at)
+        != (start.digest, start.container_id, job.nonce, start.started_at)
+        or (cleanup.stop_digest, cleanup.container_id, cleanup.nonce)
+        != (stop.digest, start.container_id, job.nonce)
+        or (capture.job_digest, capture.nonce) != (job.digest, job.nonce)
+    ):
+        raise StoreError("guest start/stop/cleanup/capture belongs to another original execution")
+    dispatch = None
+    if isinstance(archive, GuestDispatchInferenceArchive):
+        from .guest_archive import verify_published_dispatch
+
+        dispatch = verify_published_dispatch(
+            root,
+            archive,
+            job,
+            launch,
+            start,
+            stop,
+            cleanup,
+            capture,
+            publisher_digest=publisher_digest,
+        )
+    result = None
+    if capture.worker_result is not None:
+        read_bytes(root, capture.worker_result, max_bytes=65536)
+    if stop.reason == "timeout" or (
+        dispatch is not None and dispatch.watchdog.reason == "deadline"
+    ):
+        status = "timeout"
+    elif (
+        (dispatch is not None and dispatch.transport_status != "complete")
+        or stop.reason == "cancelled"
+        or stop.oom_killed
+        or stop.dead
+        or stop.exit_code != 0
+        or capture.state != "complete"
+    ):
+        status = "infrastructure_failure"
+    else:
+        result = _json(root, capture.worker_result, FrozenInferenceResult, maximum=65536)
+        if (result.grant_digest, result.executor_digest, result.nonce) != (
+            grant.digest,
+            executor_digest,
+            job.nonce,
+        ) or result.status == "timeout":
+            raise StoreError("guest worker result differs from original execution")
+        status = result.status
+    if result is None:
+        if archive.outputs is not None or archive.predictions is not None:
+            raise StoreError("guest transport/capture failure cannot supply scoring outputs")
+    else:
+        for original, saved, limit in (
+            (result.outputs, archive.outputs, grant.inference.output_limit_bytes),
+            (result.predictions, archive.predictions, 1048576),
+        ):
+            if original is None:
+                if saved is not None:
+                    raise StoreError("guest archive invents outputs")
+            elif not _same_bytes(original, saved):
+                raise StoreError("guest archive output differs from worker result")
+            else:
+                read_bytes(root, saved, max_bytes=limit)
+    if dispatch is not None and result is not None:
+        from .guest_archive import verify_published_capture
+
+        verify_published_capture(root, dispatch.capture, job, launch)
+    if status == "success":
+        vector = _json(root, archive.predictions, maximum=1048576)
+        if (
+            not isinstance(vector, dict)
+            or set(vector) != {"model_sha256", "partition_digest", "selection_digest", "prediction"}
+            or (vector["model_sha256"], vector["partition_digest"], vector["selection_digest"])
+            != (grant.model_digest, grant.partition_digest, grant.selection_digest)
+        ):
+            raise StoreError("guest prediction vector has foreign bindings")
+        values = vector["prediction"]
+        if not isinstance(values, list) or len(values) != len(
+            grant.inference.forcing.ports[0].time.dates
+        ):
+            raise StoreError("guest prediction vector has invalid dimensions")
+        for value in values:
+            try:
+                valid = type(value) in (int, float) and math.isfinite(value)
+            except OverflowError:
+                valid = False
+            if not valid:
+                raise StoreError("guest predictions must be finite numeric values")
+    return VerifiedGuestExecution(
+        "utility-verified-guest-execution-v1",
+        archive.digest,
+        job.digest,
+        grant.digest,
+        executor_digest,
+        runtime_digest,
+        start.container_id,
+        job.guest.image_id,
+        job.nonce,
+        status,
+        result,
+        stop.elapsed_seconds,
+        1,
+        "unqualified-candidate",
+    )

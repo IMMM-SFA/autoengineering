@@ -1,0 +1,1 @@
+{"allowed_read":0,"private_read_denied":1,"credential_read":1,"outside_write_denied":1,"home_write":1,"workspace_write_denied":1,"symlink_read_denied":1,"symlink_write_denied":1,"hardlink_read_denied":0,"endpoint_allowed":0,"other_tcp_denied":1,"unix_denied":1,"exec_denied":1,"checkout_read_denied":1}

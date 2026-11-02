@@ -1,0 +1,35 @@
+{
+  "schema": "utility-guest-watchdog-verification-v1",
+  "results": {
+    "regression": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "340",
+      "time": "160.822",
+      "timestamp": "2026-10-30T14:27:00.505887-07:00",
+      "hostname": "m5-mbp"
+    },
+    "final-watchdog": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "17",
+      "time": "34.792",
+      "timestamp": "2026-10-30T14:30:10.364162-07:00",
+      "hostname": "m5-mbp"
+    }
+  },
+  "authored_peer_only": true,
+  "actual_owner_sigkill_fixture": true,
+  "actual_container_execution": false,
+  "runtime_qualified": false,
+  "scientific_confirmation": false,
+  "cold_relocation_replay": true,
+  "core_unchanged_between_runs": true,
+  "platform": "Darwin",
+  "machine": "arm64",
+  "current_core_python_files": 220
+}

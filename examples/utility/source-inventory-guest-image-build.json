@@ -1,0 +1,33 @@
+{
+  "schema": "utility-source-increment-v1",
+  "created_utc": "2026-10-31T00:32:26.318069+00:00",
+  "scope": "prepared one local base-pull/image-build request; immutable scope/source, original client deadline, no retry and cold saved proof reader; no actual build authority or execution",
+  "predecessor": "examples/utility/source-inventory-guest-archive-download.json",
+  "predecessor_sha256": "a499ec334612295baaaaba74106d40d0376c38f0b8ab88707668227988da1585",
+  "current_core_python_files": 224,
+  "private_machine_bindings_excluded": true,
+  "files": {
+    "examples/utility/guest_image_build.py": "80ef840c73229cbeac2df0902f648d463aa4cac692c604fede7d515140467a68",
+    "tests/test_utility_guest_image_build.py": "d6543095a8bb4aef074a4a36ad99b0b9f7a419709b401504614777fd29d478b1",
+    ".gitignore": "2ff227dd0e98cc542f3d657b04f23728f524ba84c056f59d17e1c22702ce449d",
+    "docs/utility.md": "03586fc9fff39686175b24d773cb5c5fd3fa4e6d10a86859a0adb825f971484c",
+    "docs/reviews/part-5-progress.md": "0cd3ebbd5f0138986a3d01fea18b9d7d33809ca182a45fdce9dceb0a2467a895",
+    "docs/reviews/part-5-completion-audit.md": "548427a06f8faeff9b4038e44fb06fde55bd2e467e7624980b7a8492863d0e2b",
+    "docs/implementation-plans/part-5-frozen-prediction-increment.md": "88c73fa4395b5c1a6237a5c24cd20f849b9524028109e2bbb12b49370f76f92c",
+    "examples/utility/README.md": "d0ede5f3693cff2099a5ae04e7377a4daea01577cf958e839e93322ab3c84859",
+    "examples/utility/verification-guest-image-build-v1/README.md": "c124f9e45dbe25cedccff5b36e5d1ba9c4ead675d444486c0df92b53af0ccd19",
+    "examples/utility/verification-guest-image-build-v1/documentation.log": "76758b08b3ee7a4bc2d935961ae8c6da1e284a7308594ed5634ee30319c2eaac",
+    "examples/utility/verification-guest-image-build-v1/final-guest_image_build.py.txt": "80ef840c73229cbeac2df0902f648d463aa4cac692c604fede7d515140467a68",
+    "examples/utility/verification-guest-image-build-v1/final-source-pins.json": "8940e49a0d4093adb78509947341bbd6e47a65323ebfe0f1b7da881939b9556b",
+    "examples/utility/verification-guest-image-build-v1/final-test_utility_guest_image_build.py.txt": "d6543095a8bb4aef074a4a36ad99b0b9f7a419709b401504614777fd29d478b1",
+    "examples/utility/verification-guest-image-build-v1/final.log": "2cf3bc670735fa8fff8da0c8012deb40b25ea2989fc253a299ccffad76562a2a",
+    "examples/utility/verification-guest-image-build-v1/final.xml": "edf026e4199a91a0c4d0da0d123e25d8f0456eb7f307dff51de234311003da59",
+    "examples/utility/verification-guest-image-build-v1/lint.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "examples/utility/verification-guest-image-build-v1/prepare.log": "7bd12b12db4a0e71c5a036cbe71851408f8bff42c30059605a276fbdbc523e3d",
+    "examples/utility/verification-guest-image-build-v1/summary.json": "de56c704f63849b7be89c249d3d1c6a678d9280d3e794078adcf13e6406b8ae9",
+    "examples/utility/verification-guest-image-build-v1/whitespace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "examples/utility/prepared-guest-build-v1/README.md": "6da4c35a00faad33b45034356b93e18597587091f65571b2ef20268104d24061",
+    "examples/utility/prepared-guest-build-v1/request.json": "066de0ca30b2efafdfa3cb7e5d9cebe992c07e0f1e6854e6f71352518d6fa566",
+    "examples/utility/prepared-guest-build-v1/runner.py": "80ef840c73229cbeac2df0902f648d463aa4cac692c604fede7d515140467a68"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "status": "prepared",
+  "root": "/private/tmp/anthropic-exchange-installed-v1",
+  "wheel": "/private/tmp/anthropic-exchange-installed-v1/wheels/autoengineering-0.2.0-py3-none-any.whl",
+  "wheel_sha256": "2f739338154704827a02ea1cd6a4c3f61654f9d3eed902e5e109de90eeb0a710",
+  "host_source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+  "all_current_core_python_bytes_match": true,
+  "core_python_files": 184,
+  "guard_scope": "Python startup guard only, not an OS boundary",
+  "dependencies": "cached base paths; no editable activation or minimal dependency solve",
+  "optional_provider_or_science_install": "none"
+}

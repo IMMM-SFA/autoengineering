@@ -1,0 +1,163 @@
+{
+  "schema": "utility-exposure-draft-v1",
+  "status": "incomplete",
+  "records": [
+    {
+      "source": "leaf-river",
+      "period_or_scenario": "All periods used by earlier development and agent comparisons",
+      "exposure": "known_exposed",
+      "evidence": "Earlier Part 1-3 development; exact data partition closure pending",
+      "source_hashes": [],
+      "access_date": null,
+      "people_or_workers": "unknown_exposure",
+      "labels_diagnostics_or_aggregates": "unknown_exposure"
+    },
+    {
+      "source": "solar-9068",
+      "period_or_scenario": "2018-06-01 through 2018-06-07; historical 2018 and 2019 open-chain periods",
+      "exposure": "known_exposed",
+      "evidence": "Part 4 handoff and solar README",
+      "source_hashes": [],
+      "access_date": null,
+      "people_or_workers": "unknown_exposure",
+      "labels_diagnostics_or_aggregates": "unknown_exposure"
+    },
+    {
+      "source": "circuit",
+      "period_or_scenario": "Existing target fit and supplied scalar circuit",
+      "exposure": "known_exposed",
+      "evidence": "Part 4 interface fixture",
+      "source_hashes": [],
+      "access_date": null,
+      "people_or_workers": "unknown_exposure",
+      "labels_diagnostics_or_aggregates": "unknown_exposure"
+    },
+    {
+      "source": "wind-horns-rev",
+      "period_or_scenario": "Bundled site distribution and previous coarse/fine direction grids",
+      "exposure": "known_exposed",
+      "evidence": "Open-chain wind README",
+      "source_hashes": [],
+      "access_date": null,
+      "people_or_workers": "unknown_exposure",
+      "labels_diagnostics_or_aggregates": "unknown_exposure"
+    },
+    {
+      "source": "future-confirmation",
+      "period_or_scenario": "No independent partition acquired or inspected",
+      "exposure": "unknown_exposure",
+      "evidence": "Custodian must establish prior use and rights before admission",
+      "source_hashes": [],
+      "access_date": null,
+      "people_or_workers": "unknown_exposure",
+      "labels_diagnostics_or_aggregates": "unknown_exposure"
+    },
+    {
+      "source": "utility-circuit-ground-v1",
+      "period_or_scenario": "ground potentials -0.05, 0, +0.05 V; development absolute voltage bound 0.62 V",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-v1/manifest.json and summary.json",
+      "source_hashes": [
+        "b3a5d8fc3975c745154ffdc32d418f43e4c2c864c5fd425b6e83a5af0de96927"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local implementation worker and pytest",
+      "labels_diagnostics_or_aggregates": "modeled outputs, diagnostics and objective values"
+    },
+    {
+      "source": "utility-wind-horns-rev-corners-v1",
+      "period_or_scenario": "Four Horns Rev corner turbines; V80 NOJ, 30 degree grid and bundled wind distribution",
+      "exposure": "known_exposed",
+      "evidence": "tests/test_utility_wind.py::test_direct_wrapped_wind_parity; 3 passed in wind environment",
+      "source_hashes": [],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local implementation worker and pytest",
+      "labels_diagnostics_or_aggregates": "modeled energy and power arrays used for parity; no observed labels"
+    },
+    {
+      "source": "utility-engineering-calibration-v1",
+      "period_or_scenario": "Four Sobol source-current designs on ground -0.05, 0, +0.05 V; minimum absolute node voltage 0.62 V",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-study-v1/summary.json",
+      "source_hashes": [
+        "7cc563a8c5938cb10b7e5349f20c32ce0ec3c95a80bd7e9650a82a80be82370b"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local development worker and pytest",
+      "labels_diagnostics_or_aggregates": "modeled scenario outputs, feasibility, derivative/solver work and optimizer recommendation"
+    },
+    {
+      "source": "utility-wind-native-v1",
+      "period_or_scenario": "Four Horns Rev corner turbines, bundled distribution; native SLSQP 2 iterations and separate one-call budget control",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/wind-native-v1/summary.json",
+      "source_hashes": [
+        "59434cb495802aee86993b3eddcae44575edb4779602f9aa55d58e0075c7b905"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local development worker and pytest",
+      "labels_diagnostics_or_aggregates": "Modeled layout energy, native objective/gradient calls and budget exhaustion"
+    },
+    {
+      "source": "utility-engineering-supervised-v2",
+      "period_or_scenario": "Two Sobol source-current designs on exposed ground -0.05, 0, +0.05 V; minimum absolute node voltage 0.62 V",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-supervised-v2/summary.json",
+      "source_hashes": [
+        "f34ad2121ba69571216b26f0d228af16dda0ef23e817ee98458988aa83614f41"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local development worker, fixed engineering worker and pytest",
+      "labels_diagnostics_or_aggregates": "modeled outcomes, required checks, native solver diagnostics, process receipts and recommendation; repeated exposed development, not an independent partition"
+    },
+    {
+      "source": "utility-engineering-campaign-v2",
+      "period_or_scenario": "Baseline 0.1 A, supplied 0.03 A design and two Sobol designs on exposed ground -0.05, 0, +0.05 V; absolute node voltage minimum 0.62 V",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-campaign-v2/summary.json",
+      "source_hashes": [
+        "1d66b2e69cdf54a100903e39a9b7c8db73020b03759512a7c7a2d7862fc0c327"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local development worker and fixed engineering worker",
+      "labels_diagnostics_or_aggregates": "modeled outcomes, checks, native solver work, numerical ledger, selection and process stops; no independent partition"
+    },
+    {
+      "source": "utility-engineering-native-v2",
+      "period_or_scenario": "Existing exposed ground -0.05, 0, +0.05 V; SLSQP 20 iterations and 40 inner model-call ceiling; fresh strict 0.62 V checks",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-native-v2/summary.json",
+      "source_hashes": [
+        "f2fc5cd4194fb716f9327600a079eb426177bf683403a6b86d956719d7f92bfc"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local development worker and fixed native/scenario workers",
+      "labels_diagnostics_or_aggregates": "native proposed design, model-call/derivative work, fresh modeled outcomes and failed voltage check, final selection; not independent evidence"
+    },
+    {
+      "source": "utility-engineering-routes-v3",
+      "period_or_scenario": "Seven scripted routes on exposed circuit ground -0.05, 0, +0.05 V; one paired seed; fixed/Sobol/native supplied choices; unchanged strict 0.62 V bound",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-routes-v3/summary.json",
+      "source_hashes": [
+        "27e1f02c083ece039c66065ba33efec7b6c293f9898bebebba248587a1b4457b"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local implementation worker, scripted advisory roles and trusted scientific workers",
+      "labels_diagnostics_or_aggregates": "modeled outcomes, coded checks, native work, selections and role/mechanical receipts; no independent evidence or LLM role-utility measurement"
+    },
+    {
+      "source": "utility-engineering-plan-v1",
+      "period_or_scenario": "Public scripted plan with seven grouped cases on exposed circuit ground -0.05, 0, +0.05 V; paired fixed/Sobol/native choices and unchanged strict 0.62 V check",
+      "exposure": "known_exposed",
+      "evidence": "examples/utility/development/engineering-plan-v1/summary.json",
+      "source_hashes": [
+        "dce5c1ece00c088147413649b9d7ca814c5db43881259b13b7a67870eeccdf02"
+      ],
+      "access_date": "2026-10-28",
+      "people_or_workers": "local implementation worker, scripted advisory hosts and trusted scientific workers",
+      "labels_diagnostics_or_aggregates": "modeled outcomes, checks, grouped permissions, selected states and archived sources; no independent confirmation or LLM utility evidence"
+    }
+  ],
+  "limits": "Metadata-only register. Missing hashes, dates and exposure history block admission; no independent confirmation claim."
+}

@@ -1,0 +1,77 @@
+"""Join saved live-owner receipts without importing models or contacting Docker."""
+from pathlib import Path
+import hashlib,json,sys
+
+root=Path(sys.argv[1]).resolve(strict=True)
+pins_raw=Path(sys.argv[2]).read_bytes()
+assert hashlib.sha256(pins_raw).hexdigest()==sys.argv[3]
+pins=json.loads(pins_raw)
+for name,pin in pins.items():
+    relative=Path(name);assert not relative.is_absolute() and '..' not in relative.parts
+    path=root/relative
+    assert not any(p.is_symlink() for p in (path,*path.parents))
+    assert hashlib.sha256(path.read_bytes()).hexdigest()==pin
+def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
+def digest(value):return hashlib.sha256(canonical(value)).hexdigest()
+def read(name):
+    assert name in pins
+    return json.loads((root/name).read_bytes())
+request=read('request.json');complete=read('complete.json')
+grant=request['grant'];reg=request['registration'];runtime=reg['runtime']
+execution=complete['execution'];intent=read('runtime/intent.json')
+assert complete['request_digest']==digest(request)
+assert execution['grant_digest']==intent['grant_digest']==digest(grant)
+assert execution['runtime_digest']==intent['runtime_digest']==digest(runtime)
+assert runtime['transport_digest']==intent['transport_digest']==digest(request['transport'])
+assert execution['runtime_source_digest']==request['source_pins']['examples/utility/engineering_container_runtime.py']
+assert execution['image_id']==intent['configuration']['Image']==runtime['image_id']
+assert intent['packet_sha256']==intent['configuration']['Cmd'][0]
+assert intent['max_creations']==intent['max_starts']==1 and intent['automatic_retries']==0
+assert intent['configuration']['Labels']['org.autoengineering.grant']==digest(grant)
+assert intent['configuration']['Labels']['org.autoengineering.packet']==intent['packet_sha256']
+assert intent['configuration']['Labels']['org.autoengineering.nonce']==execution['nonce']
+cid=execution['container_id'];assert read('runtime/created.json')['Id']==cid==complete['container_id']
+before=read('runtime/before.json');terminal=read('runtime/terminal.json')
+assert before['State']['Status']=='created' and before['State']['Running'] is False
+for observed in (before,terminal):
+    assert observed['Id']==cid and observed['Image']==runtime['image_id']
+    assert observed['Name']=='/'+intent['container_name']
+    for key in ('Cmd','Entrypoint','User','Labels','OpenStdin','AttachStdin','StdinOnce','NetworkDisabled'):
+        assert canonical(observed['Config'][key])==canonical(intent['configuration'][key])
+    assert observed['HostConfig']['ReadonlyRootfs'] is True
+    assert observed['HostConfig']['Memory']==observed['HostConfig']['MemorySwap']==1073741824
+    assert observed['HostConfig']['PidsLimit']==16
+    assert observed['HostConfig']['NetworkMode']=='none'
+state=terminal['State']
+assert state['Status']=='exited' and state['ExitCode']==0 and state['OOMKilled'] is False
+assert digest(read('runtime/start-intent.json'))==execution['start_receipt_digest']
+assert digest(read('runtime/stop.json'))==execution['stop_receipt_digest']
+cleanup=read('runtime/cleanup.json')
+assert cleanup['container_id']==cid and cleanup['absent'] is True
+assert digest(cleanup)==execution['cleanup_receipt_digest']
+assert read('runtime/complete.json')['execution']==execution
+output_raw=(root/'runtime/output.json').read_bytes();client=read('runtime/client.json')
+assert client['exit_code']==0 and client['output_bytes']==len(output_raw)
+assert client['output_sha256']==hashlib.sha256(output_raw).hexdigest()
+output=json.loads(output_raw);work=output['worker']['result']
+assert work['attempted_model_starts']==work['completed_model_starts']==24
+assert work['score']==complete['score'] and digest(work['score'])==execution['score_digest']
+assert execution['container_starts']==execution['scoring_process_starts']==1
+assert execution['lifecycle_seconds']<=60
+assert complete['private_payload_read_calls']==complete['source_access_intents']==1
+assert complete['original_result_recovered_without_runtime_or_source'] is True
+assert complete['saved_replay_no_new_events'] is True
+assert complete['private_boundary_qualified'] is False and complete['independent_confirmation'] is False
+inputs=read('cost-inputs.json');callback=inputs['load_callbacks'][0]
+artifact=callback['work_artifact'];proof=read('suite/'+artifact['path'])
+assert hashlib.sha256((root/'suite'/artifact['path']).read_bytes()).hexdigest()==artifact['sha256']
+assert proof['packet_sha256']==intent['packet_sha256'] and proof['execution']==execution
+assert proof['policy_digest']==digest(reg['policy'])
+anchor=read('original-completion-pin.json')
+assert anchor['work_artifact']==artifact and anchor['registration_digest']==digest(reg)
+access=read('suite/engineering-source-accesses/'+digest(grant)+'.json')
+assert access['source_binding_digest']==proof['source_binding_digest']
+assert access['source_reads_reserved']==1 and access['automatic_retry_allowed'] is False
+assert request['source_public_manifest']['outputs_evaluated'] is False
+print(json.dumps({'verified_original_receipt_join':True,'container_starts':1,'model_starts':24,
+    'source_access_intents':1,'cleanup_confirmed':True,'private_boundary_qualified':False},sort_keys=True))

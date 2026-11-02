@@ -1,0 +1,91 @@
+{
+  "status": "passed_limited_transport_scope",
+  "host_source_identity": "bf795307c0b31643daa37651c6ea91fbbd1f2adc44c1fe5c4606c91f4a9b8eca",
+  "contracts": {
+    "passed": 169,
+    "seconds": 33.91
+  },
+  "installed_cases": {
+    "passed": 24,
+    "seconds": 17.55
+  },
+  "native_probe": {
+    "actual_provider_calls": 0,
+    "added_replay_callbacks": 0,
+    "billed_cost_usd": null,
+    "broker_usage": {
+      "cache_creation_input_tokens": null,
+      "cached_input_tokens": null,
+      "input_tokens": null,
+      "output_tokens": 10,
+      "reasoning_output_tokens": null,
+      "total_tokens": null,
+      "uncached_input_tokens": 7
+    },
+    "callback_calls": 1,
+    "endpoint_stop": {
+      "exchange_requests": 1,
+      "handler_stopped": true,
+      "listener_closed": true,
+      "request_attempts": 2,
+      "upstream_callback_stopped": true,
+      "upstream_callbacks": 1
+    },
+    "host_status": "completed",
+    "inventory": {
+      "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+      "sha256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+      "supported_flags": [
+        "--print",
+        "--bare",
+        "--output-format",
+        "--input-format",
+        "--json-schema",
+        "--model",
+        "--tools",
+        "--disable-slash-commands",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "--setting-sources",
+        "--settings",
+        "--no-session-persistence",
+        "--permission-mode",
+        "--max-budget-usd"
+      ],
+      "version": "2.1.310 (Claude Code)"
+    },
+    "local_stop_verified": true,
+    "native_diagnostic_usage": {
+      "cache_creation_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "input_tokens": 7,
+      "output_tokens": 10,
+      "reasoning_output_tokens": null,
+      "total_tokens": 17,
+      "uncached_input_tokens": 7
+    },
+    "native_error": null,
+    "native_estimated_usd": 0.000171,
+    "native_launches": 1,
+    "native_status": "completed",
+    "production_admission": false,
+    "real_credentials_read": 0,
+    "recovered_host_result_equal": true,
+    "scope": "native CLI with authored local callback; no real model or cost evidence",
+    "source_identity": "bf795307c0b31643daa37651c6ea91fbbd1f2adc44c1fe5c4606c91f4a9b8eca",
+    "version": "claude-composition-probe-1.0"
+  },
+  "new_source_files": {
+    "src/autoengineering/agents/hosts/claude_brokered.py": "e2f74df4e008e6db77f95a7dc0ddcb68ecdbf5c9663bd1965f074928e30ff32e",
+    "tests/test_agent_claude_brokered.py": "03a8bd8fb0ef6377153697c851ed106cc87e66e9c783e8f3e9a217631feb4b1c",
+    "scripts/probe_claude_composition.py": "a90f35e48b863313ba83e6f132e01826ee871baaae0099088ad65e267d3b2369"
+  },
+  "full_goal": "incomplete",
+  "admission": "unchanged; fake/Codex only",
+  "provider_calls": 0,
+  "real_credentials_read": 0,
+  "independent_confirmation_accesses": 0,
+  "documentation_cases": 19,
+  "lint": "passed",
+  "whitespace_check": "passed"
+}

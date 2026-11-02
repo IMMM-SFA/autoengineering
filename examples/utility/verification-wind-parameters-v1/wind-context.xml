@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="11" time="12.326" timestamp="2026-10-28T16:00:44.566483-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_wind_parameters" name="test_geometry_copies_inputs_and_roundtrips_scalar_parameters" time="0.001" /><testcase classname="tests.test_utility_wind_parameters" name="test_bad_geometry_stops_before_wake_execution[missing]" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_bad_geometry_stops_before_wake_execution[extra]" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_bad_geometry_stops_before_wake_execution[bool]" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_bad_geometry_stops_before_wake_execution[nan]" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_bad_geometry_stops_before_wake_execution[spacing]" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_bad_geometry_stops_before_wake_execution[boundary]" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_profile_rejects_degenerate_hardware_and_changed_turbine_count" time="0.000" /><testcase classname="tests.test_utility_wind_parameters" name="test_parameterized_wind_keeps_one_model_and_matches_direct_execution" time="10.817" /><testcase classname="tests.test_utility_wind_parameters" name="test_parameter_domain_does_not_silently_absorb_physical_tolerance" time="0.001" /><testcase classname="tests.test_utility_wind_parameters" name="test_parameter_context_binds_caller_captured_sources" time="0.006"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'digest/size'&#10;  Actual message: 'artifact type/size mismatch'">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4314/test_parameter_context_binds_c0')
+
+    @pytest.mark.skipif(importlib.util.find_spec("py_wake") is None, reason="optional wind runtime")
+    def test_parameter_context_binds_caller_captured_sources(tmp_path):
+        from examples.utility.wind import ROOT
+        from autoengineering.campaign.artifacts import read_bytes
+    
+        source = tmp_path / "captured"
+        names = (
+            "examples/utility/wind.py",
+            "examples/open_chains/wind/models.py",
+            "pixi.lock",
+            "examples/utility/wind_parameters.py",
+        )
+        for name in names:
+            target = source / name
+            target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            target.write_bytes((ROOT / name).read_bytes())
+        profile = geometry()
+        ctx = profile.context(profile.baseline, tmp_path / "scratch", source_root=source)
+        assert {r.path for r in ctx.model.source_bundle} == set(names)
+        for ref in ctx.model.source_bundle:
+            read_bytes(source, ref)
+        (source / "examples/utility/wind_parameters.py").write_text("changed")
+&gt;       with pytest.raises(ValueError, match="digest/size"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'digest/size'
+E         Actual message: 'artifact type/size mismatch'
+
+tests/test_utility_wind_parameters.py:110: AssertionError</failure></testcase></testsuite></testsuites>

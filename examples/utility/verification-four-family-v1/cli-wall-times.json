@@ -1,0 +1,49 @@
+{
+  "scope": "sequential public CLI child durations; preparation and outer producer overhead not measured; overlaps scientific/host subprocess durations",
+  "operations": [
+    {
+      "operation": "run-one",
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "elapsed_seconds": 4.047894374933094
+    },
+    {
+      "operation": "resume-rest",
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "elapsed_seconds": 3401.365189832635
+    },
+    {
+      "operation": "resume-complete",
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "elapsed_seconds": 342.8343235421926
+    },
+    {
+      "operation": "freeze",
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "elapsed_seconds": 34.321897792164236
+    },
+    {
+      "operation": "verify",
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "elapsed_seconds": 487.86424216721207
+    },
+    {
+      "operation": "status",
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "elapsed_seconds": 17.877860832959414
+    }
+  ],
+  "public_cli_inclusive_s": 4288.311408542097,
+  "complete_cost_evidence": false
+}

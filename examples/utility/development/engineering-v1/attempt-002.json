@@ -1,0 +1,20 @@
+{
+  "kind": "wrapped",
+  "ground_V": -0.05,
+  "outputs": {
+    "node1_voltage": 4.9073554472137255,
+    "node2_voltage": 0.6429001685862956,
+    "resistor1_current": 0.04957355447213726,
+    "resistor2_current": 0.000426445527862743,
+    "diode_current": 0.000426445527862743
+  },
+  "work": {
+    "converged": 1.0,
+    "residual_norm": 1.3807856767689142e-15,
+    "residual_tolerance": 1e-10,
+    "solver_iterations": 18.0,
+    "component_calls": 293.0,
+    "derivative_calls": 90.0
+  },
+  "seconds": 0.005643082782626152
+}

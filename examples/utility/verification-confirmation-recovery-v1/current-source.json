@@ -1,0 +1,5 @@
+{
+  "src/autoengineering/utility/scoring.py": "6dc4e0299318bf56c1d283b02163f12490aa9c1dd5006f7b233dc5d8d3d01c6b",
+  "src/autoengineering/utility/costs.py": "c05070a8060820a1fc86d3feb70a9d8df14bb1dd45056e197394a11f5da7d7ba",
+  "tests/test_utility_confirmation_recovery.py": "10cfef8273cd82da097bf7df0710d630630e2601049dfb3fac2a05e2ff7557d8"
+}

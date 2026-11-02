@@ -1,0 +1,7 @@
+{
+  "initial_prototype_order": "The initial authored prototype generated after the barrier. It was corrected before any real source draw to follow the plan source-before-selection sequence.",
+  "first_control_setup": "An unused-resource-cap field name failed before suite/source creation. Empty output v1 is retained.",
+  "first_control_launch": "Import-path initialization failed before output v2 creation; corrected explicit checkout initialization then ran once.",
+  "model_starts_in_refusals": 0,
+  "real_entropy_draws_in_refusals": 0
+}

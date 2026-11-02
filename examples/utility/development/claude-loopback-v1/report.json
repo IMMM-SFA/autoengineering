@@ -1,0 +1,62 @@
+{
+  "version": "claude-controlled-peer-probe-1.0",
+  "source_identity": "8545ca51e5c3118e8ebac333cac275eb4d66ae71540382ede63a6b21a74cf455",
+  "runtime": {
+    "platform": "darwin",
+    "machine": "arm64"
+  },
+  "inventory": {
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "sha256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+    "version": "2.1.310 (Claude Code)",
+    "supported_flags": [
+      "--print",
+      "--bare",
+      "--output-format",
+      "--input-format",
+      "--json-schema",
+      "--model",
+      "--tools",
+      "--disable-slash-commands",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "--setting-sources",
+      "--settings",
+      "--no-session-persistence",
+      "--permission-mode",
+      "--max-budget-usd"
+    ]
+  },
+  "policy_specification": {
+    "schema": "claude-helper-policy-1.2",
+    "workspace": "/private/tmp/claude-loopback-probe-v1/workspace",
+    "home": "/private/tmp/claude-loopback-probe-v1/home",
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "helper": "/private/tmp/claude-loopback-probe-v1/auth/helper",
+    "python": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
+    "python_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default",
+    "credential_files": [],
+    "endpoints": [
+      {
+        "address": "localhost",
+        "port": 50276
+      }
+    ],
+    "forbidden_roots": [
+      "/private/tmp/claude-loopback-probe-v1/private",
+      "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
+    ]
+  },
+  "native_helper_observed": false,
+  "requests": [],
+  "process_status": "host_failure",
+  "returncode": 1,
+  "stopped": true,
+  "transport_error": "invalid_claude_result",
+  "structured_output": null,
+  "job_sha256": "45ded4041db9cb7d5db7a0463df09411ca4c1f17b18e61be0b26cdcd608bd3b6",
+  "production_admission": false,
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "scope": "authored local peer, synthetic helper, no external endpoint or model"
+}

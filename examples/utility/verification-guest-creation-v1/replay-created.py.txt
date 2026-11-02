@@ -1,0 +1,35 @@
+"""Cold original creation replay; no daemon, source probe, model or new clock."""
+import importlib.abc
+import json
+from pathlib import Path
+import socket
+import subprocess
+import sys
+import tarfile
+import tempfile
+import time
+
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split('.')[0] in {'examples', 'torch', 'openmdao', 'pvlib', 'py_wake'}:
+            raise AssertionError('model import')
+sys.meta_path.insert(0, NoModels())
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+bundle = Path(__file__).parent
+expected = json.loads((bundle / 'expected-replay.json').read_text())
+with tempfile.TemporaryDirectory() as directory:
+    destination = Path(directory).resolve()
+    with tarfile.open(bundle / 'authored-created-owner.tar.gz') as archive:
+        archive.extractall(destination, filter='data')
+    for path in destination.rglob('*'):
+        path.chmod(0o700 if path.is_dir() else 0o600)
+    def forbidden(*args, **kwargs):
+        raise AssertionError('replay cannot execute, connect or sample a new clock')
+    subprocess.Popen = socket.socket = time.monotonic = forbidden
+    owner = GuestOwnerJournal(destination / 'owner')
+    state = owner.replay()
+    assert owner.manifest.digest == expected['owner_digest']
+    assert state.phase == 'created' and state.observations['created']['State']['Pid'] == 0
+    assert [e.digest for e in state.events] == expected['event_digests']
+    assert state.events[1].daemon_creation.to_dict() == expected['creation_response']
+    print('Cold authored original creation agrees; no daemon, start or new operation.')

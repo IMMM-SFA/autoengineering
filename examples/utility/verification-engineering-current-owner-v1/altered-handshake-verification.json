@@ -1,0 +1,7 @@
+{
+  "schema": "utility-current-owner-altered-handshake-v1",
+  "changed_container_binding_with_updated_file_pin": "rejected",
+  "new_source_reads": 0,
+  "new_container_or_model_calls": 0,
+  "check": "Original bound CID must match actual execution, create and cleanup receipts"
+}

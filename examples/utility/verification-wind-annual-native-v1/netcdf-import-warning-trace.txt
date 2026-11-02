@@ -1,0 +1,1 @@
+No runtime warning during fresh netCDF4 import.

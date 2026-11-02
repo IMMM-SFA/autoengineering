@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "data_source": "OEDI-PVDAQ-9068-pad2-inverter2",
+  "cache_policy": "verify_existing_only_no_download",
+  "window": [
+    "2018-06-01",
+    "2018-06-07"
+  ],
+  "purpose": "development_only_previously_exposed_data",
+  "input_timezone_assumption": "US/Mountain_same_as_preserved_example",
+  "ambiguous_or_nonexistent_local_time": "exclude_before_UTC_conversion",
+  "time_contract": "2.0_UTC_PT5M_instantaneous_restart_state_at_gaps",
+  "aggregation": "none_power_RMSE_in_kW",
+  "energy_reporting": "not_attempted_no_interval_energy_claim",
+  "baseline": "faiman_prilliman",
+  "alternatives": [
+    "faiman",
+    "sapm_module"
+  ],
+  "u0_bounds": [
+    20.0,
+    35.0
+  ],
+  "u1_bounds": [
+    4.0,
+    10.0
+  ],
+  "dc_loss_scale_bounds": [
+    0.9,
+    1.0
+  ],
+  "invalid_control": {
+    "dc_loss_scale": 1.1
+  },
+  "output_atol_kw": 1e-08,
+  "output_rtol": 1e-10,
+  "seed": 17,
+  "optimizer_evaluations": 12,
+  "physical_start_ceiling": 18,
+  "wall_seconds": 120,
+  "memory_bytes": 4294967296,
+  "confirmation": "not_attempted",
+  "model_timeout_seconds": 5,
+  "termination_grace_seconds": 1,
+  "kill_wait_seconds": 1
+}

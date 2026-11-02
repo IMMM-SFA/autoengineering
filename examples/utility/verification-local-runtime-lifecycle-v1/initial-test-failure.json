@@ -1,0 +1,1 @@
+{"passed":58,"failed":1,"cause":"authored recovery fixture omitted api_version; KeyError before fake API inspection","correction":"supply required plan api_version in fixture","containers_started":0}

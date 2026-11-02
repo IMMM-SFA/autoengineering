@@ -1,0 +1,132 @@
+[
+  {
+    "name": "standalone-readme.txt",
+    "url": "https://zenodo.org/api/records/15529996/files/readme.txt/content",
+    "max_body_bytes": 1704,
+    "range": null,
+    "status": "complete",
+    "http_status": 200,
+    "final_url": "https://zenodo.org/api/records/15529996/files/readme.txt/content",
+    "etag": null,
+    "content_range": null,
+    "body_bytes": 1704,
+    "sha256": "fcdd3169b6b7c026358d605aee7acff419c332038fe41969afb93e4edac7370f",
+    "elapsed_seconds": 0.6235474590212107,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  },
+  {
+    "name": "archive-footer.bin",
+    "url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "max_body_bytes": 22,
+    "range": [
+      3406626561,
+      3406626582
+    ],
+    "status": "complete",
+    "http_status": 206,
+    "final_url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "etag": null,
+    "content_range": "bytes 3406626561-3406626582/3406626583",
+    "body_bytes": 22,
+    "sha256": "b2affb1da40032e128c362dccd3e35def9f0fc8fa68f0ac6188063901fc6ecd5",
+    "elapsed_seconds": 0.5870697922073305,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  },
+  {
+    "name": "archive-directory.bin",
+    "url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "max_body_bytes": 2811679,
+    "range": [
+      3403814882,
+      3406626560
+    ],
+    "status": "complete",
+    "http_status": 206,
+    "final_url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "etag": null,
+    "content_range": "bytes 3403814882-3406626560/3406626583",
+    "body_bytes": 2811679,
+    "sha256": "d797f4ee1b2fc8add3530c9adfba4b51e8772dd6df77f4d5fb2198643f3dbe0d",
+    "elapsed_seconds": 5.368812832981348,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  },
+  {
+    "name": "archive-readme-block.bin",
+    "url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "max_body_bytes": 8570,
+    "range": [
+      38340471,
+      38349040
+    ],
+    "status": "complete",
+    "http_status": 206,
+    "final_url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "etag": null,
+    "content_range": "bytes 38340471-38349040/3406626583",
+    "body_bytes": 8570,
+    "sha256": "dce2370e29e51a4798dfb2f911792eae33a9061997e2276049eb4b0c1a621117",
+    "elapsed_seconds": 0.7660403326153755,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  },
+  {
+    "name": "summary-local-header.bin",
+    "url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "max_body_bytes": 30,
+    "range": [
+      38338752,
+      38338781
+    ],
+    "status": "complete",
+    "http_status": 206,
+    "final_url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "etag": null,
+    "content_range": "bytes 38338752-38338781/3406626583",
+    "body_bytes": 30,
+    "sha256": "ac671616d7edc9894cced92165bfe99c5c38db19b200267c9291bc9477cd5b9b",
+    "elapsed_seconds": 0.5810113749466836,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  },
+  {
+    "name": "summary-local-name.bin",
+    "url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "max_body_bytes": 73,
+    "range": [
+      38338782,
+      38338854
+    ],
+    "status": "complete",
+    "http_status": 206,
+    "final_url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "etag": null,
+    "content_range": "bytes 38338782-38338854/3406626583",
+    "body_bytes": 73,
+    "sha256": "ef92b72540ca2e426c6f9e62e102a4bded9cb99f11d609b18be8de4ae5b36988",
+    "elapsed_seconds": 0.5730289588682353,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  },
+  {
+    "name": "summary-compressed.bin",
+    "url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "max_body_bytes": 1616,
+    "range": [
+      38338855,
+      38340470
+    ],
+    "status": "complete",
+    "http_status": 206,
+    "final_url": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content",
+    "etag": null,
+    "content_range": "bytes 38338855-38340470/3406626583",
+    "body_bytes": 1616,
+    "sha256": "6867861023d1ba629396bcafe780c44e98cc1237ff256224efbf777a92875401",
+    "elapsed_seconds": 0.567229624837637,
+    "total_network_bytes": null,
+    "total_http_exchanges": null
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "authored_hydrology_lifecycle_exercised": true,
+  "core_wheel_rebuilt": false,
+  "core_wheel_source_pins_verified": 239,
+  "final_documentation_checks": "19 passed",
+  "four_task_dossiers_and_proposal": "original pins unchanged",
+  "full_default_suite": "not rerun for this example-only increment",
+  "limits": [
+    "Local byte membership does not authenticate provider provenance",
+    "No qualified private runtime or confirmation access supplied",
+    "Receipt counters are not total I/O, CPU, RSS or failed-attempt accounting"
+  ],
+  "lint": "ruff check --no-cache src tests examples passed",
+  "observations_acquired": false,
+  "physical_intervals_resolved": false,
+  "real_archives_acquired": 0,
+  "rights_and_exposure_resolved": false,
+  "schema": "utility-camels-archive-verification-v1",
+  "source_pins": {
+    "docs/reviews/part-5-camels-archive-verification.md": {
+      "sha256": "0f66f092cb6f1fc0813913167a0ecba0eeefd4f19c66606ed1c74149b6266b27",
+      "size_bytes": 4020
+    },
+    "docs/utility.md": {
+      "sha256": "3ad9c12e324a0c2e4a53be942960f081c761556f6c2c68e7b6a542784b961924",
+      "size_bytes": 207092
+    },
+    "examples/utility/hydrology_camels_archive.py": {
+      "sha256": "29a1f58801e969e3cae16637ad77707bf480ad159871d6fdc12896b817071213",
+      "size_bytes": 8740
+    },
+    "tests/test_utility_hydrology_camels_archive.py": {
+      "sha256": "6fcd7086539fffaf49562245ecd91a24847b63c2b7e1cfedba7821e51adb1077",
+      "size_bytes": 9996
+    }
+  },
+  "standalone_scientific_runs": 0,
+  "status": "authored_tests_passed_not_source_admission",
+  "task_admitted": false,
+  "test_counts": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 112
+  }
+}

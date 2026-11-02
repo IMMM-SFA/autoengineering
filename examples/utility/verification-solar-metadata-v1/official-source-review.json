@@ -1,0 +1,20 @@
+{
+  "official_documentation": "https://github.com/openEDI/documentation/blob/main/pvdaq.md",
+  "official_DOE_walkthrough": "https://www.energy.gov/sites/default/files/2024-05/Data_Tools_Webina..._Comms_Final.pdf",
+  "inspected_on": "2026-10-31",
+  "pages": [
+    21,
+    22
+  ],
+  "findings": [
+    "source_id remains null for the selected AC metric",
+    "modules_per_string and num_strings remain blank in illustrated inverter metadata",
+    "CSV header link uses sensor_name, not an inferred equipment number",
+    "time_interval L is shown but its support or availability meaning is not defined"
+  ],
+  "source_scope": "browser-extracted official text; no full PDF byte pin or hardware admission inferred",
+  "observations_csv_requested": false,
+  "public_historical_example_rows_seen": 4,
+  "reserved_period_observations_accessed": false,
+  "scientific_task_admitted": false
+}

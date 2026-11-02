@@ -1,0 +1,17 @@
+"""Capture current core-only and actual preceding-wheel CLI reconstruction."""
+from pathlib import Path
+import json,subprocess,sys
+root=Path.cwd();out=root/'examples/utility/verification-load-cost-report-v1'
+stage=Path('/private/tmp/utility-load-cost-report-v1')
+reader=stage/'reader/installed-reader.py.txt';pins=stage/'reader/public-pins.json'
+results={}
+for mode,site in (('current',stage/'installed'),('legacy',Path('/private/tmp/utility-load-costs-install-v1/installed'))):
+    command=[sys.executable,'-I','-B',str(reader),str(site),str(stage/'public'),str(pins),mode]
+    p=subprocess.run(command,cwd=stage,capture_output=True,text=True)
+    (out/(mode+'-installed.stdout.txt')).write_text(p.stdout)
+    (out/(mode+'-installed.stderr.txt')).write_text(p.stderr)
+    assert p.returncode==0,(mode,p.stderr)
+    result=json.loads(p.stdout);result.update(exit_code=p.returncode,reader_and_inputs_outside_checkout=True)
+    (out/(mode+'-installed-result.json')).write_text(json.dumps(result,indent=2)+'\n')
+    results[mode]=result
+print(json.dumps(results))

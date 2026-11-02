@@ -1,0 +1,92 @@
+import hashlib,json,shutil
+from pathlib import Path
+root=Path.cwd(); out=root/'examples/utility/verification-guest-resources-v6'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,indent=2)+'\n')
+shutil.copyfile('/private/tmp/archive-resource-v6.py',out/'archive.py.txt')
+shutil.copyfile(root/'tests/test_utility_guest_resources.py',out/'test_utility_guest_resources.py.txt')
+s=json.loads((out/'summary.json').read_text())
+prev=root/'examples/utility/qualification-state-guest-v8.json'
+v=json.loads(prev.read_text())
+v.update(schema='utility-guest-qualification-evidence-map-v9',predecessor=str(prev.relative_to(root)),predecessor_sha256=sha(prev))
+v['historical_image_id']=v['image_id']
+v['current_v6_scope']={'image_id':s['image_id'],'metadata_probe_complete':True,'resource_controls':s['cases'],'resource_evidence':str((out/'summary.json').relative_to(root)),'resource_evidence_sha256':sha(out/'summary.json'),'historical_controls_not_transferred':True,'full_inference_lifecycle_private_matrix_complete':False,'runtime_qualified':False}
+save(root/'examples/utility/qualification-state-guest-v9.json',v)
+prev=root/'examples/utility/guest-qualification-accounting-v8.json'
+v=json.loads(prev.read_text())
+v.update(schema='utility-candidate-guest-qualification-accounting-v9',predecessor=str(prev.relative_to(root)),predecessor_sha256=sha(prev),current_evidence_map='examples/utility/qualification-state-guest-v9.json')
+v['scope']+=' plus six v6 resource diagnostic starts'
+v['operations'].append({'operation':'v6 six fixed resource diagnostics','evidence':str((out/'summary.json').relative_to(root)),'evidence_sha256':sha(out/'summary.json'),'image_id':s['image_id'],'container_creations':6,'container_starts':6,'model_inference_starts':0,'native_reference_starts':0,'charged_inference_starts':0,'charged_scoring_starts':0,'scientific_starts':0})
+v['totals']['container_creations']+=6
+v['totals']['container_starts']+=6
+v['current_v6_scope'].update(resource_probe_creations=6,resource_probe_starts=6,resource_probes_complete=True,resource_evidence=str((out/'summary.json').relative_to(root)))
+save(root/'examples/utility/guest-qualification-accounting-v9.json',v)
+(out/'README.md').write_text('''# Current v6 image resource controls
+
+All six fixed probes passed against the current v6 candidate image. Memory
+reached its 1 GiB cgroup limit and exited 137 with OOMKilled. Processes reached
+EAGAIN at cgroup count 16. Workspace returned ENOSPC at 128 MiB. Root, network
+and host-canary probes returned EROFS, ENETUNREACH and ENOENT.
+
+The request allowed six creations and six starts, with no retries. All six
+original containers were confirmed absent. No model, fitting, score, private
+label, provider, image pull or host mount was used. This was local OrbStack
+Linux amd64 emulation on macOS ARM64. It does not establish an independent
+physical x86 host, owner-loss handling or complete runtime qualification.
+
+[Summary](summary.json), [original evidence](evidence/complete.json) and
+[source inventory](../source-inventory-guest-resources-v6.json) retain the
+identities and observations. Request digest:
+`5a0dc37254fa4eb181ed5b9e2a9a2ff8c14f236d7ae0de34189d381ee443abb7`.
+Completion digest:
+`98079b65f6ec0d7122145a51fe0e8d4f0b1b88aaebdf9afb8674040b3b2c4648`.
+
+The image catalogue now binds the v6 image's exact environment and wheel labels.
+Historical image configurations remain unchanged. The related tests passed
+136 cases. The first test run exposed three cases in a shared reader fixture
+that still used v5 metadata. Its correction and the initial result are retained.
+
+A fresh process replayed 109 relocated files (405,588 bytes) after installing
+read-only guards. Imports preceded the guard and dependencies were inherited.
+No process, network, clock, write or outside file access was allowed during
+verification. A separate modified copy with false cleanup absence was rejected.
+The original evidence was unchanged. This is saved producer-evidence replay,
+not independent OS attestation or installed-package qualification.
+
+Cumulative explicit runtime accounting is now 37 creations and 31 starts.
+Earlier unknown work and label quantities remain unknown. The earlier image's
+inference, lifecycle and private-scoring evidence does not transfer to v6.
+The original 26-case proposal and all task admissions remain unchanged.
+
+```sh
+pixi run python -m examples.utility.guest_resource_reader \\
+  examples/utility/verification-guest-resources-v6/evidence \\
+  --expected-digest 98079b65f6ec0d7122145a51fe0e8d4f0b1b88aaebdf9afb8674040b3b2c4648
+```
+''')
+text='''
+
+Six fresh resource probes now passed against the v6 image. The observations were
+OOMKilled at 1 GiB, EAGAIN at process count 16, ENOSPC at 128 MiB, EROFS for root,
+ENETUNREACH for network and ENOENT for the unmounted host canary. Each original
+container was confirmed absent. No scientific model, fitting, scoring, private
+label, provider, image pull or host mount was used. Related tests passed 136 cases.
+A guarded reader verified relocated evidence and rejected altered cleanup data.
+
+The cumulative explicit runtime register now records 37 creations and 31 starts.
+Older unknown work remains unknown. Historical controls remain bound to their
+original image. The v6 inference, lifecycle and private-scoring matrix, independent
+physical host qualification, task admission and full Part 5 study remain open.
+
+[Current resource evidence](PREFIXexamples/utility/verification-guest-resources-v6/README.md),
+[cumulative register](PREFIXexamples/utility/guest-qualification-accounting-v9.json).
+'''
+paths=['docs/utility.md','docs/utility-handoff.md','docs/reviews/part-5-progress.md','docs/reviews/part-5-completion-audit.md']
+for name in paths:
+    p=root/name
+    with p.open('a') as f:f.write(text.replace('PREFIX','../../' if '/reviews/' in name else '../'))
+prev=root/'examples/utility/source-inventory-guest-image-v6.json'
+files=paths+['examples/utility/guest_resources.py','examples/utility/guest_resource_runner.py','examples/utility/guest_resource_probe.py','examples/utility/guest_resource_reader.py','tests/test_utility_guest_resources.py','tests/test_utility_guest_resource_reader.py','tests/test_utility_guest_resource_runner.py','examples/utility/guest-qualification-accounting-v9.json','examples/utility/qualification-state-guest-v9.json']
+save(root/'examples/utility/source-inventory-guest-resources-v6.json',{'scope':s['scope'],'predecessor':str(prev.relative_to(root)),'predecessor_sha256':sha(prev),'current_source_sha256':{name:sha(root/name) for name in files},'verification':str((out/'summary.json').relative_to(root)),'verification_sha256':sha(out/'summary.json'),'core_python_sources':225,'declared_guest_python_sources':316,'current_image':s['image_id'],'new_runtime_container_starts':6,'new_model_starts':0,'runtime_qualified':False,'full_part_5_complete':False})
+shutil.copyfile('/private/tmp/record-resource-v6.py',out/'record.py.txt')
+print('Recorded v6 resource evidence and cumulative accounting: 37 creations, 31 starts.')

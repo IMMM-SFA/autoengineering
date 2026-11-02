@@ -1,0 +1,16 @@
+....                                                                     [100%]
+=============================== warnings summary ===============================
+tests/test_utility_wind.py::test_direct_wrapped_wind_parity
+  <frozen importlib._bootstrap>:488: RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject
+
+tests/test_utility_wind.py::test_native_wind_driver_records_and_enforces_inner_limits
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/pyDOE2/doe_factorial.py:201: SyntaxWarning: invalid escape sequence '\-'
+    A = [item for item in re.split('\-|\s|\+', gen) if item]  # remove empty strings
+
+tests/test_utility_wind.py::test_native_wind_driver_records_and_enforces_inner_limits
+tests/test_utility_wind.py::test_native_wind_driver_records_and_enforces_inner_limits
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/topfarm/cost_models/cost_model_wrappers.py:237: DeprecationWarning: output_key is deprecated; use keyword output_keys instead
+    CostModelComponent.__init__(self, input_keys, n_wt, cost_function,
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 4 warnings in 19.51s

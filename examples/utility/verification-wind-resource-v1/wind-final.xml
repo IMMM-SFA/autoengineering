@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="32" time="3.403" timestamp="2026-10-29T05:26:40.863946-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_wind_resource" name="test_joint_probability_contract_is_immutable_and_roundtrips" time="0.001" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[directions_deg-value0]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[directions_deg-value1]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[directions_deg-value2]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[speeds_m_s-value3]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[speeds_m_s-value4]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[speeds_m_s-value5]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[speeds_m_s-value6]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[probability-value7]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[probability-value8]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[probability-value9]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[probability-value10]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[probability-value11]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[probability-value12]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[turbulence_intensity-0.0]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[turbulence_intensity-2.0]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_invalid_resource_is_rejected_before_any_model_import[annualization_hours-8784]" time="0.000" /><testcase classname="tests.test_utility_wind_resource" name="test_artifact_size_path_digest_and_symlink_checks" time="0.005" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[missing]" time="0.002" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[mass]" time="0.002" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[geometry]" time="0.002" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[forcing]" time="0.001" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[scenario]" time="0.001" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[rules]" time="0.002" /><testcase classname="tests.test_utility_wind_resource" name="test_bad_scenario_cannot_reach_physical_execution[coordinates]" time="0.002" /><testcase classname="tests.test_utility_wind_resource" name="test_native_v2_binds_resource_and_keeps_legacy_serialization" time="0.002" /><testcase classname="tests.test_utility_wind_resource" name="test_pinned_pywake_weights_match_analytic_power_and_change_with_resource" time="0.627" /><testcase classname="tests.test_utility_wind_resource" name="test_direct_and_wrapped_resource_scenario_agree_and_keep_checks" time="0.016" /><testcase classname="tests.test_utility_wind_resource_process" name="test_resource_driver_original_replay_and_bounded_observation[False]" time="0.448"><failure message="autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_resource_driver_original_0')
+lost_ack = False
+
+    @pytest.mark.parametrize("lost_ack", [False, True])
+    def test_resource_driver_original_replay_and_bounded_observation(tmp_path, lost_ack):
+        def fault(stage):
+            if lost_ack and stage == "native_process_saved":
+                raise RuntimeError("lost resource observation")
+    
+&gt;       driver, batch, _ = setup(tmp_path, fault=fault)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_wind_resource_process.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_utility_wind_resource_process.py:97: in setup
+    executor = SupervisedEngineeringExecutor(execution, batch, "first", source)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_process.py:303: in __init__
+    verify_sources(spec, self.source_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = EngineeringExecutionSpec(schema='utility-engineering-execution-v2', study=EngineeringStudySpec(run=OptimizationRunSpec...ed-resource', forcing=mappingproxy({'direction_step': 90.0})),), timeout_seconds=5.0, output_bytes=16384, preflight=())
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_resource_driver_original_0/captured')
+additional_entrypoints = ()
+
+    def verify_sources(spec, source_root, *, additional_entrypoints=()):
+        """Check all source bytes before any supplied evaluator code can be imported."""
+        root = Path(source_root)
+        declared = {ref.path: ref for ref in spec.sources}
+        for ref in (*spec.sources, spec.lock):
+            read_bytes(root, ref)
+        permitted = set(declared) | {spec.lock.path}
+        for path in root.rglob("*"):
+            if path.is_symlink() or (
+                not path.is_dir() and str(path.relative_to(root)) not in permitted
+            ):
+&gt;               raise StoreError("engineering input contains an undeclared file or symlink")
+E               autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink
+
+src/autoengineering/utility/engineering_process.py:163: StoreError</failure></testcase><testcase classname="tests.test_utility_wind_resource_process" name="test_resource_driver_original_replay_and_bounded_observation[True]" time="0.396"><failure message="autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_resource_driver_original_1')
+lost_ack = True
+
+    @pytest.mark.parametrize("lost_ack", [False, True])
+    def test_resource_driver_original_replay_and_bounded_observation(tmp_path, lost_ack):
+        def fault(stage):
+            if lost_ack and stage == "native_process_saved":
+                raise RuntimeError("lost resource observation")
+    
+&gt;       driver, batch, _ = setup(tmp_path, fault=fault)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_wind_resource_process.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_utility_wind_resource_process.py:97: in setup
+    executor = SupervisedEngineeringExecutor(execution, batch, "first", source)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_process.py:303: in __init__
+    verify_sources(spec, self.source_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = EngineeringExecutionSpec(schema='utility-engineering-execution-v2', study=EngineeringStudySpec(run=OptimizationRunSpec...ed-resource', forcing=mappingproxy({'direction_step': 90.0})),), timeout_seconds=5.0, output_bytes=16384, preflight=())
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_resource_driver_original_1/captured')
+additional_entrypoints = ()
+
+    def verify_sources(spec, source_root, *, additional_entrypoints=()):
+        """Check all source bytes before any supplied evaluator code can be imported."""
+        root = Path(source_root)
+        declared = {ref.path: ref for ref in spec.sources}
+        for ref in (*spec.sources, spec.lock):
+            read_bytes(root, ref)
+        permitted = set(declared) | {spec.lock.path}
+        for path in root.rglob("*"):
+            if path.is_symlink() or (
+                not path.is_dir() and str(path.relative_to(root)) not in permitted
+            ):
+&gt;               raise StoreError("engineering input contains an undeclared file or symlink")
+E               autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink
+
+src/autoengineering/utility/engineering_process.py:163: StoreError</failure></testcase><testcase classname="tests.test_utility_wind_resource_process" name="test_changed_resource_or_mixed_protocol_refuses_before_physical_start" time="0.407"><failure message="autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_changed_resource_or_mixed0')
+
+    def test_changed_resource_or_mixed_protocol_refuses_before_physical_start(tmp_path):
+&gt;       driver, batch, source = setup(tmp_path)
+                                ^^^^^^^^^^^^^^^
+
+tests/test_utility_wind_resource_process.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_utility_wind_resource_process.py:97: in setup
+    executor = SupervisedEngineeringExecutor(execution, batch, "first", source)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_process.py:303: in __init__
+    verify_sources(spec, self.source_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = EngineeringExecutionSpec(schema='utility-engineering-execution-v2', study=EngineeringStudySpec(run=OptimizationRunSpec...ed-resource', forcing=mappingproxy({'direction_step': 90.0})),), timeout_seconds=5.0, output_bytes=16384, preflight=())
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_changed_resource_or_mixed0/captured')
+additional_entrypoints = ()
+
+    def verify_sources(spec, source_root, *, additional_entrypoints=()):
+        """Check all source bytes before any supplied evaluator code can be imported."""
+        root = Path(source_root)
+        declared = {ref.path: ref for ref in spec.sources}
+        for ref in (*spec.sources, spec.lock):
+            read_bytes(root, ref)
+        permitted = set(declared) | {spec.lock.path}
+        for path in root.rglob("*"):
+            if path.is_symlink() or (
+                not path.is_dir() and str(path.relative_to(root)) not in permitted
+            ):
+&gt;               raise StoreError("engineering input contains an undeclared file or symlink")
+E               autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink
+
+src/autoengineering/utility/engineering_process.py:163: StoreError</failure></testcase><testcase classname="tests.test_utility_wind_resource_process" name="test_real_native_resource_objective_matches_fresh_resource_evaluation" time="0.413"><failure message="autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_real_native_resource_obje0')
+
+    @pytest.mark.skipif(importlib.util.find_spec("topfarm") is None, reason="optional wind runtime")
+    def test_real_native_resource_objective_matches_fresh_resource_evaluation(tmp_path):
+&gt;       driver, batch, _ = setup(tmp_path, actual=True)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_wind_resource_process.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_utility_wind_resource_process.py:97: in setup
+    executor = SupervisedEngineeringExecutor(execution, batch, "first", source)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/utility/engineering_process.py:303: in __init__
+    verify_sources(spec, self.source_root)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = EngineeringExecutionSpec(schema='utility-engineering-execution-v2', study=EngineeringStudySpec(run=OptimizationRunSpec...ed-resource', forcing=mappingproxy({'direction_step': 90.0})),), timeout_seconds=5.0, output_bytes=16384, preflight=())
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4416/test_real_native_resource_obje0/captured')
+additional_entrypoints = ()
+
+    def verify_sources(spec, source_root, *, additional_entrypoints=()):
+        """Check all source bytes before any supplied evaluator code can be imported."""
+        root = Path(source_root)
+        declared = {ref.path: ref for ref in spec.sources}
+        for ref in (*spec.sources, spec.lock):
+            read_bytes(root, ref)
+        permitted = set(declared) | {spec.lock.path}
+        for path in root.rglob("*"):
+            if path.is_symlink() or (
+                not path.is_dir() and str(path.relative_to(root)) not in permitted
+            ):
+&gt;               raise StoreError("engineering input contains an undeclared file or symlink")
+E               autoengineering.campaign.store.StoreError: engineering input contains an undeclared file or symlink
+
+src/autoengineering/utility/engineering_process.py:163: StoreError</failure></testcase></testsuite></testsuites>

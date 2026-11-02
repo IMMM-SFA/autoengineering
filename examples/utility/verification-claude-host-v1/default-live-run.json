@@ -1,0 +1,12 @@
+{
+  "session_id": 5875,
+  "status": "completed",
+  "last_poll_at_utc": "2026-10-29T11:39:45.658370+00:00",
+  "source_identity": "dd06d8ff96bed0d21b40134a4271307dce1d7a4552f8b28ffa19ce12da45e88b",
+  "source_test_files_unchanged": 363,
+  "command": "python -m pytest tests -q -p no:cacheprovider --junitxml=examples/utility/verification-claude-host-v1/default-tests.xml",
+  "log": "default-tests.log",
+  "restart_on_observation_timeout": false,
+  "exit_code": 0,
+  "terminal_receipt": "default-terminal.json"
+}

@@ -1,0 +1,1 @@
+{"exception":"GuestAttachError","message":"guest attach stdout exceeds bound","stderr_bytes_discarded":0,"stdout_bytes_accepted":68222976,"stdout_bytes_declared":68255744}

@@ -1,0 +1,9 @@
+{
+  "copied_proof_missing_committed_receipt_refused": true,
+  "exit_code": 1,
+  "installed_reader": true,
+  "new_models": 0,
+  "new_container_starts": 0,
+  "new_private_reads": 0,
+  "original_proof_changed": false
+}

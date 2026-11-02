@@ -1,0 +1,73 @@
+"""Verify compact development inputs, accounting and decoding without raw HDF5 captures."""
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(sys.argv[2]).resolve()))
+import importlib.abc
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self,fullname,*args):
+        if fullname.split('.')[0] in {'h5py','torch','pvlib','openmdao','py_wake','topfarm'}:
+            raise RuntimeError('optional model or source runtime denied')
+sys.meta_path.insert(0,NoModels())
+import ast,hashlib,io,json,os,socket,subprocess,time,zipfile
+import numpy as np
+from examples.utility.wind_point import utc_axis,decode_variable,nearest_site
+from autoengineering.campaign.serialization import digest,unique_json
+root=Path(sys.argv[1]).resolve()
+expected=json.loads((root.parent/'expected-public.json').read_text())
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def denied(*a,**kw):raise RuntimeError('process network or clock denied')
+subprocess.Popen=socket.socket=time.time=time.monotonic=denied
+
+def audit(event,args):
+    if event=='open':
+        path,mode,flags=args
+        if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise RuntimeError('write denied')
+        if isinstance(path,int):
+            st=os.fstat(path)
+            if (st.st_dev,st.st_ino) not in inodes:raise RuntimeError('outside descriptor denied')
+        elif not Path(os.fsdecode(path)).absolute().is_relative_to(root):raise RuntimeError('outside read denied')
+    if event=='import' or event.startswith(('socket.','subprocess.','os.exec','os.fork','os.posix_spawn')):
+        raise RuntimeError('new import or execution denied')
+sys.addaudithook(audit)
+q=unique_json((root/'request.json').read_text());done=unique_json((root/'complete.json').read_text())
+cell=unique_json((root/'selected-cell.json').read_text())
+assert digest(q)==expected['request_digest']==done['request_digest']
+assert digest(done)==expected['completion_digest']
+assert digest(cell)==done['selected_cell_digest'] and cell['wind_values_read'] is False
+blob=(root/'point.npz').read_bytes()
+assert len(blob)==done['point_bytes']<512*1024 and hashlib.sha256(blob).hexdigest()==done['point_sha256']
+fields={'time_utc':'<U20','raw_speed':'<u2','raw_direction':'<u2','speed_m_s':'<f8',
+        'direction_source_deg':'<f8','speed_valid':'|b1','direction_valid':'|b1'}
+with zipfile.ZipFile(io.BytesIO(blob)) as zipped:
+    assert sorted(zipped.namelist())==sorted(k+'.npy' for k in fields)
+    assert sum(i.file_size for i in zipped.infolist())<2*1024**2
+    for name,dtype in fields.items():
+        assert zipped.getinfo(name+'.npy').file_size<1024**2
+        with zipped.open(name+'.npy') as member:
+            version=np.lib.format.read_magic(member)
+            assert version in ((1,0),(2,0))
+            header=(np.lib.format.read_array_header_1_0 if version==(1,0) else np.lib.format.read_array_header_2_0)(member,max_header_size=4096)
+            shape,order,actual=header
+            assert shape==(8760,) and order is False and actual.str==dtype
+with np.load(io.BytesIO(blob),allow_pickle=False) as arrays:
+    axis=utc_axis(arrays['time_utc'],2007,'UTC')
+    assert digest(axis)==cell['axis_digest'] and len(axis)==done['hour_count']
+    for kind,units,decoded_name in [('speed','m s-1','speed_m_s'),('direction','degree','direction_source_deg')]:
+        decoded,mask=decode_variable(arrays['raw_'+kind],kind=kind,units=units,scale_factor=100.,fill_value=65535)
+        assert np.array_equal(decoded,arrays[decoded_name],equal_nan=True)
+        assert np.array_equal(mask,arrays[kind+'_valid'])
+        assert int(mask.sum())==done['valid_'+kind+'_rows']
+    assert int((arrays['speed_valid']&arrays['direction_valid']).sum())==done['common_valid_rows']
+point=nearest_site([[[cell['latitude'],cell['longitude']]]],q['point']['latitude'],q['point']['longitude'])
+assert abs(point['distance_m']-cell['distance_m'])<1e-9
+assert 0<=cell['index']<cell['sites_checked']
+assert sum(s['stats']['requests'] for s in done['stages'].values())==done['range_requests']
+assert sum(s['stats']['received_response_bytes'] for s in done['stages'].values())==done['response_body_bytes']
+for stage in done['stages'].values():
+    stats=stage['stats'];events=stats['events']
+    assert not stats['failed'] and len(events)==stats['requests']<=128
+    assert all(e['status']=='complete' for e in events)
+    assert sum(e['reserved_bytes'] for e in events)==stats['reserved_response_bytes']<=64*1024**2
+    assert sum(e['received_bytes'] for e in events)==stats['received_response_bytes']
+assert done['task_admitted'] is False and done['physical_binding_qualified'] is False
+print(json.dumps({'compact_public_verification':True,'hour_count':8760,'range_requests':done['range_requests'],'source_body_bytes':done['response_body_bytes'],'raw_and_decoded_arrays_agree':True,'nearest_global_recomputed':False,'recorded_distance_agrees':True,'new_http_requests':0,'new_processes':0,'optional_runtimes_imported':False,'raw_HDF5_captures_read':False,'task_admitted':False}))

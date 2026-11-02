@@ -1,0 +1,8 @@
+{
+  "first_attempt_error": "Cython all-version metadata exceeded 1 MB bound; no build or install started",
+  "logical_http_requests": 2,
+  "saved_netcdf_metadata_bytes": 21574,
+  "discarded_oversize_body_bytes_read": 1000001,
+  "netcdf_metadata_sha256": "9fdd2e9195adf3c1ce81c8efae75ba0b2430d5c838ba087b8e5767bde899cecb",
+  "http_exchanges": "unknown"
+}

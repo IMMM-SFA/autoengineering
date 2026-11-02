@@ -1,0 +1,8 @@
+{
+  "scope": "aggregate host source identity changes by adding the raw Claude module",
+  "without_added_module": "ee6e55ab7d1cf2dc1cdf31b572d978b1a29451df81b26994d13ea5a482cae8d0",
+  "current": "526909d259dc5796feb2597f883c44e41f4cf970a70665921cfd22de8d883923",
+  "earlier_live_pins": "retain original sources or obtain fresh qualification; never rewrite pins",
+  "record_formats": "unchanged",
+  "actual_claude_inference": "not_attempted"
+}

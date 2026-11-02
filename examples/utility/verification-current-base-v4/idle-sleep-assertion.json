@@ -1,0 +1,14 @@
+{
+  "created_utc": "2026-10-31T08:21:11.729612+00:00",
+  "pytest_pid": 36943,
+  "helper_pid": 68602,
+  "argv": [
+    "/usr/bin/caffeinate",
+    "-i",
+    "-w",
+    "36943"
+  ],
+  "scope": "idle-sleep assertion tied to this verified pytest PID; ends when that process exits",
+  "global_power_configuration_changed": false,
+  "manual_sleep_prevented": false
+}

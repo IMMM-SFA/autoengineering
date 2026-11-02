@@ -1,0 +1,80 @@
+{
+  "adverse_reader": "rehashed modified work artifact rejected",
+  "dependency_installation_changes": 0,
+  "dependency_lock_preserved": true,
+  "documentation": {
+    "path": "docs/reviews/part-5-wind-annual-native.md",
+    "sha256": "4ac5fb74af57dd8abab41708d1857aa390dea9e0533a8dc90d00865101a82f4c",
+    "size_bytes": 3630
+  },
+  "excluded_manifest_names": [
+    ".campaign.lock",
+    ".operation.lock",
+    ".suite.lock",
+    ".utility.lock",
+    ".writer.lock"
+  ],
+  "full_cost_evidence": false,
+  "full_default_suite": "not rerun; focused base and separate native control only",
+  "full_environment_qualified": false,
+  "guest_v21_scope": "unchanged; this separately charged native wind control is outside that listed scope",
+  "initial_reader_failure": "owned temporary scope resolved to avoid macOS /var symlink; original failure retained",
+  "installed_package_reader_qualified": false,
+  "lint": {
+    "command": "pixi run lint",
+    "status": "passed"
+  },
+  "metadata_reader": "relocated default-environment replay passed with optional imports, source reads and model calls blocked",
+  "model_calls_in_warning_probes": 0,
+  "native_command": ".pixi/envs/wind/bin/python -B -m pytest tests/test_utility_wind_annual_native.py::test_native_callback_score_commit_loss_and_metadata_only_recovery -q -p no:cacheprovider --basetemp=/private/tmp/utility-wind-native-callback-v1",
+  "native_observed_pytest_summary": "1 passed, 1 warning in 10.35s",
+  "physical_model_starts_in_native_control": 3,
+  "private_runtime_qualified": false,
+  "schema": "utility-wind-annual-native-verification-v1",
+  "source_pins": {
+    "examples/utility/wind_annual.py": {
+      "sha256": "685fba50d0f7f26f0362c486d5bb8bb48045db229d54aaf970edc2885d13b4aa",
+      "size_bytes": 7310
+    },
+    "examples/utility/wind_annual_callback.py": {
+      "sha256": "3145aef0009c74a9aa2b1444b117d705eafe67ec7f5f440a6559844f5323bd49",
+      "size_bytes": 18725
+    },
+    "examples/utility/wind_annual_scoring.py": {
+      "sha256": "80e03cbf827447fa45334de7c9b1a165b11c13df5e57e0481beb3c4264291bda",
+      "size_bytes": 10990
+    },
+    "examples/utility/wind_annual_source.py": {
+      "sha256": "2bab27e011865f9ec2ff1690530338d35d0046a4529c73328257167045bbf8ef",
+      "size_bytes": 14715
+    },
+    "tests/test_utility_wind_annual_callback.py": {
+      "sha256": "b421602f95d771adaf413af200fd0e7a6b175f2c7ee8145babcd138ede471ddf",
+      "size_bytes": 13020
+    },
+    "tests/test_utility_wind_annual_native.py": {
+      "sha256": "432dcb3288fc8ad1dca86ae47ef0ff034cfea8d6c69ea921c9afb04903917989",
+      "size_bytes": 5384
+    }
+  },
+  "source_scope": "authored constant vectors and authored selection fixture; no acquired/reserved weather",
+  "status": "native_control_passed_with_recorded_dependency_warning",
+  "task_admitted": false,
+  "test_counts": {
+    "base-tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 1,
+      "tests": 121
+    },
+    "native-tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 1
+    }
+  },
+  "warning": "RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject",
+  "warning_only_probe_processes": 7,
+  "warning_reproduced_in": "netCDF4._netCDF4 through PyWake import after NumPy filter reset"
+}

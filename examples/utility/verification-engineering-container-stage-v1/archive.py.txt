@@ -1,0 +1,20 @@
+"""Collect compact public receipts; exclude wheel archives and the build plugin."""
+import hashlib,json,os,shutil
+from pathlib import Path
+root=Path.cwd();os.umask(0o077)
+p=root/'examples/utility/verification-engineering-container-stage-v1'
+scopes={'dependencies':'verification-engineering-container-dependencies-v1','image':'verification-engineering-dependency-image-v1','probe':'verification-engineering-linux-load-probe-v1'}
+for label,folder in scopes.items():
+ dst=p/label;dst.mkdir(mode=0o700)
+ for f in (root/'examples/utility'/folder).iterdir():
+  if f.is_file():shutil.copyfile(f,dst/f.name)
+# Verify all cached wheel bytes before this compact metadata handoff.
+plan=json.loads((p/'dependencies/download-plan.json').read_text())
+for item in plan['wheels']:
+ f=root/'outputs/engineering-container-wheels-v1/wheels'/item['filename']
+ assert hashlib.sha256(f.read_bytes()).hexdigest()==item['sha256'] and f.stat().st_size==item['size_bytes']
+for name in ('version','client','output'):
+ pass
+files={str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()}
+(p/'evidence-manifest.json').write_text(json.dumps(files,indent=2,sort_keys=True)+'\n')
+print('Collected public receipt files:',len(files))

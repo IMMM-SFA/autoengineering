@@ -1,0 +1,14 @@
+{
+  "basetemp": "/private/tmp/autoengineering-v4-repro-baseline-m37ne7hf/pytest",
+  "argv": [
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_utility_baseline_selection.py::test_confirmation_only_policy_does_not_enable_selection_reuse",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/private/tmp/autoengineering-v4-repro-baseline-m37ne7hf/pytest",
+    "--junitxml=/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-current-base-v4/repro-baseline.xml"
+  ]
+}

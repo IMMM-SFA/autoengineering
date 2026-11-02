@@ -1,0 +1,53 @@
+"""Join prospective-name supervision evidence without a daemon or model import."""
+from pathlib import Path
+import hashlib,json,sys
+root=Path(sys.argv[1]).resolve(strict=True)
+raw=(root/'evidence-manifest.json').read_bytes();assert hashlib.sha256(raw).hexdigest()==sys.argv[2]
+manifest=json.loads(raw)
+for name,expected in manifest['files'].items():
+    relative=Path(name);assert not relative.is_absolute() and '..' not in relative.parts
+    path=root/relative;assert not any(p.is_symlink() for p in (path,*path.parents))
+    data=path.read_bytes();assert len(data)==expected['bytes'] and hashlib.sha256(data).hexdigest()==expected['sha256']
+def read(name):
+    assert name in manifest['files'];return json.loads((root/name).read_bytes())
+def digest(value):return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+summary=read('summary.json')
+for case in summary['cases']:
+    prefix=case['mode']+'/'
+    q=read(prefix+'request.json');plan=read(prefix+'watchdog-plan.json');ready=read(prefix+'watchdog-ready.json')
+    outcome=read(prefix+'watchdog-outcome.json')
+    assert plan['schema']=='utility-coupled-watchdog-plan-v2' and plan['container_id'] is None
+    assert ready['container_id'] is None and ready['plan_digest']==outcome['plan_digest']==digest(plan)
+    assert plan['name']==q['name'] and plan['configuration']==q['configuration']
+    assert plan['owner_source_digest']==q['owner_source_sha256']
+    assert plan['watchdog_source_digest']==q['watchdog_source_sha256']
+    assert ready['watchdog_pid']==outcome['watchdog_pid']==case['watchdog_pid']
+    absence=read(prefix+'watchdog-process-absence.json')
+    assert absence['watchdog_pid']==ready['watchdog_pid'] and absence['absent'] is True
+    assert not absence['ps_stdout'].strip()
+    if case['mode']=='normal_binding':
+        bind=read(prefix+'watchdog-bind.json');bound=read(prefix+'watchdog-bound.json')
+        assert bind['plan_digest']==bound['plan_digest']==digest(plan)
+        assert bind['container_id']==bound['container_id']==case['container_id']==outcome['container_id']
+        assert bound['watchdog_pid']==ready['watchdog_pid']
+        assert outcome['reason']=='owner_done' and outcome['delete_intended'] is False
+        assert read(prefix+'owner-complete.json')['normal_binding_and_disarm'] is True
+    else:
+        boundary=read(prefix+'owner-boundary.json');kill=read(prefix+'kill-intent.json')
+        assert boundary['owner_pid']==kill['owner_pid']==case['owner_pid']
+        assert kill['watchdog_pid']==ready['watchdog_pid'] and kill['signal']=='SIGKILL'
+        assert boundary['binding_published'] is False and outcome['reason']=='owner_lost'
+    if case['mode']=='intent_only':
+        assert outcome['absent'] is False and outcome['unacknowledged_creation_unverified'] is True
+        assert case['external_current_absence_observed'] is True
+    else:
+        assert outcome['absent'] is True and outcome['unacknowledged_creation_unverified'] is False
+    if case['mode']=='created_unbound':
+        assert outcome['container_id']==case['container_id']
+        assert outcome['delete_intended'] is True
+        assert prefix+'watchdog-bind.json' not in manifest['files']
+    assert case['container_starts']==0 and case['source_reads']==0 and case['packet_submitted'] is False
+assert summary['container_creations']==2 and summary['container_starts']==0
+assert summary['runtime_qualified'] is False and summary['full_interruption_matrix_complete'] is False
+print(json.dumps({'verified':True,'controls':4,'container_creations':2,'container_starts':0,
+    'uncertain_creation_intents_retained':1,'runtime_qualified':False},sort_keys=True))

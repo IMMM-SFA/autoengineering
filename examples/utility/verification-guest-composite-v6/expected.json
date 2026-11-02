@@ -1,0 +1,24 @@
+{
+  "costs": {
+    "confirmation_access_intents": 1.0,
+    "confirmation_callback_duration": 8.84973316686228,
+    "confirmation_callbacks_completed": 1.0,
+    "confirmation_container_lifecycle_duration": 1.8716163341887295,
+    "confirmation_container_starts": 2.0,
+    "confirmation_inference_container_starts": 1.0,
+    "confirmation_inference_lifecycle_duration": 1.6435760003514588,
+    "confirmation_inference_starts": 1.0,
+    "confirmation_reservations": 1.0,
+    "confirmation_scores_committed": 1.0,
+    "confirmation_scoring_container_starts": 1.0,
+    "confirmation_scoring_starts": 1.0
+  },
+  "receipt_digest": "9a3201a342cb6dbdcc7dc875d381ade2723fbab6b8de6ff6155a86c7644ced2b",
+  "score": {
+    "feasible": true,
+    "outcome": "rmse",
+    "status": "success",
+    "units": "mm/day",
+    "value": 22.831723421642184
+  }
+}

@@ -1,0 +1,95 @@
+from pathlib import Path
+import hashlib
+import json
+
+from autoengineering.utility import private_container_runtime as module
+
+repository=Path.cwd()
+evidence=repository/'examples/utility/verification-container-creation-v1'
+evidence.mkdir(mode=0o700)
+hashes={name:hashlib.sha256((repository/name).read_bytes()).hexdigest() for name in [
+    'src/autoengineering/utility/private_container_runtime.py',
+    'src/autoengineering/utility/private_container_worker.py',
+    'src/autoengineering/utility/private_score_worker.py',
+]}
+(evidence/'executed-source-hashes.json').write_text(json.dumps(hashes,indent=2)+'\n')
+endpoint=Path('/Users/cam/.orbstack/run/docker.sock')
+version=module.API(str(endpoint)).json('GET','/version')
+server_digest=module.sha(module.encode(version))
+original_request=module.API.request
+original_json=module.API.json
+original_pipe=module.os.pipe
+results=[]
+for fault in ('lost-create-ack','pipe-failure'):
+    root=Path('/private/tmp')/('utility-creation-'+fault+'-v1')
+    root.mkdir(mode=0o700)
+    work=root/'workspace'; work.mkdir(mode=0o700)
+    (work/'job.json').write_text('{"outcome":"rmse","units":"1","prediction":[0,1]}')
+    (work/'labels.json').write_text('{"labels":[1,2],"mask":[true,true]}')
+    job_sha=module.sha((work/'job.json').read_bytes())
+    labels_sha=module.sha((work/'labels.json').read_bytes())
+    runtime=module.FixedScorerRuntime(endpoint,server_sha256=server_digest)
+    api_version=runtime.preflight()
+    operations=[]; transport_ids=[]
+    def guarded_request(api,method,path,value=None,**kwargs):
+        operations.append({'method':method,'path':path})
+        if method=='POST' and path.endswith('/start'):
+            raise AssertionError('creation fault attempted a physical start')
+        return original_request(api,method,path,value,**kwargs)
+    def delivered_json(api,method,path,value=None,**kwargs):
+        result=original_json(api,method,path,value,**kwargs)
+        if method=='POST' and path.startswith('/containers/create?name='):
+            transport_ids.append(result['Id'])
+            if fault=='lost-create-ack':
+                raise TimeoutError('synthetic lost create response delivery')
+        return result
+    module.API.request=guarded_request
+    module.API.json=delivered_json
+    if fault=='pipe-failure':
+        def failed_pipe(): raise OSError('synthetic owner pipe setup failure')
+        module.os.pipe=failed_pipe
+    expected=TimeoutError if fault=='lost-create-ack' else OSError
+    try:
+        runtime.run(root,api_version=api_version,job_sha256=job_sha,labels_sha256=labels_sha)
+    except expected:
+        pass
+    else:
+        raise AssertionError('expected creation fault did not stop the original operation')
+    module.os.pipe=original_pipe
+    assert len(transport_ids)==1
+    cid=transport_ids[0]
+    cleanup=json.loads((root/'container/cleanup.json').read_bytes())
+    snapshot=json.loads((root/'container/cleanup-before.json').read_bytes())
+    pending=json.loads((root/'container/creation-pending.json').read_bytes())
+    module.verify_owned(snapshot,{**pending,'container_id':cid})
+    assert cleanup['container_id']==cid and cleanup['removed'] is True
+    assert snapshot['State']['Running'] is False and snapshot['State']['Status']=='created'
+    assert snapshot['State']['Pid']==0
+    assert module.API(str(endpoint),api_version).inspect(cid) is None
+    repeated=runtime.reconcile_creation(root,stop=True)
+    assert repeated['removed'] is True
+    assert len([op for op in operations if op['method']=='POST'])==1
+    assert len([op for op in operations if op['method']=='DELETE'])==1
+    try:
+        runtime.run(root,api_version=api_version,job_sha256=job_sha,labels_sha256=labels_sha)
+    except FileExistsError:
+        pass
+    else:
+        raise AssertionError('existing attempt allowed another creation')
+    assert len(transport_ids)==1
+    module.API.request=original_request
+    module.API.json=original_json
+    for name,digest in hashes.items():
+        assert hashlib.sha256((repository/name).read_bytes()).hexdigest()==digest
+    record={'fault':fault,'root':str(root),'container_id':cid,'nonce':pending['nonce'],
+            'created_objects':1,'container_starts':0,'scoring_starts':0,
+            'original_id_removed':True,'live_absence_confirmed':True,
+            'no_replacement_create':True,'no_scientific_result':True,'operations':operations}
+    results.append(record)
+    print(json.dumps(record,sort_keys=True),flush=True)
+(evidence/'actual-controls.json').write_text(json.dumps({
+    'schema':'synthetic-private-container-creation-controls-v1','controls':results,
+    'created_objects':2,'container_starts':0,'scoring_starts':0,
+    'real_confirmation_data_reads':0,'provider_calls':0,'image_pulls':0,'remote_jobs':0,
+    'private_scoring_qualified':False,
+},indent=2)+'\n')

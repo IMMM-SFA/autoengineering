@@ -1,0 +1,38 @@
+{
+  "schema": "utility-guest-owner-verification-v1",
+  "created_utc": "2026-10-30T19:28:30.426586+00:00",
+  "scope": "durable suite-bound candidate owner intents and original OCI evidence; no API operations",
+  "focused": "110 passed in 25.14s",
+  "compatibility": "221 passed in 145.63s",
+  "documentation": "19 passed in 0.65s",
+  "relocated_replay": "passed",
+  "lint": "passed",
+  "explicit_line_length": "passed",
+  "diff_check": "passed",
+  "core_python_files": 215,
+  "boundary": "unqualified-candidate",
+  "guest_image_execution": "not attempted",
+  "limits": [
+    "authored OCI observations, not actual daemon evidence or OS attestation",
+    "journal does not stage inputs, dispatch or grant execution authority",
+    "actual owner dispatch, watchdog/early-abort cleanup and initialization reconciliation remain open",
+    "image/OS/resource/privacy qualification and default service integration remain open",
+    "independent tasks, owner gains/tolerances and scientific comparison remain open",
+    "full default checkpoint predates this increment"
+  ],
+  "file_sha256": {
+    "README.md": "3e9f13c6b0a9b2e5410b6a952e211a3259be052667c284d83f5ca45da2dad0dc",
+    "authored-owner-journal.tar.gz": "2f8d1478d7cff1d2a07fbd44c53555bde6cc7b123bd85857c0a9839c892212d4",
+    "compatibility.log": "59fd5931745c3cd8fc40484574054e8973d5d178dbf3dcc326eddd3925b13f70",
+    "documentation.log": "50f5248dc8806b21b235e40d31612f2c691996ab4455de73129a28ebbf7139e9",
+    "expected-projections.json": "5d63821b65ac9893149b22dfd01f1afc697a4805b543886761c4bd64c78a8479",
+    "focused.log": "82c7b72c80e1f9caa10d5e984307b469d0ad6880cc4787fdb3223ee2222cec32",
+    "guest_observations.py.txt": "14e43124a10aea5e655042e012ee7a801ec6e1934ccb61ce58445d7c495270d0",
+    "guest_owner.py.txt": "2d031f8eb0827a8e3d3c4f17a3e136ddea4c19630c05b4c28660f851d92fa576",
+    "public-file-pins.json": "0319319ab9d4a0e6917a64f991103782d444c8b54b59ce927b8417752967104b",
+    "relocated-replay.log": "baf1b6e7d89dac909ce86c63714e5a59c9d4cf32f5c082ef514ea107b780eef6",
+    "replay-public.py.txt": "272d5f201daf7da5fc9ffe957e28081732c2b6a240a2039f7342e53b63303918",
+    "test_utility_guest_owner.py.txt": "49bfe05fe222041a3146617564adfdbef8dfae96b28923b95d91b892ec5926af",
+    "tested-source-pins.json": "a82cd8150baee9b20fca768cde3b62e09c2d05fcb2ae815a2e9efdeac06f3efb"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "src/autoengineering/utility/guest_archive.py": "4eab7605331423685b5f682fa7ed55f83e3e11318198dc521ed52db0781a7af7",
+  "src/autoengineering/utility/guest_receipts.py": "86c261fc524398adc69d8cea1ca4ac86097993c514b963fc1e841069ff61101b",
+  "tests/test_utility_guest_archive.py": "45550bb5f99173803ea3c75278f8fd578dae4177d96674464f439f0da9e56fc1"
+}

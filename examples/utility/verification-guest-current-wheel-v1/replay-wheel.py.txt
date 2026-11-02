@@ -1,0 +1,33 @@
+"""Extracted-wheel cold readers outside the checkout; no dependency installation."""
+from pathlib import Path
+import hashlib,json,os,shutil,subprocess,sys,tempfile,zipfile
+root=Path.cwd().resolve()
+out=root/'examples/utility/verification-guest-current-wheel-v1'
+wheel=next(out.glob('*.whl'))
+results=[]
+with tempfile.TemporaryDirectory(prefix='guest-current-readers-',dir='/private/tmp') as temporary:
+ work=Path(temporary).resolve();package=work/'package';package.mkdir()
+ with zipfile.ZipFile(wheel) as archive:archive.extractall(package)
+ assert (package/'autoengineering/utility/guest_creation_cleanup.py').is_file()
+ cases=[
+ ('cleanup','verification-guest-creation-cleanup-v1','replay-cleanup.py.txt',
+  ['authored-early-cleanup-owner.tar.gz','expected-cleanup.json']),
+ ('composite','verification-guest-composite-v1','replay-public.py.txt',
+  ['authored-guest-composite-public.tar.gz','expected-public.json'])]
+ for name,origin,reader,inputs in cases:
+  stage=work/name;stage.mkdir()
+  for filename in [reader]+inputs:shutil.copyfile(root/'examples/utility'/origin/filename,stage/filename)
+  code="import sys,runpy;from pathlib import Path;sys.path.insert(0,sys.argv[1]);import autoengineering;assert Path(autoengineering.__file__).resolve().is_relative_to(Path(sys.argv[1]));runpy.run_path(sys.argv[2],run_name='__main__')"
+  result=subprocess.run([sys.executable,'-I','-c',code,str(package),str(stage/reader)],cwd=work,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},capture_output=True,text=True)
+  (out/(name+'-wheel.log')).write_text(result.stdout+result.stderr)
+  results.append({'case':name,'exit_code':result.returncode,'cwd_outside_checkout':True,'isolated_interpreter':True,'package_from_extracted_wheel':True})
+  print(name,result.returncode,result.stdout.strip())
+  if result.returncode:raise RuntimeError(result.stderr)
+ code="import sys;from pathlib import Path;sys.path.insert(0,sys.argv[1]);import autoengineering;assert Path(autoengineering.__file__).resolve().is_relative_to(Path(sys.argv[1]));from autoengineering.cli import cli;cli(['--help'])"
+ result=subprocess.run([sys.executable,'-I','-c',code,str(package)],cwd=work,capture_output=True,text=True)
+ (out/'cli-wheel.log').write_text(result.stdout+result.stderr)
+ assert result.returncode==0 and 'utility' in result.stdout
+ results.append({'case':'cli-help','exit_code':result.returncode,'cwd_outside_checkout':True,'isolated_interpreter':True,'package_from_extracted_wheel':True})
+summary={'schema':'utility-extracted-guest-wheel-reader-v1','wheel_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),'results':results,'dependencies_installed':False,'wheel_installed':False,'actual_container_execution':False,'runtime_privacy_qualified':False,'independent_confirmation':False}
+(out/'wheel-readers.json').write_text(json.dumps(summary,indent=2)+'\n')
+print('Extracted-wheel readers and CLI passed outside checkout.')

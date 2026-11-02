@@ -1,0 +1,10 @@
+{
+  "wheel_sha256": "038d7bc6b6f5a782a67bc8b719b4aa1da5f8a239a8982c51092c2dd3109915c1",
+  "package_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-wheel-install-v3/autoengineering/__init__.py",
+  "example_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-wheel-install-v3/examples/interoperability/solar/campaign.py",
+  "working_directory": "/private/tmp/part4-installed-v50uogfu",
+  "first_invocation_starts": 3,
+  "total_physical_starts": 15,
+  "outcome": "accepted_candidate",
+  "confirmation": "not_attempted"
+}

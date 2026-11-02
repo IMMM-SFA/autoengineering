@@ -22,6 +22,9 @@ LIVE_DOCUMENTS = (
     ROOT / "docs/optimization.md",
     ROOT / "examples/README.md",
     ROOT / "examples/leaf_river/README.md",
+    ROOT / "docs/agents.md",
+    ROOT / "docs/campaigns.md",
+    ROOT / "examples/agent_campaign/README.md",
 )
 MARKDOWN_LINK = re.compile(r"\[[^]]*]\(([^)]+)\)")
 PIXI_COMMAND = re.compile(r"\bpixi run(?: -e [a-z0-9_-]+)? ([a-z][a-z0-9_-]*)")
@@ -51,6 +54,7 @@ def test_local_markdown_links_resolve(document: Path):
 def test_documented_cli_commands_match_click_registry():
     registered = set(cli.commands)
     expected = {
+        "agents",
         "campaign",
         "candidates",
         "components",
@@ -59,6 +63,7 @@ def test_documented_cli_commands_match_click_registry():
         "graph",
         "improve",
         "optimize",
+        "utility",
         "report",
         "validate",
     }
@@ -174,7 +179,12 @@ def test_documented_pixi_tasks_exist():
 def test_python_version_and_package_extras_match_project_metadata():
     project = tomllib.loads(_read(ROOT / "pyproject.toml"))["project"]
     assert project["requires-python"] == ">=3.12,<3.13"
-    assert set(project["optional-dependencies"]) == {"bayes", "benchmark"}
+    assert set(project["optional-dependencies"]) == {
+        "bayes", "benchmark", "optuna", "interoperability", "wind", "utility"
+    }
+    assert project["optional-dependencies"]["optuna"] == ["optuna==4.5.0"]
+    assert "openmdao==3.39.0" in project["optional-dependencies"]["utility"]
+    assert "openmdao==3.41.0" in project["optional-dependencies"]["interoperability"]
 
     for path in (ROOT / "README.md", ROOT / "docs/optimization.md"):
         document = _read(path)

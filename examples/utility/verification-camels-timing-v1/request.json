@@ -1,0 +1,14 @@
+{
+  "url": "https://hess.copernicus.org/articles/19/209/2015/hess-19-209-2015.pdf",
+  "max_body_bytes": 8388608,
+  "status": "complete",
+  "prior_web_fetch": "timed out; preserved in conversation, no PDF acquired by that tool",
+  "automatic_retries": false,
+  "http_status": 200,
+  "final_url": "https://hess.copernicus.org/articles/19/209/2015/hess-19-209-2015.pdf",
+  "body_bytes": 4513636,
+  "sha256": "a43702085800f4d4b85517f3a931be613f639558a1f942be19d0bafab6a180fb",
+  "elapsed_seconds": 9.322470500133932,
+  "total_network_bytes": null,
+  "total_http_exchanges": null
+}

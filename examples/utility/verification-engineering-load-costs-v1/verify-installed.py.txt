@@ -1,0 +1,30 @@
+"""Run a copied guarded reader and reject a modified public receipt."""
+from pathlib import Path
+import json, shutil, subprocess, sys
+root = Path.cwd()
+archive = root / 'examples/utility/verification-engineering-load-costs-v1'
+stage = Path('/private/tmp/utility-load-costs-install-v1')
+reader = stage / 'reader'; reader.mkdir(mode=0o700)
+for name in ('installed-reader.py.txt', 'expected-costs.json', 'input-pins.json'):
+    shutil.copyfile(archive / name, reader / name)
+command = [sys.executable, '-I', '-B', str(reader / 'installed-reader.py.txt'),
+           str(stage / 'installed'), str(stage / 'inputs'), str(reader)]
+p = subprocess.run(command, cwd=stage, capture_output=True, text=True)
+(archive / 'installed-reader.stdout.txt').write_text(p.stdout)
+(archive / 'installed-reader.stderr.txt').write_text(p.stderr)
+assert p.returncode == 0
+result = json.loads(p.stdout)
+result.update(exit_code=p.returncode, copied_reader_and_evidence_outside_checkout=True,
+              cwd_outside_checkout=True, relative_path_invocation_refusal_exit_code=127,
+              refused_invocation_started_reader=False)
+(archive / 'installed-reader-result.json').write_text(json.dumps(result, indent=2) + '\n')
+tampered = stage / 'tampered-inputs'; shutil.copytree(stage / 'inputs', tampered)
+work = next((tampered / 'native/suite/engineering-load-work').glob('*.json'))
+work.write_text(work.read_text() + ' ')
+bad = subprocess.run([*command[:5], str(tampered), str(reader)], cwd=stage, capture_output=True, text=True)
+assert bad.returncode != 0
+(archive / 'tamper-reader-result.json').write_text(json.dumps({
+    'changed_public_work_rejected':True, 'exit_code':bad.returncode,
+    'new_models':0, 'new_private_source_reads':0,
+},indent=2) + '\n')
+print(json.dumps({'installed_reader':result,'tamper_rejected':True}))

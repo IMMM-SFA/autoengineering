@@ -1,0 +1,52 @@
+{
+  "schema": "utility-source-increment-v1",
+  "created_utc": "2026-10-30T20:32:04.145104+00:00",
+  "scope": "bounded candidate Unix attach upgrade, one verified stdin transfer, Docker frame parsing and absolute I/O deadlines",
+  "predecessor": "examples/utility/source-inventory-guest-bootstrap.json",
+  "predecessor_sha256": "3cbb2112407844236701971c199a7d035ec44d9ddb941cb0a5e02f5304d774ba",
+  "current_core_python_files": 218,
+  "files": {
+    "src/autoengineering/utility/guest_attach.py": "5054340c2c783ff0eb751a003293050294bd46f8b259578566f47621262c73e7",
+    "tests/test_utility_guest_attach.py": "261b3a9679b02b72e7081d7048057d282ea4e2c1077867ede8ba991dbbb709cf",
+    "docs/utility.md": "fb8a8e679c7128baad73578e53f85755951786d010f2afcd61dc0604f7492113",
+    "docs/implementation-plans/part-5-frozen-prediction-increment.md": "d3397587c763c742dd3d5b4c6d8b7d64e15268c69fb721e63f7f18261f0bd715",
+    "docs/reviews/part-5-progress.md": "396a9de337ead95c74c80a3cb3bce39f1fdaa6388d3668e913addd3439428693",
+    "docs/reviews/part-5-completion-audit.md": "6145d9c8be22abcd2608c4864f697295a0c10de0b4680617796fccd7c6fb2e6f",
+    "examples/utility/verification-guest-attach-v1/README.md": "cf46e2cc11217d43cbee5dedeec997ac885bf7bec3394a75db12cde9bf51941a",
+    "examples/utility/verification-guest-attach-v1/authored-native-capsule.tar.gz": "91e8089fe2e94895a1d127ae56e95279c7c86700453aed62b104a195c87fa5ae",
+    "examples/utility/verification-guest-attach-v1/capsule-file-pins.json": "3ab36375469ac1797b2025b1fecc8db356d20c9ff70fd8b7c80a98dde0c41ce7",
+    "examples/utility/verification-guest-attach-v1/compatibility.log": "f5fa345b1663758dc0047a65bbdd0414e5c81660216be27e6b5b0d57d97c4dac",
+    "examples/utility/verification-guest-attach-v1/documentation.log": "8c776bb4fa98b32be608b2afe1d90a7255c18c27e43bd48fbb222c8001fe5d78",
+    "examples/utility/verification-guest-attach-v1/expected-replay.json": "f3bb5b952597f9e6f59d9f0dc072362fa9e53f67dc2b163a188a9ace34ee44d5",
+    "examples/utility/verification-guest-attach-v1/final-attach.log": "00485857eb37c86f466a7e18c718a88a5de4e8644dcefaa8b71dd9e48f425016",
+    "examples/utility/verification-guest-attach-v1/final-guest_attach.py.txt": "5054340c2c783ff0eb751a003293050294bd46f8b259578566f47621262c73e7",
+    "examples/utility/verification-guest-attach-v1/final-source-pins.json": "1ad48f83a1e13d217b614bd2b0be95fb60297fc7388be7eb5b4ba154605c57f5",
+    "examples/utility/verification-guest-attach-v1/final-test_utility_guest_attach.py.txt": "261b3a9679b02b72e7081d7048057d282ea4e2c1077867ede8ba991dbbb709cf",
+    "examples/utility/verification-guest-attach-v1/focused.log": "ededc7522e567b58dd6d6baf4b19f9a92b64d1eceef2c14c89d12013c4b513c1",
+    "examples/utility/verification-guest-attach-v1/native-unix-proof.json": "d1e5bed37730f31cf04ed744781b6e89e52fd86eb4f41e5047891fe1c4135da5",
+    "examples/utility/verification-guest-attach-v1/regression-guest_attach.py.txt": "5054340c2c783ff0eb751a003293050294bd46f8b259578566f47621262c73e7",
+    "examples/utility/verification-guest-attach-v1/regression-source-pins.json": "fc2c0fe2a1c97caa2e528a12405433f4c6a37ea325f9f1352198ad6e9629322c",
+    "examples/utility/verification-guest-attach-v1/regression-test_utility_guest_attach.py.txt": "b978f36fcb610bb8a02ae8d96a4a923e9712189412aed84cc848d0f4d4f193a3",
+    "examples/utility/verification-guest-attach-v1/relocated-replay.log": "8884a3fbf61e7fa5b9269180e5bd823f4b3537f9a5f87d09e0600ec6bdd35899",
+    "examples/utility/verification-guest-attach-v1/replay-capsule.py.txt": "536be82d9c9f8cc328af2bb6944ddec0d6f5e38661e5dafe89707a409faf1bd8",
+    "examples/utility/verification-guest-attach-v1/summary.json": "011180d2042befac7fd4281ab67909fde1449b3dcbab3c2cfdd594d92e9e3e70"
+  },
+  "verification": {
+    "focused": "48 passed in 9.52s",
+    "compatibility": "368 passed in 208.37s",
+    "final_attach": "53 passed in 9.28s",
+    "documentation": "19 passed in 0.87s",
+    "cold_relocated_replay": "passed with models, attach, processes, sockets and new clocks denied",
+    "lint": "passed",
+    "explicit_line_length": "passed",
+    "diff_check": "passed"
+  },
+  "limits": [
+    "native Unix IPC on the current host and authored peers, not actual daemon or guest qualification",
+    "connection outcomes and I/O cancellation/timeout do not attest container stop or model failure",
+    "daemon/image identity, durable ownership/start integration, watchdog/cleanup and actual OS/resource/privacy qualification remain open",
+    "no default executor/service or existing scorer allowlist activation",
+    "prepared environment v3 and full default checkpoint retain earlier source scopes",
+    "independent tasks, owner-approved useful gains/tolerances and scientific matrix remain open"
+  ]
+}

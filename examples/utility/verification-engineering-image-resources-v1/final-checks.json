@@ -1,0 +1,11 @@
+{
+  "live_fixed_diagnostics_passed": 8,
+  "documentation_tests_passed": 19,
+  "prior_82_test_code_checkpoint_unchanged": true,
+  "new_full_suite_run": false,
+  "production_policy_namespace_unchanged": true,
+  "owner_and_core_source_unchanged": true,
+  "new_scientific_starts": 0,
+  "private_source_reads": 0,
+  "full_resource_interruption_matrix_complete": false
+}

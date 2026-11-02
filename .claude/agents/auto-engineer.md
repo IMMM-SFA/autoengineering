@@ -36,6 +36,7 @@ Run commands from the repository root with `pixi run autoengineering`.
 | `experiments <autoresearch.jsonl>` | Inspect the experiment tree. |
 | `optimize system.yaml optimization.yaml --workdir <path>` | Run or resume whole-system search. |
 | `campaign` | Run or inspect deterministic local campaigns with supplied trusted adapters. See `docs/campaigns.md`. |
+| `agents` | Run scripted workflows or explicitly configured Codex subscription workers. Native qualification and live authorization are separate. Inspect worker evidence without host access. See `docs/agents.md`. |
 
 Python interfaces and example commands are documented in `docs/workflow.md`, `docs/optimization.md`,
 and `examples/README.md`. Use the existing package rather than rebuilding its loop in agent code.
@@ -94,3 +95,9 @@ or discard evidence to make a method pass. Record durable task progress in proje
 Update persistent agent memory only when the user explicitly requests it.
 
 Research skills adapt feynman.is and alphaXiv's openresearch-cli. Preserve `NOTICE` attribution.
+
+The experimental `utility` CLI validates and prepares comparison records, seals
+selections and verifies offline evidence. Preparation grants no execution authority.
+Use `docs/utility.md` for its current limits. Live suite routes and private
+confirmation remain unfinished; do not report scientific utility from schema or
+integrity checks.

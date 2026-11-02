@@ -1,0 +1,18 @@
+{
+  "actual_run": {
+    "command": "python -m examples.utility.guest_running_cancellation execute outputs/guest-running-cancellation-v1 --expected-digest 8153da1705cf2bdb9d3d5c7faae4d3ab4d62f5f1af4feeb23fa3a7c89ba017e1",
+    "exit_code": 0,
+    "container_creations": 1,
+    "container_starts": 1
+  },
+  "regression": {
+    "command": "python -m pytest tests/test_utility_guest_running_cancellation.py tests/test_utility_guest_running_cancellation_reader.py tests/test_utility_guest_dispatch.py::test_appended_suite_cancellation_is_seen_during_transport tests/test_utility_guest_dispatch.py::test_cancel_after_observed_stop_does_not_credit_transport tests/test_documentation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-running-cancel-final-v1 --junitxml=examples/utility/verification-guest-running-cancellation-v1/final.xml",
+    "exit_code": 0
+  },
+  "cold_archive": {
+    "exit_code": 0,
+    "new_processes_after_initialization": 0,
+    "new_starts": 0,
+    "saved_status": "infrastructure_failure"
+  }
+}

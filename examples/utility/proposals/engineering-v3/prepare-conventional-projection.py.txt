@@ -1,0 +1,44 @@
+from pathlib import Path
+from dataclasses import replace
+import json
+from autoengineering.agents.batch import BatchStore
+from autoengineering.campaign.records import ModelSnapshot
+from autoengineering.campaign.serialization import digest
+from examples.utility import engineering_load as load
+root=Path('examples/utility/proposals/engineering-v3');old=Path('outputs/engineering-v3-conventional-v2')
+request=json.loads((old/'request.json').read_text())
+anchor=json.loads((old/'batch/events/000000000001.json').read_text())['event']['batch_digest']
+store=BatchStore(old/'batch',expected_digest=anchor);state=store.replay()
+assert store.spec.digest==request['batch_spec_digest']
+assert len(state.reservations)==len(state.observations)==10 and not state.pending
+assert all(o.stop_verified for o in state.observations.values())
+failure=json.loads((old/'failure.json').read_text())
+assert failure['counts']['problem_instances']==failure['counts']['cleanups_returned']==1
+proof=store.evidence({'schema':'utility-conventional-profile-projection-failure-v1','status':'known_stopped_failed_profile',
+    'error':'observer rejected the existing internal ground-only adapter model projection','original_native_invocations_charged':10,
+    'original_observations_unchanged':True,'pending_physical_work':0,'cleanup_returned':True,'driver_success_not_inferred':True})
+store.finish_case('conventional','failed',(proof,))
+proposal=json.loads((root/'proposal.json').read_text());model=ModelSnapshot.from_dict(proposal['baseline']['model'])
+projected=replace(model,inputs=tuple(p for p in model.inputs if p.name=='ground_voltage'))
+actual=load.context(.05,Path('outputs/engineering-v3-conventional-v3'),source_root=Path.cwd())
+assert actual.model==model
+assert replace(actual.model,inputs=tuple(p for p in actual.model.inputs if p.name=='ground_voltage'))==projected
+views=sorted((model.digest,projected.digest))
+assert len(set(views))==2 and replace(model,graph_digest='a'*64).digest not in views
+old_recipe=json.loads((root/'conventional-recipe-v2.json').read_text())
+recipe={**old_recipe,'schema':'utility-engineering-v3-conventional-recipe-v3','supersedes_profiling_recipe_digest':digest(old_recipe),
+    'correction':'Accept only the exact full logical model and its declared ground-only adapter projection; observation and physical policies unchanged',
+    'factory_model_digests':views,'maximum_coupled_evaluations':53,'native_helper_maximum_solves_including_corner_check':29,
+    'previous_fully_observed_profile_charges':11,'maximum_cumulative_native_driver_invocations_including_failed_profile':3}
+with (root/'conventional-recipe-v3.json').open('x') as f:json.dump(recipe,f,sort_keys=True,indent=2);f.write('\n')
+s=(root/'profile-conventional-v2.py.txt').read_text()
+s=s.replace('engineering-v3-conventional-v2','engineering-v3-conventional-v3').replace("definition/'conventional-recipe-v2.json'","definition/'conventional-recipe-v3.json'")
+s=s.replace("assert ctx.model.digest==request['model_digest']","assert ctx.model.digest in recipe['factory_model_digests']")
+s=s.replace("ResourceLimits(1,1,0,0,640.,10.,1024,1024),63,(BatchCase('conventional','comparison',digest(recipe),0,63),)","ResourceLimits(1,1,0,0,640.,10.,1024,1024),53,(BatchCase('conventional','comparison',digest(recipe),0,53),)")
+s=s.replace("'maximum_native_model_invocations':63","'maximum_native_model_invocations':53").replace("'native_model_invocations_reserved':63","'native_model_invocations_reserved':53")
+s=s.replace("stats['coupled_evaluation_intents']>=63","stats['coupled_evaluation_intents']>=53").replace("'maximum_native_invocations':63","'maximum_native_invocations':53")
+s=s.replace('max_iterations=20,max_solves=39','max_iterations=20,max_solves=29').replace("==stats['coupled_evaluation_intents']<=63","==stats['coupled_evaluation_intents']<=53")
+with (root/'profile-conventional-v3.py.txt').open('x') as f:f.write(s)
+(root/'projection-preflight.json').write_text(json.dumps({'full_model_digest':model.digest,'ground_only_projection_digest':projected.digest,
+    'both_exact_views_matched':True,'foreign_graph_rejected':True,'new_model_starts':0,'prior_charges':11,'remaining_cap':53},indent=2)+'\n')
+print(json.dumps({'projection_metadata_checked':True,'prior_profiles_terminal_and_charged':11,'remaining_native_invocation_cap':53,'scientific_limits_unchanged':True}))

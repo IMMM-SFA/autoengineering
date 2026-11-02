@@ -1,0 +1,1 @@
+{"schema":"utility-wind-resource-v1","directions_deg":[0,90,180,270],"speeds_m_s":[4,12],"probability":[[0.1,0.15],[0.1,0.15],[0.1,0.15],[0.1,0.15]],"turbulence_intensity":0.1,"annualization_hours":8760}

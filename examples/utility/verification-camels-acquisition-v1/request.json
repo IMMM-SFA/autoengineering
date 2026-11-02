@@ -1,0 +1,23 @@
+{
+  "schema": "utility-camels-acquisition-request-v1",
+  "metadata_url": "https://zenodo.org/api/records/15529996",
+  "archive_name": "basin_timeseries_v1p2_metForcing_obsFlow.zip",
+  "expected_size_bytes": 3406626583,
+  "expected_md5": "8e9a466710e8270b58f01d332a87184f",
+  "metadata_bytes_cap": 2097152,
+  "logical_http_requests_cap": 2,
+  "socket_timeout_seconds": 30,
+  "stream_elapsed_logical_limit_seconds": 900,
+  "maximum_one_read_overrun_seconds": 30,
+  "archive_body_bytes_cap": 3406626583,
+  "automatic_retries": 0,
+  "destination": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/camels-acquisition-v1",
+  "directory_mode": "0700",
+  "file_mode": "0600",
+  "parse_observations": false,
+  "scientific_model_calls": 0,
+  "confirmation_admitted": false,
+  "minimum_free_bytes": 8589934592,
+  "personal_attestation_path": "examples/utility/confirmation-reserve-attestation-v1.json",
+  "producer_sha256": "491b1c6ad29eb639e118ba30a6df5ad8db445d4d40221c29b4518ddc2a240668"
+}

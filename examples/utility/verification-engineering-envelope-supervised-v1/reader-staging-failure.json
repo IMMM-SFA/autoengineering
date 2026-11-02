@@ -1,0 +1,5 @@
+{
+  "first_attempt": "wrong working directory prevented the staging interpreter from starting; reader then refused missing staged request",
+  "model_calls": 0,
+  "retry": "metadata staging and reader only"
+}

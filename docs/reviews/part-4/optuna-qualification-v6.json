@@ -1,0 +1,62 @@
+{
+  "identity": {
+    "schema_version": 1,
+    "framework": "optuna",
+    "framework_version": "4.5.0",
+    "implementation_id": "optuna-qualified-v6",
+    "mode": "policy",
+    "configuration_digest": "14781fd4c131ab785a4fd4b9cb9626a7fd6e743f6c0c72bd91fc6db67644f880",
+    "environment_digest": "b9486dfc6918ddf465302f71692c9f1dedcaa566add8828b1a6e6995fb25b226",
+    "source_digest": "d082168e2344233487c97926e77b225938f86048b51845620e58d45347a27d51",
+    "capabilities": [
+      "serial",
+      "ledger_replay",
+      "committed_attempt_links"
+    ],
+    "seed": 17,
+    "checkpoint_format": "verified-json-ledger-v3"
+  },
+  "receipt": {
+    "schema_version": 1,
+    "integration_digest": "a7eeb86ed7df2ced612e571700542669731da00f0068f7763119196932c594f0",
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "direct_reference": [
+      {
+        "path": "examples/interoperability/evidence/optimizer-comparison-v2/index.json",
+        "sha256": "6d519e052b06b0dfb9c36439f9f32e0ac9a4224aff1a940658d727dbba65f39a",
+        "size_bytes": 382221,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "outputs/part-4-final-integration-tests-v6.log",
+        "sha256": "b3c9d985c91059e896f378c81f4ae24a57bed9ab30177403a9ca20a644f48416",
+        "size_bytes": 3092,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      }
+    ],
+    "tolerance_definition": {
+      "path": "examples/interoperability/optimizer_comparison/protocol.json",
+      "sha256": "f4881b0e91da1c16f4341a599de7b5cadabfa7e2cdce6e339a6d2c3bd0189f0e",
+      "size_bytes": 1136,
+      "media_type": "application/octet-stream",
+      "producer": "part-4-qualification",
+      "metadata": {}
+    },
+    "capability_checks": [
+      "parity_or_translation",
+      "failure_recovery",
+      "installed_execution"
+    ],
+    "limitations": [
+      "disposable in-memory sessions only",
+      "constraints veto externally; no penalty objectives",
+      "development integration, no general superiority",
+      "macOS ARM64 only; Linux runtime unverified"
+    ],
+    "qualification": "verified"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "command": [
+    ".pixi/envs/default/bin/python",
+    "scripts/utility_container_probe.py",
+    "memory-overrun",
+    "--nonce",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ],
+  "observed_returncode": 2,
+  "observed_stdout": {
+    "schema": "utility-container-probe-result-v1",
+    "status": "refused",
+    "qualified": false
+  },
+  "claim": "actual Mac CLI guard refuses before allocation, scoring or stage reads; no Linux enforcement claim"
+}

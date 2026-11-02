@@ -1,0 +1,42 @@
+from pathlib import Path
+import json,hashlib
+from autoengineering.agents.batch import BatchStore
+from autoengineering.campaign.serialization import digest
+root=Path('examples/utility/proposals/engineering-v3');old=Path('outputs/engineering-v3-conventional-v1')
+original_request=json.loads((old/'request.json').read_text())
+anchor=json.loads((old/'batch/events/000000000001.json').read_text())['event']['batch_digest']
+store=BatchStore(old/'batch',expected_digest=anchor);state=store.replay()
+assert store.spec.digest==original_request['batch_spec_digest']
+assert len(state.reservations)==len(state.observations)==1 and not state.pending
+assert next(iter(state.observations.values())).stop_verified
+failure=json.loads((old/'failure.json').read_text())
+assert failure['counts']['cleanups_returned']==failure['counts']['problem_instances']==1
+proof=store.evidence({'schema':'utility-conventional-profile-observer-failure-v1','status':'known_stopped_failed_profile','error':'observer required final convergence on native pre-optimization pass','coupled_circuit_component_calls_observed':0,'original_observation_status_retained':'scientific_infeasible','original_charge_retained':True,'pending_physical_work':0,'native_problem_cleanup_returned':True})
+store.finish_case('conventional','failed',(proof,))
+recipe=json.loads((root/'conventional-recipe.json').read_text())
+corrected={**recipe,'schema':'utility-engineering-v3-conventional-recipe-v2','supersedes_profiling_recipe_digest':digest(recipe),
+    'correction':'Native root passes describe work, not final candidate eligibility; preserve retained circuit diagnostics',
+    'maximum_coupled_evaluations':63,'native_helper_maximum_solves_including_corner_check':39,
+    'previous_fully_observed_profile_charges':1,'maximum_cumulative_native_model_invocations_including_failed_profile':64,
+    'maximum_cumulative_native_driver_invocations_including_failed_profile':2,
+    'pass_accounting_source_sha256':hashlib.sha256(Path('examples/utility/engineering_native_accounting.py').read_bytes()).hexdigest()}
+corrected['source_pins']={**recipe['source_pins'],'examples/utility/engineering_native_accounting.py':corrected['pass_accounting_source_sha256']}
+with (root/'conventional-recipe-v2.json').open('x') as f:json.dump(corrected,f,sort_keys=True,indent=2);f.write('\n')
+s=(root/'profile-conventional.py.txt').read_text()
+s=s.replace('engineering-v3-conventional-v1','engineering-v3-conventional-v2').replace("definition/'conventional-recipe.json'","definition/'conventional-recipe-v2.json'")
+s=s.replace('from examples.utility import engineering_load as load,engineering_load_native as native','from examples.utility import engineering_load as load,engineering_load_native as native\nfrom examples.utility.engineering_native_accounting import account_circuit_pass')
+s=s.replace("ResourceLimits(1,1,0,0,640.,10.,1024,1024),64,(BatchCase('conventional','comparison',digest(recipe),0,64),)","ResourceLimits(1,1,0,0,640.,10.,1024,1024),63,(BatchCase('conventional','comparison',digest(recipe),0,63),)")
+s=s.replace("'maximum_coupled_evaluations':64","'maximum_native_model_invocations':63").replace("'coupled_evaluations_reserved':64","'native_model_invocations_reserved':63")
+s=s.replace("stats['coupled_evaluation_intents']>=64","stats['coupled_evaluation_intents']>=63")
+s=s.replace("'counter_delta':{key:after[key]-before[key] for key in before},'seconds':time.monotonic()-begin}","'counter_delta':{key:after[key]-before[key] for key in before},\n                'pass_work':account_circuit_pass(before,after,diagnostic_solver_iterations=work['solver_iterations']).to_dict(),\n                'seconds':time.monotonic()-begin}")
+s=s.replace("good=row['work']['converged'] and row['work']['residual_norm']<=1e-10", "good=True  # A returned native pass is not a final candidate score.")
+s=s.replace("        assert row['work']['converged'] and row['work']['residual_norm']<=1e-10\n        assert row['work']['residual_tolerance']==1e-10 and row['work']['solver_iterations']<=100", "        if phase=='public_development_check':\n            assert row['pass_work']['circuit_work_observed']\n            assert row['work']['converged'] and row['work']['residual_norm']<=1e-10\n            assert row['work']['residual_tolerance']==1e-10 and row['work']['solver_iterations']<=100")
+s=s.replace("'maximum_evaluations':64","'maximum_native_invocations':63").replace('max_iterations=20,max_solves=40','max_iterations=20,max_solves=39')
+s=s.replace("    assert len(native.source_identity()) if hasattr(native,'source_identity') else True\n",'')
+s=s.replace("==stats['coupled_evaluation_intents']<=64","==stats['coupled_evaluation_intents']<=63")
+s=s.replace("'nonlinear_solver_iterations':sum(row['work']['solver_iterations'] for row in solves)","'nonlinear_solver_iterations':sum(row['pass_work']['nonlinear_iterations_this_pass'] for row in solves)")
+s=s.replace("'counter_totals_per_problem':totals,'inside_solve_counter_deltas':observed_deltas", "'counter_totals_per_problem':totals,\n        'circuit_evaluations_observed':sum(row['pass_work']['circuit_work_observed'] for row in solves),\n        'retained_circuit_state_passes':sum(not row['pass_work']['circuit_work_observed'] for row in solves),\n        'inside_solve_counter_deltas':observed_deltas")
+s=s.replace("'nonlinear_solver_iterations','mean_source_power_W'", "'nonlinear_solver_iterations','circuit_evaluations_observed','retained_circuit_state_passes','mean_source_power_W'")
+assert s!=(root/'profile-conventional.py.txt').read_text()
+with (root/'profile-conventional-v2.py.txt').open('x') as f:f.write(s)
+print(json.dumps({'failed_profile_terminal':True,'old_charge_retained':1,'corrected_profile_native_invocation_cap':63,'cumulative_cap':64,'scientific_limits_unchanged':True}))

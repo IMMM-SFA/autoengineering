@@ -1,0 +1,3 @@
+/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/interoperability/lib/python3.12/site-packages/openmdao/utils/relevance.py:1295: OpenMDAOWarning:The following groups have a nonlinear solver that computes gradients and will be treated as atomic for the purposes of determining which systems are included in the optimization iteration: 
+circuit
+

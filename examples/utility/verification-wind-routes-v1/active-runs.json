@@ -1,0 +1,23 @@
+{
+  "contract_session": 14638,
+  "rehearsal_session": 85031,
+  "status": "completed",
+  "instruction": "No active job remains. Preserve both runtime source versions. Common four-family runtime/rehearsal and independent confirmation remain open.",
+  "reader": "completed",
+  "full_goal": "active",
+  "rehearsal_exit_code": 0,
+  "reader_session": 85666,
+  "reader_exit_code": 0,
+  "contract_exit_code": 0,
+  "inspection_session": 15920,
+  "inspection_exit_code": 0,
+  "inspection_final_session": 21981,
+  "inspection_final_exit_code": 0,
+  "installed_reader_session": 38080,
+  "installed_reader_exit_code": 0,
+  "active_sessions": [],
+  "balanced_route_session": 24871,
+  "balanced_route_exit_code": 0,
+  "documentation_session": 53009,
+  "documentation_exit_code": 0
+}

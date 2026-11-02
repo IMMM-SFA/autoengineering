@@ -28,6 +28,7 @@ _ENTRY_POINT = re.compile(
 _POLICY_OPTIONS = {
     "random": {},
     "sobol": {},
+    "optuna": {"min_initial": 1, "candidate_retry_limit": 1},
     "botorch": {
         "min_initial": 1,
         "num_restarts": 1,

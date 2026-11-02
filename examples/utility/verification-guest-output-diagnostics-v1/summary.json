@@ -1,0 +1,100 @@
+{
+  "scope": "Two separately named fixed output producers on the real cached-image daemon; production attach and bootstrap readers; not model-worker or owner-loss qualification",
+  "request_digest": "01b09fc5ffec9667f45625efa3151adba2817c70176785ff70bd85e553de336a",
+  "actual_execution_exit_code": 0,
+  "completion_digest": "86df910df79fd07d13a243b07235c6aa59fb1344566011f31bc9cf91e26ea3b8",
+  "container_creations": 2,
+  "container_starts": 2,
+  "scientific_starts": 0,
+  "fitting_starts": 0,
+  "scoring_starts": 0,
+  "automatic_retries": 0,
+  "both_original_containers_absent": true,
+  "cases": [
+    {
+      "cleanup_absent": true,
+      "container_creations": 1,
+      "container_id": "c5cb59614028d87b58a271e7080cb2bc20742d501e1b0f4c1e59dd0375dfcb64",
+      "container_starts": 1,
+      "mode": "malformed_stdio",
+      "refusal": {
+        "exception": "StoreError",
+        "message": "guest transport frame version differs",
+        "stderr_bytes_discarded": 0,
+        "stdout_bytes_accepted": 16,
+        "stdout_bytes_declared": 16
+      },
+      "scientific_starts": 0
+    },
+    {
+      "cleanup_absent": true,
+      "container_creations": 1,
+      "container_id": "2c5df1d1acf1770aeaaf55ebcdc6513583a3f80380228994dcca911aa29fbadd",
+      "container_starts": 1,
+      "mode": "oversized_stdout",
+      "refusal": {
+        "exception": "GuestAttachError",
+        "message": "guest attach stdout exceeds bound",
+        "stderr_bytes_discarded": 0,
+        "stdout_bytes_accepted": 68222976,
+        "stdout_bytes_declared": 68255744
+      },
+      "scientific_starts": 0
+    }
+  ],
+  "verification": {
+    "tests": 166,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 28.869,
+    "exit_code": 0,
+    "session_id": 78625
+  },
+  "cold_reader_exit_code": 0,
+  "cold_reader": {
+    "cold_read": true,
+    "cases": 2,
+    "diagnostic_container_starts": 2,
+    "scientific_starts": 0,
+    "models_imported": false,
+    "new_processes": 0,
+    "network": false,
+    "private_input_reads": false,
+    "writes": false
+  },
+  "cold_reader_scope": "explicit checkout module initialization followed by archive-only guarded reads; not installed-wheel qualification",
+  "first_request": "120-second aggregate deadline exceeded 60-second individual transport bound; refused before CREATE, preserved with zero starts; fresh request uses 10-second metadata deadlines",
+  "first_cold_reader": "new example module was not installed; explicit checkout initialization fixes its import; original failed logs preserved",
+  "original_proposal_complete": false,
+  "frozen_image_changed": false,
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "runtime_qualified": false,
+  "owner_loss_cleanup_qualified": false,
+  "independent_confirmation": false,
+  "platform": "Linux amd64 under local ARM64 emulation, not independent x86 hardware",
+  "case_without_any_actual_daemon_evidence": "physical_veto",
+  "remaining_exact_fixed_worker_cases": [
+    "physical_veto",
+    "oversized_stdout",
+    "malformed_stdio"
+  ],
+  "final_reader_tests": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "documentation": {
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "checkpoint_scope": "166-test regression used source-snapshot; final reader adds duplicate-container refusal, covered by 20 final controller/reader tests and final cold replay; source-final preserves current bytes",
+  "full_default_rerun": false,
+  "lint": "passed: ruff check --no-cache src tests examples",
+  "git_diff_check": "passed",
+  "documentation_after_final_edits": 19
+}

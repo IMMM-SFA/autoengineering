@@ -1,0 +1,25 @@
+{
+  "files": {
+    "README.md": {
+      "sha256": "5aeddef20ae3a93ce7e98cab57914b36a6e474f5b145da368d1573bd063e310a",
+      "size_bytes": 948
+    },
+    "source/examples/utility/hydrology_camels_archive.py": {
+      "sha256": "29a1f58801e969e3cae16637ad77707bf480ad159871d6fdc12896b817071213",
+      "size_bytes": 8740
+    },
+    "source/tests/test_utility_hydrology_camels_archive.py": {
+      "sha256": "6fcd7086539fffaf49562245ecd91a24847b63c2b7e1cfedba7821e51adb1077",
+      "size_bytes": 9996
+    },
+    "summary.json": {
+      "sha256": "fa13d1aaef20dd7f1c08975c064580ae4df2cc82667c5a40ea384ee34b28102b",
+      "size_bytes": 1701
+    },
+    "tests.xml": {
+      "sha256": "15b6cfe436b09e4a144f2b3a15b2d1d464e25229f69b354d41b445eea8aa215b",
+      "size_bytes": 15559
+    }
+  },
+  "schema": "utility-camels-archive-file-manifest-v1"
+}

@@ -1,0 +1,50 @@
+{
+  "scope": "real daemon CREATE/START with successful acknowledgments withheld by a producer wrapper; not a network outage",
+  "request_digest": "0004fb866c72e79262027852a87b21e22c5b900afac079e05383da8e6bfa04be",
+  "completion_digest": "1354b94557544a8713f1b06a1500ec657ac25b8a213f80accddd7f6cb5273124",
+  "container_creations": 2,
+  "container_starts": 1,
+  "charged_inference_starts": 1,
+  "model_results_observed": 0,
+  "inference_elapsed_seconds": null,
+  "fitting_starts": 0,
+  "scoring_starts": 0,
+  "control_watchdogs": 1,
+  "original_containers_absent": true,
+  "original_watchdog_pid_absent": true,
+  "retry_daemon_requests": 0,
+  "runtime_qualified": false,
+  "private_confirmation": false,
+  "public_proof": {
+    "sha256": "af40984b2980b6814ac43dc2f40927bf0def7808bbe991cef42a0c45f7f3c4f7",
+    "size_bytes": 1694137,
+    "files": 92,
+    "uncompressed_bytes": 8329131,
+    "contains": "original owner, API and cleanup proof, including known exposed meteorological transfer tars; no private or fitting labels"
+  },
+  "cold_recovery": {
+    "exit_code": 0,
+    "public_archive_extraction_verified": true,
+    "new_starts": 0,
+    "source_and_dependencies_initialized_before_guard": true,
+    "after_guard": "reads only relocated proof paths/inodes; no writes, imports, clocks, array loading, sockets or processes",
+    "separate_suite_root_copied": false,
+    "separate_driver_root_copied": false,
+    "separate_source_root_copied": false,
+    "installed_package_qualification": false
+  },
+  "verification": {
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 37.873,
+    "exit_code": 0,
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "core_sources_unchanged": 224,
+    "declared_wheel_sources_unchanged": 315,
+    "full_default_rerun": false,
+    "documentation_after_edits_passed": 19
+  }
+}

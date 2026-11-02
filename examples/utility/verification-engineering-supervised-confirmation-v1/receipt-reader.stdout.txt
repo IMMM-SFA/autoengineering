@@ -1,0 +1,1 @@
+{"cleanup_confirmed": true, "container_starts": 1, "model_starts": 24, "private_boundary_qualified": false, "source_access_intents": 1, "verified_original_receipt_join": true}

@@ -1,0 +1,81 @@
+"""Cold public composite verification from an extracted wheel, not an installation."""
+import hashlib
+import importlib.abc
+import json
+import os
+from pathlib import Path
+import socket
+import subprocess
+import sys
+
+stage = Path(__file__).resolve().parent
+sys.path.insert(0, str(stage / 'unpacked'))
+
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split('.')[0] in {
+            'examples', 'torch', 'botorch', 'openmdao', 'pvlib', 'py_wake',
+            'topfarm', 'optuna', 'bmipy',
+        }:
+            raise AssertionError('optional or model import attempted')
+
+sys.meta_path.insert(0, NoModels())
+import autoengineering
+assert Path(autoengineering.__file__).is_relative_to(stage / 'unpacked')
+from autoengineering.cli import cli
+from click.testing import CliRunner
+from autoengineering.utility.report import accounting_report
+from autoengineering.utility.confirmation import read_manifest,read_selected_state,TrainedSelectedState
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.costs import join_confirmation_costs
+from autoengineering.utility.scoring import read_receipt
+from autoengineering.utility import composite_scoring, inference_execution
+import numpy
+import scipy.optimize
+
+root = stage / 'public-suite'
+allowed = {p for p in root.rglob('*') if p.is_file()}
+before = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in allowed}
+old_open, old_os_open = Path.open, os.open
+
+def guarded(path, mode='r', *args, **kwargs):
+    if path not in allowed or any(c in mode for c in 'wax+'):
+        raise AssertionError('out-of-scope read or write attempted')
+    return old_open(path, mode, *args, **kwargs)
+
+def guarded_os(path, flags, *args, **kwargs):
+    if Path(path) not in allowed or flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
+        raise AssertionError('out-of-scope read or write attempted')
+    return old_os_open(path, flags, *args, **kwargs)
+
+def forbidden(*args, **kwargs):
+    raise AssertionError('execution, network or array loading attempted')
+
+def audit(event, args):
+    if event in {'subprocess.Popen', 'os.system', 'os.posix_spawn', 'socket.connect', 'socket.bind'}:
+        forbidden()
+
+sys.addaudithook(audit)
+Path.open, os.open = guarded, guarded_os
+numpy.load = scipy.optimize.minimize = scipy.optimize.least_squares = forbidden
+subprocess.Popen = socket.socket = forbidden
+inference_execution.supervise = inference_execution.live_members = forbidden
+store = SuiteStore(root)
+state=store.replay()
+assert state['frozen'] is not None and not state['confirmation_scores']
+manifest=read_manifest(root,state['frozen'])
+bound=read_selected_state(root,manifest.cells[0].selected_state)
+assert isinstance(bound,TrainedSelectedState)
+report=accounting_report(store)
+assert report['evidence_blockers']==[]
+assert sum(r['quantity'] for r in report['receipts'] if r['resource']=='training_starts')==1
+checks=[]
+for command in ('report','verify'):
+ result=CliRunner().invoke(cli,['utility',command,str(root)])
+ if result.exit_code:raise AssertionError((command,result.output,result.exception))
+ document=json.loads(result.output)
+ if command=='verify':
+  assert document['status']=='verified_integrity' and document['complete_cost_evidence'] is False
+ checks.append({'command':command,'exit_code':result.exit_code})
+assert {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in allowed}==before
+print(json.dumps({'result':'extracted learned wheel cold state/cost/report/verify passed','public_files_verified':len(before),'checks':checks,'training_starts_retained':1,'model_imports':0,'array_loads':0,'new_processes':0,'network_calls':0,'original_or_private_scope_reads':0,'public_writes':0},sort_keys=True))

@@ -1,0 +1,6 @@
+{
+  "wheel": "autoengineering-0.2.0-py3-none-any.whl",
+  "sha256": "bd7d2a2344a3146edd2ed7aa2a795b11314bc54dae542cb3cfe90999187623a4",
+  "matched_core_python_files": 194,
+  "dependency_setup": "fresh venv, wheel extraction, cached base dependencies, no editable .pth activation"
+}

@@ -1,0 +1,154 @@
+{
+  "status": "passed",
+  "science_reservations": 2,
+  "observed_stops": 2,
+  "native_driver_status": "converged",
+  "native_callback_work": {
+    "wake": {
+      "attempted": 2,
+      "completed": 2,
+      "failed": 0,
+      "unresolved": 0
+    },
+    "gradient": {
+      "attempted": 1,
+      "completed": 1,
+      "failed": 0,
+      "unresolved": 0
+    }
+  },
+  "fresh_modelled_annual_energy_GWh": 37.06343379120568,
+  "source_files_verified": 188,
+  "native_costs": [
+    {
+      "receipt_id": "wind-cost-54e7bf5ae61547efa9e0ee303c999fbbe521810621591f46",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_process_starts",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-d896a2ba2911bf6ca74bf0c058518c96d68dee2f8a27d339",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_attempted",
+      "units": "count",
+      "quantity": 2.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-bad3310e4f88071f710b6c756a792455898dd8e10e2f6e39",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_completed",
+      "units": "count",
+      "quantity": 2.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-459334f503760d1b38b5d5d727b953e94301b1151a4b1db9",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_failed",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-fe634f802b4f60bd55ad2483a0657588321752bd4d886603",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_unresolved",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-82009064f095441394cc0823eedac717bd0b3059c8880317",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_attempted",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-3488c301cfb92b0236d8ac8c86e885d817cfef41365dc4d1",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_completed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-c43fffd2c15d0db9dfb7f089bd289f22b3600d5e6599d3a7",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_failed",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-d78e08ccd6ae06bb0ebd4dcdbcc5ea55cbee86b9d45c6cb8",
+      "source_digest": "f9fe3c16897dec46c323d56ea1dad4a4c1d50c05d27177a32ce5795443f76008",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_unresolved",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "allocation": [
+        1.0
+      ]
+    }
+  ],
+  "scientific_imports_network_dispatch": "denied",
+  "original_captured_source_access": "denied_after_archive",
+  "confirmation": "not_attempted",
+  "utility_verdict": "not_attempted"
+}

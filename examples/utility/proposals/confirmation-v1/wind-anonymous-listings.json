@@ -1,0 +1,38 @@
+{
+  "retrieved_utc": "2026-10-30T10:37:50.255842+00:00",
+  "access_scope": "anonymous object listings only; no HDF5 or weather observations read",
+  "listings": [
+    {
+      "url": "https://nrel-pds-wtk.s3.us-west-2.amazonaws.com/?list-type=2&prefix=conus%2F&delimiter=%2F&max-keys=50",
+      "prefix": "conus/",
+      "sha256": "5a96a5323ad248caad8f6801f76118e3aae574730567267c7e19b70d980506e0",
+      "truncated": "false",
+      "prefixes": [
+        "conus/conus_5min/",
+        "conus/v1.0.0/",
+        "conus/v1.1.0/"
+      ],
+      "objects": [
+        {
+          "key": "conus/",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "url": "https://nrel-pds-wtk.s3.us-west-2.amazonaws.com/?list-type=2&prefix=conus%2Fv1.1.0%2F&delimiter=%2F&max-keys=50",
+      "prefix": "conus/v1.1.0/",
+      "sha256": "1980c939aa559da6cf07a0bf80e156ea7ae5f3b0ecd9be0bf0a0c7f68d302595",
+      "truncated": "false",
+      "prefixes": [
+        "conus/v1.1.0/2014/"
+      ],
+      "objects": [
+        {
+          "key": "conus/v1.1.0/wtk_conus_2014.h5",
+          "size_bytes": 1536888915822
+        }
+      ]
+    }
+  ]
+}

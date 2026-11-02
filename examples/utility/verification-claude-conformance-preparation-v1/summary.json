@@ -1,0 +1,39 @@
+{
+  "status": "claude_api_preparation_implemented_execution_handlers_missing",
+  "host_source_identity": "90b3c06da3905c4b8782b4db18e93945eacfbe490d51a9f771a5cfd64abcd4d2",
+  "source_files": {
+    "src/autoengineering/agents/conformance.py": "cf9613526c024e458f58c31f73b780ca67f1d355899fd39da5ef25090d7c9522",
+    "src/autoengineering/agents/conformance_protocol.py": "c1da25890066f5418f09c11d840cbbc3afea85588963e168c0d4356a576bf003",
+    "src/autoengineering/agents/conformance_runtime.py": "a1b6054348fb4ff51a44022e9f54d737c73e8701e9aa1653e698a1d10dd80563",
+    "tests/test_agent_claude_conformance.py": "c06c1ad1aae21814cc031076d16d8543e90ff2c06cd381ed70a771dc6b94874c"
+  },
+  "final_conformance_tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "75",
+    "time": "105.629",
+    "timestamp": "2026-10-29T05:58:35.422283-07:00",
+    "hostname": "m5-mbp"
+  },
+  "focused_and_documentation_tests": {
+    "passed": 40,
+    "seconds": 14.02
+  },
+  "initial_restricted_tests": {
+    "passed": 33,
+    "failed": 23,
+    "reason": "loopback and owned-child supervision unavailable"
+  },
+  "prefinal_qualified_tests": {
+    "passed": 56,
+    "seconds": 115.92
+  },
+  "provider_calls": 0,
+  "real_credentials_opened": false,
+  "runtime_created_by_claude_preparation": false,
+  "claude_execution_handlers": [],
+  "scope": "authored qualification and public synthetic inputs only; actual Claude qualification and live execution remain open",
+  "full_default_bayes_installed_or_scientific_matrix_rerun": false
+}

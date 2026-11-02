@@ -1,0 +1,15 @@
+{
+  "url": "https://zenodo.org/api/records/15529996",
+  "max_body_bytes": 2097152,
+  "started_utc": "2026-11-01T21:56:25.423012+00:00",
+  "automatic_retries": false,
+  "status": "complete",
+  "http_status": 200,
+  "final_url": "https://zenodo.org/api/records/15529996",
+  "body_bytes": 14840,
+  "sha256": "3b7f0d003a2c212afeefc6b7384e8ae0ae42582ed105b58e91239dbc7363be75",
+  "content_type": "application/json",
+  "elapsed_seconds": 0.7921996251679957,
+  "total_network_bytes": null,
+  "total_http_exchanges": null
+}

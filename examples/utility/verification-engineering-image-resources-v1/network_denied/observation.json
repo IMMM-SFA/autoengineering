@@ -1,0 +1,15 @@
+{
+  "schema": "utility-guest-resource-observation-v1",
+  "mode": "network_denied",
+  "nonce": "6871e6c05ef74536b0da9c64e038d7d7",
+  "container_id": "b93088affc677a754f52226f909231d4f7d9b1479544526717b9ebde34bc94db",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "configuration_digest": "919cb2f4be34e01cb865a981e81417799a096dea3fe9bae21c14d5a62b6457e0",
+  "output_sha256": "19b6b0a98b5bb21aaa513f3492b58805bf2c4e2a4dadbf58d4bf03687715736f",
+  "result": {
+    "attempts": 1,
+    "errno": "ENETUNREACH"
+  },
+  "runtime_qualified": false,
+  "owner_loss_qualified": false
+}

@@ -1,0 +1,44 @@
+{
+  "created_utc": "2026-10-30T14:26:11.740864+00:00",
+  "current_core_python_files": 205,
+  "files": {
+    "docs/campaigns.md": "81d735e98cde565c86d11d96c1697f63f68f2b1c799a92d8b4db6fcd701bb75d",
+    "docs/reviews/part-5-completion-audit.md": "c54c40d556a86d85bb521afc8232f8e8dcd3748c1fa1a63bae4ceb4821334908",
+    "docs/reviews/part-5-progress.md": "f6bd7ccc9765246ada29e62da11ebef7cd7ea605b61862d67dfa28b95235d5a7",
+    "docs/reviews/part-5-readiness.md": "779fc5a965645323a1bb16c5e0731298de82061cc3675e2dc679869c0204369e",
+    "docs/utility-handoff.md": "522e40f66927e810058b622d58ed035ae87398f36cdf116a3b899ddbca9a61fa",
+    "docs/utility.md": "992b2ad3fd0e4ddb63e7e90a3e5ab6654d1148085fa48fbb8176a97c1b526975",
+    "examples/utility/README.md": "ab385b0f1012cff114c9cf4e42086c4455187c1869fe7604f8627814cf49d508",
+    "examples/utility/hydrology_learned.py": "3c2c0f3e71154eabd16b693b63be48ef1d45c7443b681e1a5241ec573a5e212f",
+    "examples/utility/hydrology_runtime.py": "77e1253bc76a3b75ea1b68f47bc46a13b16abc8944fc5eb69c78cad467c3e539",
+    "examples/utility/verification-routing-runtime-v1/documentation.log": "1dca912e707a4c7190ae97c9d692ce3cfa514493e03bfe5ef2a6ddd5ee303604",
+    "examples/utility/verification-routing-runtime-v1/final-provenance-and-docs.log": "6829b5445be0c9aab97bf84c6ec5e33d14d140eee72251603f45441b154d6b1a",
+    "examples/utility/verification-routing-runtime-v1/initial-frozen-scratch-failure.log": "eaacd02a5beca279593829dcc0957fcbed237618281dc21bfa1d415ccb49df2b",
+    "examples/utility/verification-routing-runtime-v1/initial-source-location-failures.log": "30b9b9ff99402b3eaa4a899c092eda2d16d5f8aac0354ac25a2d90669fc9dbc0",
+    "examples/utility/verification-routing-runtime-v1/routing-artifacts-grants.log": "30ac5779b5d8f40b5727039e8baaaf9d510d394424b56fe71966e507d007d840",
+    "examples/utility/verification-routing-runtime-v1/runtime-controller-recovery.log": "f970deca93b959be9db5ee17ab8097195b7c356ec579884c0e5fb1a87faa7483",
+    "src/autoengineering/campaign/identity.py": "7754f1c0948022eb63ab246922a5946497676b3d866ae1cbdb0e0b0da504bcae",
+    "src/autoengineering/campaign/model_worker.py": "01a9f760b95d6d53dc78ae0d71be2d17958f739ea04da009305c9a06f673d982",
+    "src/autoengineering/campaign/runtime.py": "05cfce8b47b5e6ac2e4cc595c238c1ed686a94469b0f5cae3da692c5458be9fb",
+    "tests/test_utility_campaign_training_costs.py": "5d1302ef81b66551174b3db67e46dddc35b4ef581ec9bf1aff95807fe0a659e5",
+    "tests/test_utility_hydrology_runtime.py": "6834862ede195fb64850ae79528f90e7007a5ea5490898536a30a21b5ba6420a"
+  },
+  "limits": [
+    "local authored source-checkout coverage only",
+    "private scoring, trained route writers and failed/interrupted training capture remain open",
+    "full default checkpoint predates this increment",
+    "no independent basin, installed package, optional environment, second host or platform qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-fitting-grants.json",
+  "predecessor_sha256": "0571bd24c8571240214be855a7e88e202a0849a33ed81410ac0d0140175d44aa",
+  "schema": "utility-source-increment-v1",
+  "scope": "fixed local learned routing registration and verified frozen inference",
+  "verification": {
+    "diff_check": "passed",
+    "final_provenance_and_documentation": "24 passed in 16.53s",
+    "final_runtime_controller_recovery": "58 passed in 99.35s",
+    "lint": "passed",
+    "post_test_line_wrap": "AST-equivalent worker condition",
+    "routing_artifacts_grants": "59 passed in 47.69s"
+  }
+}

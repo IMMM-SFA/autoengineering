@@ -1,0 +1,15 @@
+{
+  "wheel_sha256": "63d461f01f1436d8338e18f0e962df27b356cd6d45c2150f8b4c1684efb2caac",
+  "python_files": 226,
+  "example_python_files": 0,
+  "copied_inputs": 238,
+  "all_package_payloads_match_inputs": true,
+  "installed_payloads_match_wheel": true,
+  "build_exit_code": 0,
+  "install_exit_code": 0,
+  "target": "/private/tmp/utility-container-load-report-v1/installed",
+  "public_scope": "/private/tmp/utility-container-load-report-v1/public",
+  "network_or_dependency_installation": false,
+  "inherited_native_dependencies": true,
+  "release_or_linux_qualification": false
+}

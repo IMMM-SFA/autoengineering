@@ -1,0 +1,35 @@
+{
+  "schema": "utility-wind-source-metadata-probe-v1",
+  "pin": {
+    "schema": "utility-wind-development-object-v1",
+    "year": 2007,
+    "size_bytes": 1536888915822,
+    "etag": "\"642e2ced44694de1e6bc3a8a07fa3b4d-5726\""
+  },
+  "limits": {
+    "requests": 64,
+    "response_bytes": 5242880,
+    "block_bytes": 65536,
+    "cached_blocks": 16,
+    "max_read_bytes": 1048576,
+    "elapsed_seconds": 60.0
+  },
+  "reader_sha256": "916d4dd51711976a7217d607c19cdd614a68251398c0af3c5c54edfd77f16309",
+  "probe_sha256": "f8cbac143dade091a6c330d98549d176a6a0237e858c2215e1ab11f9beb90f3e",
+  "dataset_names": [
+    "windspeed_80m",
+    "winddirection_80m",
+    "coordinates",
+    "meta",
+    "time_index"
+  ],
+  "dataset_values_allowed": false,
+  "reserved_objects_allowed": false,
+  "deadline_mode": "application checks plus socket-operation timeout; not OS-enforced",
+  "environment": {
+    "python": "3.12.16",
+    "h5py": "3.16.0",
+    "hdf5": "2.0.0",
+    "numpy": "2.5.4"
+  }
+}

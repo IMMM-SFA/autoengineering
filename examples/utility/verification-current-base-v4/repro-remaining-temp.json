@@ -1,0 +1,22 @@
+{
+  "basetemp": "/private/tmp/autoengineering-v4-repro-remaining-6qjwugqj/pytest",
+  "argv": [
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_agent_preparation_cli.py::test_missing_qualification_leaves_pending_state_and_reports_required_input",
+    "tests/test_agent_preparation_cli.py::test_unresolved_owned_stop_remains_pending_and_keeps_its_allowance",
+    "tests/test_agent_preparation_cli.py::test_source_recovery_does_not_require_original_scientific_source_availability",
+    "tests/test_agent_single_agent.py::test_repair_exhaustion_persists_across_reopen",
+    "tests/test_agent_single_agent.py::test_existing_cli_selects_single_route_and_replay_starts_no_work",
+    "tests/test_agent_single_agent.py::test_saved_single_handoff_ack_recovers_without_duplicate_host_or_science[reconciliation_required]",
+    "tests/test_agent_single_agent.py::test_saved_single_handoff_ack_recovers_without_duplicate_host_or_science[completed]",
+    "tests/test_agent_single_agent.py::test_single_source_workspace_and_past_grants_do_not_become_capabilities",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/private/tmp/autoengineering-v4-repro-remaining-6qjwugqj/pytest",
+    "--junitxml=/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-current-base-v4/repro-remaining.xml"
+  ],
+  "cases": 8
+}

@@ -1,0 +1,7 @@
+{
+  "native-v2": {
+    "index_sha256": "a74eb4eec2aad59f0ea17a55a727cdf94d469d3bfbdebec1c3d3e995dde9ab4c",
+    "regular_files": 45,
+    "scope": "byte archive only; old policy-specific inspect function does not support this composition format"
+  }
+}

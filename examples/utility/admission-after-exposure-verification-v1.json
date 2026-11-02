@@ -1,0 +1,21 @@
+{
+  "schema": "utility-personal-exposure-metadata-verification-v1",
+  "attestation": {
+    "path": "examples/utility/confirmation-reserve-attestation-v1.json",
+    "sha256": "55e84e2cac4280c73f66373d6689ebfe6f7849ca096b3ed40c6b4a184e872c9d"
+  },
+  "review": {
+    "path": "examples/utility/admission-review-after-exposure-v1.json",
+    "sha256": "812d14b6dfb37a6acbe81bc34c4032e8581ffc47f43c5a8ad25987f237eeac78"
+  },
+  "personal_history_reply": "None of these reserves",
+  "named_reserves": [
+    "CAMELS 01491000 streamflow 2005-2014",
+    "PVDAQ 2107 AC 2022",
+    "WIND Toolkit near (-70.5, 41.5) weather 2012-2014"
+  ],
+  "original_task_dossiers_and_proposal_unchanged": true,
+  "reserved_source_reads": 0,
+  "task_admission": false,
+  "documentation_tests_passed": 19
+}

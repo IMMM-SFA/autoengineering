@@ -1,0 +1,218 @@
+[
+  {
+    "index": 0,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 1,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 18,
+      "component_calls": 293,
+      "derivative_calls": 90
+    }
+  },
+  {
+    "index": 2,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 16,
+      "component_calls": 261,
+      "derivative_calls": 80
+    }
+  },
+  {
+    "index": 3,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 15,
+      "component_calls": 245,
+      "derivative_calls": 75
+    }
+  },
+  {
+    "index": 4,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 5,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 6,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 15,
+      "component_calls": 245,
+      "derivative_calls": 75
+    }
+  },
+  {
+    "index": 7,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 16,
+      "component_calls": 261,
+      "derivative_calls": 80
+    }
+  },
+  {
+    "index": 8,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 18,
+      "component_calls": 293,
+      "derivative_calls": 90
+    }
+  },
+  {
+    "index": 9,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 16,
+      "component_calls": 261,
+      "derivative_calls": 80
+    }
+  },
+  {
+    "index": 10,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 11,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 12,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 13,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 14,
+      "component_calls": 229,
+      "derivative_calls": 70
+    }
+  },
+  {
+    "index": 14,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 15,
+      "component_calls": 245,
+      "derivative_calls": 75
+    }
+  },
+  {
+    "index": 15,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 16,
+      "component_calls": 261,
+      "derivative_calls": 80
+    }
+  },
+  {
+    "index": 16,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 15,
+      "component_calls": 245,
+      "derivative_calls": 75
+    }
+  },
+  {
+    "index": 17,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  },
+  {
+    "index": 18,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 18,
+      "component_calls": 293,
+      "derivative_calls": 90
+    }
+  },
+  {
+    "index": 19,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 15,
+      "component_calls": 245,
+      "derivative_calls": 75
+    }
+  },
+  {
+    "index": 20,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 16,
+      "component_calls": 261,
+      "derivative_calls": 80
+    }
+  },
+  {
+    "index": 21,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 18,
+      "component_calls": 293,
+      "derivative_calls": 90
+    }
+  },
+  {
+    "index": 22,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 18,
+      "component_calls": 293,
+      "derivative_calls": 90
+    }
+  },
+  {
+    "index": 23,
+    "required_checks_passed": true,
+    "work": {
+      "solver_iterations": 17,
+      "component_calls": 277,
+      "derivative_calls": 85
+    }
+  }
+]

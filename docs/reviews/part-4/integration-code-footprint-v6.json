@@ -1,0 +1,35 @@
+{
+  "scope": "Inspected implementation files, including comments and docstrings. This is code size, not engineering time or removed caller code. Shared core changes and tests are additional.",
+  "files": {
+    "examples/local_models/bmi_chain.py": {
+      "bytes": 6435,
+      "nonblank_lines": 135,
+      "sha256": "50608d4026ae4a90764690488316157eb89eff302d035c2dbc92a88f205f32b4"
+    },
+    "src/autoengineering/adapters/bmi.py": {
+      "bytes": 7041,
+      "nonblank_lines": 137,
+      "sha256": "5d6e8ed44c578229338b6a3e04f722ff267ac9f65a684d673de3acd5a2566087"
+    },
+    "src/autoengineering/adapters/openmdao.py": {
+      "bytes": 7268,
+      "nonblank_lines": 143,
+      "sha256": "55f6f96bb45076a9eb69daf3b1161c95ecfc24357f6439e5324a4e872fcfb6c9"
+    },
+    "examples/interoperability/optimizer_comparison/optuna_replay.py": {
+      "bytes": 2645,
+      "nonblank_lines": 52,
+      "sha256": "8edf6bacc0b87006e4697caf8bdae55d67af62d9b1bd933e57e38e6714e7544d"
+    },
+    "examples/interoperability/optimizer_comparison/ax_replay.py": {
+      "bytes": 3646,
+      "nonblank_lines": 66,
+      "sha256": "0597dfed9213377f245bf15345c0c4cb700bab8c8c87b15bdca1be0c067eeb83"
+    },
+    "src/autoengineering/optimization/optuna_backend.py": {
+      "bytes": 13963,
+      "nonblank_lines": 244,
+      "sha256": "d0eabcad127aba98e656608cf05a4572e3132f37cbe00aff880e9b0eb069e0bd"
+    }
+  }
+}

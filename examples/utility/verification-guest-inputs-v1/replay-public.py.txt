@@ -1,0 +1,32 @@
+"""Replay authored owner/package records only; no actual guest qualification."""
+import json
+from pathlib import Path
+import socket
+import subprocess
+import tarfile
+import tempfile
+import time
+
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+from autoengineering.utility.guest_inputs import verify_guest_inputs
+
+bundle = Path(__file__).parent
+expected = json.loads((bundle / 'expected-replay.json').read_text())
+with tempfile.TemporaryDirectory() as directory:
+    destination = Path(directory).resolve()
+    with tarfile.open(bundle / 'authored-owner-inputs.tar.gz') as archive:
+        archive.extractall(destination, filter='data')
+    root = destination / 'owner'
+    for path in [root, *root.rglob('*')]:
+        path.chmod(0o700 if path.is_dir() else 0o600)
+    def forbidden(*args, **kwargs):
+        raise AssertionError('replay cannot execute, connect or sample a new clock')
+    subprocess.Popen = socket.socket = time.monotonic = forbidden
+    owner = GuestOwnerJournal(root)
+    m = owner.manifest
+    package = verify_guest_inputs(root, m.job, m.launch, m.claim)
+    assert package.digest == expected['package_digest']
+    assert owner.replay().input_package_digest == package.digest
+    assert m.digest == expected['owner_digest']
+    assert [r.to_dict() for r in owner.projections()] == expected['projections']
+    print('Relocated authored input package and original start binding agree.')

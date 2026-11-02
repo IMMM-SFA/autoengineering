@@ -1,0 +1,40 @@
+"""Prospective-name controls; no packet, START or source operation exists here."""
+from pathlib import Path
+import json,os,sys,time
+from autoengineering.campaign.serialization import canonical_json,digest
+from autoengineering.campaign.store import durable_write
+from autoengineering.utility.guest_daemon import GuestDaemonAPI
+from examples.utility import engineering_container_runtime as owner
+from examples.utility.engineering_container_watchdog import CoupledWatchdog,cleanup_lock
+
+root=Path(sys.argv[1]);q=json.loads((root/'request.json').read_bytes())
+api=GuestDaemonAPI(q['endpoint'],api_version=q['api_version'],server_digest=q['server_digest'])
+begin=time.monotonic();active=begin+(3 if q['mode']=='intent_only' else 50);deadline=active+10
+def save(name,value):durable_write(root/name,canonical_json(value).encode())
+assert digest(api._json('GET','/version',deadline=active))==q['server_digest']
+owner.verify_image(api._json('GET','/images/'+owner.IMAGE+'/json',deadline=active))
+watchdog=CoupledWatchdog(root,api,config=q['configuration'],cid=None,name=q['name'],active_deadline=active,deadline=deadline)
+ready=watchdog.ready();assert ready['container_id'] is None
+cid=None;creates=0
+if q['mode']!='before_create':
+    save('create-intent.json',{'name':q['name'],'configuration_digest':digest(q['configuration'])})
+if q['mode'] in ('created_unbound','normal_binding'):
+    created=api._json('POST','/containers/create?name='+q['name'],q['configuration'],expected=201,deadline=active)
+    cid=created['Id'];creates=1
+    if q['mode']=='normal_binding':
+        save('created.json',created)
+        watchdog.bind(cid)
+        with cleanup_lock(root,deadline):
+            def unused_name():raise RuntimeError('original CID already acknowledged')
+            cleanup=owner.CoupledContainerRuntime._cleanup_owned(api,cid,True,unused_name,q['configuration'],q['name'],deadline,save)
+        assert cleanup['absent'] is True
+        outcome=watchdog.finish()
+        assert outcome['reason']=='owner_done' and outcome['delete_intended'] is False
+        save('owner-complete.json',{'owner_pid':os.getpid(),'watchdog_pid':ready['watchdog_pid'],
+            'container_id':cid,'creates_observed':creates,'normal_binding_and_disarm':True})
+        raise SystemExit(0)
+save('owner-boundary.json',{'owner_pid':os.getpid(),'watchdog_pid':ready['watchdog_pid'],
+    'container_id':cid,'creates_observed':creates,'mode':q['mode'],'binding_published':False})
+while True:
+    watchdog.check_alive()
+    time.sleep(.1)

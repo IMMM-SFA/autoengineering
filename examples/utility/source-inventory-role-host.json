@@ -1,0 +1,20 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "role-host-permissions-partial",
+  "files": {
+    "src/autoengineering/utility/role_host.py": "db2f486cfc934b9f47f8543940df8cf2a8e42ee08b72255468b9b772b14c74eb",
+    "src/autoengineering/utility/store.py": "9b784b1827f695b6bd716e7e2698547b81506a5a71042b44522314a210576070",
+    "src/autoengineering/utility/report.py": "48a60d12de2ddf6d1b6599dc8d8970236f23b6ae65e4596c9fb209bcb455fd5a",
+    "tests/test_utility_role_host.py": "d789e3ec6c3c00dbf5cef13bbbee566118164fcc327655bd750ca4c31707cadc"
+  },
+  "checks": {
+    "role_store_routes_barrier_scheduler": "38 passed in 2.46s",
+    "final_role_host_cli": "7 passed in 1.87s",
+    "ruff": "repository-wide pass"
+  },
+  "limits": [
+    "Serial writer only",
+    "Delegate owns physical host boundary",
+    "No actual host or mechanical ablation qualification"
+  ]
+}

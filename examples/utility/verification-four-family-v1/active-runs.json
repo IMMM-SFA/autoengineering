@@ -1,0 +1,30 @@
+{
+  "rehearsal_session": 2696,
+  "rehearsal": "completed",
+  "runtime_contracts_session": 80089,
+  "runtime_contracts_exit_code": 1,
+  "runtime_contracts": "70 passed, one stale extras assertion; updated documentation passed 19",
+  "source_checkpoint": "runtime-source.json",
+  "instruction": "No active process remains. Preserve source snapshots and evidence. Full goal remains active.",
+  "full_goal": "active",
+  "last_observed_finished": {
+    "leaf": 7,
+    "solar": 7
+  },
+  "installed_wind_science": "passed two stopped processes and fresh completed-case verification",
+  "verifier_pid": 83317,
+  "verifier_last_sample": {
+    "cpu_percent": 96.7,
+    "state": "R",
+    "elapsed": "00:05:18"
+  },
+  "reader": "completed",
+  "reader_session": 53173,
+  "rehearsal_exit_code": 0,
+  "status": "completed",
+  "installed_baseline_session": 83958,
+  "installed_baseline_exit_code": 0,
+  "active_sessions": [],
+  "checked_at_utc": "2026-10-29T02:15:55.378494+00:00",
+  "reader_exit_code": 0
+}

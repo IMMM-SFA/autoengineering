@@ -1,0 +1,15 @@
+{
+  "schema": "utility-guest-resource-observation-v1",
+  "mode": "memory_limit",
+  "nonce": "83ce617df44c49d3aa369fac524bb29a",
+  "container_id": "d15b14cd7f9e445c7b926fd47b93ab89c18958b16b31bf473d440577dcd1d49b",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "configuration_digest": "7e532ff0ed82338c32f60375f81c2919be1af76cf3a144d8d4c841ddee44fc2c",
+  "output_sha256": "4fdb8c175000e58b55e648791d7b693af710e05b4e8180851e78d4fdca78ae07",
+  "result": {
+    "oom_killed": true,
+    "exit_code": 137
+  },
+  "runtime_qualified": false,
+  "owner_loss_qualified": false
+}

@@ -1,0 +1,34 @@
+{
+  "status": "public_confirmation_callback_costs_exported_physical_starts_unknown",
+  "host_source_identity": "488b50a9b8eb383f988e1912fbd8e1cab341a32a2ccd2942deffb421ee77536a",
+  "source_files": {
+    "src/autoengineering/utility/scoring.py": "356917120fcbd12b1358408601b857c6c5ae53946fbd810c6e19e76e60562695",
+    "src/autoengineering/utility/costs.py": "045cbee5262e587d80c7e3843bd6cf6ecbd3c649eea5d508b0b777e8e256facd",
+    "src/autoengineering/utility/report.py": "08cea4f09dc64080d0b3dd4fe7615a76c383608ed34be3497a24a778db6277b3",
+    "tests/test_utility_confirmation_costs.py": "9e3b9eb662959381a5aad1066a8bb0cdeafaa0c50cb45e9b6434e3342683d3e0"
+  },
+  "utility_and_documentation_tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "26",
+    "tests": "423",
+    "time": "503.360",
+    "timestamp": "2026-10-29T07:10:54.299019-07:00",
+    "hostname": "m5-mbp"
+  },
+  "callback_measurement_schema": "utility-confirmation-callback-measurement-v1",
+  "legacy_receipt_shape_preserved": true,
+  "pending_confirmation_state": "reconciliation_required",
+  "installed_wheel": {
+    "path": "autoengineering-0.2.0-py3-none-any.whl",
+    "sha256": "4d9aacc364b33cf538f670a219dcd41f6bc38bc0c3143a4b5d47c2f761907222",
+    "matched_python_files": 192
+  },
+  "installed_reader": "ten files reconstructed byte for byte; original checkout opens, subprocesses and sockets denied with tested controls; optional models absent; cached base dependencies",
+  "actual_provider_calls": 0,
+  "independent_confirmation_accesses": 0,
+  "scope": "authored callbacks and public synthetic fixture only",
+  "complete_cost_evidence": false,
+  "full_default_bayes_or_scientific_matrix_rerun": false
+}

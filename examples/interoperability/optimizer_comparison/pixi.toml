@@ -1,0 +1,18 @@
+[workspace]
+name = "interoperability-prototypes"
+version = "0.1.0"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[dependencies]
+python = "3.12.*"
+pip = "*"
+
+[pypi-dependencies]
+optuna = "==4.5.0"
+ax-platform = "==1.1.2"
+openmdao = "==3.41.0"
+bmipy = "==2.0.1"
+pvlib = "==0.15.2"
+autoengineering = {path = "../../..", editable = true}
+pytest = ">=7"

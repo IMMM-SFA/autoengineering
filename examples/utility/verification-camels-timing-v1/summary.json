@@ -1,0 +1,61 @@
+{
+  "authored_hydrology_lifecycle_exercised": true,
+  "basin_hydrographs_inspected": false,
+  "causal_physical_interval_resolved": false,
+  "core_wheel_input_pins_unchanged": 239,
+  "four_dossiers_and_proposal": "original pins unchanged",
+  "full_default_suite": "not rerun for example parser repair",
+  "legacy_calendar_processing_authenticated": false,
+  "lint": "passed",
+  "old_evidence": "source snapshots retained; historical results not rewritten",
+  "paper_inspected": "pdftotext extracted PDF pages 2-5; aggregate basin statistics and captions included",
+  "primary_time_series_members_opened": 0,
+  "prior_personal_exposure": "unknown",
+  "prior_web_pdf_fetch": "timed_out",
+  "saved_final_response_body_bytes": 4582708,
+  "schema": "utility-camels-timing-nodata-review-v1",
+  "source_pins": {
+    "docs/reviews/part-5-camels-timing-review.md": {
+      "sha256": "52b421e8b5a5be86533d0b77531fa3315c1c8cdddb00ef83c0628545263f1880",
+      "size_bytes": 2443
+    },
+    "docs/utility.md": {
+      "sha256": "97c0ef3673d1184b6fa707adffccc0c4c04024d60a354a2cce9b8d64d7bc6e68",
+      "size_bytes": 207892
+    },
+    "examples/utility/hydrology_camels.py": {
+      "sha256": "2303c2fa30436cef6214f52d4a78f4e8eb790b377ac0039bf0eea5ba33ca3df3",
+      "size_bytes": 8007
+    },
+    "tests/test_utility_hydrology_camels.py": {
+      "sha256": "6c75a06f86c6072dcf7343713ab261100d6335678793bb62da87573839ea424c",
+      "size_bytes": 15018
+    }
+  },
+  "standalone_scientific_runs": 0,
+  "status": "missing_driver_rejection_fixed_timing_unadmitted",
+  "successful_bounded_shell_fetches": 3,
+  "task_admitted": false,
+  "test_counts": {
+    "documentation-tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 19
+    },
+    "tests-before.xml": {
+      "errors": 0,
+      "failures": 4,
+      "skipped": 0,
+      "tests": 4
+    },
+    "tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 103
+    }
+  },
+  "total_http_exchanges": null,
+  "total_network_bytes": null
+}

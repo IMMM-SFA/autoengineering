@@ -1,0 +1,45 @@
+"""Prepare an installed execution script without starting science."""
+from pathlib import Path
+import hashlib,json
+root=Path.cwd();out=root/'examples/utility/verification-engineering-robust-installed-v1';base=Path('/private/tmp/utility-robust-installed-v1')
+s=(root/'examples/utility/verification-engineering-load-installed-v1/installed-execution.source.txt').read_text()
+s=s.replace('import json\n','import json\nimport importlib.resources, math, platform\n',1)
+s=s.replace('import examples.utility.engineering_load_native as native','import examples.utility.engineering_load_robust_native as native')
+a=s.index('cases = (');b=s.index('entry = ',a)
+s=s[:a]+'''fixture=json.loads(importlib.resources.files('examples.utility').joinpath('fixtures/engineering_robust_cases.json').read_text())
+assert len(fixture['cases'])==24
+cases=tuple(EngineeringScenario.from_dict(v) for v in fixture['cases'])
+'''+s[b:]
+s=s.replace('rules(.62,.001)','rules(.66,.001)').replace('rules(.62, .001)','rules(.66, .001)')
+s=s.replace('"examples.utility.engineering_load_native:execute"','"examples.utility.engineering_load_robust_native:execute"')
+s=s.replace('180., 15.','600., 15.').replace('    3, (BatchCase("loads", "comparison", study.digest, 0, 3),))','    25, (BatchCase("loads", "comparison", study.digest, 0, 25),))')
+start=s.index('batch = BatchStore.create')
+s=s[:start]+'''request={'scope':'one installed native robust design and 24 fresh scientific checks on exposed authored cases','specification':spec.to_dict(),'batch':batch_spec.to_dict(),'wheel_sha256':c['wheel_sha256'],'max_native_processes':1,'max_scenario_processes':24,'max_inner_native_solves':40,'new_fitting_starts':0,'automatic_retries':0,'reference_current_A':.022793262535515797,'reference_mean_power_W':.05198172873029417,'parity_atol':1e-12,'parity_rtol':1e-12,'site_guard_sha256':hashlib.sha256((Path(c['installed'])/'sitecustomize.py').read_bytes()).hexdigest(),'independent_confirmation':False}
+(base/'execution-request.json').write_text(json.dumps(request,indent=2)+'\\n')
+try: (Path(c['original_checkout'])/'pyproject.toml').read_bytes()
+except RuntimeError: pass
+else: raise AssertionError('original checkout content read was allowed')
+'''+s[start:]
+s=s.replace('import json\n','import json\nimport hashlib\n',1)
+start=s.index('action = EvaluationAction(');end=s.index('verify_native_report',start)
+s=s[:start]+'''driver = SupervisedNativeDriver(spec, runner)
+report = driver.run()
+assert report.status == "success"
+action = EvaluationAction("installed-native-candidate", report.result.configuration, "system", None, seed=17)
+value = runner(action)
+assert value.evaluation.eligible and len(value.scenarios) == 24
+assert math.isclose(report.result.configuration['source_current'],request['reference_current_A'],abs_tol=1e-12,rel_tol=1e-12)
+assert math.isclose(value.evaluation.metrics['source_power'],request['reference_mean_power_W'],abs_tol=1e-12,rel_tol=1e-12)
+'''+s[end:]
+s=s.replace('len(state.reservations) == 3','len(state.reservations) == 25').replace('len(batch.replay().reservations) == 3','len(batch.replay().reservations) == 25')
+s=s.replace('archive = Path(c["archive"])','archive = base / "execution-proof"\narchive.mkdir(mode=0o700)')
+s=s.replace('fixed-result.json','scientific-evaluation.json').replace('"fixed_scenario_processes": 2','"fresh_scenario_processes": 24').replace('"original_reservations": 3','"original_reservations": 25')
+s=s.replace('"inherited_dependencies": "interoperability",','''"inherited_dependencies": "interoperability", "configuration": dict(report.result.configuration),
+    "mean_source_power_W": value.evaluation.metrics['source_power'], "native_inner_solves": len(report.result.solves),
+    "original_checkout_content_denied": True, "site_guard_in_parent_and_child_interpreter": True,
+    "domain_code_staged_from_verified_wheel": True, "host_system": platform.system(),
+    "host_architecture": platform.machine(), "python": platform.python_version(),
+    "host_invocations": 0, "independent_confirmation": False,''')
+(out/'execute.py.txt').write_text(s)
+(base/'execute.py').write_text(s)
+print('Prepared installed outside-checkout execution; no scientific process started.')

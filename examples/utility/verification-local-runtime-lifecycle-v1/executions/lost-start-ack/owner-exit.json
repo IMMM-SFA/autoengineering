@@ -1,0 +1,7 @@
+{
+  "fault": "lost-start-ack",
+  "owner_pid": 37936,
+  "returncode": 2,
+  "expected_returncode": 2,
+  "output": "/private/tmp/utility-runtime-lifecycle-lost-start-ack-v1"
+}

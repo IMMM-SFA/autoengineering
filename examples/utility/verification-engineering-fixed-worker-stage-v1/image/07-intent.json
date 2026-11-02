@@ -1,0 +1,33 @@
+{
+  "command": [
+    "buildx",
+    "build",
+    "--builder",
+    "default",
+    "--load",
+    "--platform",
+    "linux/amd64",
+    "--network",
+    "none",
+    "--pull=false",
+    "--no-cache",
+    "--provenance=false",
+    "--sbom=false",
+    "--resource",
+    "memory=2g",
+    "--resource",
+    "memory-swap=2g",
+    "--resource",
+    "cpu-period=100000",
+    "--resource",
+    "cpu-quota=100000",
+    "--iidfile",
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/engineering-worker-image-v1/image.id",
+    "--metadata-file",
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/engineering-worker-image-v1/build-metadata.json",
+    "--progress",
+    "plain",
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/engineering-worker-image-v1/context"
+  ],
+  "request_digest": "8fd8cbd09e66751d8462571920b228b7393e43a82fbbbd685b288588a957db81"
+}

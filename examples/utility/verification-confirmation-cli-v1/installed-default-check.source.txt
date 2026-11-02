@@ -1,0 +1,13 @@
+import sys,json,socket,ssl,subprocess
+sys.path.insert(0,sys.argv[1])
+from click.testing import CliRunner
+from autoengineering.cli import cli
+import autoengineering.utility.command as command
+assert command.__file__.startswith(sys.argv[1]+"/")
+def denied(*a,**k):raise AssertionError("unexpected network/process")
+socket.socket=denied;subprocess.Popen=denied
+r=CliRunner().invoke(cli,["utility","confirm",sys.argv[2],sys.argv[3],"--registration","unqualified-container"])
+assert r.exit_code==2,r.output
+assert json.loads(r.output)["error"]=="confirmation_not_admitted_or_invalid"
+assert not {"torch","botorch","openmdao","pvlib","py_wake","topfarm"}&set(sys.modules)
+print(json.dumps({"installed_default_cli":True,"unadmitted_profile_refused":True,"model_or_provider_starts":0,"network_process_denied":True}))

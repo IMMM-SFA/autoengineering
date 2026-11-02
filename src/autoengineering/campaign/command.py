@@ -79,7 +79,7 @@ def validate_command(specification, source_root):
     root = _source_root(specification, source_root)
     verify_dependencies(spec, root)
     for adapter in spec.execution.adapter_ids:
-        registry().validate(adapter, spec.baseline.model, root)
+        registry(spec=spec, root=root).validate(adapter, spec.baseline.model, root)
     click.echo(
         canonical_json({"status": "ok", "campaign_id": spec.name, "spec_digest": spec.digest})
     )

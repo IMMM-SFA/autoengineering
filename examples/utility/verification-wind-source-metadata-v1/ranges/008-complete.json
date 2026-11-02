@@ -1,0 +1,10 @@
+{
+  "request": 8,
+  "lo": 1310904090624,
+  "hi": 1310904156159,
+  "reserved_bytes": 65537,
+  "status": "complete",
+  "received_bytes": 65536,
+  "sha256": "fc96035722839557267a01339211e3f315c1c8bb9462b6c450dc4232df7a0814",
+  "body_file": "008-0000013137f90000.bin"
+}

@@ -1,0 +1,90 @@
+{
+  "README.md": {
+    "sha256": "bfc4caff1cb3a421a3459baf71b38c247fc06f051d12569b2169fc543539bf1d",
+    "size_bytes": 1732
+  },
+  "actual-result.json": {
+    "sha256": "6c4828631c5dafb175d85a1b9fdf189d5f9caf31831fdae2d7fdcff687b3c1f9",
+    "size_bytes": 701
+  },
+  "direct-intent.json": {
+    "sha256": "deb5639ad08f2fb39ee434aa64274d9038c86acb581326a45337995ec0dd621c",
+    "size_bytes": 73
+  },
+  "direct-result.json": {
+    "sha256": "73d116c5d17fc6ad48eca205a7a784e06e7afd1087e5aaf31d84e9ff4ce6c9ca",
+    "size_bytes": 79
+  },
+  "kernel-journal/00-result.json": {
+    "sha256": "2d2fc0badf5a797547fd5e03add456f1971ab665d107cac36517bb41322b4b1a",
+    "size_bytes": 145
+  },
+  "kernel-journal/00-start.json": {
+    "sha256": "7f007cdb43b702238c17f5da0a293326c2af8e01c5f0ae3429b8b4bbba88938a",
+    "size_bytes": 223
+  },
+  "kernel-journal/complete.json": {
+    "sha256": "c6fc1c23d1f68123ebc7fd77de43b932d27eaecb02a97ff796def560f769b8a8",
+    "size_bytes": 824
+  },
+  "kernel-journal/intent.json": {
+    "sha256": "1f4923ea4e18a666bd409e2377d423d3e933ba95e25c9d3fa5a2ce53b9ef4730",
+    "size_bytes": 452
+  },
+  "read.py.txt": {
+    "sha256": "bf35203e24b30421c4fd493fc1b8cb30c961d915fa1c484932d2bcf01cc581d2",
+    "size_bytes": 2997
+  },
+  "reader-verification.json": {
+    "sha256": "e4b8e7a1e579380b01148d8062e8545b2ffada91e835f9d36fe2bc0ef28032a8",
+    "size_bytes": 153
+  },
+  "request.json": {
+    "sha256": "72c715f9d298a2426a7a5f52c392aae9bad070d9131d6fdcf9b7bd774f46eda3",
+    "size_bytes": 1924
+  },
+  "run.py.txt": {
+    "sha256": "ebb8281ba020d8e6d8e3742a00e4966eeec8791ee2e04eef89aa28a5ce4c9265",
+    "size_bytes": 4041
+  },
+  "source/examples/utility/wind.py": {
+    "sha256": "6fdc15a62f95f2cd13cd6175480ac9b5ec381126097b9ab7e72cd7ebf8d94b37",
+    "size_bytes": 5151
+  },
+  "source/examples/utility/wind_annual.py": {
+    "sha256": "685fba50d0f7f26f0362c486d5bb8bb48045db229d54aaf970edc2885d13b4aa",
+    "size_bytes": 7310
+  },
+  "source/examples/utility/wind_annual_scoring.py": {
+    "sha256": "80e03cbf827447fa45334de7c9b1a165b11c13df5e57e0481beb3c4264291bda",
+    "size_bytes": 10990
+  },
+  "source/examples/utility/wind_hourly.py": {
+    "sha256": "6f888bf95361769b0ae18ca3ea0d2ff0702ee691e22536f89d0576853c1dc9fe",
+    "size_bytes": 10307
+  },
+  "source/examples/utility/wind_parameters.py": {
+    "sha256": "552c978d2b91b2e3e3900c46329ff67f9bb06a15b691aaaaa7f77e851bfb7726",
+    "size_bytes": 5317
+  },
+  "source/pixi.lock": {
+    "sha256": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+    "size_bytes": 666693
+  },
+  "source/tests/test_utility_wind_annual.py": {
+    "sha256": "822713d0a875b003645d69722305593675fb8053c74fb0a1edf27b3c6b2c27ec",
+    "size_bytes": 7091
+  },
+  "source/tests/test_utility_wind_annual_scoring.py": {
+    "sha256": "5a5a30a2f2c61a43d380d462a7f610e22164dd8ae45f9f392695e6a763855741",
+    "size_bytes": 9576
+  },
+  "summary.json": {
+    "sha256": "f73ae8b931886f80811e24c82f69c38fb8faa29fcd7f8033679ae90078f09cdb",
+    "size_bytes": 915
+  },
+  "tests.xml": {
+    "sha256": "981f270962d8b77501fcf1c1b6aa2422df326ca60e6516d2f0aaeed404d899b8",
+    "size_bytes": 16908
+  }
+}

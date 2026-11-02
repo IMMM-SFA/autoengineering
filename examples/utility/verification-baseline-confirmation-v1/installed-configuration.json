@@ -1,0 +1,43 @@
+{
+  "installed_root": "/private/tmp/utility-baseline-confirmation-installed-v1",
+  "suite": "/private/tmp/utility-baseline-confirmation-fixture-v1/suite",
+  "grant_path": "/private/tmp/utility-baseline-confirmation-fixture-v1/grant-0.json",
+  "follower_grant_path": "/private/tmp/utility-baseline-confirmation-fixture-v1/grant-1.json",
+  "suite_digest": "657dcf6fafb0b445aa1b8be3397f5f14bdfddf6c129a328b63e2ffa5c9de7ad0",
+  "partition_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+  "scorer_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+  "qualification_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+  "outcome": {
+    "schema": "engineering-outcome-v1",
+    "name": "power",
+    "units": "W",
+    "direction": "minimize",
+    "aggregation": "mean",
+    "evaluator_identity": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "callback_record": "/private/tmp/utility-baseline-confirmation-fixture-v1/callback.json",
+  "analysis_plan": {
+    "schema": "utility-analysis-v1",
+    "contrasts": [
+      {
+        "task_id": "task",
+        "route_id": "multi",
+        "comparator_id": "conventional",
+        "outcome": "power",
+        "units": "W",
+        "direction": "minimize",
+        "minimum_gain": 0.1,
+        "minimum_feasible_rate": 1.0,
+        "confidence": 0.95,
+        "interval": "paired_student_t",
+        "resamples": 500,
+        "seed": 17,
+        "multiplicity": "single_prespecified"
+      }
+    ],
+    "missing_policy": "complete_pairs_and_full_denominators",
+    "dependence_policy_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "wheel_sha256": "cb50bae1e624b1b8f5877b657681c4182d384f33c6056f1a026a865fc3b08afc",
+  "matched_core_files": 201
+}

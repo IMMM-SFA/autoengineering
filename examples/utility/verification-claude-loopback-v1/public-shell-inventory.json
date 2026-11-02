@@ -1,0 +1,23 @@
+{
+  "/bin/sh": {
+    "resolved_path": "/bin/sh",
+    "link_target": null,
+    "uid": 0,
+    "mode": 493,
+    "regular_target_sha256": "ad5c194b05f83bc5e793c1cd67b148a4b680467b5a5730ab1a31fe4e6460ee9f"
+  },
+  "/bin/bash": {
+    "resolved_path": "/bin/bash",
+    "link_target": null,
+    "uid": 0,
+    "mode": 365,
+    "regular_target_sha256": "fde343ee184953c1fa1185abddeaa8be61c6acbebae4eb54db5d6b55b09a5755"
+  },
+  "/private/var/select/sh": {
+    "resolved_path": "/bin/bash",
+    "link_target": "/bin/bash",
+    "uid": 0,
+    "mode": 493,
+    "regular_target_sha256": "fde343ee184953c1fa1185abddeaa8be61c6acbebae4eb54db5d6b55b09a5755"
+  }
+}

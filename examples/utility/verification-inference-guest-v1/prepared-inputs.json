@@ -1,0 +1,11 @@
+{
+  "predecessor_inputs_digest": "d5db58cf78c57526855a070b15cf629524f1f37742eb7bc42f4e199aee127453",
+  "successor_inputs_digest": "5eee3a23d3574a7f3c160f9ebfbedd9f1670f7db4e7b79f1edeef1168aeeb60b",
+  "runtime_archives": 49,
+  "compressed_archive_bytes": 265399717,
+  "wheel_python_sources": 302,
+  "core_python_files": 212,
+  "status": "prepared_inputs_only",
+  "starts_authorized": false,
+  "runtime_qualified": false
+}

@@ -1,0 +1,82 @@
+{
+  "all_original_containers_absent": true,
+  "both_resource_profiles_combined": {
+    "created": 13,
+    "starts": 12
+  },
+  "cases": [
+    {
+      "case": "memory_limit",
+      "elapsed_seconds": 1.4901579995639622,
+      "result": {
+        "exit_code": 137,
+        "oom_killed": true
+      }
+    },
+    {
+      "case": "pid_limit",
+      "elapsed_seconds": 1.005698333028704,
+      "result": {
+        "children": 15,
+        "errno": "EAGAIN",
+        "pids_current": 16
+      }
+    },
+    {
+      "case": "workspace_limit",
+      "elapsed_seconds": 0.9876119587570429,
+      "result": {
+        "errno": "ENOSPC",
+        "written_bytes": 134217728
+      }
+    },
+    {
+      "case": "read_only_root",
+      "elapsed_seconds": 0.9849452497437596,
+      "result": {
+        "errno": "EROFS"
+      }
+    },
+    {
+      "case": "network_denied",
+      "elapsed_seconds": 0.9696069578640163,
+      "result": {
+        "attempts": 1,
+        "errno": "ENETUNREACH"
+      }
+    },
+    {
+      "case": "host_canary_denied",
+      "elapsed_seconds": 0.9707760419696569,
+      "result": {
+        "errno": "ENOENT"
+      }
+    }
+  ],
+  "completion_digest": "e899a83865a1ae3619af3fcfbbf68b204525566f168350ffa258582556a6df8b",
+  "created": 6,
+  "image_id": "sha256:516cb2702eb45d99264dc90622fea8de4de987f68b4266ba8c86da4c312390de",
+  "original_26_case_proposal": "unchanged; not executed as a whole",
+  "original_image_resource_work_preserved": {
+    "created": 7,
+    "starts": 6
+  },
+  "owner_loss_qualified": false,
+  "request_digest": "ebd628517a85b6173f127819782d62d36ca9d4d3dc17c28e6ab68a013bfa504e",
+  "runtime_qualified": false,
+  "scientific_starts": 0,
+  "scope": "six local derivative-image resource controls, not full runtime admission",
+  "starts": 6,
+  "verification": {
+    "core_sources_unchanged": 224,
+    "declared_wheel_sources_unchanged": 315,
+    "documentation_after_edits_passed": 19,
+    "errors": 0,
+    "failures": 0,
+    "full_default_rerun": false,
+    "git_diff_check": "passed",
+    "related_passed": 417,
+    "ruff": "passed",
+    "skips": 0
+  }
+}

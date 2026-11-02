@@ -1,0 +1,7 @@
+{
+  "parity": "exact",
+  "physical_starts": 2,
+  "maximum_conservation_residual_mm": 2.220446049250313e-16,
+  "seconds": 0.0006107920780777931,
+  "time_profile": "scalar_daily_end"
+}

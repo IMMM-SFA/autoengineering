@@ -1,0 +1,41 @@
+from pathlib import Path
+import builtins
+import io
+import json
+import os
+import socket
+import ssl
+import subprocess
+import sys
+
+base=Path(sys.argv[1]);c=json.loads((base/'installed-configuration.json').read_bytes())
+sys.path.insert(0,c['installed_root'])
+from autoengineering.utility.contracts import ScoredTaskSpec,UtilitySuiteSpec
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.report import accounting_report
+assert not {'torch','botorch','openmdao','pvlib','py_wake','topfarm'} & set(sys.modules)
+blocked=(Path('/private/tmp/utility-task-scoring-fixture-v1'),Path('/private/tmp/utility-task-scoring-final-v1'))
+def guard(function):
+    def checked(path,*args,**kwargs):
+        if isinstance(path,(str,bytes,os.PathLike)):
+            value=Path(os.fsdecode(path)).absolute()
+            assert not any(value.is_relative_to(root) for root in blocked),'original root opened'
+        return function(path,*args,**kwargs)
+    return checked
+builtins.open=guard(builtins.open);io.open=guard(io.open);os.open=guard(os.open)
+def denied(*args,**kwargs):raise AssertionError('offline reader attempted network or process')
+socket.socket=denied;subprocess.Popen=denied
+reports=[]
+for name in ('public-suite','executed-engineering-suite'):
+    store=SuiteStore(base/name);before=store.replay();task=store.spec.tasks[0]
+    assert isinstance(task,ScoredTaskSpec) and task.outcome_digest!=task.scoring_outcome_digest
+    report=accounting_report(store)
+    assert not report['evidence_blockers'],report['evidence_blockers']
+    assert len(report['confirmation_receipts'])==1
+    assert store.replay()['head']==before['head']
+    reports.append({'suite':name,'selection_acceptance_digest':task.outcome_digest,'confirmation_outcome_digest':task.scoring_outcome_digest,'public_confirmation_receipts':1,'journal_unchanged':True})
+raw=(base/'legacy-suite.json').read_text().strip();legacy=UtilitySuiteSpec.from_json(raw)
+assert legacy.to_json()==raw and 'scoring_outcome_digest' not in raw
+result={'schema':'utility-task-scoring-installed-reader-v1','suites':reports,'legacy_bytes_and_digest_preserved':True,'installed_core_files':201,'original_roots_network_and_process_denied':True,'model_or_provider_starts':0,'private_scoring_qualified':False,'independent_confirmation':False}
+(base/'installed-reader.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

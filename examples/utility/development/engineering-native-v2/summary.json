@@ -1,0 +1,385 @@
+{
+  "purpose": "exposed engineering scientific tools; no independent confirmation or route comparison",
+  "physical_reservations_before_reopen": 3,
+  "physical_reservations_total": 16,
+  "verified_process_stops": 16,
+  "repeat_request_added_reservations": 0,
+  "evaluation_count": 5,
+  "native_reports": [
+    {
+      "schema": "utility-native-report-v1",
+      "specification_digest": "46e96b8022c9d2e5cb27c8538f8ddb3bc76338cf987b43fbea3a5c6b42881bff",
+      "binding_digest": "0c11599d66d2b9fad85a7b38c25ddd752a40639e7c2e38175b274cb8547a9c2e",
+      "job_digest": "bb569047b9c1aa013db8f71b007b794b434fb121cb744a2167d2c09504468852",
+      "reservation_id": "native-46e96b8022c9d2e5cb27c8538f8ddb3b",
+      "status": "success",
+      "process_status": "completed",
+      "process_identity": {
+        "nonce": "native-bb569047b9c1aa013db8f71b007b794b",
+        "pgid": 214,
+        "pid": 214,
+        "started": "Wed Oct 28 11:19:14 2026"
+      },
+      "stop_verified": true,
+      "elapsed_seconds": 0.9468385418877006,
+      "result": {
+        "schema": "utility-native-result-v2",
+        "job_digest": "bb569047b9c1aa013db8f71b007b794b434fb121cb744a2167d2c09504468852",
+        "configuration": {
+          "source_current": 0.0244754662795676
+        },
+        "driver_success": true,
+        "solves": [
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": false,
+              "residual_norm": 419.2852931221434,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 0,
+              "component_calls": 0,
+              "derivative_calls": 0
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 1.3807856767689142e-15,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 18,
+              "component_calls": 293,
+              "derivative_calls": 90
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 1.3807856767689142e-15,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 0,
+              "component_calls": 298,
+              "derivative_calls": 90
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 4.150298811220199e-15,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 6,
+              "component_calls": 410,
+              "derivative_calls": 125
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 8.131516293641283e-19,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 9,
+              "component_calls": 559,
+              "derivative_calls": 170
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 6.776263578034403e-19,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 5,
+              "component_calls": 655,
+              "derivative_calls": 200
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 5.2339859876737727e-17,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 3,
+              "component_calls": 719,
+              "derivative_calls": 220
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 5.2827750854356204e-17,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 2,
+              "component_calls": 767,
+              "derivative_calls": 235
+            }
+          },
+          {
+            "phase": "driver",
+            "scenario_id": null,
+            "counter_scope": "shared_problem_snapshot",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 5.1906179007743525e-17,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 1,
+              "component_calls": 799,
+              "derivative_calls": 245
+            }
+          },
+          {
+            "phase": "scenario",
+            "scenario_id": "low-ground",
+            "counter_scope": "independent_problem",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 4.7460950100552957e-17,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 19,
+              "component_calls": 309,
+              "derivative_calls": 95
+            }
+          },
+          {
+            "phase": "scenario",
+            "scenario_id": "nominal-ground",
+            "counter_scope": "independent_problem",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 1.8515462600621202e-16,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 17,
+              "component_calls": 277,
+              "derivative_calls": 85
+            }
+          },
+          {
+            "phase": "scenario",
+            "scenario_id": "high-ground",
+            "counter_scope": "independent_problem",
+            "diagnostics": {
+              "converged": true,
+              "residual_norm": 6.76189789924897e-16,
+              "residual_tolerance": 1e-10,
+              "residual_units": "A",
+              "solver_iterations": 15,
+              "component_calls": 245,
+              "derivative_calls": 75
+            }
+          }
+        ],
+        "driver_final_state": {
+          "converged": true,
+          "residual_norm": 5.1906179007743525e-17,
+          "residual_tolerance": 1e-10,
+          "residual_units": "A",
+          "solver_iterations": 1,
+          "component_calls": 810,
+          "derivative_calls": 250
+        }
+      }
+    }
+  ],
+  "native_inner_model_calls": 12,
+  "decision": {
+    "comparator_id": "fixed-398cc3941b284004004eb3e60bc85f8c",
+    "eligible_alternatives": [
+      "fixed-398cc3941b284004004eb3e60bc85f8c",
+      "fixed-961d6d8e803be089a58adfba51445c75",
+      "eval-000000",
+      "eval-000001"
+    ],
+    "selected_id": "fixed-961d6d8e803be089a58adfba51445c75",
+    "selected_configuration": {
+      "source_current": 0.03
+    },
+    "outcome": "accepted_candidate",
+    "rules_digest": "a85f69834f6bd59356ad4ee766a98a70274668cc8fc509239fa2cce993685ce1",
+    "reasons": [
+      "Applied frozen eligibility and ranking rules"
+    ],
+    "evidence": []
+  },
+  "selected_state": {
+    "schema": "utility-selected-state-v1",
+    "model": {
+      "graph_digest": "94e0d1d54f317e8340d75ade5414265adb31a73a1d9b07e08558786e401bfbbb",
+      "implementations": {
+        "circuit": "openmdao-3.41.0"
+      },
+      "source_bundle": [
+        {
+          "path": "examples/utility/engineering.py",
+          "sha256": "726f4dcb7ef8a42ab158365d6245fe2d50c0d06e7e879f3db76b1c000d85a9e8",
+          "size_bytes": 8675,
+          "media_type": "text/plain",
+          "producer": "development-capture",
+          "metadata": {}
+        },
+        {
+          "path": "examples/interoperability/circuit/model.py",
+          "sha256": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+          "size_bytes": 3057,
+          "media_type": "text/plain",
+          "producer": "development-capture",
+          "metadata": {}
+        },
+        {
+          "path": "examples/interoperability/circuit/fixture.py",
+          "sha256": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+          "size_bytes": 1818,
+          "media_type": "text/plain",
+          "producer": "development-capture",
+          "metadata": {}
+        },
+        {
+          "path": "pixi.lock",
+          "sha256": "16f3911bdc180b361f4bbcb02d2a848d68107635f9eb830781b53ba691a52ce5",
+          "size_bytes": 591146,
+          "media_type": "text/plain",
+          "producer": "development-capture",
+          "metadata": {}
+        }
+      ],
+      "dependency_bundle": "6ea642cb575ad69f292d352ea46d2c9e3c4129ff55c7a49559c7300032f9ce18",
+      "inputs": [
+        {
+          "name": "ground_voltage",
+          "dimensions": [],
+          "units": "V",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "time": null,
+          "missing": "forbid"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "node1_voltage",
+          "dimensions": [],
+          "units": "V",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "time": null,
+          "missing": "forbid"
+        },
+        {
+          "name": "node2_voltage",
+          "dimensions": [],
+          "units": "V",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "time": null,
+          "missing": "forbid"
+        },
+        {
+          "name": "resistor1_current",
+          "dimensions": [],
+          "units": "A",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "time": null,
+          "missing": "forbid"
+        },
+        {
+          "name": "resistor2_current",
+          "dimensions": [],
+          "units": "A",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "time": null,
+          "missing": "forbid"
+        },
+        {
+          "name": "diode_current",
+          "dimensions": [],
+          "units": "A",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "time": null,
+          "missing": "forbid"
+        }
+      ]
+    },
+    "configuration": {
+      "source_current": 0.03
+    },
+    "evaluation": {
+      "id": "fixed-961d6d8e803be089a58adfba51445c75",
+      "model_id": "d1d945376b845f310177cb765054dbb64b4fab61992b2a51e55f8d9ce6be171e",
+      "configuration": {
+        "source_current": 0.03
+      },
+      "status": "success",
+      "metrics": {
+        "source_power": 0.0893099779110804
+      },
+      "checks": [
+        {
+          "name": "node_voltage",
+          "version": "1",
+          "status": "pass",
+          "required": true,
+          "scope": "scenario",
+          "value": null,
+          "threshold": null,
+          "reason": "Every declared scenario must satisfy the check",
+          "evidence": []
+        }
+      ],
+      "outputs": [],
+      "split_id": "development-fitting",
+      "attempt_id": "fixed-961d6d8e803be089a58adfba51445c75",
+      "elapsed_seconds": 2.7654167083092034,
+      "provenance": {
+        "engineering_rules": "a85f69834f6bd59356ad4ee766a98a70274668cc8fc509239fa2cce993685ce1",
+        "executor": "03567870cebbd6723c1bbd12c71c9cd9e5115a55c73587665bee92e6e51e79a4"
+      }
+    },
+    "candidate": null
+  },
+  "utility_verdict": "not_attempted"
+}

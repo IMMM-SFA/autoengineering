@@ -1,0 +1,15 @@
+{
+  "wheel_sha256": "72a1fda0bf81f8160e209265ba4f469fd50dbf9ebbb19a71fc1f43a38e0edc57",
+  "python_files": 227,
+  "example_python_files": 0,
+  "copied_inputs": 239,
+  "all_package_payloads_match_inputs": true,
+  "installed_payloads_match_wheel": true,
+  "build_exit_code": 0,
+  "install_exit_code": 0,
+  "target": "/private/tmp/utility-wind-cost-installed-v1/installed",
+  "public_scope": "/private/tmp/utility-wind-cost-installed-v1/public",
+  "network_or_dependency_installation": false,
+  "inherited_base_dependencies": true,
+  "release_or_linux_qualification": false
+}

@@ -1,0 +1,7 @@
+{
+  "changed_owned_pid_refused": true,
+  "reason": "saved owner signal differs from exact owned child",
+  "original_evidence_unchanged": true,
+  "new_guest_starts": 0,
+  "new_model_runs": 0
+}

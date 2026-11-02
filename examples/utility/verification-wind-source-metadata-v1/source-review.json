@@ -1,0 +1,15 @@
+{
+  "provider_source": "https://nrel.sitefinity.cloud/hpc/wind-dataset",
+  "h5py_file_object_contract": "https://docs.h5py.org/en/stable/high/file.html#python-file-like-objects",
+  "source_version_finding": "Provider describes v1.1.0/2014 as updated WRF and boundary-layer physics; do not assume homogeneous weather-only transfer with 2007-2013 v1.0.0",
+  "scope": "metadata only; no 2014 object accessed; no statistical comparability or source admission inferred",
+  "point_extraction_planning": {
+    "coordinates_bytes": 19905088,
+    "one_variable_chunk_bytes": 1999872,
+    "time_chunks_for_8760_hours": 27,
+    "two_variables_raw_chunk_bytes_before_range_alignment": 107993088,
+    "current_reader_max_single_read": 1048576,
+    "current_profile_supports_full_chunk_read": false,
+    "next_step": "prepare a new bounded point-extraction profile with reviewed nearest-grid, raw-fill-before-scaling, direction conventions, annual support and source-version policies; do not silently enlarge this consumed metadata request"
+  }
+}

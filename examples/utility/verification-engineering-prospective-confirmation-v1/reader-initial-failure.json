@@ -1,0 +1,11 @@
+{
+  "status": "metadata_reader_guard_failure",
+  "reason": "guard was armed before lazy core wire-schema import",
+  "new_scientific_work": 0,
+  "fix": "Allow core package metadata initialization with model imports, private reads, network and processes denied; then require public-only file access",
+  "failures": 2,
+  "lazy_core_modules": [
+    "load_container_costs",
+    "baseline_selection"
+  ]
+}

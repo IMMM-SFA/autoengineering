@@ -1,0 +1,27 @@
+--- a/include/netCDF4.pxi
++++ b/include/netCDF4.pxi
+@@ -370,11 +370,10 @@
+     pass
+ 
+ 
+-# taken from numpy.pxi in numpy 1.0rc2.
++# Use the ndarray declaration already supplied by cimport numpy.
++ctypedef numpy.ndarray ndarray
+ cdef extern from "numpy/arrayobject.h":
+     ctypedef int npy_intp 
+-    ctypedef extern class numpy.ndarray [object PyArrayObject]:
+-        pass
+     npy_intp PyArray_SIZE(ndarray arr) nogil
+     npy_intp PyArray_ISCONTIGUOUS(ndarray arr) nogil
+     npy_intp PyArray_ISALIGNED(ndarray arr) nogil
+--- a/src/netCDF4/_netCDF4.pyx
++++ b/src/netCDF4/_netCDF4.pyx
+@@ -1723,7 +1723,7 @@
+         with nogil:
+             ierr = nc_get_att(_grpid, varid, attname, PyArray_BYTES(value_arr))
+         _ensure_nc_success(ierr, err_cls=AttributeError)
+-        if value_arr.shape == ():
++        if value_arr.ndim == 0:
+             # return a scalar for a scalar array
+             return value_arr.item()
+         elif att_len == 1:

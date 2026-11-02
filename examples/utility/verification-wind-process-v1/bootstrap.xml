@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.251" timestamp="2026-10-28T16:52:52.155371-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_wind_process" name="test_original_wind_process_recovery_has_no_new_charge" time="0.224"><failure message="autoengineering.campaign.store.StoreError: engineering evaluator registration is unavailable">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4322/test_original_wind_process_rec0')
+
+    def test_original_wind_process_recovery_has_no_new_charge(tmp_path):
+&gt;       driver, batch, _ = setup(tmp_path)
+                           ^^^^^^^^^^^^^^^
+
+tests/test_utility_wind_process.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_utility_wind_process.py:120: in setup
+    return SupervisedWindDriver(spec, executor, fault=fault), batch, source
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+examples/utility/wind_process.py:175: in __init__
+    verify_wind_sources(spec, executor.source_root)
+examples/utility/wind_process.py:131: in verify_wind_sources
+    verify_sources(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+spec = EngineeringExecutionSpec(schema='utility-engineering-execution-v2', study=EngineeringStudySpec(run=OptimizationRunSpec..._id='bundled-distribution', forcing=mappingproxy({'direction_step': 30.0})),), timeout_seconds=5.0, output_bytes=16384)
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4322/test_original_wind_process_rec0/captured')
+
+    def verify_sources(spec, source_root, *, additional_entrypoints=()):
+        """Check all source bytes before any supplied evaluator code can be imported."""
+        root = Path(source_root)
+        declared = {ref.path: ref for ref in spec.sources}
+        for ref in (*spec.sources, spec.lock):
+            read_bytes(root, ref)
+        permitted = set(declared) | {spec.lock.path}
+        for path in root.rglob("*"):
+            if path.is_symlink() or (not path.is_dir() and str(path.relative_to(root)) not in permitted):
+                raise StoreError("engineering input contains an undeclared file or symlink")
+        package = Path(__file__).resolve().parents[1]
+        for path in package.rglob("*.py"):
+            relative = "src/autoengineering/"+str(path.relative_to(package))
+            ref = declared.get(relative)
+            if ref is None or read_bytes(root, ref) != path.read_bytes():
+                raise StoreError("engineering runtime source closure is incomplete or changed")
+        for entrypoint in (spec.entrypoint, *additional_entrypoints):
+            module = entrypoint.split(":")[0]
+            # find_spec can import parents. Require their files in the closure first.
+            search = [str(root), *sys.path]
+            for index, part in enumerate(module.split("."), 1):
+                name = ".".join(module.split(".")[:index])
+                key = name.replace(".", "/")
+                keys = (key+".py", key+"/__init__.py", "src/"+key+".py", "src/"+key+"/__init__.py")
+                info = PathFinder.find_spec(part, search)
+                if info is None:
+&gt;                   raise StoreError("engineering evaluator registration is unavailable")
+E                   autoengineering.campaign.store.StoreError: engineering evaluator registration is unavailable
+
+src/autoengineering/utility/engineering_process.py:103: StoreError</failure></testcase></testsuite></testsuites>

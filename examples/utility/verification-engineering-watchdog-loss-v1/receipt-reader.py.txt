@@ -1,0 +1,51 @@
+"""Replay watchdog-loss producer evidence without project or model imports."""
+from pathlib import Path
+import hashlib,json,sys
+root=Path(sys.argv[1]).resolve(strict=True)
+raw=(root/'evidence-manifest.json').read_bytes()
+assert hashlib.sha256(raw).hexdigest()==sys.argv[2]
+manifest=json.loads(raw)
+for name,expected in manifest['files'].items():
+    relative=Path(name);assert not relative.is_absolute() and '..' not in relative.parts
+    path=root/relative
+    assert not any(p.is_symlink() for p in (path,*path.parents))
+    data=path.read_bytes()
+    assert len(data)==expected['bytes'] and hashlib.sha256(data).hexdigest()==expected['sha256']
+def read(name):
+    assert name in manifest['files']
+    return json.loads((root/name).read_bytes())
+def digest(value):return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+summary=read('summary.json')
+for case in summary['cases']:
+    prefix=case['mode']+'/'
+    q=read(prefix+'request.json');plan=read(prefix+'watchdog-plan.json')
+    ready=read(prefix+'watchdog-ready.json');boundary=read(prefix+'owner-boundary.json')
+    kill=read(prefix+'kill-intent.json');loss=read(prefix+'watchdog-loss.json')
+    refusal=read(prefix+'owner-refusal.json');finish=read(prefix+'finish-refusal.json')
+    cid=read(prefix+'created.json')['Id']
+    assert plan['container_id']==ready['container_id']==case['container_id']==cid
+    assert ready['plan_digest']==loss['plan_digest']==digest(plan)
+    assert plan['configuration']==q['configuration'] and plan['name']==q['name']
+    assert plan['owner_source_digest']==q['owner_source_sha256']
+    assert plan['watchdog_source_digest']==q['watchdog_source_sha256']
+    assert ready['watchdog_pid']==boundary['watchdog_pid']==kill['watchdog_pid']==loss['watchdog_pid']
+    assert boundary['owner_pid']==kill['owner_pid']==case['owner_pid']
+    assert kill['signal']=='SIGKILL' and loss['exit_code']==-9
+    assert loss['score_authority_revoked'] is True and loss['automatic_retry_allowed'] is False
+    assert refusal['score_published'] is False and refusal['automatic_retry_allowed'] is False
+    assert finish['lost_watchdog_result_refused'] is True
+    cleanup=read(prefix+'cleanup.json')
+    assert cleanup['container_id']==cid and cleanup['absent'] is True
+    absence=read(prefix+'watchdog-process-absence.json')
+    assert absence['watchdog_pid']==ready['watchdog_pid'] and absence['absent'] is True
+    assert not absence['ps_stdout'].strip()
+    assert case['packet_submitted'] is False and case['source_reads']==0
+    if case['mode']=='running_before_input':
+        running=read(prefix+'running.json')
+        assert running['Id']==cid and running['State']['Running'] is True
+        assert read(prefix+'start-intent.json')['packet_sent'] is False
+assert summary['container_creations']==2 and summary['container_starts']==1
+assert summary['runtime_qualified'] is False and summary['complete_interruption_matrix'] is False
+print(json.dumps({'verified':True,'container_creations':2,'container_starts':1,
+    'watchdog_sigkills':2,'owners_refused_results':2,'private_payloads_submitted':0,
+    'runtime_qualified':False},sort_keys=True))

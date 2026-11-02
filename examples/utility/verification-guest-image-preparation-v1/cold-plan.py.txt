@@ -1,0 +1,25 @@
+"""Fresh extracted-wheel metadata reader under execution and file-access guards."""
+from pathlib import Path
+import json,os,socket,subprocess,sys,time
+package=Path(sys.argv[1]);root=Path(sys.argv[2]);pin=sys.argv[3]
+sys.path.insert(0,str(package))
+from examples.utility import guest_image
+assert Path(guest_image.__file__).resolve().is_relative_to(package)
+import numpy
+# All code is initialized before the saved-data-only read barrier.
+def forbidden(*args,**kwargs):raise AssertionError('execution, source probe, array or clock')
+subprocess.Popen=socket.socket=numpy.load=time.monotonic=time.time=forbidden
+guest_image._source_alignment=forbidden
+active=[True]
+def reads(event,args):
+ if not active[0] or event!='open' or isinstance(args[0],int):return
+ path=Path(args[0]).resolve();mode,flags=args[1:3]
+ if not path.is_relative_to(root):raise AssertionError('unrelated or original source read')
+ writing=mode is not None and any(c in mode for c in 'wax+')
+ writing=writing or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND)
+ if writing:raise AssertionError('write')
+sys.addaudithook(reads)
+plan=guest_image.verify(root,expected_digest=pin)
+assert plan['remote_payload_bytes']==317657548 and not plan['build_authorized']
+print('Original image recipe agrees from relocated saved bytes through the extracted wheel.')
+active[0]=False

@@ -1,0 +1,19 @@
+{
+  "all_loaded_core_modules_from_installed_target": true,
+  "dependencies_installed": false,
+  "installed_payload_files_verified": 235,
+  "new_coupled_or_reference_model_solves": 0,
+  "outside_checkout": true,
+  "reader_result": {
+    "absolute_gain_W": 0.012487250213233526,
+    "coupled_observations": 24,
+    "mean_source_power_W": 0.24974500426467053,
+    "new_model_calls": 0,
+    "saved_reference_verified": true,
+    "task_admitted": false
+  },
+  "relocated_public_evidence": true,
+  "schema": "utility-engineering-v3-installed-reference-check-v1",
+  "wheel_rebuilt": false,
+  "wheel_sha256": "72a1fda0bf81f8160e209265ba4f469fd50dbf9ebbb19a71fc1f43a38e0edc57"
+}

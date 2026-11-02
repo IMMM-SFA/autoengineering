@@ -1,0 +1,35 @@
+"""Cold original creation cleanup proof; original daemon and suite are absent."""
+import importlib.abc
+from pathlib import Path
+import os,socket,subprocess,sys,tarfile,tempfile,time
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'examples','torch','openmdao','pvlib','py_wake'}:
+   raise AssertionError('model import')
+sys.meta_path.insert(0,NoModels())
+import numpy
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+from autoengineering.utility.guest_creation_cleanup import GuestCreationCleanupOutcome,read_creation_cleanup
+bundle=Path(__file__).parent
+expected=GuestCreationCleanupOutcome.from_json((bundle/'expected-cleanup.json').read_text())
+with tempfile.TemporaryDirectory() as folder:
+ root=Path(folder).resolve()
+ with tarfile.open(bundle/'authored-early-cleanup-owner.tar.gz') as archive:
+  archive.extractall(root,filter='data')
+ for path in root.rglob('*'):
+  path.chmod(0o700 if path.is_dir() else 0o600)
+ def forbidden(*args,**kwargs):raise AssertionError('execution, clock or array load')
+ subprocess.Popen=socket.socket=time.monotonic=time.time=numpy.load=forbidden
+ active=[True]
+ def reads(event,args):
+  if not active[0] or event!='open' or isinstance(args[0],int):return
+  path=Path(args[0]).resolve();mode,flags=args[1:3]
+  if not path.is_relative_to(root):raise AssertionError('private or unrelated read')
+  writing=mode is not None and any(c in mode for c in 'wax+')
+  writing=writing or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND)
+  if writing:raise AssertionError('write')
+ sys.addaudithook(reads)
+ owner=GuestOwnerJournal(root/'owner')
+ assert read_creation_cleanup(owner)==expected
+ print('Original early cleanup agrees from relocated saved observations only.')
+ active[0]=False

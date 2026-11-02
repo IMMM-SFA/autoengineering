@@ -1,0 +1,113 @@
+[
+  {
+    "current": 0.01,
+    "direct": {
+      "outputs": {
+        "node1_voltage": 0.9963309842743584,
+        "node2_voltage": 0.6294294117101928,
+        "resistor1_current": 0.009963309842743583,
+        "resistor2_current": 3.6690157256416543e-05,
+        "diode_current": 3.6690157256416543e-05
+      },
+      "work": {
+        "converged": true,
+        "residual_norm": 1.5394440279828392e-13,
+        "residual_tolerance": 1e-10,
+        "solver_iterations": 18,
+        "component_calls": 293,
+        "derivative_calls": 90
+      },
+      "seconds": 0.0077756671234965324,
+      "derivative": null
+    },
+    "wrapped": {
+      "node1_voltage": 0.9963309842743584,
+      "node2_voltage": 0.6294294117101928,
+      "resistor1_current": 0.009963309842743583,
+      "resistor2_current": 3.6690157256416543e-05,
+      "diode_current": 3.6690157256416543e-05
+    },
+    "wrapped_work": {
+      "converged": 1.0,
+      "residual_norm": 1.5394440279828392e-13,
+      "residual_tolerance": 1e-10,
+      "solver_iterations": 18.0,
+      "component_calls": 293.0,
+      "derivative_calls": 90.0
+    }
+  },
+  {
+    "current": 0.05,
+    "direct": {
+      "outputs": {
+        "node1_voltage": 4.957355447213728,
+        "node2_voltage": 0.6929001685865015,
+        "resistor1_current": 0.04957355447213728,
+        "resistor2_current": 0.00042644552786272257,
+        "diode_current": 0.00042644552786272257
+      },
+      "work": {
+        "converged": true,
+        "residual_norm": 4.793420434884288e-15,
+        "residual_tolerance": 1e-10,
+        "solver_iterations": 16,
+        "component_calls": 261,
+        "derivative_calls": 80
+      },
+      "seconds": 0.004965333268046379,
+      "derivative": null
+    },
+    "wrapped": {
+      "node1_voltage": 4.957355447213728,
+      "node2_voltage": 0.6929001685865015,
+      "resistor1_current": 0.04957355447213728,
+      "resistor2_current": 0.00042644552786272257,
+      "diode_current": 0.00042644552786272257
+    },
+    "wrapped_work": {
+      "converged": 1.0,
+      "residual_norm": 4.793420434884288e-15,
+      "residual_tolerance": 1e-10,
+      "solver_iterations": 16.0,
+      "component_calls": 261.0,
+      "derivative_calls": 80.0
+    }
+  },
+  {
+    "current": 0.1,
+    "direct": {
+      "outputs": {
+        "node1_voltage": 9.908047345079474,
+        "node2_voltage": 0.7127818530267862,
+        "resistor1_current": 0.09908047345079474,
+        "resistor2_current": 0.0009195265492052688,
+        "diode_current": 0.0009195265492052688
+      },
+      "work": {
+        "converged": true,
+        "residual_norm": 5.143984196931406e-13,
+        "residual_tolerance": 1e-10,
+        "solver_iterations": 15,
+        "component_calls": 245,
+        "derivative_calls": 75
+      },
+      "seconds": 0.004329541232436895,
+      "derivative": null
+    },
+    "wrapped": {
+      "node1_voltage": 9.908047345079474,
+      "node2_voltage": 0.7127818530267862,
+      "resistor1_current": 0.09908047345079474,
+      "resistor2_current": 0.0009195265492052688,
+      "diode_current": 0.0009195265492052688
+    },
+    "wrapped_work": {
+      "converged": 1.0,
+      "residual_norm": 5.143984196931406e-13,
+      "residual_tolerance": 1e-10,
+      "solver_iterations": 15.0,
+      "component_calls": 245.0,
+      "derivative_calls": 75.0
+    }
+  }
+]

@@ -1,0 +1,499 @@
+{
+  "schema": "utility-accounting-v2",
+  "suite_digest": "acdec6757357f58da021fb90ecdca441c9f63062a10fba44d2cbcdc958d51a37",
+  "assigned_cells": 2,
+  "cells": {
+    "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2": "finished",
+    "db7428f79bf3a13de8aa112aeba4c39f68963fc342f94bd9c2493d82d6b556ca": "finished"
+  },
+  "confirmation_receipts": [
+    {
+      "attempt_id": "confirmation-2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9a",
+      "receipt_digest": "7926b8c083c3bb08c04cf9011a13390e927e664e4fdfbd5cb6a871ba241485be",
+      "receipt": {
+        "grant_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+        "access_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+        "score": {
+          "status": "success",
+          "outcome": "mean_source_power",
+          "units": "W",
+          "value": 0.24701566460811183,
+          "feasible": true
+        },
+        "outcome_contract": {
+          "schema": "engineering-outcome-v1",
+          "name": "mean_source_power",
+          "units": "W",
+          "direction": "minimize",
+          "aggregation": "mean",
+          "evaluator_identity": "e4f7242f1b86e3bee3b62bdc7aee009ce7182fca5ec130ebe5ff8349a7d9151a"
+        },
+        "recovery": {
+          "schema": "utility-confirmation-recovery-v1",
+          "attempt_id": "confirmation-2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9a",
+          "grant_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+          "access_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+          "scorer_digest": "ddb89f5e81cb93359e72b3baaf4cca0189ef589e4e9bd0fe9fda6dc0ba41f322",
+          "score_digest": "74b9ba1cdfe413079b44cac0563bdfe9e0297b74ed0261028843f7db3ce1298d"
+        },
+        "execution": {
+          "schema": "utility-confirmation-container-execution-v1",
+          "grant_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+          "scorer_digest": "ddb89f5e81cb93359e72b3baaf4cca0189ef589e4e9bd0fe9fda6dc0ba41f322",
+          "score_digest": "74b9ba1cdfe413079b44cac0563bdfe9e0297b74ed0261028843f7db3ce1298d",
+          "runtime_digest": "fa790705fdac07cd5385c82906e647f7d5f0c26ce91172a6619828869413cc04",
+          "container_id": "fa71b82c00f65a03ca15b0058f6d31146d18f324ae57bc2bedd547da0d38147e",
+          "nonce": "9630ba667ac342d2ae33b9bba7c09092",
+          "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+          "runtime_source_digest": "08a268d3ec43cd8fc05909e09fbf44b4706c83131f2b053151a32929fe5abd8a",
+          "wrapper_source_digest": "4f8df511204e3625c2662eb38a5da90bb556ac78a4da9dacd00e47ae07f359f9",
+          "worker_source_digest": "cb8ccb30ec38cded2cade797d5e971bd222b506ef8a100184490ceb59e5d9c82",
+          "start_receipt_digest": "e2c87532be4d0142b1f54680c4ebb43c227637e0cf20eb9a33b00625997369a2",
+          "stop_receipt_digest": "523db82aa8cb61ba9d9fd61dd0c9628d7627de3eae51d45d84b6595f8fa851f3",
+          "cleanup_receipt_digest": "16f59aab80eb9bc52029615e518c7d24f49ebe0429abf1ac1ff518efacc64036",
+          "container_starts": 1,
+          "scoring_process_starts": 1,
+          "lifecycle_seconds": 1.8630443750880659
+        }
+      }
+    }
+  ],
+  "confirmation_state": "scored_unanalyzed",
+  "role_permissions_reserved": [],
+  "parent_reservations": [
+    {
+      "regime": "fixed_evaluations",
+      "resource": "active_time",
+      "quantity": 260.0
+    },
+    {
+      "regime": "fixed_evaluations",
+      "resource": "container_starts",
+      "quantity": 1.0
+    },
+    {
+      "regime": "fixed_evaluations",
+      "resource": "host_invocations",
+      "quantity": 4.0
+    },
+    {
+      "regime": "fixed_evaluations",
+      "resource": "load_model_starts",
+      "quantity": 24.0
+    },
+    {
+      "regime": "fixed_evaluations",
+      "resource": "load_solver_iterations",
+      "quantity": 2400.0
+    },
+    {
+      "regime": "fixed_evaluations",
+      "resource": "scientific_starts",
+      "quantity": 3.0
+    },
+    {
+      "regime": "fixed_evaluations",
+      "resource": "training_starts",
+      "quantity": 0.0
+    }
+  ],
+  "physical_receipt_costs": {
+    "complete": false,
+    "missing": [],
+    "unknown": [
+      "cost-6eb364e27451ca8bda844b4a85cac55df9757b04e5ac32bf",
+      "cost-926f4ed56032967adf4b0271292a328bfa08de6eb7a01056"
+    ],
+    "known_totals": [
+      {
+        "resource": "confirmation_access_intents",
+        "units": "count",
+        "quantity": 1.0
+      },
+      {
+        "resource": "confirmation_container_lifecycle_duration",
+        "units": "s",
+        "quantity": 1.8630443750880659
+      },
+      {
+        "resource": "confirmation_container_starts",
+        "units": "count",
+        "quantity": 1.0
+      },
+      {
+        "resource": "confirmation_recoveries_committed",
+        "units": "count",
+        "quantity": 1.0
+      },
+      {
+        "resource": "confirmation_reservations",
+        "units": "count",
+        "quantity": 1.0
+      },
+      {
+        "resource": "confirmation_scores_committed",
+        "units": "count",
+        "quantity": 1.0
+      },
+      {
+        "resource": "confirmation_scoring_starts",
+        "units": "count",
+        "quantity": 1.0
+      },
+      {
+        "resource": "load_case_attempts",
+        "units": "count",
+        "quantity": 24.0
+      },
+      {
+        "resource": "load_completed_evaluations",
+        "units": "count",
+        "quantity": 24.0
+      },
+      {
+        "resource": "load_component_calls",
+        "units": "count",
+        "quantity": 6328.0
+      },
+      {
+        "resource": "load_component_linearize_calls",
+        "units": "count",
+        "quantity": 1940.0
+      },
+      {
+        "resource": "load_known_completed_component_calls",
+        "units": "count",
+        "quantity": 6328.0
+      },
+      {
+        "resource": "load_known_completed_component_linearize_calls",
+        "units": "count",
+        "quantity": 1940.0
+      },
+      {
+        "resource": "load_known_completed_solver_iterations",
+        "units": "count",
+        "quantity": 388.0
+      },
+      {
+        "resource": "load_model_start_reservations",
+        "units": "count",
+        "quantity": 24.0
+      },
+      {
+        "resource": "load_model_starts",
+        "units": "count",
+        "quantity": 24.0
+      },
+      {
+        "resource": "load_solver_iteration_reservations",
+        "units": "count",
+        "quantity": 2400.0
+      },
+      {
+        "resource": "load_solver_iterations",
+        "units": "count",
+        "quantity": 388.0
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "receipt_id": "cost-d68125cf285c58d85ef7cff68613b69c3d8541e7f15cfcb0",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_reservations",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-84f419fb68308a5459418d1df81ba73098f1fc5e96176df8",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_access_intents",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-2a12fcfb6a8ee2120216204e13b78353c9831141d3c272a7",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_scores_committed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-926f4ed56032967adf4b0271292a328bfa08de6eb7a01056",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_callbacks_completed",
+      "units": "count",
+      "quantity": null,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-6eb364e27451ca8bda844b4a85cac55df9757b04e5ac32bf",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_callback_duration",
+      "units": "s",
+      "quantity": null,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-4168ab0aeb99fce0ce5abbf8302561eb1a23e3483c73018a",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_scoring_starts",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-90f2eecb61d99771b6557c0f5a3e18111f3ee60767a6f1ed",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_recoveries_committed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-e8905f478e4973da6f5dcea58a2ae3753b080f0e015474b8",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_container_starts",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "cost-66c293a4f1cb98ab172bfbccbb6c78d00efea9d1a74ef1e2",
+      "source_digest": "0dae4124f2a4021fddf9dd3f50158050a490902b8cfd7444eb11a4bdbbc6b12c",
+      "category": "confirmation",
+      "resource": "confirmation_container_lifecycle_duration",
+      "units": "s",
+      "quantity": 1.8630443750880659,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-a2341f94fedc87a18309b29b34294151cbb472766e6ee207",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_model_start_reservations",
+      "units": "count",
+      "quantity": 24.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-2e1cee957541ba136f793d3925ebdd5393e33bc08ce56e08",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_solver_iteration_reservations",
+      "units": "count",
+      "quantity": 2400.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-49873268369e4c3a180845404a05413d01ec64064a641cef",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_case_attempts",
+      "units": "count",
+      "quantity": 24.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-38c3628257142359f62c3ce2021404b05b837458b6fdc93e",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_completed_evaluations",
+      "units": "count",
+      "quantity": 24.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-9d2a45b90d1121888c9b6b0e92076a6ee49f1846ccf308d0",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_model_starts",
+      "units": "count",
+      "quantity": 24.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-0c94f4cc2ec0f083d944ebfd6ceea0813e642bbe59d88d7b",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_solver_iterations",
+      "units": "count",
+      "quantity": 388.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-0613d2165bfa7f14d3fbaff328581b9fcf5f6a969584a10e",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_known_completed_solver_iterations",
+      "units": "count",
+      "quantity": 388.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-12e705fd802e55fea3935941b78e564121cbd3e0a0dad840",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_component_calls",
+      "units": "count",
+      "quantity": 6328.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-4f18316ecb5d30038ae1bc081dd2d3096c798c5ea4c798f0",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_known_completed_component_calls",
+      "units": "count",
+      "quantity": 6328.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-9eece040bda30df07ad8781016a75b2870d3104631c35475",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_component_linearize_calls",
+      "units": "count",
+      "quantity": 1940.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "load-cost-479a3d6df7617f51b43946cc022fb5e31055ba0fba7a4a25",
+      "source_digest": "20fc8ab5fc565d3b86c5770f68734e418e7afe8c323f192f553e8f0b42a82ba7",
+      "category": "confirmation",
+      "resource": "load_known_completed_component_linearize_calls",
+      "units": "count",
+      "quantity": 1940.0,
+      "cell_digests": [
+        "2a7b2c4391d0799df1af1a29e5d792c0e098bac652fe9b9acc780d61136b64d2"
+      ],
+      "allocation": [
+        1.0
+      ]
+    }
+  ],
+  "evidence_blockers": [],
+  "complete_cost_evidence": false,
+  "cost_limits": [
+    "Task-level solver, training, human and preparation receipts remain required",
+    "Reservations do not establish physical starts",
+    "Per-attempt durations may overlap",
+    "Scoring starts require execution receipts; callback duration includes nested work",
+    "Container lifecycle durations overlap callback durations; do not add them",
+    "Provider token components overlap totals; do not sum distinct token resources",
+    "Missing token fields and billed provider spend remain unknown",
+    "Load work receipts are trusted application evidence, not OS execution proof",
+    "Do not add load reservations or known-completed subsets to full totals",
+    "Component linearization counts include Newton work and are not FLOPs"
+  ],
+  "utility_verdict": "not_attempted",
+  "cost_inputs_digest": "6235915fb459401fad686a34e10b81f8e97caae604c2e63a83237d0815acffc5",
+  "source_head": "3320418072037a7b9440e6a6c432583669b4eaa7c2ec71e75f6650f0e6bc6e80"
+}

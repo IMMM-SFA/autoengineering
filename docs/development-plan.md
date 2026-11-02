@@ -93,6 +93,17 @@ failures, interruption, and replay without changing existing ledger semantics.
 
 ## 3. Implement a small multi-agent system
 
+The [detailed implementation plan](implementation-plans/part-3-multi-agent-system.md) defines the
+role contracts, host integration, permissions, generated-code admission, recovery, and acceptance
+gates above the [Part 2 campaign handoff](part-3-campaign-handoff.md).
+
+__Status: implemented and locally verified for the bounded macOS ARM64 delivery.__ The
+[final audit](reviews/part-3-final-audit.md) maps all seven increments to executed evidence.
+The three-route Leaf River pilot completed with identical scientific choices and added agent
+overhead. Independent confirmation, broader utility and the original deferred scope remain
+outside this delivery.
+
+
 Start with four roles, activated as needed rather than keeping every agent running continuously:
 
 | Role | Responsibility | Required output |
@@ -125,6 +136,15 @@ are not exactly reproducible.
 
 ## 4. Add established capabilities where examples need them
 
+The [detailed implementation plan](implementation-plans/part-4-interoperability.md) defines
+BMI semantics, external optimizer selection, coupled and solar examples, conditional integrations,
+and the recovery, verification and adoption gates. Its bounded macOS ARM64 delivery
+is complete in the [final audit](reviews/part-4-completion-audit.md). This includes
+the qualified BMI subset, selected experimental Optuna policy, real coupled circuit,
+solar workflow and installed reports. Linux runtime is unverified. PyMT extensions,
+DAKOTA and Ray remain deferred under their recorded need gates. The
+[Part 5 handoff](part-4-handoff.md) preserves development exposure and scientific limits.
+
 Investigate all six systems, but implement integrations in order of demonstrated need. Prefer
 adapters to reimplementing numerical methods. The following priorities are proposed choices;
 the linked documentation describes the source capabilities.
@@ -154,6 +174,10 @@ failure meaning and recovery, and provides a measured benefit or removes a docum
 burden. Optional integrations must not become dependencies of the base package.
 
 ## 5. Establish utility across real examples
+
+The [detailed implementation plan](implementation-plans/part-5-utility-confirmation.md) defines
+independent task admission, matched route comparisons, comparative confirmation, cost accounting,
+role ablations and implementation gates. It is proposed work; no Part 5 confirmation has run.
 
 Develop examples alongside the interfaces, then freeze an evaluation suite separate from the
 development cases. Existing examples help build the workflow, but cannot alone establish that it

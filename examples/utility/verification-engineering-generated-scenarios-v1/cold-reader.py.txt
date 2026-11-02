@@ -1,0 +1,49 @@
+"""Verify public scenario commitments and the authored barrier without private inputs."""
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(sys.argv[2]).resolve()))
+import importlib.abc
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self,fullname,*args):
+        if fullname.split('.')[0] in {'openmdao','py_wake','topfarm','pvlib','torch','h5py'}:
+            raise RuntimeError('optional models denied')
+sys.meta_path.insert(0,NoModels())
+import hashlib,json,os,socket,subprocess,time
+from autoengineering.campaign.serialization import digest,unique_json
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.controller import UtilityController
+from autoengineering.utility.confirmation import read_manifest
+from examples.utility import engineering_scenarios as g
+root=Path(sys.argv[1]).resolve()
+expected=json.loads((root.parent/'expected-public.json').read_text())
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def denied(*args,**kwargs):raise RuntimeError('private derivation entropy process network or clock denied')
+g.derive=g.secrets.token_bytes=subprocess.Popen=socket.socket=time.monotonic=time.time=denied
+
+def audit(event,args):
+    if event=='open':
+        path,mode,flags=args
+        if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise RuntimeError('write denied')
+        if isinstance(path,int):
+            info=os.fstat(path)
+            if (info.st_dev,info.st_ino) not in inodes:raise RuntimeError('outside descriptor denied')
+        elif not Path(os.fsdecode(path)).absolute().is_relative_to(root):raise RuntimeError('outside read denied')
+    if event=='import' or event.startswith(('socket.','subprocess.','os.exec','os.fork','os.posix_spawn')):
+        raise RuntimeError('new import or execution denied')
+sys.addaudithook(audit)
+for name,sha in expected['files'].items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+metadata=g.read_public(root/'metadata',expected_manifest_digest=expected['public_manifest_digest'])
+store=SuiteStore(root/'suite')
+assert store.spec.digest==expected['suite_digest']
+state=store.replay()
+assert state['frozen']==expected['selection_barrier_digest']
+barrier=read_manifest(store.root,state['frozen'])
+assert len(barrier.cells)==len(store.spec.cells)==2 and all(c.status=='not_attempted' for c in barrier.cells)
+assert not state['attempts'] and len(state['events'])==1
+assert metadata['suite_digest']==store.spec.digest and metadata['scenario_count']==24
+assert metadata['policy']['generation_stage']=='before_any_suite_selection'
+assert all(metadata[k] is False for k in ('outputs_evaluated','task_admitted','historical_data_independence_attested','private_boundary_qualified'))
+assert not any(p.name=='scenarios.json' for p in root.rglob('*'))
+print(json.dumps({'public_commitments_verified':True,'complete_authored_barrier_verified':True,
+                  'scenario_count':24,'private_sources_read':False,'private_draw_recomputed':False,
+                  'entropy_calls':0,'model_calls':0,'processes':0,'network_calls':0,'task_admitted':False}))

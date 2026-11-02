@@ -1,0 +1,32 @@
+{
+  "created_utc": "2026-10-30T12:35:12.864730+00:00",
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "a1466b136e153824b9579fcec442aada13842b3092da23466f4516ec1746b5e0",
+    "docs/reviews/part-5-progress.md": "7c0c91ed108b2c2fdca1ebc1552614d5dc9dcd9e2f8b7c6ae0144b9b8c3f61e7",
+    "docs/reviews/part-5-readiness.md": "4cb1fa12669aaeb5d4e4c60f7127751968b58ee287a6976b1ecb2f2df53b6ceb",
+    "docs/utility-handoff.md": "fb7d03c4a1a6109c581daaab226d11f7100c89c3f194b94f4bf1b1eae9230ecf"
+  },
+  "limits": [
+    "default environment only; historical verification/development archives excluded from source pins",
+    "no learned-worker, independent task or private scorer admission",
+    "parent training-cost integration, fitting grants and trained selection closure remain open",
+    "no fresh optional-environment, installed-package or second-platform qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-training-parent-transport.json",
+  "predecessor_sha256": "db20e1fa28c1fc063931834276cc0e752dcb1941b7beeb1d467373daa1954d56",
+  "qualification": "examples/utility/verification-current-base-v2",
+  "qualification_summary_sha256": "9db544517df5a4e84da7ec41397e1cbf66539b371fcde52dee9566e8ce5eeae8",
+  "qualification_terminal_sha256": "573fe663c8dddcd066e2d1f97415e7bf649359b249e14f41f190097104bf98c3",
+  "runtime_and_test_bytes_unchanged_after_full_run": true,
+  "schema": "utility-source-increment-v1",
+  "scope": "full default-suite verification and subsequent documentation-only checkpoint pointers",
+  "verification": {
+    "diff_check": "passed",
+    "errors": 0,
+    "failures": 0,
+    "full_default": "2721 passed, 120 skipped in 2202.17s",
+    "junit_cases": 2841,
+    "post_checkpoint_documentation": "22 passed in 0.73s",
+    "unchanged_pinned_files": 8007
+  }
+}

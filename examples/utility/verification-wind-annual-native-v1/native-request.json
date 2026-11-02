@@ -1,0 +1,176 @@
+{
+  "schema": "utility-wind-annual-native-control-v1",
+  "scope": "authored constant drivers and authored selection fixture; not independent data",
+  "physical_model_starts_reserved": 3,
+  "private_payload_reads_reserved": 3,
+  "private_bytes_reserved": 420864,
+  "automatic_retries": 0,
+  "fault": "confirmation_score_created",
+  "leap_year_ratio_relative_tolerance": 1e-12,
+  "same_hour_count_absolute_tolerance_gwh": 1e-12,
+  "grant": {
+    "suite_digest": "def63a9bf9bd2fa85ead12d3fe914b80bb5af9462a2e0c5d42d8530f5befb6a8",
+    "cell_digest": "dc70207e1a9f17b9d553bef71f56db6f70774f247c67d8fcd61e766db259fedb",
+    "partition_digest": "312ff8d6f733f5a00691781496a0c89db23e0b75b9b60d99a601d292b8b27eac",
+    "scorer_digest": "684be773f96ffcbc447cb1e9e5524cbdc591d7e627ad5db41630818222325b8d",
+    "outcome_digest": "f9a6bd6dae81b4f30793324b1c63e9f1a8ebdba929526af2d1f34d509f0230ea",
+    "model_digest": "76402566e4faabd4f4a5f69da79ce00113ee68704219381688f5a8a5ae03224e",
+    "selection_digest": "1da80a232ffe84deb8163bf180a80c726d7c35a4816cfeb95a954368d2ef195f",
+    "resources": [
+      {
+        "name": "scientific_starts",
+        "units": "count",
+        "limit": 1.0,
+        "enforcement": "reservation"
+      },
+      {
+        "name": "wind_model_starts",
+        "units": "count",
+        "limit": 3.0,
+        "enforcement": "reservation"
+      },
+      {
+        "name": "private_wind_reads",
+        "units": "count",
+        "limit": 3.0,
+        "enforcement": "reservation"
+      },
+      {
+        "name": "private_wind_bytes",
+        "units": "count",
+        "limit": 420864.0,
+        "enforcement": "reservation"
+      },
+      {
+        "name": "active_time",
+        "units": "s",
+        "limit": 60.0,
+        "enforcement": "reservation"
+      }
+    ]
+  },
+  "model_artifact": {
+    "path": "artifacts/76402566e4faabd4f4a5f69da79ce00113ee68704219381688f5a8a5ae03224e/model.json",
+    "sha256": "76402566e4faabd4f4a5f69da79ce00113ee68704219381688f5a8a5ae03224e",
+    "size_bytes": 2168,
+    "media_type": "application/json",
+    "producer": "fixture",
+    "metadata": {}
+  },
+  "source_binding_artifact": {
+    "path": "wind-annual-source-bindings/task.json",
+    "sha256": "d1498faffffee50018bd4cbe9014e007a0dbd2767eab1010326f2fd565f5ba09",
+    "size_bytes": 2229,
+    "media_type": "application/json",
+    "producer": "wind-annual-source",
+    "metadata": {}
+  },
+  "policy": {
+    "schema": "utility-wind-annual-score-v1",
+    "scorer_source_digest": "80e03cbf827447fa45334de7c9b1a165b11c13df5e57e0481beb3c4264291bda",
+    "model_digest": "3d6b004349a9ca2a47cebabbba615fdf8849162a3c83c3a8da29edc8153156b1",
+    "plan_digest": "312ff8d6f733f5a00691781496a0c89db23e0b75b9b60d99a601d292b8b27eac"
+  },
+  "geometry": {
+    "x": [
+      0.0,
+      600.0,
+      0.0,
+      600.0
+    ],
+    "y": [
+      0.0,
+      0.0,
+      600.0,
+      600.0
+    ],
+    "direction_step": 30
+  },
+  "expected_model": {
+    "graph_digest": "034ab06a4b38673a04ed0b962ca37866cc6af40aed740b9ec10087d3d2fa2cf2",
+    "implementations": {
+      "wind": "annual-hourly-noj-v1"
+    },
+    "source_bundle": [
+      {
+        "path": "examples/utility/wind_hourly.py",
+        "sha256": "6f888bf95361769b0ae18ca3ea0d2ff0702ee691e22536f89d0576853c1dc9fe",
+        "size_bytes": 10307,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "examples/utility/wind_parameters.py",
+        "sha256": "552c978d2b91b2e3e3900c46329ff67f9bb06a15b691aaaaa7f77e851bfb7726",
+        "size_bytes": 5317,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "examples/utility/wind.py",
+        "sha256": "6fdc15a62f95f2cd13cd6175480ac9b5ec381126097b9ab7e72cd7ebf8d94b37",
+        "size_bytes": 5151,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "examples/utility/wind_annual.py",
+        "sha256": "685fba50d0f7f26f0362c486d5bb8bb48045db229d54aaf970edc2885d13b4aa",
+        "size_bytes": 7310,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "pixi.lock",
+        "sha256": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+        "size_bytes": 666693,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "examples/utility/wind_annual_scoring.py",
+        "sha256": "80e03cbf827447fa45334de7c9b1a165b11c13df5e57e0481beb3c4264291bda",
+        "size_bytes": 10990,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "examples/utility/wind_annual_source.py",
+        "sha256": "2bab27e011865f9ec2ff1690530338d35d0046a4529c73328257167045bbf8ef",
+        "size_bytes": 14715,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      },
+      {
+        "path": "examples/utility/wind_annual_callback.py",
+        "sha256": "3145aef0009c74a9aa2b1444b117d705eafe67ec7f5f440a6559844f5323bd49",
+        "size_bytes": 18725,
+        "media_type": "text/plain",
+        "producer": "annual-wind-model",
+        "metadata": {}
+      }
+    ],
+    "dependency_bundle": "01183e715353a39062fedea42880b9e0cfb737ea7d805bd9b80e62f121e93d26",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "mean_annual_energy",
+        "dimensions": [],
+        "units": "GWh",
+        "dtype_family": "float",
+        "coordinates": [],
+        "grid_id": "scalar",
+        "coordinate_digest": "466de580545845fce8391900157034a8c40ff9e5093e88949f3cc9d7827b5965",
+        "time": null,
+        "missing": "forbid"
+      }
+    ]
+  }
+}

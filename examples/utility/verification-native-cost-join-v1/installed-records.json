@@ -1,0 +1,386 @@
+{
+  "circuit": [
+    {
+      "receipt_id": "native-cost-0b1c5795eaaee3127633b93a2a5fbc94e53ea0d2e161a07f",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_driver_process_starts",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-b3eda93f2bcdce4a9b4d066295b2ce7254b22a51bee3452e",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_inner_model_calls",
+      "units": "count",
+      "quantity": 4.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-e6c7b14ebef217cf1c6143929f1bf8bbd930dfae6a7f6c5e",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_driver_derivative_calls",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-f5d341d1158a7ac30d7712bef3a75db500c6373c53a93dc2",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_driver_final_solver_iterations",
+      "units": "count",
+      "quantity": 2.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-5382682f2e182e22078db0e89067283df0adbf281ee8aa66",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_driver_final_component_calls",
+      "units": "count",
+      "quantity": 5.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-cb05bc6030d117ce8d14676a1a08310fa9c31217d439178b",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_scenario_solver_iterations",
+      "units": "count",
+      "quantity": 4.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-5085597f0054ab537beef2f88642aa319a387aa50f4afd8a",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_scenario_component_calls",
+      "units": "count",
+      "quantity": 10.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-9922d043cc5a0537e536111b7da54978f9c93143ae82d725",
+      "source_digest": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "category": "selection",
+      "resource": "native_scenario_derivative_calls",
+      "units": "count",
+      "quantity": 2.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    }
+  ],
+  "callback": [
+    {
+      "receipt_id": "native-cost-077dbda820b6b14742b681b984afcb6213a692c32f38925b",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_driver_process_starts",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-b4a385ecb6320d5a334b14a60de9d05bc1f13e4466d23ab2",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_callback_entries",
+      "units": "count",
+      "quantity": 2.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-2ab4362bbaca0136c739ce426fd618a8adf0619ffbd5caf9",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_gradient_callbacks_attempted",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-e486dc9cfbc71af0c0a1b9dea151480acad17e4925d4115c",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_gradient_callbacks_completed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-7c76b5de81113c4fa8f382b1bf7118818a0ba1e3812649f0",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_gradient_callbacks_failed",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-f571f28a998c0034292ee71d69efed7be37199654578ec56",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_gradient_callbacks_unresolved",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-c0685a40f9cff43ecf135f9fec4812af943fb1a3cf3b4cfa",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_wake_callbacks_attempted",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-f4450266d69d4b9aeee15a2ff3f2eeed5a45562d8eaa7eee",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_wake_callbacks_completed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-0f56e590dc2e3f85943de8fd10887b5fc0c33bd4cf31eb7a",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_wake_callbacks_failed",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "native-cost-c7c0fa486cc3c182575b5012f6f0f99679cbe4e7b779a122",
+      "source_digest": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "category": "selection",
+      "resource": "native_wake_callbacks_unresolved",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    }
+  ],
+  "wind": [
+    {
+      "receipt_id": "wind-cost-a78a2f7a4774465c8b44bc9808b3cf9c45b9f17b09abd818",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_process_starts",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-e445c750d723a474a382efe761d4a63992c2e21f0067d9fd",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_attempted",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-72e68a2f7728a06906cec5fd982f6bee2ca5625c16bd99f1",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_completed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-97c538eba13fe92e080664f323a7b12ef85f04502ebfa0ad",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_failed",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-462d8f52043e1dc3be6b45b6acf054fd63b65710a3236d06",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_wake_callbacks_unresolved",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-abf1c8516e0277548213077ec7022914766480293e0acd19",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_attempted",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-1f4b0adaadc7244c3e26b950bd04db7425068a49a8c7686a",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_completed",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-19caaa5794277f677369000516a3856a6e6769447a24cebf",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_failed",
+      "units": "count",
+      "quantity": 1.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    },
+    {
+      "receipt_id": "wind-cost-72afd49e0aedccd68a2f44f590dcf5f984dacb06b5bd1acf",
+      "source_digest": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "category": "selection",
+      "resource": "wind_native_gradient_callbacks_unresolved",
+      "units": "count",
+      "quantity": 0.0,
+      "cell_digests": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "allocation": [
+        1.0
+      ]
+    }
+  ]
+}

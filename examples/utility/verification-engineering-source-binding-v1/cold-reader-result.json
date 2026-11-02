@@ -1,0 +1,15 @@
+{
+  "sealed_binding_verified": true,
+  "saved_receipt_verified": true,
+  "bound_scorer_identity_verified": true,
+  "source_read_intents": 1,
+  "confirmation_starts_charged": 1,
+  "new_source_reads": 0,
+  "new_entropy": 0,
+  "new_scoring": 0,
+  "new_models": 0,
+  "network": 0,
+  "processes": 0,
+  "authored_score_only": true,
+  "task_admitted": false
+}

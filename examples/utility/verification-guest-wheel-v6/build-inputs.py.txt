@@ -1,0 +1,64 @@
+"""Build the successor guest wheel offline, preserving the exact v5 evidence."""
+from pathlib import Path
+import hashlib,io,json,os,shutil,subprocess,sys,zipfile
+sys.path.insert(0,str(Path.cwd()))
+from autoengineering.campaign.artifacts import read_bytes,reference
+from examples.utility.inference_environment import prepare_inputs,verify_inputs
+from examples.utility.guest_image import _source_alignment
+root=Path.cwd();out=root/'examples/utility/verification-guest-wheel-v6'
+old_root=root/'examples/utility/prepared-inference-environment-v5'
+old_digest='7c66ecada3955ad940d07fcf409b7f78bf68fc643950340f408d9d398a6fa06e'
+old=verify_inputs(old_root,expected_digest=old_digest)
+old_bytes=read_bytes(old_root,old.wheel,max_bytes=4*1024*1024)
+stage=Path('/private/tmp/utility-guest-wheel-v6');stage.mkdir(mode=0o700)
+build=stage/'source';build.mkdir(mode=0o700)
+names={'pyproject.toml','pixi.lock','LICENSE','NOTICE','README.md'}
+with zipfile.ZipFile(io.BytesIO(old_bytes)) as previous:
+    for name in previous.namelist():
+        if '.dist-info/' in name:
+            continue
+        source='src/'+name if name.startswith('autoengineering/') else name
+        names.add(source)
+        if not name.startswith('autoengineering/') or not name.endswith('.py'):
+            assert (root/source).read_bytes()==previous.read(name),source
+names.update(str(p.relative_to(root)) for p in (root/'src/autoengineering').rglob('*.py'))
+pins={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in sorted(names)}
+for name in names:
+    dest=build/name;dest.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
+    shutil.copyfile(root/name,dest)
+(out/'wheel-source-pins.json').write_text(json.dumps(pins,indent=2)+'\n')
+env=os.environ.copy();env['SOURCE_DATE_EPOCH']='1793318400'
+command=[sys.executable,'-I','-B','-c',"from setuptools.build_meta import build_wheel; build_wheel('../wheel')"]
+p=subprocess.run(command,cwd=build,env=env,capture_output=True,text=True)
+(out/'build.stdout.txt').write_text(p.stdout);(out/'build.stderr.txt').write_text(p.stderr)
+assert p.returncode==0
+wheel=next((stage/'wheel').glob('*.whl'));saved=out/wheel.name
+shutil.copyfile(wheel,saved)
+with zipfile.ZipFile(saved) as z:
+    payloads={n:z.read(n) for n in z.namelist() if '.dist-info/' not in n}
+    python={n:b for n,b in payloads.items() if n.endswith('.py')}
+    assert len(python)==316
+    core={n:b for n,b in python.items() if n.startswith('autoengineering/')}
+    assert len(core)==225
+    assert set(core)=={'autoengineering/'+str(p.relative_to(root/'src/autoengineering')) for p in (root/'src/autoengineering').rglob('*.py')}
+    for name,data in payloads.items():
+        source='src/'+name if name.startswith('autoengineering/') else name
+        assert hashlib.sha256(data).hexdigest()==pins[source]
+lock=reference(root,'pixi.lock',media_type='text/plain',producer='pixi')
+wheel_ref=reference(root,str(saved.relative_to(root)),media_type='application/zip',producer='build')
+inputs=prepare_inputs(root,lock=lock,wheel=wheel_ref,output=root/'examples/utility/prepared-inference-environment-v6')
+assert verify_inputs(root/'examples/utility/prepared-inference-environment-v6',expected_digest=inputs.digest)==inputs
+_source_alignment(inputs,root)
+assert verify_inputs(old_root,expected_digest=old_digest)==old
+assert old.archives==inputs.archives and old.lock.sha256==inputs.lock.sha256
+assert all(hashlib.sha256((root/n).read_bytes()).hexdigest()==sha for n,sha in pins.items())
+result={'inputs_digest':inputs.digest,'wheel_sha256':wheel_ref.sha256,'build_exit_code':p.returncode,
+ 'copied_inputs':len(pins),'core_python_files':225,'declared_guest_python_files':316,
+ 'all_package_payloads_match_inputs':True,'current_source_alignment_verified':True,
+ 'historical_v5_inputs_preserved':True,'runtime_archives_unchanged':True,'lock_unchanged':True,
+ 'dependency_roots':list(inputs.roots),'runtime_archives':len(inputs.archives),
+ 'compressed_archive_bytes':inputs.compressed_archive_bytes,
+ 'new_network_requests':0,'new_dependency_installations':0,'new_model_calls':0,
+ 'installed':False,'image_built':False,'runtime_qualified':False,'task_admitted':False}
+(out/'prepared-inputs.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

@@ -1,0 +1,4 @@
+{
+  "summary_sha256": "6c4c8d386ab29198f84cd0e299ac686de809fe3abc47c05e14914f86edac6a52",
+  "scope": "caller-pinned synthetic demo export; arithmetic reconstruction, not model execution"
+}

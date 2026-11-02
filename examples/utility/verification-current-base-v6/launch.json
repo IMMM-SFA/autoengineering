@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/usr/bin/caffeinate",
+    "-i",
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/private/tmp/utility-current-base-v6",
+    "--junitxml=/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-current-base-v6/junit.xml",
+    "--tb=short"
+  ],
+  "cwd": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture",
+  "began_utc": "2026-10-31T20:31:51.443336+00:00",
+  "pinned_files": 11997,
+  "core_python_files": 225,
+  "test_python_files": 287,
+  "sleep_inhibited_from_launch": true
+}

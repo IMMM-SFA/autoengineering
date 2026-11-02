@@ -1,0 +1,617 @@
+"""Candidate independent owner-pipe watchdog; no create, start or science retry.
+
+Only the original CID/image/labels authorize cleanup. A successful HTTP action
+alone is not stop proof. Original observations and unresolved outcomes are retained.
+This module is not actual-daemon, deadline or OS/privacy runtime qualification.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import os
+from pathlib import Path
+import select
+import stat
+import struct
+import subprocess
+import sys
+import time
+from typing import Literal
+
+from autoengineering.campaign.artifacts import confined_file, put_bytes, read_bytes
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.campaign.serialization import Record, canonical_json, digest, unique_json
+from autoengineering.campaign.store import StoreError, checked_directory, durable_write
+from .contracts import sha256
+from .guest_daemon import GuestDaemonAPI, GuestDaemonProfile, _access
+from .guest_observations import labels, verify_owned
+from .guest_owner import GuestOwnerJournal
+
+POLL = 0.1
+CLEANUP_SECONDS = 10.0
+READY_SECONDS = 5.0
+
+
+@dataclass(frozen=True)
+class GuestWatchdogPlan(Record):
+    schema: Literal["utility-guest-watchdog-plan-v1"]
+    owner_digest: str
+    job_digest: str
+    launch_digest: str
+    container_id: str
+    nonce: str
+    owner_pid: int
+    suite_root: str
+    socket_path: str
+    runtime: GuestDaemonProfile
+    armed_at: float
+    deadline: float
+    cleanup_seconds: Literal[10.0] = 10.0
+
+    def _validate(self):
+        for value in (self.owner_digest, self.job_digest, self.launch_digest, self.container_id):
+            sha256(value)
+        if (
+            not self.nonce
+            or len(self.nonce) != 32
+            or any(c not in "0123456789abcdef" for c in self.nonce)
+            or self.owner_pid <= 0
+            or not 0 < self.deadline - self.armed_at <= 60
+        ):
+            raise ValueError("guest watchdog identity/deadline differs")
+        if (
+            not Path(self.suite_root).is_absolute()
+            or not Path(self.socket_path).is_absolute()
+            or digest(self.socket_path) != self.runtime.endpoint_digest
+        ):
+            raise ValueError("guest watchdog private endpoint/suite scope differs")
+
+
+@dataclass(frozen=True)
+class GuestWatchdogReady(Record):
+    schema: Literal["utility-guest-watchdog-ready-v1"]
+    plan_digest: str
+    owner_digest: str
+    container_id: str
+    watchdog_pid: int
+
+    def _validate(self):
+        for value in (self.plan_digest, self.owner_digest, self.container_id):
+            sha256(value)
+        if self.watchdog_pid <= 0:
+            raise ValueError("guest watchdog requires its original process")
+
+
+@dataclass(frozen=True)
+class GuestWatchdogOutcome(Record):
+    schema: Literal["utility-guest-watchdog-outcome-v1"]
+    plan_digest: str
+    owner_digest: str
+    container_id: str
+    reason: Literal[
+        "owner_lost",
+        "deadline",
+        "cancelled",
+        "owner_done",
+        "invalid_disarm",
+        "startup_refused",
+        "owner_finished",
+    ]
+    result: Literal["absent", "unverified", "foreign_refused", "disarmed"]
+    before: ArtifactRef | None
+    stopped: ArtifactRef | None
+    absence: ArtifactRef | None
+    kill_intended: bool
+    delete_intended: bool
+    parent_cleanup_head: str | None = None
+
+    def _validate(self):
+        for value in (self.plan_digest, self.owner_digest, self.container_id):
+            sha256(value)
+        if self.parent_cleanup_head is not None:
+            sha256(self.parent_cleanup_head)
+        if (self.result in ("absent", "disarmed")) != (self.absence is not None):
+            raise ValueError("guest watchdog absence must be explicitly observed")
+        if self.result == "disarmed" and (
+            self.reason != "owner_done"
+            or self.parent_cleanup_head is None
+            or self.kill_intended
+            or self.delete_intended
+        ):
+            raise ValueError("guest watchdog disarm requires original parent cleanup")
+
+
+def _json(root, name, kind, limit=65536):
+    path = confined_file(root, name)
+    if path.stat().st_size > limit:
+        raise StoreError("guest watchdog record exceeds bound")
+    return kind.from_json(path.read_text())
+
+
+def _bindings(owner, plan):
+    m = owner.manifest
+    if (
+        plan.owner_digest,
+        plan.job_digest,
+        plan.launch_digest,
+        plan.nonce,
+        plan.runtime.digest,
+    ) != (m.digest, m.job.digest, m.launch.digest, m.job.nonce, m.launch.runtime_digest):
+        raise StoreError("guest watchdog differs from original owner/job/runtime")
+    state = owner.replay()
+    if len(state.events) < 2 or state.observations["created"]["Id"] != plan.container_id:
+        raise StoreError("guest watchdog lacks original creation")
+    if state.events[1].daemon_creation is None:
+        raise StoreError("guest watchdog cannot arm without a reviewed original create response")
+    return state
+
+
+def _identity(value, owner, plan):
+    """Immutable ownership only; resource drift must not disable owned cleanup."""
+    m = owner.manifest
+    if (
+        not isinstance(value, dict)
+        or value.get("Id") != plan.container_id
+        or value.get("Image") != m.job.guest.image_id
+    ):
+        raise StoreError("guest watchdog refuses foreign container identity")
+    config = value.get("Config")
+    observed = config.get("Labels") if isinstance(config, dict) else None
+    if not isinstance(observed, dict) or any(
+        observed.get(k) != v for k, v in labels(m.job, m.launch).items()
+    ):
+        raise StoreError("guest watchdog refuses foreign original labels")
+
+
+def _stopped(value):
+    state = value.get("State")
+    return (
+        isinstance(state, dict)
+        and state.get("Status") in ("exited", "dead", "created")
+        and state.get("Running") is False
+        and type(state.get("Pid")) is int
+        and state["Pid"] == 0
+        and state.get("Restarting") is False
+        and state.get("Paused") is False
+    )
+
+
+def _server(api, *, deadline):
+    server = api._json("GET", "/version", deadline=deadline)
+    if (
+        digest(server) != api.profile.server_digest
+        or server.get("ApiVersion") != api.profile.api_version
+        or server.get("Os") != "linux"
+    ):
+        raise StoreError("guest watchdog daemon identity changed")
+
+
+def _save(root, name, value):
+    return put_bytes(
+        root,
+        canonical_json(value).encode(),
+        name=name,
+        media_type="application/json",
+        producer="guest-watchdog",
+    )
+
+
+def _intent(root, name, plan, reason):
+    path = root / name
+    value = {"plan_digest": plan.digest, "container_id": plan.container_id, "reason": reason}
+    if path.exists() or path.is_symlink():
+        prior = unique_json(confined_file(root, name).read_text())
+        if prior != value:
+            raise StoreError("guest watchdog cleanup intent differs")
+        return False
+    durable_write(path, canonical_json(value).encode())
+    return True
+
+
+def _absence(root, plan):
+    return _save(
+        root,
+        "observed-absent.json",
+        {
+            "plan_digest": plan.digest,
+            "container_id": plan.container_id,
+            "nonce": plan.nonce,
+            "observed_absent": True,
+        },
+    )
+
+
+def _publish(root, plan, reason, result, before, stopped, absence, *, parent_head=None):
+    outcome = GuestWatchdogOutcome(
+        "utility-guest-watchdog-outcome-v1",
+        plan.digest,
+        plan.owner_digest,
+        plan.container_id,
+        reason,
+        result,
+        before,
+        stopped,
+        absence,
+        (root / "kill-intent.json").is_file(),
+        (root / "delete-intent.json").is_file(),
+        parent_head,
+    )
+    durable_write(root / "outcome.json", outcome.to_json().encode())
+    return outcome
+
+
+def cleanup(owner, api, plan, root, reason):
+    """One bounded original-CID kill/delete sequence, preserving uncertainty."""
+    if (root / "outcome.json").exists():
+        return read_outcome(root, owner, plan)
+    _bindings(owner, plan)
+    end = min(plan.deadline + CLEANUP_SECONDS, time.monotonic() + CLEANUP_SECONDS)
+    before_ref = stop_ref = absent_ref = None
+    try:
+        _server(api, deadline=end)
+        before = api.inspect(plan.container_id, deadline=end)
+        if before is None:
+            return _publish(root, plan, reason, "absent", None, None, _absence(root, plan))
+        try:
+            _identity(before, owner, plan)
+        except ValueError:
+            return _publish(root, plan, reason, "foreign_refused", None, None, None)
+        before_ref = _save(root, "cleanup-before.json", before)
+        current = before
+        if not _stopped(current):
+            if _intent(root, "kill-intent.json", plan, reason):
+                try:
+                    api._request(
+                        "POST", f"/containers/{plan.container_id}/kill?signal=SIGKILL", deadline=end
+                    )
+                except Exception:
+                    pass  # Do not infer that a lost response prevented the kill.
+            until = min(end, time.monotonic() + 5)
+            while time.monotonic() < until:
+                current = api.inspect(plan.container_id, deadline=end)
+                if current is None:
+                    absent_ref = _absence(root, plan)
+                    break
+                _identity(current, owner, plan)
+                if _stopped(current):
+                    break
+                time.sleep(min(0.05, max(0, until - time.monotonic())))
+        if current is not None and _stopped(current):
+            stop_ref = _save(root, "cleanup-stopped.json", current)
+        if absent_ref is None:
+            # A forced removal closes the late-start race on the exact owned CID.
+            # Without a stopped observation it proves absence only, never success.
+            if current is not None:
+                _identity(current, owner, plan)
+            if _intent(root, "delete-intent.json", plan, reason):
+                try:
+                    api._request(
+                        "DELETE", f"/containers/{plan.container_id}?force=1&v=0", deadline=end
+                    )
+                except Exception:
+                    pass
+            remaining = api.inspect(plan.container_id, deadline=end)
+            if remaining is None:
+                absent_ref = _absence(root, plan)
+            else:
+                _identity(remaining, owner, plan)
+        return _publish(
+            root,
+            plan,
+            reason,
+            "absent" if absent_ref else "unverified",
+            before_ref,
+            stop_ref,
+            absent_ref,
+        )
+    except Exception:
+        return _publish(root, plan, reason, "unverified", before_ref, stop_ref, None)
+
+
+def read_outcome(root, owner, plan):
+    """Read original cleanup evidence only; no live API, new time or action."""
+    _bindings(owner, plan)
+    root = checked_directory(root)
+    outcome = _json(root, "outcome.json", GuestWatchdogOutcome)
+    if (outcome.plan_digest, outcome.owner_digest, outcome.container_id) != (
+        plan.digest,
+        owner.manifest.digest,
+        plan.container_id,
+    ):
+        raise StoreError("guest watchdog outcome belongs to another original plan")
+    for ref in (outcome.before, outcome.stopped):
+        if ref is not None:
+            value = unique_json(read_bytes(root, ref, max_bytes=1024 * 1024).decode())
+            _identity(value, owner, plan)
+            if ref == outcome.stopped and not _stopped(value):
+                raise StoreError("guest watchdog stop observation is not terminal")
+    if outcome.absence is not None:
+        value = unique_json(read_bytes(root, outcome.absence, max_bytes=65536).decode())
+        if value != {
+            "plan_digest": plan.digest,
+            "container_id": plan.container_id,
+            "nonce": plan.nonce,
+            "observed_absent": True,
+        }:
+            raise StoreError("guest watchdog original absence observation differs")
+    for flag, name in (
+        (outcome.kill_intended, "kill-intent.json"),
+        (outcome.delete_intended, "delete-intent.json"),
+    ):
+        path = root / name
+        if flag != path.is_file() or path.is_symlink():
+            raise StoreError("guest watchdog original cleanup intent is missing or changed")
+        if flag:
+            value = unique_json(confined_file(root, name).read_text())
+            if value != {
+                "plan_digest": plan.digest,
+                "container_id": plan.container_id,
+                "reason": outcome.reason,
+            }:
+                raise StoreError("guest watchdog cleanup intent belongs to another action")
+    if outcome.result == "disarmed":
+        state = owner.replay()
+        if state.phase != "cleaned" or state.events[-1].digest != outcome.parent_cleanup_head:
+            raise StoreError("guest watchdog disarm lacks original completed cleanup")
+    return outcome
+
+
+def watch(root, owner_fd, ready_fd):
+    root = checked_directory(root)
+    plan = _json(root, "plan.json", GuestWatchdogPlan)
+    owner = GuestOwnerJournal(root.parents[1], suite_root=Path(plan.suite_root))
+    owner._binding()
+    _bindings(owner, plan)
+    if not stat.S_ISFIFO(os.fstat(owner_fd).st_mode) or not stat.S_ISFIFO(
+        os.fstat(ready_fd).st_mode
+    ):
+        raise StoreError("guest watchdog requires original owner/readiness pipes")
+    api = GuestDaemonAPI(
+        plan.socket_path,
+        api_version=plan.runtime.api_version,
+        server_digest=plan.runtime.server_digest,
+    )
+    if api.profile != plan.runtime:
+        raise StoreError("guest watchdog implementation/runtime identity changed")
+    try:
+        api.preflight(
+            owner.manifest.job, deadline=min(plan.deadline, time.monotonic() + READY_SECONDS)
+        )
+        original = api.inspect(plan.container_id, deadline=plan.deadline)
+        _identity(original, owner, plan)
+        verify_owned(original, owner.manifest.job, owner.manifest.launch)
+    except Exception:
+        return cleanup(owner, api, plan, root, "startup_refused")
+    ready = GuestWatchdogReady(
+        "utility-guest-watchdog-ready-v1",
+        plan.digest,
+        plan.owner_digest,
+        plan.container_id,
+        os.getpid(),
+    )
+    durable_write(root / "ready.json", ready.to_json().encode())
+    raw = ready.to_json().encode()
+    try:
+        data = memoryview(struct.pack("!I", len(raw)) + raw)
+        while data:
+            amount = os.write(ready_fd, data)
+            if amount <= 0:
+                raise OSError("readiness pipe closed")
+            data = data[amount:]
+    except OSError:
+        return cleanup(owner, api, plan, root, "owner_lost")
+    finally:
+        os.close(ready_fd)
+    reason = "deadline"
+    while time.monotonic() < plan.deadline:
+        readers, _, _ = select.select(
+            [owner_fd], [], [], min(POLL, max(0, plan.deadline - time.monotonic()))
+        )
+        if not readers:
+            continue
+        command = os.read(owner_fd, 1)
+        # The owner may close its pipe because its identical deadline just
+        # expired. Readability after a scheduler pause cannot relabel that as
+        # owner loss or allow late disarm/cancellation to override expiry.
+        if time.monotonic() >= plan.deadline:
+            reason = "deadline"
+            break
+        if command == b"D":
+            try:
+                state = owner.replay()
+                _server(api, deadline=min(plan.deadline + CLEANUP_SECONDS, time.monotonic() + 5))
+                if (
+                    state.phase == "cleaned"
+                    and api.inspect(
+                        plan.container_id,
+                        deadline=min(plan.deadline + CLEANUP_SECONDS, time.monotonic() + 5),
+                    )
+                    is None
+                ):
+                    return _publish(
+                        root,
+                        plan,
+                        "owner_done",
+                        "disarmed",
+                        None,
+                        None,
+                        _absence(root, plan),
+                        parent_head=state.events[-1].digest,
+                    )
+            except Exception:
+                pass
+            reason = "invalid_disarm"
+        elif command == b"F":
+            reason = "owner_finished"
+        elif command == b"C":
+            reason = "cancelled"
+        else:
+            reason = "owner_lost"
+        break
+    return cleanup(owner, api, plan, root, reason)
+
+
+class GuestWatchdogHandle:
+    """One real child and non-inherited owner write end; not a runtime admission."""
+
+    def __init__(self, process, owner_fd, root, owner, plan):
+        self.process, self._owner_fd, self.root, self.owner, self.plan = (
+            process,
+            owner_fd,
+            root,
+            owner,
+            plan,
+        )
+
+    def check_live(self):
+        if (
+            self._owner_fd is None
+            or self.process.poll() is not None
+            or time.monotonic() >= self.plan.deadline
+        ):
+            raise StoreError("original guest watchdog is not live within its deadline")
+        ready = _json(self.root, "ready.json", GuestWatchdogReady)
+        if (ready.plan_digest, ready.watchdog_pid) != (self.plan.digest, self.process.pid):
+            raise StoreError("guest watchdog readiness belongs to another process")
+        return ready
+
+    def _signal(self, data):
+        try:
+            self.check_live()
+            os.write(self._owner_fd, data)
+        finally:
+            self.close_owner()
+
+    def finish(self):
+        """Request owned cleanup after the parent observed the original stop."""
+        if self.owner.replay().phase not in ("stopped", "cleanup_intent"):
+            raise StoreError("guest watchdog finish requires original stopped evidence")
+        self._signal(b"F")
+
+    def cancel(self):
+        self._signal(b"C")
+
+    def disarm(self):
+        if self.owner.replay().phase != "cleaned":
+            raise StoreError("guest watchdog cannot disarm before original cleanup")
+        self._signal(b"D")
+
+    def close_owner(self):
+        if self._owner_fd is not None:
+            os.close(self._owner_fd)
+            self._owner_fd = None
+
+    def outcome(self, *, timeout=15):
+        self.process.wait(timeout=timeout)
+        return read_outcome(self.root, self.owner, self.plan)
+
+
+def arm(owner, store, api, *, deadline):
+    """Arm an independent real process before any future model-start dispatch."""
+    cleanup = owner.root / "control/creation-cleanup"
+    if cleanup.exists() or cleanup.is_symlink():
+        raise StoreError("creation cleanup already intended; watchdog start authority refused")
+    _access(owner, store)
+    state = owner.replay()
+    if state.phase != "created" or state.events[1].daemon_creation is None:
+        raise StoreError("guest watchdog requires reviewed original unstarted creation")
+    if owner.manifest.launch.runtime_digest != api.identity:
+        raise StoreError("guest watchdog runtime differs from original launch")
+    now = time.monotonic()
+    if (
+        type(deadline) not in (int, float)
+        or not 0 < deadline - now <= owner.manifest.launch.timeout_seconds
+    ):
+        raise StoreError("guest watchdog deadline exceeds original grant")
+    root = owner.root / "control" / "guest-watchdog"
+    root.mkdir(mode=0o700)  # An existing or interrupted guard is never automatically replaced.
+    (root / "artifacts").mkdir(mode=0o700)
+    m = owner.manifest
+    plan = GuestWatchdogPlan(
+        "utility-guest-watchdog-plan-v1",
+        m.digest,
+        m.job.digest,
+        m.launch.digest,
+        state.observations["created"]["Id"],
+        m.job.nonce,
+        os.getpid(),
+        str(store.root),
+        api._socket_path,
+        api.profile,
+        now,
+        deadline,
+    )
+    durable_write(root / "plan.json", plan.to_json().encode())
+    owner.fault("watchdog_intended")
+    owner_read, owner_write = os.pipe()
+    ready_read, ready_write = os.pipe()
+    process = None
+    try:
+        process = subprocess.Popen(
+            [
+                sys.executable,
+                "-I",
+                "-m",
+                "autoengineering.utility.guest_watchdog",
+                str(root),
+                str(owner_read),
+                str(ready_write),
+            ],
+            pass_fds=(owner_read, ready_write),
+            close_fds=True,
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        os.close(owner_read)
+        owner_read = None
+        os.close(ready_write)
+        ready_write = None
+        end = min(deadline, time.monotonic() + READY_SECONDS)
+        raw = bytearray()
+        size = None
+        while time.monotonic() < end:
+            readers, _, _ = select.select(
+                [ready_read], [], [], min(POLL, max(0, end - time.monotonic()))
+            )
+            if not readers:
+                continue
+            value = os.read(ready_read, 65536)
+            if not value:
+                break
+            raw.extend(value)
+            if len(raw) >= 4 and size is None:
+                size = struct.unpack("!I", raw[:4])[0]
+                if not 0 < size <= 65536:
+                    raise StoreError("guest watchdog readiness exceeds bound")
+            if size is not None and len(raw) > size + 4:
+                raise StoreError("guest watchdog readiness contains trailing bytes")
+            if size is not None and len(raw) == size + 4:
+                ready = GuestWatchdogReady.from_json(bytes(raw[4:]).decode())
+                handle = GuestWatchdogHandle(process, owner_write, root, owner, plan)
+                if ready != handle.check_live():
+                    raise StoreError("guest watchdog pipe readiness differs from original record")
+                return handle
+        raise StoreError("guest watchdog readiness is unverified; start forbidden")
+    except BaseException:
+        os.close(owner_write)
+        raise
+    finally:
+        for descriptor in (owner_read, ready_read, ready_write):
+            if descriptor is not None:
+                os.close(descriptor)
+
+
+def main():
+    try:
+        if len(sys.argv) != 4:
+            return 2
+        outcome = watch(Path(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
+        return 0 if outcome.result in ("absent", "disarmed") else 2
+    except Exception:
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

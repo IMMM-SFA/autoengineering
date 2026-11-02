@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "wheel_sha256": "d556a4d7c4ab4215eb311d9f5fd1d1f9741fc553a22621e18836ca97f0f2f15b",
+  "all_tables_byte_identical": true,
+  "summary_identical": true,
+  "files_copied": 94,
+  "table_rows": {
+    "predictions.csv": 3941,
+    "scenarios.csv": 28,
+    "checks.csv": 56,
+    "layouts.csv": 28
+  },
+  "original_checkout_opens": "denied by existing installed Python audit policy",
+  "optional_scientific_packages": "absent",
+  "model_imports_process_and_socket_dispatch": "denied inside exporter",
+  "confirmation": "not_attempted",
+  "scope": "fresh installed reader reconstructs saved development diagnostics, not a complete private confirmation package"
+}

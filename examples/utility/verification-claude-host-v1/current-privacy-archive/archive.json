@@ -1,0 +1,446 @@
+{
+  "excluded_nodes": {
+    "home/linked-private": {
+      "target": "/private/tmp/claude-host-source-probes-v1/privacy/private/labels",
+      "type": "symlink"
+    },
+    "u.sock": {
+      "mode": 49152,
+      "type": "special"
+    },
+    "workspace/linked-private": {
+      "target": "/private/tmp/claude-host-source-probes-v1/privacy/private/labels",
+      "type": "symlink"
+    }
+  },
+  "files": {
+    "artifacts/3b8d928e02fba8ebd8b8ffbd25090cd54a81081d6982e7bc9665e777c811e4f6/probe.c": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "artifacts/3b8d928e02fba8ebd8b8ffbd25090cd54a81081d6982e7bc9665e777c811e4f6/probe.c",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "3b8d928e02fba8ebd8b8ffbd25090cd54a81081d6982e7bc9665e777c811e4f6",
+      "size_bytes": 6696
+    },
+    "artifacts/58f5f9dc56c3c213625c30deb860a8e79e4754cc927938d936e542412dcc9f33/prefs.plist": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "artifacts/58f5f9dc56c3c213625c30deb860a8e79e4754cc927938d936e542412dcc9f33/prefs.plist",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "58f5f9dc56c3c213625c30deb860a8e79e4754cc927938d936e542412dcc9f33",
+      "size_bytes": 253
+    },
+    "artifacts/5d7041e3d17ebb41ec96622b12e911679d501f688d2647a702eec61e72db74e9/control.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "artifacts/5d7041e3d17ebb41ec96622b12e911679d501f688d2647a702eec61e72db74e9/control.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "5d7041e3d17ebb41ec96622b12e911679d501f688d2647a702eec61e72db74e9",
+      "size_bytes": 113
+    },
+    "artifacts/b73fc8842ad089bfd2981e961d15e1e99195542313e5ce314488c40811d027fb/policy.sb": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "artifacts/b73fc8842ad089bfd2981e961d15e1e99195542313e5ce314488c40811d027fb/policy.sb",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "b73fc8842ad089bfd2981e961d15e1e99195542313e5ce314488c40811d027fb",
+      "size_bytes": 2680
+    },
+    "artifacts/cc8513011b1866fe42b49a5f64d83408496edb10d650ccb8d95ebe4506143839/observed.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "artifacts/cc8513011b1866fe42b49a5f64d83408496edb10d650ccb8d95ebe4506143839/observed.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "cc8513011b1866fe42b49a5f64d83408496edb10d650ccb8d95ebe4506143839",
+      "size_bytes": 97
+    },
+    "claude-driver.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "claude-driver.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "3d4a59bbae74a7cd2daecc593a20793e26e838c632c6ec91788d679dabdde66b",
+      "size_bytes": 3034
+    },
+    "compile/completion.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/completion.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "d3c1cd4ce82c10e20a49594ea9028c0b655b2fe28eacc4865069149f34aad7cf",
+      "size_bytes": 618
+    },
+    "compile/intent.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/intent.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "acdea654ba69eb1ca24a81dbd6a8bad1954ccfb9b930837a1df41310d3fe3380",
+      "size_bytes": 51
+    },
+    "compile/job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "0ff97c082ca9f2cf7c1f2308ac737b87784e3aa259e81673292329bce7280b5f",
+      "size_bytes": 482
+    },
+    "compile/launch-gate.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/launch-gate.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "acdea654ba69eb1ca24a81dbd6a8bad1954ccfb9b930837a1df41310d3fe3380",
+      "size_bytes": 51
+    },
+    "compile/process.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/process.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "ac9e1fd4de3629c13dc8522013d3ead8eb762ad92375a4fbc330725888f13e1c",
+      "size_bytes": 113
+    },
+    "compile/stderr.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/stderr.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "compile/stdin.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/stdin.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "compile/stdout.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/stdout.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "compile/watchdog-job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/watchdog-job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "76def66fe102818eeb5427b49aa773cde830f0e5a6deff6174a21bb43492039e",
+      "size_bytes": 492
+    },
+    "compile/watchdog-ready.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/watchdog-ready.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "3fcdb7f027be62a8653eebad76d77a64711226c95f39f15ada494c07ab95dc60",
+      "size_bytes": 145
+    },
+    "compile/watchdog-result.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "compile/watchdog-result.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "0f2b007b5693f0430d25206985989cd4a62859fa166a9514f7dbe12c4454a2cd",
+      "size_bytes": 173
+    },
+    "confined/completion.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/completion.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "71ac9ec06348743ea872da8d0914a721009a6d0eacb3d5985a7c0a4851ce3b23",
+      "size_bytes": 619
+    },
+    "confined/intent.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/intent.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "fa157ed5e7757ce877c9d2eecfab41e441db62fd65669b07713d5e946fe21189",
+      "size_bytes": 51
+    },
+    "confined/job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "8688230644bce905a944ac6848e8abfe4253344b5306da34c0318edd944ed17b",
+      "size_bytes": 1485
+    },
+    "confined/launch-gate.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/launch-gate.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "fa157ed5e7757ce877c9d2eecfab41e441db62fd65669b07713d5e946fe21189",
+      "size_bytes": 51
+    },
+    "confined/process.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/process.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "77d60dd900f4cd734a9f6e599ad7de68c2a242672d022324f01d17a379430348",
+      "size_bytes": 113
+    },
+    "confined/stderr.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/stderr.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "deb02deed536181d6f6fdfd8e54c0515cc00d57d7454b4c1bba7f5427c2739d1",
+      "size_bytes": 29
+    },
+    "confined/stdin.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/stdin.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "confined/stdout.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/stdout.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "cc8513011b1866fe42b49a5f64d83408496edb10d650ccb8d95ebe4506143839",
+      "size_bytes": 97
+    },
+    "confined/watchdog-job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/watchdog-job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "fea64690064634287dcc17b7362615d833e1e07bf9f51ad08eaa8afb7283463e",
+      "size_bytes": 492
+    },
+    "confined/watchdog-ready.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/watchdog-ready.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "ed7a0af9417ab8fb5fd296d8c0749d4bead1802d04ca1fb2a35c580e176cd4c1",
+      "size_bytes": 145
+    },
+    "confined/watchdog-result.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "confined/watchdog-result.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "2cdfcc94d4a7190a1f1fdb728414c4b938e0e08706faeef68a19545380116284",
+      "size_bytes": 173
+    },
+    "control/completion.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/completion.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "eb275f1033887afa132d197a4016e503fa4fe8c801822453a12269d609a701a2",
+      "size_bytes": 620
+    },
+    "control/intent.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/intent.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "988b0aa33c2dcc870d56a91dc912ce1c1e136fc8aa77d88ddd0c21cbc4ae4aa0",
+      "size_bytes": 51
+    },
+    "control/job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "5dc476b804a4fd45ceb68edd572e4faa339d7591a22b760c606e53b25931caa4",
+      "size_bytes": 1394
+    },
+    "control/launch-gate.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/launch-gate.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "988b0aa33c2dcc870d56a91dc912ce1c1e136fc8aa77d88ddd0c21cbc4ae4aa0",
+      "size_bytes": 51
+    },
+    "control/process.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/process.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "8cf39ea47f50349a89ea897eabf1d50d7ec925c527aa25eb7a0a099e58d77c8f",
+      "size_bytes": 113
+    },
+    "control/stderr.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/stderr.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "control/stdin.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/stdin.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "control/stdout.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/stdout.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "5d7041e3d17ebb41ec96622b12e911679d501f688d2647a702eec61e72db74e9",
+      "size_bytes": 113
+    },
+    "control/watchdog-job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/watchdog-job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "b029a021dcc32c91d589123b380567ad9a712519c27225d06c6efe85e8fe91d6",
+      "size_bytes": 492
+    },
+    "control/watchdog-ready.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/watchdog-ready.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "12df4dded56276d892a2b33cfb04988f790ca1496ec9b81071a27f035c2acd07",
+      "size_bytes": 145
+    },
+    "control/watchdog-result.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "control/watchdog-result.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "4281618e0d2c63fac5040a0ef58e778f866de0ccceb10f258cdf227143bca537",
+      "size_bytes": 173
+    },
+    "home/write-marker": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "home/write-marker",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "policy.sb": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "policy.sb",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "b73fc8842ad089bfd2981e961d15e1e99195542313e5ce314488c40811d027fb",
+      "size_bytes": 2680
+    },
+    "private/cache": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "private/cache",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "51b6e45d81c056e52c73ca56b057f4c4c34bb515a6f48bfaa3c0d3e4ea859735",
+      "size_bytes": 48
+    },
+    "private/checkout": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "private/checkout",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "55497df6b33cf9e3d539934f3f36ba9d41701fd380fd60e3106ac5e39aab9a1b",
+      "size_bytes": 51
+    },
+    "private/evaluator": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "private/evaluator",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "a74b6106c71de51f99154c66777edffa9e9c7bccfd01c3382b29cf399f67a4f5",
+      "size_bytes": 52
+    },
+    "private/labels": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "private/labels",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "19c3b630923408fad24e9c92f22c5cb8e4ccba435a1f6fbec51831df161f85f0",
+      "size_bytes": 49
+    },
+    "private/lease": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "private/lease",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "1f827f126bc56265730265d898546bb3ad2447d961873f995aca22ca7628d474",
+      "size_bytes": 48
+    },
+    "private/prefs.plist": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "private/prefs.plist",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "58f5f9dc56c3c213625c30deb860a8e79e4754cc927938d936e542412dcc9f33",
+      "size_bytes": 253
+    },
+    "probe": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "probe",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "7e0297a16c9c3b5ab9095c0b5f01c13db16f6d99520be0206ae2305d1811ae9b",
+      "size_bytes": 35112
+    },
+    "probe.c": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "probe.c",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "3b8d928e02fba8ebd8b8ffbd25090cd54a81081d6982e7bc9665e777c811e4f6",
+      "size_bytes": 6696
+    },
+    "receipt.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "receipt.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "66e4740b21f465fab4b6779f01fac7dd2b3636536c43abe8ddf250fd81321d0e",
+      "size_bytes": 4911
+    },
+    "trusted-helper": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "trusted-helper",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "306c6ca7407560340797866e077e053627ad409277d1b9da58106fce4cf717cb",
+      "size_bytes": 17
+    },
+    "workspace/brief.txt": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "workspace/brief.txt",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "56e46e26e895008ede192a9fcf3d6927a677001063c1e06ffc436c35aa9d429a",
+      "size_bytes": 28
+    },
+    "workspace/prefs.plist": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "workspace/prefs.plist",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "58f5f9dc56c3c213625c30deb860a8e79e4754cc927938d936e542412dcc9f33",
+      "size_bytes": 253
+    }
+  },
+  "original_root": "/private/tmp/claude-host-source-probes-v1/privacy",
+  "production_admission": false,
+  "total_bytes": 71603,
+  "version": "claude-policy-archive-1.0"
+}

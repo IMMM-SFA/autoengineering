@@ -166,6 +166,13 @@ def run_child(controller, request, model_id, model, adapter_id, parameters):
         )
         return child_result(evaluation, action, spec) if evaluation else None
 
+    def result_links(action):
+        attempts = tuple(
+            item.id for item in controller.state().budget.attempts
+            if item.child_action_id == f"{study_id}:{action.id}"
+        )
+        return {"campaign_id": spec.name, "study_id": study_id, "attempt_ids": attempts}
+
     study = OptimizationStudy(
         run.study,
         run.search_space,
@@ -176,6 +183,7 @@ def run_child(controller, request, model_id, model, adapter_id, parameters):
         target_value=run.target_value,
         input_artifact_hashes={"campaign": spec.digest, "child": identity},
         pending_result_resolver=resolve,
+        result_link_resolver=result_links,
     )
     while controller.remaining is None or controller.remaining > 0:
         study.run_result(max_new_evaluations=1)

@@ -1,0 +1,42 @@
+{
+  "audit": 3,
+  "checked_at_utc": "2026-10-29T17:30:56.781417+00:00",
+  "previous_turn": "no progress: required external inputs absent",
+  "this_turn": "no progress: same blocker verified again",
+  "tasks": {
+    "hydrology": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "unchanged_since_first_audit": true
+    },
+    "solar": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "unchanged_since_first_audit": true
+    },
+    "engineering": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "unchanged_since_first_audit": true
+    },
+    "wind": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "unchanged_since_first_audit": true
+    }
+  },
+  "protocol_exists": false,
+  "changed_source_test_configuration_files": [],
+  "platform": "darwin",
+  "runtime_decision_received": false,
+  "custodian_decision_received": false,
+  "blocking_condition": "independent experiment cannot advance without admitted untouched inputs/custody, qualified protected runtime and frozen authorized protocol",
+  "threshold": "same root prerequisite condition confirmed on three consecutive post-regression goal turns",
+  "live_required_regressions": "none; both original processes terminal exit 0",
+  "decision": "request goal status blocked, not complete",
+  "remaining_scope": "admitted independent tasks, qualified private runtime/scorers, frozen scientific and cost contracts, live-host/run authority and full independent execution/reporting remain incomplete"
+}

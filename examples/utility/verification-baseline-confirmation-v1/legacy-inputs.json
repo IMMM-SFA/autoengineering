@@ -1,0 +1,40 @@
+{
+  "kind": "valid",
+  "store": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-baseline-reuse-guards-v1/public-fixtures/valid",
+  "plan": {
+    "schema": "utility-analysis-v1",
+    "contrasts": [
+      {
+        "task_id": "task",
+        "route_id": "multi",
+        "comparator_id": "conventional",
+        "outcome": "power",
+        "units": "W",
+        "direction": "minimize",
+        "minimum_gain": 0.1,
+        "minimum_feasible_rate": 1.0,
+        "confidence": 0.95,
+        "interval": "paired_student_t",
+        "resamples": 500,
+        "seed": 17,
+        "multiplicity": "single_prespecified"
+      }
+    ],
+    "missing_policy": "complete_pairs_and_full_denominators",
+    "dependence_policy_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "allocation": {
+    "score_digest": "32d6133144bd4831285b2e08b008ac351d82dc1629fbe0835a662ae3cbc0bdb8",
+    "cell_digests": [
+      "aab68a315bfbaa8bdfcfe22e1680b6c2f6b149e086a964f8c401e6d44248f20f",
+      "49961ca9e9a7253c875a34e45208350ed974f10841d9f45626662f142788a2cd"
+    ],
+    "allocation": [
+      0.5,
+      0.5
+    ],
+    "profile": "deterministic_frozen_reference"
+  },
+  "original_root": "/private/tmp/utility-baseline-reuse-fixtures-v1/valid",
+  "callbacks_during_preparation": 1
+}

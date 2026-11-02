@@ -1,0 +1,33 @@
+{
+  "schema": "utility-camels-trusted-preparation-exposure-v1",
+  "task_id": "hydrology",
+  "site_id": "usgs-01491000",
+  "period": "1980-01-01 through 2014-12-31",
+  "forcing_sha256": "d0bbf390e742defb9ed85a350cfd1091c9504be2a793d6c160a3bd44e9c20c90",
+  "streamflow_sha256": "45ebf2d12c64303b0e6b904ccc84e8caa6d0c9bc14febbb41eae38f3d649f362",
+  "actor": "fixed trusted source-preparation and diagnostic programs",
+  "purposes": [
+    "archive membership",
+    "schema and published-date validation",
+    "predeclared quality-count checks"
+  ],
+  "content_received_by_trusted_programs": [
+    "drivers",
+    "labels"
+  ],
+  "content_exported_to_advisory_context": [
+    "source metadata",
+    "timestamp-field metadata",
+    "fixed-window quality counts"
+  ],
+  "observation_or_forcing_values_exported": false,
+  "model_predictions_or_scores_exported": false,
+  "adaptive_model_fitting_or_selection_run": false,
+  "source_windows_chosen_from_performance": false,
+  "prior_personal_attestation": {
+    "path": "examples/utility/confirmation-reserve-attestation-v1.json",
+    "sha256": "55e84e2cac4280c73f66373d6689ebfe6f7849ca096b3ed40c6b4a184e872c9d"
+  },
+  "future_custody_classification": "not_admitted; reconcile this trusted quality access with the pinned study exposure register",
+  "protected_same_user_execution_boundary_qualified": false
+}

@@ -1,0 +1,43 @@
+"""Authored public fixture wrapper; this supplies no private runtime admission."""
+from pathlib import Path
+import json
+import socket
+import ssl
+import subprocess
+import sys
+
+configuration=json.loads(Path(sys.argv[1]).read_bytes());mode=sys.argv[2]
+if mode.startswith('follower'): configuration['grant_path']=configuration['follower_grant_path']
+sys.path.insert(0,configuration['installed_root'])
+from autoengineering.utility.confirmation_command import ConfirmationRegistration,build_confirmation_command
+from autoengineering.utility.outcomes import OutcomeSpec
+from autoengineering.utility.scoring import PublicScore
+from autoengineering.utility.store import SuiteStore
+import autoengineering.utility.confirmation_command as implementation
+assert str(Path(implementation.__file__)).startswith(configuration['installed_root']+'/')
+def denied(*args,**kwargs):raise AssertionError('fixture scorer attempted network or child execution')
+socket.socket=denied;subprocess.Popen=denied
+assert not {'torch','botorch','openmdao','pvlib','py_wake','topfarm'} & set(sys.modules)
+record=Path(configuration['callback_record'])
+class AuthoredScorer:
+    identity=configuration['scorer_digest']
+    def __call__(self,grant,model):
+        assert not record.exists(),'new callback instead of original recovery'
+        score=PublicScore('success','power','W',3.0,True)
+        record.write_text(json.dumps({'callback_invocations':1,'recoveries':0,'score':score.to_dict()}))
+        return score
+    def recover(self,grant,model):
+        state=json.loads(record.read_bytes());state['recoveries']+=1
+        record.write_text(json.dumps(state))
+        return PublicScore.from_dict(state['score'])
+if mode=='interrupt':
+    original=SuiteStore.__init__
+    def initialize(self,*args,**kwargs):
+        def fault(stage):
+            if stage=='confirmation_score_created':raise RuntimeError('PRIVATE-FIXTURE-CANARY')
+        kwargs['fault']=fault;original(self,*args,**kwargs)
+    SuiteStore.__init__=initialize
+registration=ConfirmationRegistration('authored-fixture',configuration['suite_digest'],configuration['partition_digest'],configuration['scorer_digest'],configuration['qualification_digest'],OutcomeSpec.from_dict(configuration['outcome']),AuthoredScorer(),True)
+args=[configuration['suite'],configuration['grant_path'],'--registration','authored-fixture']
+if mode=='recover':args.append('--recover')
+build_confirmation_command((registration,))(args=args)

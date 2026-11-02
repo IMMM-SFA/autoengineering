@@ -1,0 +1,20 @@
+{
+  "scope": "normalized token components in offline cost reporting",
+  "tests": {
+    "passed": 58,
+    "seconds": 27.84
+  },
+  "lint": "passed src/tests/examples",
+  "fixed_runtime_and_test_source": true,
+  "source_hashes_verified_after_tests": true,
+  "installed": {
+    "wheel_sha256": "6a7a0128eefe9ce20171378ee4ddf5b6d1318d54cb1d16f86478599a319abf99",
+    "matched_core_python_files": 194,
+    "dependency_setup": "fresh venv, wheel extraction, cached base dependencies; no editable activation or fresh solve"
+  },
+  "installed_denial_controls": 4,
+  "new_provider_or_scientific_work": 0,
+  "billed_spend": "unknown",
+  "full_default_bayes_scientific_matrices": "not_attempted",
+  "part_5": "incomplete"
+}

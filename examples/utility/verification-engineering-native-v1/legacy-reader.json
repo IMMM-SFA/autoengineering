@@ -1,0 +1,12 @@
+{
+  "result_schema": "utility-native-result-v1",
+  "identity_preserved": true,
+  "selected_state_matches": true,
+  "costs": {
+    "native_driver_process_starts": 1.0,
+    "native_inner_model_calls": 12.0,
+    "native_driver_derivative_calls": null,
+    "native_scenario_derivative_calls": 255.0
+  },
+  "limit": "final driver derivative counter was not recorded by this earlier profile"
+}

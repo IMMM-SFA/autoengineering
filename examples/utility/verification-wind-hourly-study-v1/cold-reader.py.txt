@@ -1,0 +1,108 @@
+"""Replay saved scalar parity, input identity and charges without running models.
+
+Does not recompute physical power or qualify raw HDF5 directional conventions.
+"""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(sys.argv[2]).resolve()))
+import importlib.abc
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split('.')[0] in {'h5py','torch','pvlib','openmdao','py_wake','topfarm'}:
+            raise RuntimeError('optional model runtime denied')
+sys.meta_path.insert(0, NoModels())
+import hashlib, json, math, os, socket, subprocess, time
+import numpy as np
+from examples.utility.wind_hourly import WindHourly, POLICY, read_point
+from examples.utility.wind_hourly_check import ASSUMPTIONS
+from examples.utility.wind_parameters import WindGeometry
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.campaign.serialization import digest, unique_json
+from autoengineering.agents.batch import BatchStore
+from examples.utility.wind_hourly_study_reader import read_stopped_process
+from autoengineering.utility.engineering_process import EngineeringExecutionSpec, EngineeringScenarioJob, decode_scenario
+from autoengineering.utility.outcomes import EngineeringEvaluation, engineering_decision
+from autoengineering.campaign.artifacts import read_bytes
+from examples.utility.wind_hourly_scenario import HourlyBinding, BINDING_PATH
+root=Path(sys.argv[1]).resolve()
+expected=json.loads((root.parent/'expected-public.json').read_text())
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def denied(*args,**kwargs):raise RuntimeError('process, network or clock denied')
+subprocess.Popen=socket.socket=time.time=time.monotonic=denied
+
+def audit(event,args):
+    if event=='open':
+        path,mode,flags=args
+        if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):
+            raise RuntimeError('write denied')
+        if isinstance(path,int):
+            st=os.fstat(path)
+            if (st.st_dev,st.st_ino) not in inodes:raise RuntimeError('outside descriptor denied')
+        elif not Path(os.fsdecode(path)).absolute().is_relative_to(root):
+            raise RuntimeError('outside read denied')
+    if event=='import' or event.startswith(('socket.','subprocess.','os.exec','os.fork','os.posix_spawn')):
+        raise RuntimeError('new import or execution denied')
+sys.addaudithook(audit)
+for name,sha in expected['files'].items():
+    assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+load=lambda n:unique_json((root/n).read_text())
+q=load('request.json');done=load('complete.json')
+assert digest(q)==expected['request_digest']==done['request_digest']
+assert digest(done)==expected['completion_digest']
+assert load('consumed.json')['request_digest']==digest(q)
+spec=EngineeringExecutionSpec.from_dict(q['execution'])
+assert spec.digest==done['execution_digest']
+for ref in spec.sources:
+    read_bytes(root/'source',ref)
+binding=HourlyBinding.from_json((root/'source'/BINDING_PATH).read_text())
+point=read_point(root/'source',binding.point,2007)
+assert len(point['time_utc'])==8760
+batch=BatchStore(root/'batch',expected_digest=done['batch_digest'])
+state=batch.replay()
+assert len(state.reservations)==len(state.observations)==5 and not state.pending
+assert all(r.resource=='science' for r in state.reservations.values())
+assert all(o.stop_verified and o.status=='success' for o in state.observations.values())
+for observation in state.observations.values():
+    for ref in observation.evidence:read_bytes(root/'batch',ref)
+processes=[]
+for directory in sorted((root/'batch/cases/hourly-development/engineering-processes').iterdir()):
+    if not directory.is_dir():continue
+    job=EngineeringScenarioJob.from_json((directory/'scenario.json').read_text())
+    assert job.execution==spec
+    nonce=unique_json((directory/'process/intent.json').read_text())['nonce']
+    process=read_stopped_process(directory/'process',root/'source',spec.sources,spec.output_bytes)
+    status,result=decode_scenario(job,process)
+    assert status=='success' and result is not None and process.stopped
+    assert all(c.status=='pass' and c.required for c in result.score.checks)
+    assert result.solver_work=={'wind_evaluations':1.0}
+    processes.append((job,result))
+assert len(processes)==5
+baseline=EngineeringEvaluation.from_json((root/'baseline.json').read_text())
+alternatives=[]
+for path in sorted((root/'batch/cases/hourly-development/utility-studies').rglob('*-result.json')):
+    saved=unique_json(path.read_text())
+    evidence=ArtifactRef.from_dict(saved['evidence'])
+    evaluation=EngineeringEvaluation.from_json(read_bytes(root/'batch',evidence).decode())
+    assert evaluation.evaluation.status=='success'
+    assert len(saved['reservations'])==1 and saved['reservations'][0] in state.observations
+    alternatives.append(evaluation)
+assert len(alternatives)==4
+for evaluation in (baseline,*alternatives):
+    found=[result for job,result in processes if job.action_id==evaluation.evaluation.id]
+    assert len(found)==1 and evaluation.scenarios==(found[0].score,)
+selection=engineering_decision(baseline,tuple(alternatives),spec.study.rules)
+assert selection.to_dict()==expected['retention']
+assert selection.outcome=='retain_baseline' and selection.selected_id=='hourly-baseline'
+assert done['baseline_energy_gwh']==baseline.evaluation.metrics['annual_energy']
+assert abs(done['baseline_energy_gwh']-q['prior_standalone_baseline_gwh'])<=q['parity_atol']
+best=max(alternatives,key=lambda a:a.evaluation.metrics['annual_energy'])
+assert done['recommendation']['action_id']==best.evaluation.id
+assert done['recommendation']['outcomes']==dict(best.evaluation.metrics)
+assert best.evaluation.metrics['annual_energy']<baseline.evaluation.metrics['annual_energy']
+assert done['baseline_and_study_replayed_without_new_work'] and done['supervised_baseline_matches_standalone']
+assert not done['task_admitted'] and not done['independent_confirmation']
+print(json.dumps({'offline_reconstruction':True,'original_stopped_processes':5,
+                  'scientific_reservations':5,'physical_observations':5,'pending':0,
+                  'baseline_retained':True,'new_model_calls':0,'new_processes':0,'new_http_requests':0,
+                  'optional_models_imported':False,'physical_power_recomputed':False,
+                  'task_admitted':False}))

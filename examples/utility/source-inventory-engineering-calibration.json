@@ -1,0 +1,18 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "real-engineering-calibration-development",
+  "files": {
+    "examples/utility/engineering_study.py": "7cc563a8c5938cb10b7e5349f20c32ce0ec3c95a80bd7e9650a82a80be82370b",
+    "src/autoengineering/utility/studies.py": "12c25bd30281fdcfac9689c943eb24cabcc61541c1f106263e4f1186b8675779",
+    "tests/test_utility_engineering.py": "073626a1d5e10f50d4a74a4bfaee01c65170f7370236e2e5ab53eee9ee204432"
+  },
+  "checks": {
+    "engineering_and_bridge": "10 passed, 4 OpenMDAO warnings in 2.26s",
+    "ruff": "repository-wide pass",
+    "rehearsal": "4 trials, 12 scenario starts, no duplicate starts after resume"
+  },
+  "limits": [
+    "Trusted synchronous lifecycle only",
+    "No independent confirmation or utility verdict"
+  ]
+}

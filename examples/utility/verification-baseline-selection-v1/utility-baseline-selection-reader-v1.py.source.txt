@@ -1,0 +1,43 @@
+from pathlib import Path
+import builtins
+import io
+import json
+import os
+import socket
+import ssl
+import subprocess
+import sys
+
+base=Path(sys.argv[1]);c=json.loads((base/'installed-configuration.json').read_bytes())
+sys.path.insert(0,c['installed_root'])
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.report import accounting_report
+from autoengineering.utility.confirmation import read_manifest
+from autoengineering.utility.controller import UtilityController
+import autoengineering.utility.baseline_selection as implementation
+assert implementation.__file__.startswith(c['installed_root']+'/')
+assert not {'torch','botorch','openmdao','pvlib','py_wake','topfarm'} & set(sys.modules)
+def guard(function):
+    def checked(path,*args,**kwargs):
+        if isinstance(path,(str,bytes,os.PathLike)):
+            value=Path(os.fsdecode(path)).absolute()
+            assert not value.is_relative_to(Path(c['root'])),'original fixture root opened'
+        return function(path,*args,**kwargs)
+    return checked
+builtins.open=guard(builtins.open);io.open=guard(io.open);os.open=guard(os.open)
+def denied(*args,**kwargs):raise AssertionError('reader attempted network or child execution')
+socket.socket=denied;subprocess.Popen=denied
+store=SuiteStore(base/'public-suite');before=store.replay()
+manifest=read_manifest(store.root,before['frozen'])
+assert len(manifest.cells)==4 and len({s.selected_state.sha256 for s in manifest.cells})==1
+runtime=UtilityController(store)
+for s in manifest.cells:runtime.verify_result(s.attempt_id)
+report=accounting_report(store);assert not report['evidence_blockers']
+science=[r for r in report['receipts'] if r['resource']=='campaign_process_starts']
+assert len(science)==1 and science[0]['quantity']==1 and science[0]['allocation']==[.25]*4
+copies=[r for r in report['receipts'] if r['resource']=='baseline_reference_copy_duration']
+assert len(copies)==3 and all(r['quantity'] is None for r in copies)
+assert store.replay()['head']==before['head']
+result={'schema':'utility-baseline-selection-installed-reader-v1','installed_core_files':202,'logical_selections':4,'original_scientific_process_starts':1,'metadata_followers':3,'shared_state_artifacts':1,'scientific_cost_allocation':[.25]*4,'unmeasured_reference_copy_durations':3,'all_lineage_verified':True,'journal_unchanged':True,'original_roots_network_and_process_denied':True,'private_scoring_qualified':False,'independent_confirmation':False}
+(base/'installed-reader.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

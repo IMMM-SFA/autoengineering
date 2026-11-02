@@ -1,0 +1,53 @@
+"""Archive completed current-image owned-process loss controls and replay them."""
+import hashlib,json,os,shutil,subprocess,sys,tarfile
+from pathlib import Path
+from autoengineering.campaign.serialization import digest
+from examples.utility import guest_owner_loss_reader as reader
+root=Path.cwd();os.umask(0o077)
+proof=root/'examples/utility/verification-guest-owner-loss-v6'
+run=root/'outputs/guest-owner-loss-v6';data=proof/'evidence'
+data.mkdir(mode=0o700)
+def top_files(src,dst):
+ for p in src.iterdir():
+  if p.is_file() and p.suffix in ('.json','.txt','.log'):shutil.copyfile(p,dst/p.name)
+top_files(run,data)
+q=json.loads((run/'request.json').read_text());done=json.loads((run/'complete.json').read_text())
+for case in q['case_requests']:
+ src=run/case; dst=data/case;dst.mkdir(mode=0o700)
+ top_files(src,dst)
+ for name in ('child-api','parent-api'):shutil.copytree(src/name,dst/name)
+ owners=[p for p in (src/'work').iterdir() if p.is_dir() and (p/'owner.json').is_file()]
+ assert len(owners)==1 and not any(p.is_symlink() for p in owners[0].rglob('*'))
+ shutil.copytree(owners[0],dst/'owner')
+ if case=='owner_loss_after_capture':shutil.copytree(src/'suite',dst/'suite')
+for p in data.rglob('*'):
+ if p.is_dir():p.chmod(0o700)
+expected=digest(done)
+reader.read_completion(data,expected_digest=expected)
+files={str(p.relative_to(data)):{'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in data.rglob('*') if p.is_file()}
+for name in files:
+ assert Path(name).name not in ('fitting.npz','comparison.npz','private-labels.json')
+ if name.endswith('.tar'):
+  with tarfile.open(data/name) as a:
+   assert all(Path(m.name).name not in ('fitting.npz','comparison.npz','private-labels.json') for m in a.getmembers())
+archive=proof/'public-proof.tar.gz'
+with tarfile.open(archive,'w:gz') as a:
+ for name in sorted(files):a.add(data/name,arcname=name,recursive=False)
+relocated=Path('/private/tmp/utility-owner-loss-v6-public');relocated.mkdir(mode=0o700)
+with tarfile.open(archive) as a:a.extractall(relocated,filter='data')
+for p in relocated.rglob('*'):
+ if p.is_dir():p.chmod(0o700)
+assert all(hashlib.sha256((relocated/n).read_bytes()).hexdigest()==v['sha256'] for n,v in files.items())
+cold=proof/'cold-recovery.py.txt'
+shutil.copyfile(root/'examples/utility/verification-guest-owner-loss-v1/cold-recovery.py.txt',cold)
+command=[sys.executable,'-B','-c',"import runpy,sys; script=sys.argv.pop(1); runpy.run_path(script,run_name='__main__')",str(cold),str(relocated),expected]
+p=subprocess.run(command,cwd=root,capture_output=True,text=True)
+(proof/'cold.stdout.txt').write_text(p.stdout);(proof/'cold.stderr.txt').write_text(p.stderr)
+assert p.returncode==0,p.stderr
+(proof/'evidence-manifest.json').write_text(json.dumps(files,indent=2,sort_keys=True)+'\n')
+cases=[{'case':x['case'],'container_creations':x['container_creations'],'container_starts':x['container_starts'],'owner_returncode':x['owner_returncode'],'original_container_absent':x['original_container_absent'],'captured_result_recovered':x['recovered'] is not None,'inference_elapsed_seconds':x['inference_elapsed_seconds']} for x in done['results']]
+summary={'scope':'Four actual exact-owned-process loss controls on the current v6 image','image_id':json.loads((run/'owner_loss_running/request.json').read_text())['guest']['image_id'],'request_digest':digest(q),'completion_digest':expected,'cases':cases,'container_creations':4,'container_starts':2,'charged_inference_starts':2,'model_results_observed':1,'model_inference_starts_known_lower_bound':1,'model_inference_starts_total':None,'owner_children':4,'watchdogs':3,'owner_sigkills':3,'watchdog_sigkills':1,'all_original_containers_absent':True,'all_original_watchdogs_absent':True,'new_fitting_starts':0,'scoring_starts':0,'private_observations':0,'automatic_retries':0,'parent_composite_reservations_remain_charged':True,'archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'archive_bytes':archive.stat().st_size,'evidence_files':len(files),'evidence_bytes':sum(v['bytes'] for v in files.values()),'cold_reader':{'exit_code':p.returncode,'relocated':True,'model_imports_blocked_from_startup':True,'metadata_initialization_before_guard':True,'processes_network_arrays_clocks_writes_outside_reads_denied_during_replay':True,'dependencies':'inherited','independent_os_attestation':False},'host_scope':'Local OrbStack Linux amd64 emulation on macOS ARM64','during_model_computation_interruption_qualified':False,'runtime_qualified':False,'independent_confirmation':False,'full_part_5_complete':False}
+(proof/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+for name in ('guest_owner_loss_controls.py','guest_owner_loss_reader.py','guest_inference_smoke.py'):
+ shutil.copyfile(root/'examples/utility'/name,proof/(name+'.txt'))
+print(json.dumps({'completion_digest':expected,'archive_files':len(files),'cold_exit':p.returncode,'cases':cases}))

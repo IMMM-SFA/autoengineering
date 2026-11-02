@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import PurePosixPath
 import re
 from typing import Literal
@@ -90,6 +90,43 @@ class TimeContract(Record):
 
 
 @dataclass(frozen=True)
+class SubdailyTimeContract(Record):
+    """Version 2 UTC five-minute sample axis, with explicit state resets at gaps.
+
+    Instantaneous power samples remain power. This contract does not turn them
+    into interval energy or supply missing observations by interpolation.
+    """
+
+    schema_version: Literal["2.0"]
+    dates: tuple[str, ...]
+    semantics: Literal["instantaneous"]
+    timestep: Literal["PT5M"]
+    calendar: Literal["proleptic_gregorian"]
+    timestamp: Literal["instant"]
+    timezone: Literal["UTC"]
+    gap_policy: Literal["restart_state"]
+    warmup_mask: tuple[bool, ...]
+    scoring_mask: tuple[bool, ...]
+
+    def _validate(self):
+        parsed = [datetime.fromisoformat(value) for value in self.dates]
+        if not parsed:
+            raise ValueError("subdaily time axis cannot be empty")
+        for raw, value in zip(self.dates, parsed):
+            if value.tzinfo is None or value.utcoffset() != timedelta(0):
+                raise ValueError("subdaily timestamps require UTC")
+            canonical = value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            if raw != canonical or value.second != 0 or value.minute % 5:
+                raise ValueError("subdaily timestamps require canonical UTC five-minute samples")
+        if any((right - left).total_seconds() < 300 for left, right in zip(parsed, parsed[1:])):
+            raise ValueError("subdaily timestamps must increase without duplicates")
+        if len(self.warmup_mask) != len(parsed) or len(self.scoring_mask) != len(parsed):
+            raise ValueError("subdaily masks must match timestamps")
+        if any(a and b for a, b in zip(self.warmup_mask, self.scoring_mask)):
+            raise ValueError("subdaily warmup and scoring masks overlap")
+
+
+@dataclass(frozen=True)
 class PortContract(Record):
     name: str
     dimensions: tuple[str, ...]
@@ -98,7 +135,7 @@ class PortContract(Record):
     coordinates: tuple[str, ...]
     grid_id: str
     coordinate_digest: str
-    time: TimeContract | None
+    time: TimeContract | SubdailyTimeContract | None
     missing: Literal["forbid"] = "forbid"
 
     def _validate(self):

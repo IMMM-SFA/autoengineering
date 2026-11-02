@@ -1,0 +1,61 @@
+{
+  "identity": {
+    "schema_version": 1,
+    "framework": "bmipy",
+    "framework_version": "2.0.1",
+    "implementation_id": "bmi-qualified-v5",
+    "mode": "model",
+    "configuration_digest": "d95d957d53342571e98763e1866514ab9de8e96139a1e5a9940d3c92c76aa65e",
+    "environment_digest": "b9486dfc6918ddf465302f71692c9f1dedcaa566add8828b1a6e6995fb25b226",
+    "source_digest": "1354384066c2765b17cfe0b214de7e966b3d3029340c66f5fbba31bc108d682d",
+    "capabilities": [
+      "scalar_float64",
+      "daily_exchange",
+      "fresh_lifecycle"
+    ],
+    "seed": 17,
+    "checkpoint_format": "fresh-attempt-only"
+  },
+  "receipt": {
+    "schema_version": 1,
+    "integration_digest": "b6f3caea5fc7be9a7226e29e0d3d27e951489ad8b42d4085940c3865b86f88c3",
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "direct_reference": [
+      {
+        "path": "examples/interoperability/evidence/bmi-installed-v5/outputs.npz",
+        "sha256": "f3dd3f3aeac8530676a0611c22ccd341ed77239e6f99a62afc19ac45447d3c73",
+        "size_bytes": 1416,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "examples/interoperability/evidence/bmi-installed-v5/report.json",
+        "sha256": "6d4b8ce9d747778fa7a809595843c9cb911262f4a069c5e728fc4c584c41207e",
+        "size_bytes": 182,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      }
+    ],
+    "tolerance_definition": {
+      "path": "examples/interoperability/bmi/protocol.json",
+      "sha256": "14c5be86262a09c6ec01385f25c8ff04a5bf720046e7fa0ff198128c04ecdbbc",
+      "size_bytes": 462,
+      "media_type": "application/octet-stream",
+      "producer": "part-4-qualification",
+      "metadata": {}
+    },
+    "capability_checks": [
+      "parity_or_translation",
+      "failure_recovery",
+      "installed_execution"
+    ],
+    "limitations": [
+      "scalar daily exchange only",
+      "spatial/seconds independent BMI model unsupported",
+      "macOS ARM64 only; Linux runtime unverified"
+    ],
+    "qualification": "verified"
+  }
+}

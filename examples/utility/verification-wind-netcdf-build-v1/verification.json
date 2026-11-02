@@ -1,0 +1,32 @@
+{
+  "schema": "utility-wind-netcdf-experiment-verification-v1",
+  "logical_http_requests_charged": 7,
+  "bytes_read_including_discarded_body": 4925020,
+  "http_exchange_count": "unknown",
+  "build_attempts_charged": 3,
+  "builds_completed": 2,
+  "builds_failed": 1,
+  "unmodified_rebuild_warning_criterion": "failed",
+  "canonical_declaration_first_patch": "compile failed on scalar shape comparison",
+  "corrected_patch_authored_roundtrips": "passed",
+  "corrected_patch_cross_readers": "passed",
+  "corrected_patch_import_warning_absent": true,
+  "upstream_tests": {
+    "passed": 8,
+    "failed": 5,
+    "skipped": 0,
+    "warning_policy": "errors",
+    "full_suite": false
+  },
+  "failures_preserved": true,
+  "candidate_promoted": false,
+  "existing_wind_environment_modified": false,
+  "original_extension_sha256": "c660b697c7b3e4cf8f78ddb07e19c38583bcf533ac8cc9907d0e165ccacfad83",
+  "scientific_model_calls": 0,
+  "private_source_reads": 0,
+  "wind_task_admitted": false,
+  "private_runtime_qualified": false,
+  "declared_metadata_timeout_seconds": 30,
+  "fetch_implementation_timeout_seconds": 60,
+  "timeout_limit_deviation": "Original metadata fetch used 60 seconds; do not claim a 30-second enforced metadata bound. No request timed out."
+}

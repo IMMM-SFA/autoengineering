@@ -1,0 +1,28 @@
+"""Compare original and isolated binary builds, including cross-reader checks."""
+from pathlib import Path
+import hashlib,json,os,subprocess,sys
+root=Path.cwd();out=root/'examples/utility/verification-wind-netcdf-build-v1';stage=Path('/private/tmp/utility-wind-netcdf-build-v1')
+intent={'schema':'utility-wind-netcdf-probe-intent-v1','subprocesses':4,'timeout_seconds_each':30,
+    'checks':['48 authored hours','mask and fill','compressed float64','packed int16 at 1e-12 absolute tolerance','CF time conversion',
+              'xarray netcdf4 backend','compound float pairs','variable length integer arrays','variable length strings','cross-reader compatibility'],
+    'warning_policy':'Set always after NumPy import; record all messages; require no candidate binary-compatibility warning',
+    'scientific_model_calls':0,'private_source_reads':0,'existing_environment_changes':False}
+(out/'probe-intent.json').write_text(json.dumps(intent,indent=2)+'\n')
+module=root/'.pixi/envs/wind/lib/python3.12/site-packages/netCDF4/_netCDF4.cpython-312-darwin.so';original_pin=hashlib.sha256(module.read_bytes()).hexdigest()
+results=[]
+for label,target,scope,mode in [('original','-',stage/'original-authored','write'),
+    ('candidate',str(stage/'installed'),stage/'candidate-authored','write'),
+    ('original_reads_candidate','-',stage/'candidate-authored','read'),
+    ('candidate_reads_original',str(stage/'installed'),stage/'original-authored','read')]:
+    p=subprocess.run([sys.executable,'-I','-B',str(out/'probe.py.txt'),target,str(scope),mode],capture_output=True,text=True,timeout=30)
+    (out/(label+'.stdout.txt')).write_text(p.stdout);(out/(label+'.stderr.txt')).write_text(p.stderr)
+    assert p.returncode==0,p.stderr
+    result=json.loads(p.stdout);result['label']=label;results.append(result)
+    if target!='-':assert not any('size changed' in item['message'] for item in result['warnings'])
+assert any('numpy.ndarray size changed' in item['message'] for item in results[0]['warnings'])
+assert hashlib.sha256(module.read_bytes()).hexdigest()==original_pin
+record={'schema':'utility-wind-netcdf-probe-result-v1','results':results,'original_extension_sha256':original_pin,
+    'original_extension_unchanged':True,'candidate_binary_warning_absent':True,'authored_roundtrips':'passed',
+    'candidate_promoted_to_project_environment':False,'private_runtime_qualified':False,'new_scientific_model_calls':0}
+(out/'probe-result.json').write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record))

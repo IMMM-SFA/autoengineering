@@ -1,0 +1,18 @@
+{
+  "costs": {
+    "confirmation_access_intents": 1.0,
+    "confirmation_callback_duration": 9.245286083314568,
+    "confirmation_callbacks_completed": 1.0,
+    "confirmation_container_lifecycle_duration": 2.3995056664571166,
+    "confirmation_container_starts": 2.0,
+    "confirmation_inference_container_starts": 1.0,
+    "confirmation_inference_lifecycle_duration": 2.152639666572213,
+    "confirmation_inference_starts": 1.0,
+    "confirmation_reservations": 1.0,
+    "confirmation_scores_committed": 1.0,
+    "confirmation_scoring_container_starts": 1.0,
+    "confirmation_scoring_starts": 1.0
+  },
+  "grant_digest": "6a9f303900edcf7d0c3084891e71721d7aa1a1315526dc22c2f02322645a3923",
+  "result_digest": "fc97150b3094ae50e0d7c280c70810a2793c73cdf1e2ad5897ee97a68377ddbb"
+}

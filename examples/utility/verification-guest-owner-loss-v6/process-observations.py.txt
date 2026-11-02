@@ -1,0 +1,17 @@
+"""Read-only process-table observations for exact PIDs saved by owned children."""
+import json,subprocess
+from pathlib import Path
+from examples.utility.guest_inference_smoke import save
+root=Path('outputs/guest-owner-loss-v6')
+records=[]
+for p in sorted(root.glob('*/work/*/control/guest-watchdog/ready.json')):
+ v=json.loads(p.read_text())
+ pid=v['pid']
+ assert type(pid) is int and pid>0
+ result=subprocess.run(['/bin/ps','-p',str(pid),'-o','pid=,ppid=,stat=,command='],text=True,capture_output=True)
+ assert result.returncode in (0,1)
+ records.append({'case':p.parts[2],'pid':pid,'ps_returncode':result.returncode,'stdout':result.stdout,'stderr':result.stderr,'absent':result.returncode==1 and result.stdout==''})
+assert len(records)==3
+assert all(r['absent'] for r in records),records
+save(Path('examples/utility/verification-guest-owner-loss-v6'),'process-observations.json',{'scope':'only original recorded watchdog PIDs; no signal sent','watchdogs':records,'all_absent':True})
+print('All three original watchdog PIDs are absent; no signals sent.')

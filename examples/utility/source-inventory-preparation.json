@@ -1,0 +1,17 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "offline-preparation-partial",
+  "files": {
+    "src/autoengineering/utility/preparation.py": "1897774ac5228b0f24e749c9c61aed0bf898b56d1af3adf3c72e0cc22a1604fc",
+    "tests/test_utility_preparation.py": "fd312ea4fbfdebc8fd6699ffda95f9bea7e8bfdf17e9b49e935f496f33b68ba2"
+  },
+  "checks": {
+    "preparation": "3 passed in 0.69s",
+    "ruff": "repository-wide pass"
+  },
+  "limits": [
+    "No task adapter parity",
+    "No campaign calibration integration",
+    "Default full suite still running"
+  ]
+}

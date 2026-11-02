@@ -1,0 +1,36 @@
+"""Archive public metadata for a consumed attempt, without source or runtime access."""
+from pathlib import Path
+import hashlib,json,shutil
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.scoring import ConfirmationGrant
+from autoengineering.utility.load_container_costs import ContainerLoadCostRegistration
+from autoengineering.utility.load_costs import CostEvidenceSpec,LoadCostInput
+from autoengineering.utility.report import accounting_report,render_markdown
+from examples.utility.engineering_source_binding import ACCESS_DIRECTORY
+
+root=Path.cwd()
+archive=root/'examples/utility/verification-engineering-prospective-confirmation-v1'
+work=root/'outputs/engineering-prospective-confirmation-v1'
+request=json.loads((archive/'request.json').read_text())
+assert not list((work/'callback-work').iterdir())
+store=SuiteStore(work/'suite')
+state=store.replay()
+assert state['frozen'] is not None and not state['confirmation_scores']
+public=archive/'public';public.mkdir(mode=0o700)
+shutil.copytree(work/'suite',public/'suite',ignore=shutil.ignore_patterns('.campaign.lock','.suite.lock','.writer.lock','.operation.lock','.utility.lock'))
+store=SuiteStore(public/'suite')
+grant=ConfirmationGrant.from_dict(request['grant'])
+registration=ContainerLoadCostRegistration.from_dict(request['registration'])
+inputs=CostEvidenceSpec('utility-cost-inputs-v1',store.spec.digest,(LoadCostInput(grant,registration,None),))
+report=accounting_report(store,cost_inputs=inputs)
+(public/'cost-inputs.json').write_text(inputs.to_json()+'\n')
+(public/'accounting.json').write_text(json.dumps(report,indent=2)+'\n')
+(public/'accounting.md').write_text(render_markdown(report))
+assert report['complete_cost_evidence'] is False
+assert not any(p.name in ('scenarios.json','packet.json','seed.json') for p in public.rglob('*'))
+assert not any(b'"seed_hex"' in p.read_bytes() for p in public.rglob('*.json'))
+checks={'scope':'original consumed attempt; no source/runtime replay','suite_digest':store.spec.digest,'grant_digest':grant.digest,'callback_work_scope_empty':True,'original_attempt_source_pins_verified':True,'confirmation_score_committed':False,'private_payload_read_receipt_present':(store.root/ACCESS_DIRECTORY).exists(),'complete_cost_evidence':False,'automatic_retry_allowed':False,'charged_grant_retained':True,'new_model_starts':0,'new_source_payload_reads':0,'container_execution_receipt':None,'actual_work_totals_from_receipts':None}
+(archive/'failed-attempt-check.json').write_text(json.dumps(checks,sort_keys=True,indent=2)+'\n')
+pins={str(p.relative_to(public)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(public.rglob('*')) if p.is_file() and not p.name.endswith('.lock')}
+(archive/'public-pins.json').write_text(json.dumps(pins,sort_keys=True,indent=2)+'\n')
+print(json.dumps({'public_files':len(pins),'saved_score':False,'charged_grant_retained':True,'complete_cost_evidence':False,'new_source_or_model_calls':0}))

@@ -1,0 +1,36 @@
+{
+  "purpose": "exposed development layout; no independent weather confirmation",
+  "sources": {
+    "examples/utility/wind.py": "6fdc15a62f95f2cd13cd6175480ac9b5ec381126097b9ab7e72cd7ebf8d94b37",
+    "examples/utility/wind_native.py": "59434cb495802aee86993b3eddcae44575edb4779602f9aa55d58e0075c7b905",
+    "examples/utility/rehearse_wind.py": "b3762b2ed05b0a3d22c42173d2ec0d52addaa19bacabd18522fd0d6aa73c63e6",
+    "examples/open_chains/wind/models.py": "c3b1e3e4001b329a078b00adc959c7950da8c76f95016e233f1d04ef26234ce4",
+    "pixi.lock": "16f3911bdc180b361f4bbcb02d2a848d68107635f9eb830781b53ba691a52ce5"
+  },
+  "versions": {
+    "py-wake": "2.6.20",
+    "topfarm": "2.6.2",
+    "numpy": "2.5.2"
+  },
+  "x_m": [
+    423974,
+    424179,
+    425654,
+    425859
+  ],
+  "y_m": [
+    6151447,
+    6149779,
+    6151447,
+    6149779
+  ],
+  "max_iterations": 2,
+  "max_wake_calls": 12,
+  "max_gradient_calls": 4,
+  "budget_control": {
+    "max_wake_calls": 1,
+    "max_gradient_calls": 1
+  },
+  "final_layout_evaluation_cap": 2,
+  "direction_grid_degrees": 30
+}

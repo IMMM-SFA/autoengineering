@@ -1,0 +1,46 @@
+[
+  {
+    "archive": "examples/utility/development/claude-durable-command-exchange-v1",
+    "index_sha256": "4eece0f2ed4a5397e63674910f0e6736bfa5a2687f3a279bab80f3ba19095840",
+    "status": "failed",
+    "source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+    "upstream_command_stop": {
+      "state": "verified_stopped",
+      "watchdog_reason": "group_stopped",
+      "bindings": {
+        "upstream.json": "a773c9ea4dc206852a2072ebac341407398dca6448bfdb20f33f70f2d7bce094",
+        "process/job.json": "f9f0e64f23a6c120f7b14c8162a1475319579285c89570fbe532e884699647d3",
+        "process/process.json": "9d8018ed61d294b0b9af31e96080aa4972f3f9c0a721f0cc5467d173fe14eff4",
+        "process/watchdog-job.json": "1f712bac4d1e9cbf9aba714cc38faad42e4e862a034aae6b5bdcfb728ad7822e",
+        "process/watchdog-result.json": "321fe11a27a6a9d235782c37b753aeabf63993ca45f0109f185293d502a35a73"
+      }
+    },
+    "native_status": "completed",
+    "native_stopped": true,
+    "extra_callbacks_on_recovery": 0,
+    "provider_calls": 0,
+    "scope": "authored CommandUpstream worker, not provider or real authentication"
+  },
+  {
+    "archive": "examples/utility/development/claude-durable-command-exchange-v2",
+    "index_sha256": "90c32d39cc2a5a806e4ce734e80ade2817bbf529bed015bfac50e2a4c7958e92",
+    "status": "passed_limited_scope",
+    "source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+    "upstream_command_stop": {
+      "state": "verified_stopped",
+      "watchdog_reason": "group_stopped",
+      "bindings": {
+        "upstream.json": "fb800b8c4145c22a82eb59f03757cc5d2be5492565ddc9b3a4710634f1ead353",
+        "process/job.json": "678eb5021a49e92124dc8b22c7763e6be935b0e7af97179019522c0ed6b1300f",
+        "process/process.json": "b41a3f9e35d93f78fb727f834ccdd4200f555e742dc1e048cd0a9146c8b5d16e",
+        "process/watchdog-job.json": "8f0c7d013c46b2f0a9c9fc24ac88e1f3ecd27415c4e0f19b87432016c1e4fd3e",
+        "process/watchdog-result.json": "4cf8e8d948156175139b1fdde4f0b7868ab0d2affc915813497742b701cc289f"
+      }
+    },
+    "native_status": "completed",
+    "native_stopped": true,
+    "extra_callbacks_on_recovery": 0,
+    "provider_calls": 0,
+    "scope": "authored CommandUpstream worker, not provider or real authentication"
+  }
+]

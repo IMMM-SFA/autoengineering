@@ -1,0 +1,214 @@
+{
+  "Id": "ed29c60d6fb15203b7d05097c382569aa3f949682994fc39f373af47f3e8a0f1",
+  "Created": "2026-10-31T23:18:37.723159036Z",
+  "Path": "/opt/inference/bin/python",
+  "Args": [
+    "-I",
+    "-S",
+    "-B",
+    "/opt/coupled-worker/entrypoint.py",
+    "99d825e159dd93bc72653f55e83acb168c918f80953d8ccd15f6981447150ae7"
+  ],
+  "State": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-31T23:18:37.917717426Z",
+    "FinishedAt": "2026-10-31T23:18:39.346475261Z"
+  },
+  "Image": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "ResolvConfPath": "",
+  "HostnamePath": "",
+  "HostsPath": "",
+  "LogPath": "",
+  "Name": "/ae-guest-resource-bea2e908fdfb4be2876b93990c232b11",
+  "RestartCount": 0,
+  "Driver": "overlayfs",
+  "Platform": "linux",
+  "MountLabel": "",
+  "ProcessLabel": "",
+  "AppArmorProfile": "",
+  "ExecIDs": null,
+  "HostConfig": {
+    "Binds": [],
+    "ContainerIDFile": "",
+    "LogConfig": {
+      "Type": "none",
+      "Config": {}
+    },
+    "NetworkMode": "none",
+    "PortBindings": {},
+    "RestartPolicy": {
+      "Name": "no",
+      "MaximumRetryCount": 0
+    },
+    "AutoRemove": false,
+    "VolumeDriver": "",
+    "VolumesFrom": [],
+    "ConsoleSize": [
+      0,
+      0
+    ],
+    "CapAdd": [],
+    "CapDrop": [
+      "ALL"
+    ],
+    "CgroupnsMode": "private",
+    "Dns": null,
+    "DnsOptions": null,
+    "DnsSearch": null,
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "IpcMode": "private",
+    "Cgroup": "",
+    "Links": null,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyRootfs": true,
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "Tmpfs": {
+      "/work": "rw,noexec,nosuid,nodev,size=134217728,mode=0700,uid=1000,gid=1000"
+    },
+    "UTSMode": "",
+    "UsernsMode": "",
+    "ShmSize": 8408530944,
+    "Runtime": "runc",
+    "Isolation": "",
+    "CpuShares": 0,
+    "Memory": 1073741824,
+    "NanoCpus": 1000000000,
+    "CgroupParent": "",
+    "BlkioWeight": 0,
+    "BlkioWeightDevice": null,
+    "BlkioDeviceReadBps": null,
+    "BlkioDeviceWriteBps": null,
+    "BlkioDeviceReadIOps": null,
+    "BlkioDeviceWriteIOps": null,
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "Devices": [],
+    "DeviceCgroupRules": null,
+    "DeviceRequests": [],
+    "MemoryReservation": 0,
+    "MemorySwap": 1073741824,
+    "MemorySwappiness": null,
+    "OomKillDisable": null,
+    "PidsLimit": 16,
+    "Ulimits": null,
+    "CpuCount": 0,
+    "CpuPercent": 0,
+    "IOMaximumIOps": 0,
+    "IOMaximumBandwidth": 0,
+    "MaskedPaths": [
+      "/proc/acpi",
+      "/proc/asound",
+      "/proc/interrupts",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/sys/devices/virtual/powercap",
+      "/sys/firmware"
+    ],
+    "ReadonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ]
+  },
+  "Storage": {
+    "RootFS": {
+      "Snapshot": {
+        "Name": "overlayfs"
+      }
+    }
+  },
+  "Mounts": [],
+  "Config": {
+    "Hostname": "ed29c60d6fb1",
+    "Domainname": "",
+    "User": "1000:1000",
+    "AttachStdin": true,
+    "AttachStdout": true,
+    "AttachStderr": true,
+    "Tty": false,
+    "OpenStdin": true,
+    "StdinOnce": true,
+    "Env": [
+      "PATH=/opt/inference/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "LANG=C.UTF-8",
+      "OMP_NUM_THREADS=1",
+      "MKL_NUM_THREADS=1",
+      "OPENBLAS_NUM_THREADS=1",
+      "NUMEXPR_NUM_THREADS=1",
+      "PYTHONNOUSERSITE=1"
+    ],
+    "Cmd": [
+      "99d825e159dd93bc72653f55e83acb168c918f80953d8ccd15f6981447150ae7"
+    ],
+    "Healthcheck": {
+      "Test": [
+        "NONE"
+      ]
+    },
+    "Image": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+    "Volumes": null,
+    "WorkingDir": "/work",
+    "Entrypoint": [
+      "/opt/inference/bin/python",
+      "-I",
+      "-S",
+      "-B",
+      "/opt/coupled-worker/entrypoint.py"
+    ],
+    "NetworkDisabled": true,
+    "Labels": {
+      "org.autoengineering.environment": "1567a187b04e1e2d1fe3dd164098ee22579b79c78dd58b62d40dbbb1f2dc5afe",
+      "org.autoengineering.environment-recipe": "fixed-coupled-source-overlay-v1",
+      "org.autoengineering.nonce": "bea2e908fdfb4be2876b93990c232b11",
+      "org.autoengineering.packet": "99d825e159dd93bc72653f55e83acb168c918f80953d8ccd15f6981447150ae7",
+      "org.autoengineering.purpose": "utility-coupled-worker-candidate-v1",
+      "org.autoengineering.source-image": "sha256:39fb6f877a99e384ec2af08363a598ea23fd6ef7ec3bae076e0ab1ffe99508b0",
+      "org.autoengineering.wheel": "52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7"
+    },
+    "StopSignal": "SIGTERM",
+    "StopTimeout": 5
+  },
+  "NetworkSettings": {
+    "SandboxID": "",
+    "SandboxKey": "",
+    "Ports": {},
+    "Networks": {}
+  },
+  "ImageManifestDescriptor": {
+    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+    "digest": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+    "size": 2948,
+    "annotations": {
+      "config.digest": "sha256:8ff6f6e01b1533d175941c514ff1b02d13bfa3c12a5950cb8d6afb56a89a4bd7"
+    },
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "stage": "before request creation or any daemon action",
+  "reason": "base-only preparer cannot resolve the optional OpenMDAO model-version metadata",
+  "correction": "prepare in the existing interoperability environment with a fresh output scope; no fallback or package install",
+  "container_creations": 0,
+  "container_starts": 0,
+  "coupled_model_starts": 0,
+  "original_empty_scope_preserved": true
+}

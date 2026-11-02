@@ -1,0 +1,8 @@
+{
+  "error_type": "ValueError",
+  "phase": "strict_archive_and_calendar_validation",
+  "automatic_retry_allowed": false,
+  "observation_values_exported": false,
+  "model_calls": 0,
+  "task_admitted": false
+}

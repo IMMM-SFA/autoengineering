@@ -1,0 +1,34 @@
+
+import importlib.abc,sys
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'examples','torch','openmdao','pvlib','py_wake'}:raise AssertionError('model import')
+sys.meta_path.insert(0,NoModels())
+from pathlib import Path
+import os,socket,subprocess,time,numpy
+from autoengineering.utility.guest_executor import GuestRoutingExecutor
+from autoengineering.utility.guest_receipts import VerifiedGuestExecution
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.scoring import ConfirmationGrant
+from autoengineering.utility import guest_executor,guest_archive
+root=Path(sys.argv[1]);grant=ConfirmationGrant.from_json(sys.argv[2])
+expected=VerifiedGuestExecution.from_json(sys.argv[4])
+def forbidden(*args,**kwargs):raise AssertionError('execution, source probe, array load or clock')
+subprocess.Popen=socket.socket=numpy.load=time.monotonic=time.time=forbidden
+guest_executor.publisher_identity=guest_archive.publisher_identity=forbidden
+def saved(event,args):
+ if event!='open' or isinstance(args[0],int):return
+ path=Path(args[0]).resolve();mode,flags=args[1:3]
+ if not path.is_relative_to(root):raise AssertionError('ungranted read: '+str(path))
+ if (mode is not None and any(c in mode for c in 'wax+')) or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise AssertionError('write')
+store=SuiteStore(root)
+store.replay()  # Initialize the public metadata reader before the strict read barrier.
+sys.addaudithook(saved)
+store=SuiteStore(root)
+executor=GuestRoutingExecutor.for_recovery(store,grant,Path(sys.argv[3]))
+assert executor.source_root is executor.driver_root is executor.api is None
+assert executor.recover(grant)==expected
+try:executor.execute(grant)
+except ValueError as error:assert 'recovery-only' in str(error)
+else:raise AssertionError('recovery facade executed')
+print('Fresh recovery facade agrees from original public metadata only.')

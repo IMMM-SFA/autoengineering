@@ -1,0 +1,18 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "selection-barrier-partial",
+  "files": {
+    "src/autoengineering/utility/confirmation.py": "642453c4b41250dc556c15683b92da2d599984c3e6a5385b016551756fbac4bb",
+    "src/autoengineering/utility/store.py": "b4254b094d0b1daa22cac4285d6e1a98c864458391614293a4fbb0597e7cd70c",
+    "tests/test_utility_confirmation.py": "7c898a4ddaee15fc0107c729d007d762f617d5351e682cea4224f52f66784928"
+  },
+  "checks": {
+    "consolidated_utility_before_final_attestation": "71 passed in 18.24s",
+    "barrier_after_final_attestation": "7 passed in 1.16s",
+    "ruff": "repository-wide pass"
+  },
+  "limits": [
+    "No private scorer or confirmation access",
+    "G3/G4 integration remains open"
+  ]
+}

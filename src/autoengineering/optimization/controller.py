@@ -16,8 +16,10 @@ import numpy as np
 from .backend import (
     MarginalValueExhausted,
     OptimizerBackend,
+    ResultEvidenceBackend,
     ScopedActionBackend,
     SearchSpaceExhausted,
+    SuggestionEvidenceBackend,
 )
 from .ledger import ObservationLedger
 from .provenance import (
@@ -272,6 +274,7 @@ class OptimizationStudy:
         input_artifact_hashes: Mapping[str, str] | None = None,
         pending_result_resolver: Callable[[EvaluationAction], EvaluationResult | None]
         | None = None,
+        result_link_resolver: Callable[[EvaluationAction], Mapping] | None = None,
     ) -> None:
         if not isinstance(spec, StudySpec) or not isinstance(space, SearchSpace):
             raise TypeError("spec and space must be immutable StudySpec and SearchSpace instances")
@@ -342,6 +345,9 @@ class OptimizationStudy:
         if pending_result_resolver is not None and not callable(pending_result_resolver):
             raise TypeError("pending_result_resolver must be callable or None")
         self.pending_result_resolver = pending_result_resolver
+        if result_link_resolver is not None and not callable(result_link_resolver):
+            raise TypeError("result_link_resolver must be callable or None")
+        self.result_link_resolver = result_link_resolver
         self.start_timestamp = ""
         self.end_timestamp: str | None = None
         self.stop_reason: str | None = None
@@ -350,6 +356,7 @@ class OptimizationStudy:
         self._validate_ledger_path()
         with self._lock():
             self._initialize_or_recover()
+            self._synchronize_results()
 
     def ask(self, n: int = 1) -> tuple[EvaluationAction, ...]:
         """Durably reserve one affordable action before any evaluator work begins."""
@@ -373,6 +380,8 @@ class OptimizationStudy:
                 self._commit_terminal(reason)
                 return ()
             started = self.monotonic_clock()
+            if isinstance(self.backend, SuggestionEvidenceBackend):
+                self.backend.prepare_suggestion(self.ledger, self.work_directory)
             try:
                 actions = self.backend.suggest(self.ledger, n=1)
             except SearchSpaceExhausted:
@@ -401,6 +410,8 @@ class OptimizationStudy:
                     raise StudyRecoveryError(
                         "partial backend proposed an action beyond the remaining budget"
                     )
+            if isinstance(self.backend, SuggestionEvidenceBackend):
+                self.backend.record_suggestion(self.ledger, self.work_directory, action)
             self._write_pending(action, None, optimizer_seconds=max(0.0, elapsed))
             self._pending_lock = lock
             keep_lock = True
@@ -460,6 +471,18 @@ class OptimizationStudy:
                 lock.__exit__(None, None, None)
                 if self._pending_lock is lock:
                     self._pending_lock = None
+
+    def release_pending_writer(self) -> None:
+        """Release ownership without acknowledging or deleting a pending action.
+
+        Call after dispatch has returned or raised. External physical work must
+        remain blocked by its owning executor until reconciled. Reopening uses
+        the normal pending-result resolver and never redispatches this action.
+        """
+        lock = self._pending_lock
+        if lock is not None:
+            lock.__exit__(None, None, None)
+            self._pending_lock = None
 
     def run(self, *, max_new_evaluations: int | None = None) -> Recommendation:
         """Ask, evaluate, and tell sequentially until stopped or the call limit is met."""
@@ -1203,7 +1226,10 @@ class OptimizationStudy:
                 self._scoped_backend.validate_action(pending.action, committed_entries)
             if pending.result is not None:
                 self._validate_result(pending.result)
-            expected = self.backend.suggest(_LedgerReplay(committed_entries, committed_bytes), n=1)
+            replay = _LedgerReplay(committed_entries, committed_bytes)
+            if isinstance(self.backend, SuggestionEvidenceBackend):
+                self.backend.verify_saved_suggestion(replay, self.work_directory, pending.action)
+            expected = self.backend.suggest(replay, n=1)
             if len(expected) != 1 or expected[0] != pending.action:
                 raise ValueError("action differs from deterministic backend replay")
         except Exception as error:
@@ -1465,6 +1491,12 @@ class OptimizationStudy:
     ) -> None:
         entries, ledger_bytes = self.ledger.snapshot()
         self._validate_entries(entries)
+        pending = self._read_pending()
+        self._synchronize_results(
+            allow_action_id=(
+                pending.action.id if pending is not None and pending.result is not None else None
+            )
+        )
         identity = self._make_identity(hashlib.sha256(ledger_bytes).hexdigest())
         diagnostics = self.backend.diagnostics(self.ledger)
         write_study_artifacts(
@@ -1482,3 +1514,10 @@ class OptimizationStudy:
             committed_bootstrap_sha256=committed_bootstrap_sha256,
         )
         self.run_identity = identity
+
+    def _synchronize_results(self, *, allow_action_id=None):
+        if isinstance(self.backend, ResultEvidenceBackend):
+            self.backend.synchronize_results(
+                self.ledger, self.work_directory,
+                allow_action_id=allow_action_id, links=self.result_link_resolver,
+            )

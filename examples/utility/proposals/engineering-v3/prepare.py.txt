@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json,sys
+import numpy as np
+from autoengineering.campaign.serialization import digest
+from examples.utility import engineering_load as load,engineering_scenarios as source
+from examples.utility.confirmation_choices import engineering_scenarios
+root=Path.cwd();out=root/'examples/utility/proposals/engineering-v3'
+sys.path.insert(0,str(root/'tests'))
+from test_utility_engineering_load_robust_native import scenarios
+cases=[case.to_dict() for case in scenarios()]
+assert len(cases)==24 and not any(case['forcing']==old['forcing'] for case in cases for old in engineering_scenarios())
+bounds={'ground_voltage':(-.02,.02),'resistor1_ohm':(90.,110.),'resistor2_ohm':(9000.,11000.)}
+assert all(lo<=case['forcing'][name]<hi for case in cases for name,(lo,hi) in bounds.items())
+source_policy=source.ScenarioPolicy('utility-engineering-generated-scenarios-v1','engineering',bounds,source.source_identity())
+model=load.context(.05,root/'outputs/engineering-v3-development-v1',source_root=root).model
+inventory={name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ('tests/test_utility_engineering_load_robust_native.py','examples/utility/engineering_load.py','examples/utility/engineering.py','examples/utility/engineering_scenarios.py','examples/interoperability/circuit/model.py','examples/interoperability/circuit/fixture.py','pixi.lock')}
+inputs={'schema':'utility-engineering-v3-development-inputs-v1','purpose':'public exposed development fixture only','cases':cases,'case_source':'tests/test_utility_engineering_load_robust_native.py::scenarios(seed=41)','case_count':24,'all_cases_public':True,'confirmation_eligible':False,'units':load.UNITS}
+proposal={'schema':'utility-engineering-revised-study-proposal-v3','task_id':'engineering','status':'development_definition_frozen_confirmation_not_admitted','question':'Can a fixed source-current design reduce modeled mean source power while satisfying all declared load-case voltage and constitutive checks?','claim':'new generated operating scenarios under the supplied circuit, not empirical predictive skill','development_input_digest':digest(inputs),'baseline':{'source_current_A':.05,'model':model.to_dict(),'model_digest':model.digest},'design_domain':{'source_current_A':[.01,.1]},'confirmation_source_policy':source_policy.to_dict(),'confirmation_source_policy_digest':source_policy.digest,'confirmation_seed_or_rows_generated':False,'development_definition_uses_old_proposed_reserve_grid':False,'historical_v2_proposal_rewritten':False,'primary':{'metric_id':'mean_source_power','units':'W','direction':'minimize','aggregation':'equal_case_mean'},'secondary_policy':{'minimum_absolute_node2_voltage_V':.62,'constitutive_residual_max_A':1e-10,'maximum_solver_iterations_per_case':100,'all_cases_required':True,'per_case_power_degradation_fraction_max':.01},'useful_gain_policy':{'fraction_of_development_baseline':.05,'absolute_gain':None,'reference':'same fixed 0.05 A baseline and exact public development inputs','freeze_before_confirmation':True},'public_reference_check':{'method':'independent scalar Kirchhoff/diode equation solved by bisection','maximum_bisection_steps_per_case':200,'voltage_absolute_tolerance_V':1e-7,'power_absolute_tolerance_W':1e-8,'diode_Is_A':1e-15,'diode_Vt_V':.025875},'development_profile_caps':{'coupled_model_starts':24,'analytical_reference_solves':24,'maximum_solver_iterations_per_case':100,'host_calls':0,'container_starts':0,'private_source_reads':0,'automatic_retries':0,'per_case_reservation_seconds':10,'OS_deadline_qualified':False,'CPU_or_RSS_cap_qualified':False},'source_pins':inventory,'final_suite_protocol_frozen':False,'task_admitted':False,'open_gates':['authoritative development receipts and parity checks','conventional recipe and route/matrix/numeric-budget freeze','fresh one-use confirmation generation under final suite identity','current-daemon protected execution and interruption qualification','complete independent utility comparison and cost analysis']}
+for name,value in [('development-inputs.json',inputs),('proposal.json',proposal)]:
+    with (out/name).open('x') as f:json.dump(value,f,sort_keys=True,indent=2);f.write('\n')
+print(json.dumps({'development_cases':24,'proposal_digest':digest(proposal),'confirmation_rows_generated':False,'scientific_starts':0}))

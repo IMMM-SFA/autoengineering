@@ -1,0 +1,17 @@
+{
+  "digest": "503d6d86b3ec113853ab5a64cc7a4ea8f6df277087639462e73a2a4f5702b808",
+  "wheel_sha256": "2bcd32d9f0488aa85ec6e89e3bf243266380ba4b69daebc26347ce7eb58af44a",
+  "build_inputs": 355,
+  "core_python_files": 224,
+  "wheel_python_sources": 314,
+  "archives": 49,
+  "compressed_bytes": 265399717,
+  "preserved_inputs": {
+    "prepared-inference-environment-v3": "9402879f689a26da4dcb07573e3f007efbc7cd4fa3451f6e0c41ae40667f0966",
+    "prepared-inference-environment-v1": "d5db58cf78c57526855a070b15cf629524f1f37742eb7bc42f4e199aee127453",
+    "prepared-inference-environment-v2": "5eee3a23d3574a7f3c160f9ebfbedd9f1670f7db4e7b79f1edeef1168aeeb60b"
+  },
+  "installed": false,
+  "image_built": false,
+  "runtime_qualified": false
+}

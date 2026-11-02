@@ -1,0 +1,223 @@
+"""Bounded trusted evaluation of a fixed current across 24 supplied operating cases.
+
+This is the coupled-model scoring kernel. The source-binding/access service must
+supply authorized cases. This module opens no private source, selects no design,
+and provides no OS deadline, RSS control, task admission or scorer registration.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import hashlib
+from itertools import islice
+import math
+from pathlib import Path
+from typing import Literal
+
+import numpy as np
+
+from autoengineering.adapters.python import run_lifecycle
+from autoengineering.campaign.serialization import Record, canonical_json, digest
+from autoengineering.campaign.store import checked_directory, durable_write
+from autoengineering.utility.contracts import sha256, identifier
+from autoengineering.utility.scoring import PublicScore
+from examples.utility import engineering_load as load
+
+
+def source_identity():
+    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+
+@dataclass(frozen=True)
+class LoadScorePolicy(Record):
+    schema: Literal["utility-coupled-load-score-v1"]
+    expected_model_digest: str
+    scorer_source_digest: str
+    minimum_node2_voltage_V: float
+    outcome: Literal["mean_source_power"] = "mean_source_power"
+    units: Literal["W"] = "W"
+    maximum_cases: Literal[24] = 24
+    residual_tolerance_A: Literal[1e-10] = 1e-10
+    fixed_solver_maximum_iterations: Literal[100] = 100
+
+    def _validate(self):
+        sha256(self.expected_model_digest)
+        sha256(self.scorer_source_digest)
+
+
+def _save(root, name, value):
+    durable_write(root / name, canonical_json(value).encode())
+
+
+def _cases(rows):
+    rows = tuple(islice(rows, 25))
+    if len(rows) != 24:
+        raise ValueError("coupled scoring requires exactly 24 frozen load cases")
+    identifiers = set()
+    result = []
+    for row in rows:
+        if set(row) != {"scenario_id", "forcing", "weight"} or set(row["forcing"]) != set(
+            load.UNITS
+        ):
+            raise ValueError("coupled load case fields differ")
+        identifier(row["scenario_id"])
+        if row["scenario_id"] in identifiers or row["weight"] != 1 / 24:
+            raise ValueError("coupled load case identity or weights differ")
+        identifiers.add(row["scenario_id"])
+        forcing = dict(row["forcing"])
+        if any(type(v) not in (int, float) or not math.isfinite(v) for v in forcing.values()):
+            raise ValueError("coupled load forcing must be finite numeric scalars")
+        if min(forcing[n] for n in load.LOADS) <= 0:
+            raise ValueError("coupled load resistance must be positive")
+        result.append(
+            {"scenario_id": row["scenario_id"], "forcing": forcing, "weight": row["weight"]}
+        )
+    return tuple(result)
+
+
+def score_loads(current, rows, root, source_root, *, policy, execution_digest):
+    """Evaluate each case once and retain every attempted start before model creation.
+
+    All cases must pass voltage, convergence, residual and passive-power checks.
+    Failure never becomes an objective penalty. A failed model attempt retains
+    unknown inner work; completed counters remain separate. Output root is private.
+    An existing root cannot obtain a fresh evaluation allowance.
+    """
+    if (
+        not isinstance(policy, LoadScorePolicy)
+        or policy.scorer_source_digest != source_identity()
+        or type(current) not in (int, float)
+        or not math.isfinite(current)
+        or not 0.01 <= current <= 0.1
+    ):
+        raise ValueError("coupled scoring policy, source or design differs")
+    sha256(execution_digest)
+    cases = _cases(rows)
+    root = checked_directory(root)
+    if any(root.iterdir()):
+        raise ValueError("coupled scoring scope already consumed")
+    context = load.context(current, root, source_root=Path(source_root))
+    if context.model.digest != policy.expected_model_digest:
+        raise ValueError("coupled scoring model differs from the frozen model")
+    _save(
+        root,
+        "intent.json",
+        {
+            "policy_digest": policy.digest,
+            "execution_digest": execution_digest,
+            "case_digest": digest(cases),
+            "source_current_A": current,
+            "model_starts_reserved": 24,
+            "automatic_retries": 0,
+            "os_deadline_qualified": False,
+            "aggregate_rss_qualified": False,
+        },
+    )
+    completed = []
+    counters = {name: 0 for name in ("solver_iterations", "component_calls", "derivative_calls")}
+    attempted = 0
+    for index, case in enumerate(cases):
+        attempted += 1
+        _save(
+            root,
+            f"{index:02d}-intent.json",
+            {
+                "execution_digest": execution_digest,
+                "scenario_id": case["scenario_id"],
+                "case_digest": digest(case),
+                "model_start_reserved": 1,
+            },
+        )
+        try:
+            scratch = root / f"case-{index:02d}"
+            scratch.mkdir(mode=0o700)
+            ctx = load.context(current, scratch, source_root=Path(source_root))
+            if ctx.model != context.model:
+                raise ValueError("coupled model changed between cases")
+            forcing = {
+                name: np.asarray(value, dtype=float) for name, value in case["forcing"].items()
+            }
+            result = run_lifecycle(
+                load.adapter(), ctx, forcing, ctx.model.inputs, ctx.model.outputs
+            )
+            if result.training.status != "not_applicable":
+                raise ValueError("coupled scoring cannot train")
+            outputs = {k: float(v) for k, v in result.outputs.items()}
+            diagnostics = {k: float(v) for k, v in result.diagnostics.items()}
+            if not all(math.isfinite(v) for v in (*outputs.values(), *diagnostics.values())):
+                raise ValueError("coupled model returned nonfinite values")
+            if diagnostics["converged"] not in (0.0, 1.0) or diagnostics["residual_norm"] < 0:
+                raise ValueError("coupled convergence diagnostics differ")
+            for name in counters:
+                value = diagnostics[name]
+                if value < 0 or value != int(value):
+                    raise ValueError("coupled work counter differs")
+            power = current * (outputs["node1_voltage"] - case["forcing"]["ground_voltage"])
+            feasible = (
+                diagnostics["converged"] == 1.0
+                and diagnostics["residual_norm"] <= policy.residual_tolerance_A
+                and diagnostics["residual_tolerance"] == policy.residual_tolerance_A
+                and diagnostics["solver_iterations"] <= policy.fixed_solver_maximum_iterations
+                and outputs["node2_voltage"] >= policy.minimum_node2_voltage_V
+                and power >= 0
+            )
+            if not math.isfinite(power):
+                raise ValueError("coupled source power overflow")
+            receipt = {
+                "scenario_id": case["scenario_id"],
+                "source_power_W": power,
+                "node2_voltage_V": outputs["node2_voltage"],
+                "feasible": feasible,
+                "diagnostics": diagnostics,
+                "elapsed_seconds": result.elapsed_seconds,
+            }
+            _save(root, f"{index:02d}-result.json", receipt)
+            completed.append(receipt)
+            for name in counters:
+                counters[name] += int(diagnostics[name])
+        except Exception as error:
+            _save(
+                root,
+                "failed.json",
+                {
+                    "execution_digest": execution_digest,
+                    "attempted_model_starts": attempted,
+                    "completed_model_starts": len(completed),
+                    "error_type": type(error).__name__,
+                    "last_attempt_inner_work_unknown": True,
+                    "known_completed_inner_work": counters,
+                    "automatic_retry_allowed": False,
+                },
+            )
+            return PublicScore("model_failure", policy.outcome, policy.units, None, None)
+    feasible = all(r["feasible"] for r in completed)
+    mean = math.fsum(r["source_power_W"] / 24 for r in completed)
+    if not math.isfinite(mean):
+        raise ValueError("coupled aggregate overflow")
+    score = PublicScore(
+        "success" if feasible else "scientific_infeasible",
+        policy.outcome,
+        policy.units,
+        mean if feasible else None,
+        feasible,
+    )
+    _save(
+        root,
+        "complete.json",
+        {
+            "execution_digest": execution_digest,
+            "policy_digest": policy.digest,
+            "attempted_model_starts": attempted,
+            "completed_model_starts": len(completed),
+            "inner_work": counters,
+            "inner_work_units": {name: "count" for name in counters},
+            "derivative_counter_scope": "component _linearize invocations, including Newton linearization; not FLOPs",
+            "mean_source_power_W": mean,
+            "all_cases_feasible": feasible,
+            "score": score.to_dict(),
+            "task_admitted": False,
+            "private_boundary_qualified": False,
+            "automatic_retries": 0,
+        },
+    )
+    return score

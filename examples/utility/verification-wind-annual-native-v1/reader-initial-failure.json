@@ -1,0 +1,7 @@
+{
+  "status": "initial metadata replay failed",
+  "message": "campaign directory contains a symlink",
+  "cause": "macOS temporary directory returned through /var alias",
+  "correction": "resolve the owned temporary metadata scope; preserve core symlink checks",
+  "model_starts": 0
+}

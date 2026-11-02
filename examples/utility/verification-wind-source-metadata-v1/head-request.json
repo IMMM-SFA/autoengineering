@@ -1,0 +1,10 @@
+{
+  "method": "HEAD",
+  "url": "https://nrel-pds-wtk.s3.us-west-2.amazonaws.com/conus/v1.0.0/wtk_conus_2007.h5",
+  "timeout_seconds": 10,
+  "body_bytes_allowed": 0,
+  "redirects_allowed": 0,
+  "year": 2007,
+  "phase": "development",
+  "reserved_years_allowed": false
+}

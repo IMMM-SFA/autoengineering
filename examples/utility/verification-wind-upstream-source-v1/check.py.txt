@@ -1,0 +1,74 @@
+"""Check reviewed upstream angle operations without importing rex or reading weather."""
+
+import ast
+import hashlib
+import json
+from pathlib import Path
+
+import numpy as np
+
+
+ROOT = Path(__file__).resolve().parent
+PINS = {
+    "rex_utilities_utilities.py.txt": "31288cc35a936cdf0ccbbfab91a2faf2ec1b8d7caf8429b51df17fd345a68905",
+    "sam-wind-format.html": "757fa7b4104193bf2f143018c6899617d4508de64e3f600d075aba2a47225c0f",
+    "rex_sam_resource.py.txt": "ccfb13658f7306ed5cd1aa0e9a7ec3ed75b8a4f210caf1da5185aa1f1159d1a4",
+    "rex_renewable_resource.py.txt": "778a2d58f4a3de6e54cfdbd0e0f41f27bdf117ff5a7aeac3482fcc13d91577c0",
+    "rex_resource_extraction_resource_extraction.py.txt": "886eacce3ee03bde4859628a8ca831c9568899b107f8afc60396bbf8f44c621d",
+}
+
+
+def function(path, name, owner=None):
+    tree = ast.parse(path.read_text())
+    body = tree.body
+    if owner:
+        body = next(n for n in body if isinstance(n, ast.ClassDef) and n.name == owner).body
+    node = next(n for n in body if isinstance(n, ast.FunctionDef) and n.name == name)
+    node.decorator_list = []
+    code = ast.Module(body=[node], type_ignores=[])
+    namespace = {"np": np}
+    exec(compile(code, str(path), "exec"), namespace)
+    return namespace[name]
+
+
+def main():
+    records = json.loads((ROOT / "acquisition.json").read_text())
+    for record in records:
+        data = (ROOT / record["path"]).read_bytes()
+        assert len(data) == record["size_bytes"]
+        assert hashlib.sha256(data).hexdigest() == record["sha256"]
+    for name, expected in PINS.items():
+        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected
+
+    sam = ROOT / "rex_sam_resource.py.txt"
+    units = function(sam, "check_units", "SAMResource")
+    roll = function(sam, "roll_timeseries", "SAMResource")
+    bounds = function(sam, "enforce_arr_range", "SAMResource")
+    unscale = function(ROOT / "rex_utilities_utilities.py.txt", "rex_unscale")
+    raw = np.array([0, 2345, 9000, 18000, 27000, 36000], dtype=np.uint16)
+    expected = np.array([0, 23.45, 90, 180, 270, 360], dtype=np.float32)
+    decoded = unscale(raw.astype("float32"), scale_factor=100, adder=0)
+    np.testing.assert_array_equal(decoded, expected)
+    for shift in (0, -5, 3):
+        actual = units("winddirection", roll(decoded.copy(), shift, 1), "windpower")
+        actual = bounds("winddirection", actual, (0, 360), [0])
+        np.testing.assert_array_equal(actual, np.roll(expected, shift))
+    result = {
+        "status": "passed",
+        "upstream_commit": json.loads((ROOT / "commit.json").read_text())["sha"],
+        "successful_source_fetches": len(records),
+        "total_http_requests": None,
+        "acquired_bytes": sum(record["size_bytes"] for record in records),
+        "checks": ["source pins", "scalar unscaling", "direction units unchanged",
+                   "timezone roll preserves angles", "valid cardinal endpoints preserved"],
+        "weather_reads": 0,
+        "model_evaluations": 0,
+        "claim": "Reviewed helper operations preserve in-range angles; source-supported inference only",
+        "task_admitted": False,
+        "raw_direction_convention_qualified": False,
+    }
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

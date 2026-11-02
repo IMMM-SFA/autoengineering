@@ -1,0 +1,12 @@
+{
+  "figure_data": "reconstructed",
+  "files": 15,
+  "image_integrity": "internally_consistent",
+  "image_rendering": "not_repeated",
+  "status": "verified_numeric_reconstruction",
+  "suite_digest": "7c4f0e66d8791a5f8d96219af09919bb134ddca889cbbf27db23e74e8ae0e528",
+  "profile": "authored public export; base source reader",
+  "matplotlib_available": false,
+  "process_launches": 0,
+  "network_connections": 0
+}

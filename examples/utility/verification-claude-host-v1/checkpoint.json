@@ -1,0 +1,27 @@
+{
+  "status": "host_adapter_implemented; full default suite running",
+  "host_source_identity": "dd06d8ff96bed0d21b40134a4271307dce1d7a4552f8b28ffa19ce12da45e88b",
+  "fixed_source_files": {
+    "src/autoengineering/agents/records.py": "a560671cd1f346c90ca47ab4821244181996d42d88eb031b65023b0bb10d93f6",
+    "src/autoengineering/agents/host_configuration.py": "4984c82d1e944d6d4711fc0c6dd7565abdd0678d3bf4db4b39e5165d85f4026a",
+    "src/autoengineering/agents/scheduler.py": "7d930d4a88b9931a1200ec5a41f0e1e00ac89993f26ea67561be18a7f9db486f",
+    "src/autoengineering/agents/store.py": "b0347bfa2e28e214b19f4c0febae4d7200b290e702d9409b30be4e35b4cfc776",
+    "src/autoengineering/agents/batch.py": "90ee5e6898fd661d0c7028a5555fc3a1637de2619235c81dd60ef8f2e39972ae",
+    "src/autoengineering/agents/batch_native.py": "aa24500d7507ac29b586acb78db65b8338c5bd3b20836ece0af95c0fa360f16d",
+    "src/autoengineering/agents/command.py": "e4a5a3d6c7348fa08691cf8a508833008917498c3c35c2a454c105f67f50fbb0",
+    "src/autoengineering/agents/hosts/claude_profile.py": "fa9b79afb0458b165a1422fa88641ad54ed154bfe66f6c9d51dec4452a755266",
+    "src/autoengineering/agents/hosts/claude_host.py": "078049089e32aa4b89e61fe3cc06fcf2d921daccfba48816046063ba86d8a9f7",
+    "tests/test_agent_claude_host.py": "34dd756f1abc8ca4c4996db3c533b7758396e548d009ac415d5b5789aeabbe32",
+    "tests/test_agent_claude_profile.py": "5d0430000bd8c33908b8fbcf6b0062202ce3c73daf833c1c772f1a708ce338b3"
+  },
+  "initial_related_tests": 96,
+  "extended_workflow_tests": 29,
+  "installed_final_tests": 29,
+  "installed_fixture_scope": "explicit exported producer, public lock and exact wheel source mirror; engine imports from installed wheel",
+  "default_suite_session": 5875,
+  "actual_claude_qualification": "not_established",
+  "actual_provider_conformance": "not_attempted",
+  "real_credentials_read": 0,
+  "provider_calls": 0,
+  "full_part_5": "incomplete"
+}

@@ -1,0 +1,1 @@
+{"action_id": "eval-000011", "configuration": {"x": 0.960618663645858, "y": 0.45469649051708083}, "result": {"constraint_residual": 0.41531515416293896, "feasible": false, "objective": null, "status": "scientific_infeasible"}}

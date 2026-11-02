@@ -1,0 +1,56 @@
+{
+  "package_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-wheel-install-v6/autoengineering/__init__.py",
+  "framework_imports": "blocked",
+  "reports": {
+    "optimizer-comparison-v2": {
+      "pin": "6d519e052b06b0dfb9c36439f9f32e0ac9a4224aff1a940658d727dbba65f39a",
+      "report_sha256": "bf66ccea30cdccf604bf1bf59aaaa4d74ca48c74cda8dce4f4d9a4abc15d9042",
+      "matches_retained_report": true
+    },
+    "circuit-v3": {
+      "pin": "76bc11734b2fedffa978c34342a9bf616f6db90a5cbac43f758afc11461ed4aa",
+      "report_sha256": "67e8f5e1bdef6fccd1bde509756c7619205c16393b40ab04868ae95f23eddf11",
+      "matches_retained_report": true
+    },
+    "solar-campaign-v2": {
+      "pin": "89153355f5b015727516f88a2d59bdefb5780e66bf8cd75b844471eafcb4e3ad",
+      "report_sha256": "dbd76e17fc1b1cb456c286c5ddd3e1bb2454c1d7ddcdd854bb038d039672c093",
+      "matches_retained_report": true
+    },
+    "bmi-installed-v1": {
+      "pin": "09829784e4a296990ee7b18cd3e58121b3d5c10d393f98c60b7165d803770b5d",
+      "report_sha256": "7a104d23f45ddd464a61b714dfa157f68679ca7029649215d8aa29532530dbfc",
+      "matches_retained_report": true
+    },
+    "bmi-installed-v5": {
+      "pin": "1110d6c8a67eb933a8d634a5d66164444d2391ca3de1af000c8e36f0cbcade20",
+      "report_sha256": "f753eebc7ee10c033bebc4031a9c4999da98b2ec9d636f5d978ca20ab8affec1",
+      "matches_retained_report": true
+    },
+    "circuit-installed-v5": {
+      "pin": "53e3729728972b20b2fdd0b4c8bd5d0d8bd76b4232e1031b6dc5a8af98194c6e",
+      "report_sha256": "58dcf663c6ff0510de5524da083ec5744db76c293e3857f11df740d2cb9294ed",
+      "matches_retained_report": true
+    },
+    "solar-campaign-installed-v5b": {
+      "pin": "3f55c64e9a5c9d504d5d1133398796b3cc06762d4f353cba9cf7980ae9ac8a79",
+      "report_sha256": "a7da51fb8f98b6352286b291aeb3725898a642878f693ee552f17ccc30c2544f",
+      "matches_retained_report": true
+    },
+    "bmi-installed-v6": {
+      "pin": "6112cafc7665d4c0b97b857b4e743495ff27bdf1ff96a9684e5bdfcc1a94b11b",
+      "report_sha256": "f753eebc7ee10c033bebc4031a9c4999da98b2ec9d636f5d978ca20ab8affec1",
+      "matches_retained_report": true
+    },
+    "circuit-installed-v6": {
+      "pin": "1efc4b7f4957db20b895742df8a8c4de47fd5237d7fbdee4f023c7af25c2726c",
+      "report_sha256": "58dcf663c6ff0510de5524da083ec5744db76c293e3857f11df740d2cb9294ed",
+      "matches_retained_report": true
+    },
+    "solar-campaign-installed-v6": {
+      "pin": "dc899348a31fcf6b0ec67233afc593867ea70e39dc4ceab7b375851dbcfffae5",
+      "report_sha256": "a7da51fb8f98b6352286b291aeb3725898a642878f693ee552f17ccc30c2544f",
+      "matches_retained_report": true
+    }
+  }
+}

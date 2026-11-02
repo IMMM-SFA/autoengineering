@@ -1,0 +1,38 @@
+{
+  "status": "owned_domain_canary_not_visible_cleanup_reconciled_not_host_qualified",
+  "host_source_identity": "488b50a9b8eb383f988e1912fbd8e1cab341a32a2ccd2942deffb421ee77536a",
+  "qualification_version": "native-claude-api-boundary-1.1",
+  "required_observation": "preferences.owned_user_domain_canary_not_visible",
+  "source_files": {
+    "scripts/probe_claude_preferences.py": "ca99f7cb32fe9b7d3891cc59b8964b4701bb95ecb2aaaaf2263ec4262af5a899",
+    "tests/test_claude_preferences_probe.py": "4202454d02014e2d0fd05eca76801461d789a6ae037ee198b72fac9d88a9bed5",
+    "src/autoengineering/agents/hosts/claude_profile.py": "c9db2f318a275157e1709801f68b835f0edd2e9d58aa971b05a8c26cf74ce08b",
+    "tests/test_agent_claude_profile.py": "5a6c8dd3e576e20685e1f82e0ea6266a8cb0dc80be06205834a4df7c806b6e38"
+  },
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "135",
+    "time": "32.028",
+    "timestamp": "2026-10-29T06:46:29.342931-07:00",
+    "hostname": "m5-mbp"
+  },
+  "provider_calls": 0,
+  "real_credentials_opened": false,
+  "actual_client_started": false,
+  "host_qualified": false,
+  "independent_confirmation_accesses": 0,
+  "scope": "one owned ordinary CFPreferences user domain per probe; substituted executable; no workspace/shared-memory/native-client qualification",
+  "retained_failures": [
+    "restricted shared-memory allocation in initial unit suite",
+    "v3/v4 asynchronous empty-file flush exceeded immediate/five-second cleanup; original summaries retained"
+  ],
+  "current_reconciliation": "probe-v4/cleanup-reconciliations/000002.json",
+  "reconciliation_probe_starts": 0,
+  "reconciliation_preference_calls": 0,
+  "process_observation_helpers": "used by watchdog verifier; not counted as probe starts",
+  "all_owned_domain_files_absent": true,
+  "full_default_bayes_or_scientific_matrix_rerun": false
+}

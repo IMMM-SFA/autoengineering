@@ -1,0 +1,61 @@
+from pathlib import Path
+import json
+import os
+import signal
+import sys
+import time
+
+sys.path.insert(0,sys.argv[1])
+from autoengineering.utility import private_container_runtime as module
+
+root=Path(sys.argv[2]);settings=json.loads((root/'control.json').read_bytes())
+runtime=module.FixedScorerRuntime(Path(settings['endpoint']),server_sha256=settings['server_sha256'])
+assert runtime.identity==settings['runtime_identity']
+original_request=module.API.request
+def trace(method,path):
+    with (root/'creator-requests.jsonl').open('ab') as stream:
+        stream.write(module.encode({'method':method,'path':path})+b'\n')
+        stream.flush();os.fsync(stream.fileno())
+def request(api,method,path,value=None,**kwargs):
+    trace(method,path)
+    status,raw=original_request(api,method,path,value,**kwargs)
+    if method=='POST' and path.endswith('/start'):
+        assert status==204,'original start was not acknowledged by transport'
+        plan=json.loads((root/'container/plan.json').read_bytes())
+        cid=plan['container_id'];assert path=='/containers/'+cid+'/start'
+        before=api.inspect(cid);module.verify_owned(before,plan)
+        module.write(root/'running-before-pause.json',before)
+        assert before['State']['Running'] is True and before['State']['Paused'] is False
+        assert before['State']['Pid']>0
+        trace('POST','/containers/'+cid+'/pause')
+        paused_status,_=original_request(api,'POST','/containers/'+cid+'/pause')
+        assert paused_status==204,'pause did not complete; no replacement attempt allowed'
+        paused=api.inspect(cid);module.verify_owned(paused,plan)
+        module.write(root/'paused-running.json',paused)
+        assert paused['State']['Running'] is True and paused['State']['Paused'] is True
+        assert paused['State']['Pid']==before['State']['Pid']
+        module.write(root/'running-fault-intent.json',{
+            'fault':settings['fault'],'owner_pid':os.getpid(),'container_id':cid,'nonce':plan['nonce'],
+            'transport_start_status':status,'paused':True,
+        })
+        if settings['fault'] in ('cancel','owner-loss'):
+            os.kill(os.getpid(),signal.SIGTERM if settings['fault']=='cancel' else signal.SIGKILL)
+            raise AssertionError('owner termination failed')
+        if settings['fault']=='lost-start-ack':
+            raise TimeoutError('synthetic lost original start acknowledgement delivery')
+        if settings['fault']=='runtime-timeout': return status,raw
+        assert settings['fault']=='deadline'
+        deadline=time.monotonic()+15
+        while not (root/'container/cleanup.json').exists():
+            assert time.monotonic()<deadline,'independent deadline cleanup was not recorded'
+            time.sleep(.05)
+    return status,raw
+module.API.request=request
+try:
+    runtime.run(root,api_version=settings['api_version'],job_sha256=settings['job_sha256'],
+                labels_sha256=settings['labels_sha256'])
+except (TimeoutError,module.Refused) as exc:
+    assert settings['fault'] in ('deadline','lost-start-ack','runtime-timeout')
+    module.write(root/'expected-controller-refusal.json',{'type':type(exc).__name__,'fault':settings['fault']})
+else:
+    raise AssertionError('interrupted original scoring produced an accepted result')

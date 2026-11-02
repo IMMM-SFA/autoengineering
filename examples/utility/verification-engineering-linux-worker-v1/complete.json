@@ -1,0 +1,68 @@
+{
+  "request_digest": "5a7ab4c5f43d993c0e9deb0ba1914d22211679960de341de2135bca9b00ede4d",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "container_id": "ed29c60d6fb15203b7d05097c382569aa3f949682994fc39f373af47f3e8a0f1",
+  "container_creations": 1,
+  "container_starts": 1,
+  "coupled_model_starts": 24,
+  "runtime_observed": {
+    "observed": {
+      "capabilities": "none",
+      "effective_limits": {
+        "cpu.max": "100000 100000",
+        "memory.max": "1073741824",
+        "memory.swap.max": "0",
+        "pids.max": "16"
+      },
+      "gid": 1000,
+      "network_interfaces": [
+        "lo"
+      ],
+      "root_read_only": true,
+      "seccomp": 2,
+      "uid": 1000,
+      "workspace_bytes": 134217728
+    },
+    "owner_loss_qualified": false,
+    "private_boundary_qualified": false,
+    "schema": "utility-coupled-container-result-v1",
+    "worker": {
+      "captured_bytes": 421,
+      "child_exit_code": 0,
+      "child_signal": null,
+      "mode": "score",
+      "output_limit_bytes": 16384,
+      "output_limited": false,
+      "private_boundary_qualified": false,
+      "result": {
+        "attempted_model_starts": 24,
+        "automatic_retries": 0,
+        "completed_model_starts": 24,
+        "known_completed_inner_work": {
+          "component_calls": 5880,
+          "derivative_calls": 1800,
+          "solver_iterations": 360
+        },
+        "last_attempt_inner_work_unknown": false,
+        "private_boundary_qualified": false,
+        "schema": "utility-coupled-load-worker-result-v1",
+        "score": {
+          "feasible": true,
+          "outcome": "mean_source_power",
+          "status": "success",
+          "units": "W",
+          "value": 0.27174569156641054
+        }
+      },
+      "schema": "utility-coupled-load-output-v1"
+    }
+  },
+  "score_within_frozen_tolerance": true,
+  "absolute_power_difference_W": 0.0,
+  "private_data": false,
+  "private_source_reads": 0,
+  "automatic_retries": 0,
+  "private_boundary_qualified": false,
+  "runtime_qualified": false,
+  "original_container_absent": true
+}

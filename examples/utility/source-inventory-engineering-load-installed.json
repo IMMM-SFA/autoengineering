@@ -1,0 +1,24 @@
+{
+  "created_utc": "2026-10-30T10:33:12.187006+00:00",
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "38b45a154191e916e6370055d5a533549cab3201d29d8d8d1a0cd95a2ad106e0",
+    "docs/reviews/part-5-confirmation-proposal.md": "b2fd760212e906b866407f64365959c66724933e43c161467372352d947219d7",
+    "docs/reviews/part-5-progress.md": "0f480b5880313263aef158c4a6bedce9e7df8b6d298ffa7b2aa6a9dad916a9e7",
+    "docs/utility.md": "6ff2807d2f2c8fbbee42ba20d631b1be5b64499ef6e1f519109fb2bf25a81644",
+    "examples/utility/README.md": "417e6e8b661731566a1eb13d306ff547b992c93a6b2fce2066eba1103f00b07e"
+  },
+  "limits": [
+    "inherited interoperability/base dependencies",
+    "native report reader scope only",
+    "no private scoring or final scenario admission"
+  ],
+  "matching_core_files": 202,
+  "matching_packaged_python_files": 286,
+  "package_source_changed": false,
+  "predecessor": "examples/utility/source-inventory-engineering-load-native.json",
+  "predecessor_sha256": "664268caaed63810c43e8841411e5d1eea8998ea6dec53ec8b2cb174954061a5",
+  "qualification": "examples/utility/verification-engineering-load-installed-v1",
+  "qualification_terminal_sha256": "fa8ad854bf44f3d8b15ad741553faccdc2d3b040a7f0ade7fed2a071912e12bd",
+  "schema": "utility-source-increment-v1",
+  "scope": "installed fixed/native development execution and base-only native receipt reader"
+}

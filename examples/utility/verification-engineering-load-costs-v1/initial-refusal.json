@@ -1,0 +1,13 @@
+{
+  "preparation_exit_code": 1,
+  "preparation_error": "Checkout example namespace absent from script import path",
+  "preparation_public_inputs_opened": false,
+  "build_install_wrapper_exit_code": 1,
+  "build_exit_code": 0,
+  "install_exit_code": 0,
+  "final_input_copy_error": "Preparation output absent",
+  "native_model_starts": 0,
+  "private_reads": 0,
+  "preserved_stage": "/private/tmp/utility-load-costs-install-v1",
+  "next_action": "Correct metadata preparation and copy verified public evidence into the existing installation. No rebuild, reinstall or model retry."
+}

@@ -1,0 +1,13 @@
+{
+  "status": "completed",
+  "session_id": 5875,
+  "exit_code": 0,
+  "tests": 2233,
+  "passed": 2127,
+  "skipped": 106,
+  "reported_seconds": 1811.17,
+  "junit_seconds": 1811.062,
+  "source_identity": "dd06d8ff96bed0d21b40134a4271307dce1d7a4552f8b28ffa19ce12da45e88b",
+  "source_test_files_unchanged": 363,
+  "observed_at_utc": "2026-10-29T11:59:12.805786+00:00"
+}

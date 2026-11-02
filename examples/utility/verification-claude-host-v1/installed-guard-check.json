@@ -1,0 +1,10 @@
+{
+  "module": "/private/tmp/claude-host-installed-v1/venv/lib/python3.12/site-packages/autoengineering/agents/hosts/claude_host.py",
+  "checks": {
+    "original_open": "denied",
+    "external_connect": "denied",
+    "external_lookup": "denied",
+    "arbitrary_process": "denied"
+  },
+  "child_audit_hook_inherited": false
+}

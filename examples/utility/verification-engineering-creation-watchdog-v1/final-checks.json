@@ -1,0 +1,9 @@
+{
+  "focused_tests_passed": 82,
+  "documentation_tests_passed": 19,
+  "full_lint_passed": true,
+  "core_source_changed": false,
+  "source_reads": 0,
+  "full_default_suite_rerun": false,
+  "full_interruption_matrix_complete": false
+}

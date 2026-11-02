@@ -1,0 +1,86 @@
+{
+  "status": "blocked_draft",
+  "transfer_claim": "new-period or new-scenario only after custody review",
+  "routes": [
+    "unchanged_baseline",
+    "conventional",
+    "single_agent",
+    "multi_agent"
+  ],
+  "regimes": [
+    "fixed_evaluations",
+    "fixed_total_cost"
+  ],
+  "repetitions": {
+    "planning_default": 10,
+    "frozen": false,
+    "freeze_rule": "Use development variability and minimum useful effect before confirmation access"
+  },
+  "budget_status": "No execution authorized. Profile exposed development inputs then freeze numeric caps including confirmation reserve.",
+  "analysis_status": "Freeze effect margin, secondary tolerances, paired interval method, seed and multiplicity policy before access.",
+  "confirmation": {
+    "partition": null,
+    "status": "unknown_exposure",
+    "access": "No worker access; trusted custodian only after suite selection barrier"
+  },
+  "human_expert": "not_attempted",
+  "task_id": "wind",
+  "family": "Wind layout",
+  "question": "Does layout selection improve modeled energy on independent wind scenarios while satisfying spacing and area constraints?",
+  "baseline": "Current scenario executor uses four Horns Rev corner turbines, V80 and NOJ; the old 16-turbine dossier description did not match this implementation",
+  "candidate_pool": "Supplied bounded four-turbine layouts and native TOPFARM SLSQP; fixed hardware, explicit geometry and minimum-distance checks",
+  "conventional": "TOPFARM native SLSQP with inner calls counted",
+  "primary_outcome": {
+    "name": "Modeled annual energy",
+    "units": "GWh",
+    "direction": "maximize"
+  },
+  "physical_checks": [
+    "Four rotor-diameter spacing (320 m)",
+    "Finite positions inside frozen rectangle",
+    "Fixed turbine curves and wind support",
+    "Convergence status retained"
+  ],
+  "blockers": [
+    "Independent weather/scenario source, exposure/custody and rights",
+    "Qualified protected confirmation path; supplied-resource execution is a public/development profile and must not publish private weather in its source bundle",
+    "Freeze final geometry, lease interpretation, resource bins, information grants and native inner-work budgets; direction quadrature alone is not independent weather"
+  ],
+  "parameter_domains": "Not frozen; executable admission blocked",
+  "minimum_useful_gain": null,
+  "secondary_tolerances": null,
+  "source_closure": "See source inventory; data hashes and license closure pending",
+  "environment": "wind",
+  "development_partition": "Previously exposed fixtures only; never confirmation",
+  "time_policy": "Freeze initialization, causal carryover, warmup, masks, gaps and embargo before execution",
+  "claim_limit": "Modeled objective only; no measured predictive claim",
+  "development_matrix_evidence": {
+    "examples/utility/development/four-family-v1/summary.json": "8250213ec8103c5a10bf747d0b60742b719be5bcc507e7d6e548a49289ade0a1",
+    "examples/utility/development/four-family-v1/execution-plan.json": "ef1ad174e3b7742552820dba46de8624b480839b5e6b2161656e212f4a561571"
+  },
+  "development_contract": {
+    "status": "implemented_exposed_only",
+    "turbines": 4,
+    "resource": "Legacy v1 uses the bundled Horns Rev distribution; v2 accepts an explicit joint direction/speed mass table for supplied public/development resources",
+    "independent_resource_ingestion": "Supplied-resource numerical execution implemented; independent data admission and protected confirmation remain unqualified",
+    "implemented": [
+      "Immutable geometry and supplied layout catalogue",
+      "Preflight spacing/rectangle checks before physical starts",
+      "Native SLSQP and fresh evaluation through separately owned processes",
+      "Scientific scenario checks and seven scripted routes in the common exposed rehearsal",
+      "Versioned resource binding shared by native optimization and a separately reserved fresh scenario evaluation"
+    ],
+    "evidence": {
+      "examples/utility/wind.py": "6fdc15a62f95f2cd13cd6175480ac9b5ec381126097b9ab7e72cd7ebf8d94b37",
+      "examples/utility/wind_scenario.py": "5282ff9183278f7a8a3e547739c07275761a35385798f761ca3f7ad5b4171bba",
+      "examples/utility/wind_parameters.py": "552c978d2b91b2e3e3900c46329ff67f9bb06a15b691aaaaa7f77e851bfb7726",
+      "examples/utility/wind_process.py": "bfda776a9b172d1b44fa2a79ac274bb2a0a5c43d4fe9b10ca8ded376e0d36365",
+      "examples/utility/development/wind-native-process-v1/summary.json": "3fb847fce2ad1662f963fb20804e16ac03cc7fe2af3e76cbb749441f1a8a0ad8",
+      "examples/utility/wind_resource.py": "1dc6f01c19413ad402dd3b687e782d10a62a85dbcad0b743e4a43712ae9f7585",
+      "examples/utility/wind_resource_scenario.py": "12623519b6fb036945a34fdf057eb512311daad9311218468265bf7b5f232bac",
+      "examples/utility/wind_native.py": "c5c0039eea09ebe0aa415579964a7b3278aba5f8a11da27167ff6a5ab625ca59",
+      "examples/utility/wind_proposal.py": "38927945664e7dd7897d3245b0727a79479c81597f4cc513395d48158c3b9979",
+      "examples/utility/verification-wind-resource-v1/summary.json": "fc041501d622fa4424ec04bf71d184df905ab31eaec63a2d052e2af71a3d552d"
+    }
+  }
+}

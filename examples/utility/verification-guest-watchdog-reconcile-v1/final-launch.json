@@ -1,0 +1,7 @@
+{
+  "schema": "utility-verification-command-v1",
+  "command": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility_guest_watchdog_reconcile.py tests/test_utility_guest_composite.py -q -p no:cacheprovider --junitxml=examples/utility/verification-guest-watchdog-reconcile-v1/final.xml",
+  "source_pins": "final-source-pins.json",
+  "scope": "authored local fixture processes and Unix peers, not actual daemon/container/runtime privacy qualification",
+  "terminal_result": "final.xml"
+}

@@ -1,0 +1,19 @@
+{
+  "scope": "fixed local resource diagnostics and saved replay; incremental source inventory, not full source/platform/private qualification",
+  "predecessor": "examples/utility/source-inventory-guest-identity.json",
+  "predecessor_sha256": "b3abd0cd398bf1e0fc038a512019b563b97907f42434f545dbafa592c0f82df8",
+  "source_sha256": {
+    "examples/utility/guest_resource_probe.py": "2d335d1463ec77dbba20dc4fe5949bf9f61953be0f780fbf3c3cc46ffb4e343d",
+    "examples/utility/guest_resources.py": "3a87cbb04e031429a43fdd1869661038bf6274aacca3cb158381634b6f5776d6",
+    "examples/utility/guest_resource_runner.py": "9d9fbaa09bbbdd5a54386a9052d40fce40cf6916fafc51bc67e06df6609ed38d",
+    "examples/utility/guest_resource_reader.py": "b0a4401f03596b59f33de3f785c6205fbcef72730af1192988296dc5b86b2239",
+    "tests/test_utility_guest_resource_probe.py": "6161c147803dd9190953ddba83d00d9447c9ff7d7a27b28361ed575a1a54c143",
+    "tests/test_utility_guest_resources.py": "21b96d33d430cdd4cb68eb9f6467b0c893b5904550dfb3ce2009c6b1a9c677c9",
+    "tests/test_utility_guest_resource_runner.py": "2fa7d2771750241e7b60b6fd5df79be581f27627895c23f63cbdd8bf6e1756cd",
+    "tests/test_utility_guest_resource_reader.py": "91ca918e63efeda6d694b9ffd82be2fcc9ff9b0a8c1f71026747d7ef9fd3d283"
+  },
+  "verification": "examples/utility/verification-guest-resources-v1/summary.json",
+  "completion_digest": "f5395216c48d94a2ada8f5090467178b2f3471d3026197c63e9412f12aa5c103",
+  "failed_request_digest": "0a99d30a1f5df56c3a10fa099ec23a92f66cbce4c6a646c9267fef01d1669206",
+  "completed_request_digest": "ad457623720c9d9514dc26c76bbae4f9624c9519f400e26391db1f91545db639"
+}

@@ -1,0 +1,34 @@
+{
+  "created_utc": "2026-10-31T12:17:24.478409+00:00",
+  "request_digest": "f2df304d9bee6b956c0e9641c2323a9c1446e9610621cd03669ec36dbe535107",
+  "completion_digest": "653357f8bf204e3366d15d68f86c4c2f230db11409cf5f24c2f8526d7727c8d8",
+  "profile_digest": "499c937bedcf48ddc008f81c3b9157128ebe45b1c8bb4f7d33e8ffca4e734c56",
+  "image_id": "sha256:fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399",
+  "python": {
+    "architecture": "x86_64",
+    "build_digest": "b045b35133aee229f091997de805d765ccda1c386ba6b0802f6534008f759cca",
+    "implementation": "CPython",
+    "schema": "utility-guest-python-identity-v1",
+    "system": "Linux",
+    "version": "3.12.13"
+  },
+  "physical_container_starts": 1,
+  "scientific_starts": 0,
+  "elapsed_seconds": 9.822837291751057,
+  "original_container_absent": true,
+  "runtime_qualified": false,
+  "final_regression": {
+    "tests": 140,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "source_sha256": {
+    "examples/utility/guest_identity.py": "0b95839d5a62728a4ea92b08744bbc8497b05cf31e5e4aa13b4d4aa1fbef5a2b",
+    "tests/test_utility_guest_identity.py": "a015f123085d1508210c904fe8d64fd171f61e807ce654e19c7dbbc4bae81ab1"
+  },
+  "executed_controller_sha256": "036baf1982a8f45a65b2e1432e0c95e7bc2a731d26b35b34576a99839647b903",
+  "reader_compatible_with_original_controller": true,
+  "cold_reader_exit_code": 0,
+  "limits": "Metadata only. Resource enforcement, owner-loss, the 26-case matrix, private scoring and independent admission remain unqualified."
+}

@@ -1,0 +1,35 @@
+{
+  "created_utc": "2026-10-30T10:25:19.570644+00:00",
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "bcc0d9e7aafb962e80036f4cfa4ed130ba589823e7cb7d193dc4219df963c5f6",
+    "docs/reviews/part-5-confirmation-proposal.md": "0ca4e3a72d8c6ea1b4f1351e6eb179f1cbd6707a37c9f2a1b8fdf52eba9f819d",
+    "docs/reviews/part-5-progress.md": "a7a44e8165750b35a18b6197327df8161e4004f563a6fdd6a61149f5ef6d1d38",
+    "docs/utility.md": "25c1e496e34f236e68571fd9277baaf8ee3a04d8f1e9c74faf3ce4e898a7abe1",
+    "examples/utility/README.md": "08b109b07276349ec19dcd92577f226d376b2c82a4d7d3521a02348574f64fac",
+    "examples/utility/engineering_load_native.py": "3a01b9d8d43673d9af48ea0a14274344d0ceff439a3125c4b038d98787ee04d7",
+    "tests/test_utility_engineering_load_native.py": "a0a413b665b237a4e7b7ed7f94b6d74eb3ff24851ca9c66a3fbd8285af68add8"
+  },
+  "limits": [
+    "Requires a supplied controlling corner",
+    "No proposed final scenario evaluated",
+    "No installed-profile or private-scoring admission"
+  ],
+  "predecessor": "examples/utility/source-inventory-engineering-load.json",
+  "predecessor_sha256": "e69cfa83d7801ced609083494401af87d1a84d9248bbac0ae7298163e3722e52",
+  "schema": "utility-source-increment-v1",
+  "scope": "native controlling-corner load development recipe; not final source release",
+  "unchanged_core_python_files": 202,
+  "unchanged_legacy_examples": [
+    "examples/utility/engineering.py",
+    "examples/utility/engineering_native.py",
+    "examples/interoperability/circuit/model.py",
+    "examples/interoperability/circuit/fixture.py"
+  ],
+  "verification": {
+    "default": "25 passed, 11 skipped in 2.00s",
+    "diff_check": "passed",
+    "documentation": "19 passed in 0.91s",
+    "interoperability": "52 passed, 6 warnings in 28.51s",
+    "lint": "passed"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "scope": "actual local cancellation of two exposed authored unstarted containers",
+  "request_digest": "88205202e69e4d28264d731d7c1b0bd76cad34c2e8077432b7669ce548db18a6",
+  "completion_digest": "a75833654e13b948e2a7c279528d045ebedad20fd3a451d3ed5f05787ab3bcba",
+  "container_creations": 2,
+  "container_starts": 0,
+  "scientific_starts": 0,
+  "fitting_starts": 0,
+  "scoring_starts": 0,
+  "control_watchdogs": 1,
+  "original_containers_absent": true,
+  "private_confirmation": false,
+  "runtime_qualified": false,
+  "public_proof": {
+    "sha256": "1fa80f12a99044ee72a941258965584c9b83d952d42e315d1af16b0c3b5580d9",
+    "size_bytes": 1695055,
+    "files": 93,
+    "contains": "original owner metadata, cleanup/API evidence and frozen transfer tar with known exposed meteorological drivers; no private labels or fitting labels"
+  },
+  "cold_recovery": {
+    "exit_code": 0,
+    "replayed_cases": 2,
+    "new_starts": 0,
+    "source_and_dependencies_initialized_before_guard": true,
+    "after_guard": "reads only relocated proof path/inodes; no writes, imports, clocks, array loading, sockets or processes",
+    "source_root_copied": false,
+    "driver_root_copied": false,
+    "suite_root_copied": false,
+    "initial_invocation_failure": "script-directory imports could not locate example helpers; corrected invocation initializes from checkout before guard",
+    "installed_package_qualification": false,
+    "public_archive_extraction_verified": true,
+    "archive_files": 93,
+    "archive_bytes": 8332439
+  },
+  "watchdog_process_observation": "watchdog-process-observation.json",
+  "reader_increment": {
+    "scope": "also verify transfer archive when cancellation precedes dispatch",
+    "focused_passed": 10,
+    "seconds": 3.33,
+    "failures": 0,
+    "errors": 0,
+    "command": "python -m pytest tests/test_utility_guest_cancellation_controls.py tests/test_utility_guest_cancellation_reader.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-cancellation-reader-unit-v2",
+    "source_inventory": "examples/utility/source-inventory-guest-cancellation.json",
+    "saved_archive_guard_rechecked": true
+  },
+  "regression_scope": {
+    "reader_revision": "before the later verify_guest_inputs import/call for after-create cases",
+    "reader_source_snapshot": "regression-reader.py.txt",
+    "reader_test_snapshot": "regression-reader-tests.py.txt",
+    "snapshot_method": "reconstructed by removing the later import/call and one added test; not a launch-time source pin",
+    "other_current_sources": "control handler and core/runtime sources unchanged"
+  },
+  "verification": {
+    "tests": 136,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 323.844,
+    "exit_code": 0,
+    "documentation_after_edits_passed": 19,
+    "current_reader_focused_passed": 10,
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "full_default_rerun": false,
+    "core_sources_unchanged": 224,
+    "declared_wheel_sources_unchanged": 315
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "scope": "incremental authored solar interval and role partition preparation, not raw-source/site/model/private or platform qualification",
+  "predecessor": "examples/utility/source-inventory-confirmation-choices.json",
+  "predecessor_sha256": "9f97cfcac31ef9ce32f7ede388a50db5f8b079d40907fa97125dbdb9f568aa5f",
+  "source_sha256": {
+    "examples/utility/solar_intervals.py": "cc71fb2dd686021153bad722858ee0b76dd8aa4fd552e1b2bcaaeaa3d2b667d9",
+    "examples/utility/solar_partitions.py": "03efa7b1a77697147a1d8ec9f43886f1aeafded64b069c1afb3ebb78604cf878",
+    "tests/test_utility_solar_intervals.py": "fcc010117a274cca8e8adc21df15d7f8cf1d8e7bc504bc2b573b201080be1179",
+    "tests/test_utility_solar_partitions.py": "abde7d77015501a893fe90b0d91b6ba9b30e3a34e9d09cd341906d9660b0b1c8"
+  },
+  "verification": "examples/utility/verification-solar-inputs-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_wheel_sources_unchanged": 315
+}

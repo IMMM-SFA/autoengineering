@@ -1,0 +1,18 @@
+{
+  "request_digest": "caaeef195120ea0f462cf6cbdf78f3da2ebe918162447a69ee9935f68da49a6d",
+  "request_path": "examples/utility/prepared-guest-build-v6/request.json",
+  "schema": "utility-local-image-build-request-v4",
+  "context_digest": "4340a8d04bcb9e408dffb8057e5fd8bc3241e14b56036533b8c1cf4684b62797",
+  "client_deadline_seconds": 1200,
+  "build_commands": 1,
+  "maximum_base_pull_commands": 1,
+  "automatic_retries": 0,
+  "scientific_starts": 0,
+  "provider_calls": 0,
+  "independent_label_accesses": 0,
+  "docker_commands_dispatched": 0,
+  "image_built": false,
+  "runtime_qualified": false,
+  "dispatch_deferred_while_full_default_running": true,
+  "required_followup": "Explicit-environment derivative and current-image controls; no historical admission transfer"
+}

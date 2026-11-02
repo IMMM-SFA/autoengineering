@@ -1,0 +1,28 @@
+{
+  "schema": "utility-engineering-envelope-supervised-installed-reader-v1",
+  "outside_checkout": true,
+  "relocated_replay": "passed",
+  "rehashed_dropped_native_work": "rejected",
+  "reader": {
+    "schema": "utility-engineering-envelope-supervision-read-v1",
+    "outer_process_receipts": 49,
+    "native_inner_model_calls": 35,
+    "independent_support_calls": 1,
+    "total_root_model_calls": 83,
+    "scenario_cost_records": 240,
+    "baseline_power_W": 0.24974500426467053,
+    "selected_power_W": 0.019410607545283756,
+    "decision": "accepted_candidate",
+    "optimizer_target_met": false,
+    "archive_only_replay": "passed",
+    "all_core_modules_from_installed_target": true,
+    "new_model_calls": 0,
+    "independent_confirmation": false
+  },
+  "installed_payloads_verified": 235,
+  "wheel_sha256": "4e4dd052bc1ea57609aa61a6454560d5784baad7989597a9eeda6f4991dd6fb7",
+  "wheel_rebuilt": false,
+  "dependencies_installed": false,
+  "new_scientific_calls": 0,
+  "reader_initialization": "core metadata readers may read installed libraries; guarded replay reads evidence only"
+}

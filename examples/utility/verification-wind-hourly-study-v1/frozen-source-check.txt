@@ -1,0 +1,4 @@
+verify_inputs and _source_alignment passed for environment 7c66ecada3955ad940d07fcf409b7f78bf68fc643950340f408d9d398a6fa06e.
+224 core Python files and all 315 declared guest Python source bytes match.
+New hourly scenario/study/archive-reader modules remain outside the frozen wheel.
+No guest build or execution was performed.

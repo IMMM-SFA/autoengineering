@@ -1,0 +1,33 @@
+"""Pinned full default regression; preserve terminal status and every source delta."""
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, os, subprocess, sys, time
+root = Path.cwd()
+out = root / 'examples/utility/verification-current-base-v6'
+names = set(json.loads((root / 'examples/utility/verification-current-base-v5/source-pins.json').read_text()))
+for folder in ('src', 'tests', 'examples'):
+    names.update(str(p.relative_to(root)) for p in (root / folder).rglob('*.py')
+        if not any(part.startswith(('verification-', 'prepared-')) for part in p.parts))
+names.add(str(Path(__file__).relative_to(root)))
+pins = {n:hashlib.sha256((root / n).read_bytes()).hexdigest() for n in sorted(names)}
+(out / 'source-pins.json').write_text(json.dumps(pins,indent=2)+'\n')
+command = ['/usr/bin/caffeinate', '-i', sys.executable, '-B', '-m', 'pytest', 'tests', '-q',
+           '-p', 'no:cacheprovider', '--basetemp=/private/tmp/utility-current-base-v6',
+           '--junitxml=' + str(out / 'junit.xml'), '--tb=short']
+launch = {'command':command,'cwd':str(root),'began_utc':datetime.now(timezone.utc).isoformat(),
+          'pinned_files':len(pins),'core_python_files':len(list((root/'src/autoengineering').rglob('*.py'))),
+          'test_python_files':len(list((root/'tests').rglob('*.py'))),'sleep_inhibited_from_launch':True}
+(out / 'launch.json').write_text(json.dumps(launch,indent=2)+'\n')
+start = time.monotonic()
+with (out / 'pytest.log').open('w') as log:
+    child = subprocess.Popen(command,cwd=root,stdout=log,stderr=subprocess.STDOUT)
+    (out / 'process.json').write_text(json.dumps({'runner_pid':os.getpid(),'child_pid':child.pid},indent=2)+'\n')
+    print(json.dumps({'status':'running','child_pid':child.pid,'pinned_files':len(pins),'core_python_files':launch['core_python_files']}),flush=True)
+    code = child.wait()
+changed = [n for n,sha in pins.items() if not (root/n).is_file() or hashlib.sha256((root/n).read_bytes()).hexdigest()!=sha]
+result = {'exit_code':code,'elapsed_seconds':time.monotonic()-start,
+          'ended_utc':datetime.now(timezone.utc).isoformat(),'changed_pins':changed,
+          'junit_present':(out/'junit.xml').is_file()}
+(out / 'completion.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result),flush=True)
+raise SystemExit(code if not changed else 99)

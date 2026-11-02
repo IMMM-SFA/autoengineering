@@ -1,0 +1,14 @@
+{
+  "schema": "utility-guest-resource-observation-v1",
+  "mode": "read_only_root",
+  "nonce": "ec6f2e74be0741afb2caabb005c4a0e5",
+  "container_id": "9259857f66c3250ca1197aafef69a072493767c3a670baa9f0de013d0fa2d8c3",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "configuration_digest": "aa6464147337b8b9961a16926954d1acf5bcc4222a764cf9a157f6da06236016",
+  "output_sha256": "71e3a67bd4ff3eb57334be8c4c09bad7a302018cdc2a8c31d5630e3583380f3e",
+  "result": {
+    "errno": "EROFS"
+  },
+  "runtime_qualified": false,
+  "owner_loss_qualified": false
+}

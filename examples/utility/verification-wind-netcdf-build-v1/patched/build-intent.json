@@ -1,0 +1,22 @@
+{
+  "schema": "utility-wind-netcdf-build-intent-v1",
+  "build_attempts": 1,
+  "timeout_seconds": 300,
+  "python": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/bin/python",
+  "python_version": "3.12.14 (main, Sep  3 2026, 03:46:19) [Clang 21.1.8 ]",
+  "numpy": "2.5.2",
+  "netCDF4": "1.7.4",
+  "Cython": "3.2.4",
+  "setuptools": "84.0.0",
+  "setuptools-scm": "8.3.1",
+  "netcdf_config": "/opt/homebrew/bin/nc-config",
+  "hdf5_prefix": "/opt/homebrew/opt/hdf5",
+  "netcdf_prefix": "/opt/homebrew/opt/netcdf",
+  "NETCDF4_LIMITED_API": "0",
+  "cumulative_build_attempts": 2,
+  "local_patch": true,
+  "MACOSX_DEPLOYMENT_TARGET": "26.0",
+  "existing_environment_modified": false,
+  "scientific_model_calls": 0,
+  "private_reads": 0
+}

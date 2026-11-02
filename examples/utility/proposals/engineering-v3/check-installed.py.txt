@@ -1,0 +1,20 @@
+"""Verify an existing core installation and run the reader outside the checkout."""
+from pathlib import Path
+import hashlib,json,subprocess,sys,zipfile
+source,installed,public=map(lambda x:Path(x).resolve(),sys.argv[1:])
+root=source/'examples/utility/proposals/engineering-v3'
+wheel=source/'examples/utility/verification-wind-cost-report-v1/autoengineering-0.2.0-py3-none-any.whl'
+assert hashlib.sha256(wheel.read_bytes()).hexdigest()=='72a1fda0bf81f8160e209265ba4f469fd50dbf9ebbb19a71fc1f43a38e0edc57'
+verified=0
+with zipfile.ZipFile(wheel) as z:
+    for name in z.namelist():
+        if name.startswith('autoengineering/') and not name.endswith('/'):
+            assert (installed/name).read_bytes()==z.read(name),name
+            verified+=1
+code='import sys,runpy; installed,script,root=sys.argv[1:]; sys.path.insert(0,installed); sys.argv=[script,root]; runpy.run_path(script,run_name="__main__"); from pathlib import Path; import autoengineering; assert Path(autoengineering.__file__).resolve().is_relative_to(Path(installed)); assert all(Path(module.__file__).resolve().is_relative_to(Path(installed)) for name,module in tuple(sys.modules.items()) if (name=="autoengineering" or name.startswith("autoengineering.")) and getattr(module,"__file__",None))'
+assert not Path.cwd().resolve().is_relative_to(source)
+result=subprocess.run([sys.executable,'-I','-B','-c',code,str(installed),str(root/'verify-reference.py.txt'),str(public)],capture_output=True,text=True)
+assert result.returncode==0,result.stderr
+record={'schema':'utility-engineering-v3-installed-reference-check-v1','wheel_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),'installed_payload_files_verified':verified,'all_loaded_core_modules_from_installed_target':True,'outside_checkout':True,'relocated_public_evidence':True,'reader_result':json.loads(result.stdout),'wheel_rebuilt':False,'dependencies_installed':False,'new_coupled_or_reference_model_solves':0}
+(root/'installed-reader-verification.json').write_text(json.dumps(record,sort_keys=True,indent=2)+'\n')
+print(json.dumps(record))

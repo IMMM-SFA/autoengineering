@@ -1,0 +1,16 @@
+{
+  "schema": "utility-guest-resource-observation-v1",
+  "mode": "pid_limit",
+  "nonce": "5ce8f6bf6d8f49a8b3fe7e5497a66482",
+  "container_id": "d582eec5a913628ad3e7b0aec57ed25dabf9d606b1a463aa8f4d4b1506b7c1bb",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "configuration_digest": "038df9f0e23f493ed40b5e32ae39d94b0f5892ba092cfd349ac17d25f7bb4c5d",
+  "output_sha256": "be99310db361d1b01083c918ff00633f6cd9b7650b2d766a5a3be2ef282fa6da",
+  "result": {
+    "children": 15,
+    "errno": "EAGAIN",
+    "pids_current": 16
+  },
+  "runtime_qualified": false,
+  "owner_loss_qualified": false
+}

@@ -1,0 +1,29 @@
+{
+  "scope": "Six actual resource probes of the v6 source-aligned candidate image",
+  "predecessor": "examples/utility/source-inventory-guest-image-v6.json",
+  "predecessor_sha256": "c455da02588d380c4d295f4938e4b7ce8a66b6c3eac1fe9030d7c65eb4921622",
+  "current_source_sha256": {
+    "docs/utility.md": "a1c5e03ee299a25650f260fec77aa5a223d9af06411526bc7b70075696960f2e",
+    "docs/utility-handoff.md": "f508920d11dd5184f2f61e9967dc99a62c05aba6e96c6a926deb11c656070a5e",
+    "docs/reviews/part-5-progress.md": "9caa416d7f1e4f10b53bf8688f155a76f04994784d070731b06f29f7ef324cce",
+    "docs/reviews/part-5-completion-audit.md": "72b042733bd7816d7e7933e0d28b378451816376860c0e6be072afa71657c487",
+    "examples/utility/guest_resources.py": "ae2f6f97baa13a68852363e3e558a762f10124ac23f4a971c2cff79691702bfa",
+    "examples/utility/guest_resource_runner.py": "9d10d0b5abf7852d59e5634e2cc950cba126c6348a58598a69c64b30849e4cb1",
+    "examples/utility/guest_resource_probe.py": "2d335d1463ec77dbba20dc4fe5949bf9f61953be0f780fbf3c3cc46ffb4e343d",
+    "examples/utility/guest_resource_reader.py": "a12beff7ef65e7b21b3c5e27f18f2d52be8cb8188b77bdb35cad9b08f1a72811",
+    "tests/test_utility_guest_resources.py": "7b7ea616db96c386cfea0e2a2d8df69f748a5daff50cf74129926333498523fc",
+    "tests/test_utility_guest_resource_reader.py": "a23e210dc28d00968939596ddbad441d77efb0f515ac37e93a97bf9d38c5d965",
+    "tests/test_utility_guest_resource_runner.py": "1f88af833c067d2bab339ae0047c43c5e33879fbc901d51c9ed5a630ea0c6b61",
+    "examples/utility/guest-qualification-accounting-v9.json": "86c06933b5859b4a2dbb4402fa50eef2d19b31ed75dcaf4a96143d2a83abcc8f",
+    "examples/utility/qualification-state-guest-v9.json": "32f15c291b55090799879ba44cd3a2597d374f6c53b6a886c5176950a27bdc82"
+  },
+  "verification": "examples/utility/verification-guest-resources-v6/summary.json",
+  "verification_sha256": "e70f116f51bbf65800dfe20c271a1c7a041f4d183b3aad88e40a3ccfd447232c",
+  "core_python_sources": 225,
+  "declared_guest_python_sources": 316,
+  "current_image": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
+  "new_runtime_container_starts": 6,
+  "new_model_starts": 0,
+  "runtime_qualified": false,
+  "full_part_5_complete": false
+}

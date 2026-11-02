@@ -1,0 +1,7 @@
+{
+  "fault": "cancellation",
+  "owner_pid": 37920,
+  "returncode": -15,
+  "expected_returncode": -15,
+  "output": "/private/tmp/utility-runtime-lifecycle-cancellation-v1"
+}

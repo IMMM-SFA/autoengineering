@@ -1,0 +1,35 @@
+from pathlib import Path
+root=Path.cwd()
+text='''
+
+The robust supplied-load recipe now has selected-source installed execution
+outside the checkout on macOS ARM64, Python 3.12.16 and inherited OpenMDAO 3.41.0.
+The wheel contains all 225 core modules, seven domain modules and the exposed
+24-case authored fixture. Installed and staged payloads match the wheel. A startup
+hook denies original checkout content while allowing inherited dependencies.
+This is a diagnostic harness, not a private execution boundary.
+
+One native process used 35 inner solves within a 40-call cap. Twenty-four fresh
+scientific processes passed strict checks. The current and mean power matched
+checkout results at tolerances frozen before execution. All 25 reservations have
+verified stopped receipts. Saved native/scenario recovery launched nothing.
+A separate installed core-only base reader verified 385 relocated evidence files,
+reconstructed costs and matched the aggregate to all committed scenario scores
+with models/runtime/original roots denied after initialization.
+
+The fixture is now bundled and explicitly known exposed in the draft exposure
+register. Earlier unknown history and all blocked task admissions remain unchanged.
+No independent or proposed final scenario source was opened. Linux, private
+engineering scoring, a full release and the actual comparative study remain open.
+The frozen v6 inference image and its separate accounting register are unchanged.
+
+[Installed robust engineering evidence](PREFIXexamples/utility/verification-engineering-robust-installed-v1/README.md).
+'''
+for name in ['docs/utility.md','docs/utility-handoff.md','docs/reviews/part-5-progress.md','docs/reviews/part-5-completion-audit.md']:
+ with (root/name).open('a') as f:f.write(text.replace('PREFIX','../../' if '/reviews/' in name else '../'))
+p=root/'docs/reviews/part-5-completion-audit.md'
+s=p.read_text().replace('Original corner recipe unchanged. Final data/admission and installed model execution remain open.','Original corner recipe unchanged. Selected-source installed execution and base-only receipt reconstruction now pass on macOS ARM64 in verification-engineering-robust-installed-v1. Final data/admission, Linux and protected scoring remain open.',1)
+p.write_text(s)
+p=root/'examples/utility/README.md'
+s=p.read_text().replace('The new recipe itself is not installed or platform qualified.','The new recipe now has selected-source installed execution on macOS ARM64; see\n[installed evidence](verification-engineering-robust-installed-v1/README.md). Linux,\nprivate scoring and independent task admission remain open.',1)
+p.write_text(s)

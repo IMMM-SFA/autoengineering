@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "changed_table": "predictions.csv",
+  "renderer_exit": 1,
+  "rendered_images": 0,
+  "model_work": "none"
+}

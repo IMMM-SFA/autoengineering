@@ -41,6 +41,9 @@ autoengineering = { path = ".", editable = true }
 smac = ">=2.3,<3"
 
 [environments]
+utility = { features = ["optuna", "utility", "wind"] }
+interoperability = { features = ["optuna", "interoperability"] }
+optuna = { features = ["optuna"] }
 solar = { features = ["solar"] }
 wind = { features = ["wind"] }
 hybrid = { features = ["hybrid"] }
@@ -67,3 +70,22 @@ coin-or-cbc = "*"
 glpk = "*"
 pandas = ">=2,<3"
 timezonefinder = "==6.5.9"
+
+[feature.optuna.pypi-dependencies]
+optuna = "==4.5.0"
+
+[feature.interoperability.pypi-dependencies]
+psutil = "==7.2.2"
+bmipy = "==2.0.1"
+openmdao = "==3.41.0"
+pvlib = "==0.15.2"
+
+[feature.interoperability.tasks]
+test-interoperability = "python -m pytest tests/test_bmi_adapter.py tests/test_openmdao_adapter.py tests/test_optuna_backend.py tests/test_integration_contracts.py tests/test_integration_replay.py tests/test_integration_supervision.py tests/test_integration_evidence.py tests/test_interoperability_identity.py tests/test_circuit_integration.py tests/test_solar_integration.py tests/test_subdaily_contract.py tests/test_optuna_replay_prototype.py -q -p no:cacheprovider"
+
+[feature.utility.pypi-dependencies]
+# TOPFARM 2.6.2 requires OpenMDAO 3.39.*. Keep interoperability's 3.41.0 pin separate.
+openmdao = "==3.39.0"
+pvlib = "==0.15.2"
+bmipy = "==2.0.1"
+psutil = "==7.2.2"

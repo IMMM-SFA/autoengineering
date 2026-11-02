@@ -1,0 +1,13 @@
+........................................................................ [ 94%]
+....                                                                     [100%]
+=============================== warnings summary ===============================
+tests/test_utility_engineering_native.py::test_actual_native_circuit_recipe_enforces_inner_call_ceiling
+tests/test_utility_engineering.py::test_scenario_direct_wrapped_parity_and_derivatives
+tests/test_utility_engineering.py::test_native_driver_preserves_derivatives_and_counts_inner_solves
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/interoperability/lib/python3.12/site-packages/openmdao/utils/relevance.py:1295: OpenMDAOWarning: The following groups have a nonlinear solver that computes gradients and will be treated as atomic for the purposes of determining which systems are included in the optimization iteration: 
+  circuit
+  
+    issue_warning("The following groups have a nonlinear solver that computes gradients "
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+76 passed, 3 warnings in 332.36s (0:05:32)

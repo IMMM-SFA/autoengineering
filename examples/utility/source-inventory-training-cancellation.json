@@ -1,0 +1,43 @@
+{
+  "created_utc": "2026-10-30T15:25:13.320556+00:00",
+  "current_core_python_files": 206,
+  "files": {
+    "docs/implementation-plans/part-5-frozen-prediction-increment.md": "7cc7aeff50a82ec5a73ac8abcbc07b05f632a9e06ed0b6c1cd6f9c54a3bf5688",
+    "docs/reviews/part-5-completion-audit.md": "5f6692f4d8920396abe6aadba52d7b13d06493d9bd33676f51cf90c2e6204105",
+    "docs/reviews/part-5-progress.md": "6b8a0e6baee5791ac625a4bf0aa9ae35564e160e1d1bd8560527363ce89b657a",
+    "docs/reviews/part-5-readiness.md": "e0cc9460ae69b4e3f7c0ad09b998a628975bedc91f2bbc4ce973045743b29e0f",
+    "docs/utility-handoff.md": "2a5bf370788fa36d882ffc9f82bb03abc5f8407bc92305fa4cf016527302bab6",
+    "docs/utility.md": "9ad2c91d36291ebf0157b93de5a1df81b7d6e48ab8e6cf6e33eb79bba40f630e",
+    "examples/utility/README.md": "499de435005c08797f95e9485f0c3a7b555adbc6839d9e816632d96607a7917d",
+    "examples/utility/verification-training-cancellation-v1/bounded-normal-recovery.log": "ccb80dc3e9a67267ebcd38c32a15368ef811620293a4f0dd5179794e18e16d80",
+    "examples/utility/verification-training-cancellation-v1/corrected-three-cases.log": "24bac634ba4cf57b659a2ae73210cdee5bb12452467d2e3926465cf8f59294b0",
+    "examples/utility/verification-training-cancellation-v1/documentation.log": "a350bca063c7a5c4089f6ef4401cf87b263030c794349f2bdf6709609c0c6e12",
+    "examples/utility/verification-training-cancellation-v1/final-terminal-recovery.log": "682a77655fc3cd6f2426f26d0a07fecb19f397d07314d5a40b37d787bd487d17",
+    "examples/utility/verification-training-cancellation-v1/metadata-bound-refusal.log": "0981548d0afc2c19d90c407b2635ce0ea5f5a434b1eb72369df6523acbc242a8",
+    "examples/utility/verification-training-cancellation-v1/specification-pin-refusal.log": "ecbdf354c86f2ce4b891488c1262576af59e895e6c80705af6aca3e837053724",
+    "examples/utility/verification-training-cancellation-v1/unpinned-negative-fixture.log": "efbbfe212475be2ebcbf87ac29c7dd76414911fe1bde71283e7cc381a3b659c5",
+    "src/autoengineering/campaign/controller.py": "9b297e8dc382db1e7c2c22411bfb67b9452ab345906f492e073d41f9051aaa8d",
+    "src/autoengineering/utility/campaign_costs.py": "23e14a90d46bda11171241950972d1eb9a253d19144336cd6f36912a975b78f7",
+    "tests/test_utility_campaign_training_costs.py": "14e947dfa580070ca33117641a1c24c7bde941629a28d7d017e9d3c296e7ecdd",
+    "tests/test_utility_training_cancellation.py": "96f773ff8836675bd93b234e42c63be7eee2f819f0fb82c51d588c174f80ec81"
+  },
+  "limits": [
+    "actual training intent observed, not optimizer-step completion counters",
+    "private frozen inference chain remains planned and unregistered",
+    "other kill/adapter profiles and independent task admission remain open",
+    "full default checkpoint predates this increment",
+    "no installed package, optional environment, new host/platform or private data qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-trained-execution.json",
+  "predecessor_sha256": "326ccf73cb25ab950cd8f2656ae7596d372afdf1073d13b63f2fa74062091d92",
+  "schema": "utility-source-increment-v1",
+  "scope": "original-proof cancellation after a durable registered fitting intent, plus protected inference gap plan",
+  "verification": {
+    "corrected_cancellation_cases": "3 passed in 40.95s",
+    "diff_check": "passed",
+    "final_documentation": "19 passed in 0.59s",
+    "final_terminal_recovery": "23 passed in 99.38s",
+    "formatting": "recovery AST equality verified",
+    "lint": "passed"
+  }
+}

@@ -1,0 +1,33 @@
+"""Read real archive/context proofs and authored build proof from wheel code only."""
+from pathlib import Path
+import importlib.abc,json,os,socket,subprocess,sys,time
+package=Path(sys.argv[1]);saved=Path(sys.argv[2]);expected=json.loads(Path(sys.argv[3]).read_text())
+sys.path.insert(0,str(package))
+from autoengineering.campaign.serialization import digest
+from examples.utility import guest_archive_download as archives,guest_image_context as contexts,guest_image_build as builds,guest_image
+import autoengineering,numpy
+for module in (autoengineering,archives,contexts,builds,guest_image):
+ assert Path(module.__file__).resolve().is_relative_to(package)
+b''.decode('cp437')
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'torch','botorch','openmdao','pvlib','py_wake','topfarm','bmipy'}:
+   raise AssertionError('scientific model import')
+sys.meta_path.insert(0,NoModels())
+def forbidden(*args,**kwargs):raise AssertionError('execution, network, clock, source probe or arrays')
+subprocess.Popen=socket.socket=time.monotonic=time.time=numpy.load=forbidden
+archives._open=guest_image._source_alignment=builds._binary=builds._endpoint=builds._run=forbidden
+active=[True]
+def reads(event,args):
+ if not active[0] or event!='open' or isinstance(args[0],int):return
+ path=Path(args[0]).resolve();mode,flags=args[1:3]
+ if not path.is_relative_to(saved):raise AssertionError('package, original or unrelated file read')
+ if mode is not None and any(c in mode for c in 'wax+'):raise AssertionError('write')
+ if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise AssertionError('write')
+sys.addaudithook(reads)
+a=archives.verify(saved/'cache',expected_digest='cd89e6cb04b26261960045de4ee6d7e807f50f10a77c77e9aa3ccef21cc3b0d8')
+c=contexts.verify(saved/'context',expected_digest='0e523c9b2dd0cc9bbc01bea14b185db87f14e982a495f5960b1c082804df2cce')
+b=builds.read_completion(saved/'authored/build',expected_digest=digest(expected))
+assert b==expected and a['received_payload_bytes']==272387807 and not c['build_authorized']
+print('Extracted-wheel readers agree for 50 real archives, the real context and authored build metadata under saved-data-only guards.')
+active[0]=False

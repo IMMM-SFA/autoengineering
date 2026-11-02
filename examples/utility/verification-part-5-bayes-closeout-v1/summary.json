@@ -1,0 +1,32 @@
+{
+  "scope": "full documented test-bayes regression, not an independent scientific comparison",
+  "original_exec_session_id": 35864,
+  "terminal_exit_code": 0,
+  "passed": 2365,
+  "skipped": 57,
+  "warnings": 44,
+  "seconds": 2407.67,
+  "junit_totals": {
+    "tests": 2422,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 57
+  },
+  "pinned_source_test_configuration_files": 401,
+  "changed_pinned_files": [],
+  "prior_inventoried_example_python_files": 11469,
+  "changed_example_python_files": [],
+  "source_fixed_during_test_run": true,
+  "predecessor_inventory": {
+    "path": "examples/utility/source-inventory-base-closeout.json",
+    "sha256": "13537736e90481b874424bf1ee52be8134edbbcb51ca4f74a91601799beace49"
+  },
+  "warning_scope": [
+    "Torch JIT deprecation",
+    "GPyTorch small-noise and negative-variance rounding",
+    "BoTorch input scaling",
+    "SMAC ConfigSpace deprecations"
+  ],
+  "private_confirmation_and_actual_host_platform_qualification": "not_established",
+  "part_5": "incomplete"
+}

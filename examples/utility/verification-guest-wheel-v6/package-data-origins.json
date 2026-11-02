@@ -1,0 +1,182 @@
+{
+  "src/autoengineering/agents/prompts/implementer.txt": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/agents/prompts/implementer.txt"
+  },
+  "src/autoengineering/agents/prompts/investigator.txt": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/agents/prompts/investigator.txt"
+  },
+  "src/autoengineering/agents/prompts/orchestrator.txt": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/agents/prompts/orchestrator.txt"
+  },
+  "src/autoengineering/agents/prompts/reviewer.txt": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/agents/prompts/reviewer.txt"
+  },
+  "src/autoengineering/agents/prompts/single_agent.txt": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/agents/prompts/single_agent.txt"
+  },
+  "src/autoengineering/campaign/scientific-closure-v1.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/campaign/scientific-closure-v1.json"
+  },
+  "src/autoengineering/campaign/scientific-closure-v2.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/campaign/scientific-closure-v2.json"
+  },
+  "src/autoengineering/campaign/scientific-closure-v3.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "autoengineering/campaign/scientific-closure-v3.json"
+  },
+  "examples/campaign_contracts/comparison.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/comparison.json"
+  },
+  "examples/campaign_contracts/data.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/data.json"
+  },
+  "examples/campaign_contracts/fitting.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/fitting.json"
+  },
+  "examples/campaign_contracts/fixture.yaml": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/fixture.yaml"
+  },
+  "examples/campaign_contracts/forcing.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/forcing.json"
+  },
+  "examples/campaign_contracts/hydrology-system.yaml": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/hydrology-system.yaml"
+  },
+  "examples/campaign_contracts/request.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/request.json"
+  },
+  "examples/campaign_contracts/response.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/response.json"
+  },
+  "examples/campaign_contracts/routing-system.yaml": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/routing-system.yaml"
+  },
+  "examples/campaign_contracts/system.yaml": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/campaign_contracts/system.yaml"
+  },
+  "examples/interoperability/bmi/protocol.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/interoperability/bmi/protocol.json"
+  },
+  "examples/interoperability/circuit/protocol.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/interoperability/circuit/protocol.json"
+  },
+  "examples/interoperability/optimizer_comparison/pixi.lock": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/interoperability/optimizer_comparison/pixi.lock"
+  },
+  "examples/interoperability/optimizer_comparison/pixi.toml": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/interoperability/optimizer_comparison/pixi.toml"
+  },
+  "examples/interoperability/optimizer_comparison/protocol.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/interoperability/optimizer_comparison/protocol.json"
+  },
+  "examples/interoperability/solar/protocol.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/interoperability/solar/protocol.json"
+  },
+  "examples/open_chains/solar/README.md": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/open_chains/solar/README.md"
+  },
+  "examples/open_chains/solar/candidates.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/open_chains/solar/candidates.json"
+  },
+  "examples/open_chains/solar/sources.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/open_chains/solar/sources.json"
+  },
+  "examples/open_chains/solar/system.yaml": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/open_chains/solar/system.yaml"
+  },
+  "examples/utility/README.md": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/README.md"
+  },
+  "examples/utility/fixtures/selection.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/fixtures/selection.json"
+  },
+  "examples/utility/fixtures/suite.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/fixtures/suite.json"
+  },
+  "examples/utility/fixtures/wind-resource-demo.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/fixtures/wind-resource-demo.json"
+  },
+  "examples/utility/tasks/engineering.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/tasks/engineering.json"
+  },
+  "examples/utility/tasks/hydrology.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/tasks/hydrology.json"
+  },
+  "examples/utility/tasks/solar.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/tasks/solar.json"
+  },
+  "examples/utility/tasks/wind.json": {
+    "kind": "frozen-v5-package-data",
+    "wheel_sha256": "8d693b02719c1325d7f82ac674e35418e1ab1962bbf1db475211558284b64977",
+    "package_path": "examples/utility/tasks/wind.json"
+  }
+}

@@ -1,0 +1,39 @@
+"""Replay the public typed result outside the checkout without model imports."""
+from pathlib import Path
+import importlib.abc
+import json
+import socket
+import subprocess
+import sys
+
+installed, public = (Path(value).resolve() for value in sys.argv[1:])
+sys.path.insert(0, str(installed))
+
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'examples', 'openmdao', 'py_wake', 'pvlib', 'torch'}:
+            raise AssertionError('model import denied')
+        return None
+
+sys.meta_path.insert(0, NoModels())
+def denied(*args, **kwargs):
+    raise AssertionError('external execution denied')
+socket.socket = denied
+subprocess.Popen = denied
+from autoengineering.utility.engineering_native import NativeDriverResultV3, native_result_from_json
+result = native_result_from_json((public / 'registration-result.json').read_text())
+work = json.loads((public / 'observed-work.json').read_text())
+assert isinstance(result, NativeDriverResultV3)
+assert work == {'model_calls': 35, 'problems': 26, 'cleanups_returned': 26}
+assert len(result.solves) + len(result.support_solves) == work['model_calls']
+assert len([s for s in result.solves if s.phase == 'scenario']) == 24
+assert len(result.support_solves) == 1 and result.support_solves[0].support_id == 'declared-envelope-corner'
+assert result.driver_success and not result.optimizer_target_met
+assert all(Path(module.__file__).resolve().is_relative_to(installed)
+           for name, module in tuple(sys.modules.items())
+           if (name == 'autoengineering' or name.startswith('autoengineering.'))
+           and getattr(module, '__file__', None))
+print(json.dumps({'typed_result_digest': result.digest, 'recorded_model_calls': 35,
+                  'independent_support_calls': 1, 'scored_scenario_calls': 24,
+                  'new_model_calls': 0, 'all_loaded_core_modules_from_installed_target': True,
+                  'physical_driver_success': True, 'optimizer_target_met': False}))

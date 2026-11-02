@@ -1,0 +1,25 @@
+{
+  "schema": "utility-regression-terminal-v1",
+  "original_session": 4703,
+  "exit_code": 0,
+  "command": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility*.py -q -p no:cacheprovider --basetemp=/private/tmp/utility-baseline-confirmation-regression-v1 --junitxml=examples/utility/verification-baseline-confirmation-v1/regression.xml",
+  "passed": 711,
+  "skipped": 26,
+  "duration_seconds": 594.25,
+  "junit_counts": {
+    "tests": 737,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 26
+  },
+  "source_pin_files": 12475,
+  "source_pin_sha256": "52c7fd329b95ef47fbea72c2069750b40206520cd53bc66d34d91b50a7e59b71",
+  "all_pinned_sources_unchanged": true,
+  "junit_sha256": "c267b7474af4a487f23e6cd26245d7f81573aed904b3649f75a038ea1b701cb4",
+  "log_sha256": "c66c2eba29b42e0686d3f419a6e828685ca6646acba41ac4b76ad27301abb3f3",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "full_default_suite_rerun": false,
+  "bayes_suite_rerun": false,
+  "private_scoring_qualified": false
+}

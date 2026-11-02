@@ -1,0 +1,297 @@
+{
+  "purpose": "bounded native wind development; not independent weather",
+  "native": {
+    "schema": "utility-wind-driver-report-v1",
+    "specification_digest": "ec244590d98f9bbd709585769aff01d5c29326753be2c7f9a72778b537c4e539",
+    "binding_digest": "0ba67a0341677eefd3900919d310b3a7a4ccb21c2234f8404cb58c836ce43aae",
+    "job_digest": "30f7a730352f5955ee7a03d792cc0bd0d5e96f0bf1ed97a5aa587f63a9ed1e81",
+    "reservation_id": "native-b4e046be061ad937b789da827e84c361",
+    "status": "success",
+    "process_status": "completed",
+    "process_identity": {
+      "pid": 70502,
+      "pgid": 70502,
+      "nonce": "native-30f7a730352f5955ee7a03d792cc0bd0",
+      "started": "Wed Oct 28 19:45:51 2026"
+    },
+    "stop_verified": true,
+    "elapsed_seconds": 2.746568833012134,
+    "result": {
+      "schema": "utility-wind-driver-result-v1",
+      "job_digest": "30f7a730352f5955ee7a03d792cc0bd0d5e96f0bf1ed97a5aa587f63a9ed1e81",
+      "proposal": {
+        "schema": "utility-wind-native-proposal-v1",
+        "specification": {
+          "schema": "utility-wind-native-spec-v1",
+          "geometry": {
+            "x": [
+              423974.0,
+              424179.0,
+              425654.0,
+              425859.0
+            ],
+            "y": [
+              6151447.0,
+              6149779.0,
+              6151447.0,
+              6149779.0
+            ],
+            "direction_step": 30
+          },
+          "maximum_iterations": 2,
+          "maximum_wake_calls": 12,
+          "maximum_gradient_calls": 4
+        },
+        "result": {
+          "status": "converged",
+          "driver_success": true,
+          "feasible": true,
+          "x": [
+            423974.0,
+            424179.0,
+            425654.0,
+            425859.0
+          ],
+          "y": [
+            6151447.0,
+            6149779.0,
+            6151447.0,
+            6149779.0
+          ],
+          "calls": [
+            {
+              "kind": "wake",
+              "index": 1,
+              "status": "completed",
+              "x": [
+                423974.0,
+                424179.0,
+                425654.0,
+                425859.0
+              ],
+              "y": [
+                6151447.0,
+                6149779.0,
+                6151447.0,
+                6149779.0
+              ],
+              "energy_gwh": 37.06343379120568
+            },
+            {
+              "kind": "wake",
+              "index": 2,
+              "status": "completed",
+              "x": [
+                423974.0,
+                424179.0,
+                425654.0,
+                425859.0
+              ],
+              "y": [
+                6151447.0,
+                6149779.0,
+                6151447.0,
+                6149779.0
+              ],
+              "energy_gwh": 37.06343379120568
+            },
+            {
+              "kind": "gradient",
+              "index": 1,
+              "status": "completed",
+              "x": [
+                423974.0,
+                424179.0,
+                425654.0,
+                425859.0
+              ],
+              "y": [
+                6151447.0,
+                6149779.0,
+                6151447.0,
+                6149779.0
+              ],
+              "energy_gwh": null
+            }
+          ],
+          "maximum_wake_calls": 12,
+          "maximum_gradient_calls": 4,
+          "maximum_iterations": 2
+        },
+        "eligibility": "fresh_evaluation_required"
+      }
+    }
+  },
+  "fresh": {
+    "rules_digest": "21e4328556a81a8d093cc85594f6a4b0e255264668d924c4d98d8f5b06b079ee",
+    "scenarios": [
+      {
+        "scenario_id": "bundled-distribution",
+        "forcing_digest": "8152437123e58e124ba0f9d107634f6aa90bb65924cb1f4079fd0764a4f605c6",
+        "values": {
+          "annual_energy": 37.06343379120568
+        },
+        "checks": [
+          {
+            "name": "finite",
+            "version": "1",
+            "status": "pass",
+            "required": true,
+            "scope": "outputs",
+            "value": null,
+            "threshold": null,
+            "reason": "Finite outputs required",
+            "evidence": []
+          },
+          {
+            "name": "wind_spacing",
+            "version": "1",
+            "status": "pass",
+            "required": true,
+            "scope": "outputs",
+            "value": 1680.0,
+            "threshold": 319.999,
+            "reason": "Fixed four-diameter spacing",
+            "evidence": []
+          },
+          {
+            "name": "wind_nonnegative_power",
+            "version": "1",
+            "status": "pass",
+            "required": true,
+            "scope": "outputs",
+            "value": 60910.05281352752,
+            "threshold": 0.0,
+            "reason": "Nonnegative modeled turbine power",
+            "evidence": []
+          },
+          {
+            "name": "wind_rated_power",
+            "version": "1",
+            "status": "pass",
+            "required": true,
+            "scope": "outputs",
+            "value": 2000000.0,
+            "threshold": 2000000.0002000001,
+            "reason": "Fixed V80 turbine rating",
+            "evidence": []
+          },
+          {
+            "name": "wind_boundary",
+            "version": "1",
+            "status": "pass",
+            "required": true,
+            "scope": "outputs",
+            "value": 0.0,
+            "threshold": 0.0,
+            "reason": "Frozen rectangle and parameter domain",
+            "evidence": []
+          }
+        ]
+      }
+    ],
+    "evaluation": {
+      "id": "native-fresh",
+      "model_id": "supplied-engineering",
+      "configuration": {
+        "x_0": 423974.0,
+        "x_1": 424179.0,
+        "x_2": 425654.0,
+        "x_3": 425859.0,
+        "y_0": 6151447.0,
+        "y_1": 6149779.0,
+        "y_2": 6151447.0,
+        "y_3": 6149779.0
+      },
+      "status": "success",
+      "metrics": {
+        "annual_energy": 37.06343379120568
+      },
+      "checks": [
+        {
+          "name": "finite",
+          "version": "1",
+          "status": "pass",
+          "required": true,
+          "scope": "outputs",
+          "value": null,
+          "threshold": null,
+          "reason": "Every declared scenario must satisfy the check",
+          "evidence": []
+        },
+        {
+          "name": "wind_spacing",
+          "version": "1",
+          "status": "pass",
+          "required": true,
+          "scope": "outputs",
+          "value": null,
+          "threshold": null,
+          "reason": "Every declared scenario must satisfy the check",
+          "evidence": []
+        },
+        {
+          "name": "wind_nonnegative_power",
+          "version": "1",
+          "status": "pass",
+          "required": true,
+          "scope": "outputs",
+          "value": null,
+          "threshold": null,
+          "reason": "Every declared scenario must satisfy the check",
+          "evidence": []
+        },
+        {
+          "name": "wind_rated_power",
+          "version": "1",
+          "status": "pass",
+          "required": true,
+          "scope": "outputs",
+          "value": null,
+          "threshold": null,
+          "reason": "Every declared scenario must satisfy the check",
+          "evidence": []
+        },
+        {
+          "name": "wind_boundary",
+          "version": "1",
+          "status": "pass",
+          "required": true,
+          "scope": "outputs",
+          "value": null,
+          "threshold": null,
+          "reason": "Every declared scenario must satisfy the check",
+          "evidence": []
+        }
+      ],
+      "outputs": [],
+      "split_id": "development-fitting",
+      "attempt_id": "native-fresh",
+      "elapsed_seconds": 1.5166655420325696,
+      "provenance": {
+        "engineering_rules": "21e4328556a81a8d093cc85594f6a4b0e255264668d924c4d98d8f5b06b079ee",
+        "executor": "63b62d11098e0bc38af195bd58aebca00a668214af5c59ac0c971cb2efa6ad2b"
+      }
+    }
+  },
+  "callback_work": {
+    "wake": {
+      "attempted": 2,
+      "completed": 2,
+      "failed": 0,
+      "unresolved": 0
+    },
+    "gradient": {
+      "attempted": 1,
+      "completed": 1,
+      "failed": 0,
+      "unresolved": 0
+    }
+  },
+  "case_status": "passed",
+  "reservations": 2,
+  "observed_stops": 2,
+  "completed_replay_added_reservations": 0,
+  "confirmation": "not_attempted",
+  "utility_verdict": "not_attempted"
+}

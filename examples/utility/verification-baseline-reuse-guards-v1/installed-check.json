@@ -1,0 +1,26 @@
+{
+  "schema": "utility-baseline-reuse-installed-verification-v1",
+  "checks": [
+    {
+      "case": "valid",
+      "logical_scored_cells": 2,
+      "physical_receipts": 1
+    },
+    {
+      "case": "reserved",
+      "rejected": true,
+      "charge_retained": true
+    },
+    {
+      "case": "different-scenarios",
+      "rejected": true
+    }
+  ],
+  "installed_core_files": 200,
+  "original_roots_network_and_process_denied": true,
+  "optional_frameworks_not_imported": true,
+  "new_scoring_callbacks": 0,
+  "model_or_provider_starts": 0,
+  "fixture_only": true,
+  "private_scoring_qualified": false
+}

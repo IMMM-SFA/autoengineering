@@ -102,6 +102,7 @@ def run_lifecycle(
         array.setflags(write=False)
     saved_fitting = {name: value.copy() for name, value in fitting.items()}
     handle = None
+    primary_error = None
     try:
         handle = adapter.prepare(context)
         adapter.validate(handle)
@@ -131,5 +132,13 @@ def run_lifecycle(
             training,
             time.monotonic() - started,
         )
+    except BaseException as error:
+        primary_error = error
+        raise
     finally:
-        adapter.cleanup(handle)
+        try:
+            adapter.cleanup(handle)
+        except Exception as cleanup_error:
+            if primary_error is None:
+                raise
+            primary_error.add_note(f"adapter cleanup failed: {cleanup_error}")

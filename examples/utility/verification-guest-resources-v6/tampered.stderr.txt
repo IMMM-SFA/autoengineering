@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-guest-resources-v6/cold-resource-reader.py.txt", line 50, in <module>
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/guest_resource_reader.py", line 195, in read_completion
+ValueError: saved diagnostic cleanup is unverified

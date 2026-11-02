@@ -1,0 +1,15 @@
+{
+  "session_id": 4238,
+  "state": "terminal",
+  "exit_code": 0,
+  "passed": 2016,
+  "skipped": 106,
+  "xml_tests": 2122,
+  "xml_seconds": 2145.46,
+  "reported_seconds": 2145.54,
+  "host_source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+  "frozen_files_verified": 364,
+  "source_or_test_changes_during_run": [],
+  "checked_at_utc": "2026-10-29T10:10:34.450648+00:00",
+  "scope": "default full repository suite, not optional Bayes environment or frozen benchmark matrix"
+}

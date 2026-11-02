@@ -1,0 +1,13 @@
+{
+  "schema": "utility-baseline-reuse-guards-terminal-v1",
+  "focused_passed": 89,
+  "focused_duration_seconds": 16.35,
+  "documentation_passed": 19,
+  "ruff_exit_code": 0,
+  "installed_core_files_matching_source": 200,
+  "behavior_regressions_reproduced": 3,
+  "raw_initial_diagnostic_failure_preserved": true,
+  "execution_sharing_implemented": false,
+  "private_scoring_qualified": false,
+  "goal_complete": false
+}

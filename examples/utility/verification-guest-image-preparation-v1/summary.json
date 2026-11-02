@@ -1,0 +1,38 @@
+{
+  "schema": "utility-guest-image-preparation-verification-v1",
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "39",
+    "time": "1.105",
+    "timestamp": "2026-10-30T16:49:50.069215-07:00",
+    "hostname": "m5-mbp"
+  },
+  "case_modules": {
+    "tests.test_utility_guest_image": 12,
+    "tests.test_utility_inference_environment": 27
+  },
+  "documentation_tests": 19,
+  "ruff_passed": true,
+  "E501_passed": true,
+  "whitespace_passed": true,
+  "core_python_files": 224,
+  "wheel_python_sources": 315,
+  "build_inputs": 356,
+  "changed_build_inputs_after_build": [
+    "examples/utility/README.md"
+  ],
+  "all_python_build_inputs_unchanged": true,
+  "image_plan_digest": "f9b1782fb389a6e7d262de44089c5cafb3bde1fb4852ffa36c0e1b57fbb252d3",
+  "remote_payload_bytes": 317657548,
+  "guarded_relocated_extracted_wheel_replay": true,
+  "acquired_archives": 0,
+  "acquired_image_layers": 0,
+  "packages_installed": false,
+  "image_built": false,
+  "runtime_qualified": false,
+  "independent_confirmation": false,
+  "full_default_rerun": false
+}

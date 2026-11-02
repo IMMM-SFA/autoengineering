@@ -1,0 +1,1 @@
+{"action_id": "eval-000001", "configuration": {"x": 0.6236343113705516, "y": 0.7029540482908487}, "result": {"feasible": false, "objective": null, "reason": "frozen_failure_control", "status": "model_failure"}}

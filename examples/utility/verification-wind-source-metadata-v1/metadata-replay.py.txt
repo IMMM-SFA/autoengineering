@@ -1,0 +1,48 @@
+"""Reconstruct source metadata from captured development ranges; network forbidden."""
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(sys.argv[1]).resolve()))
+import hashlib,json,socket,subprocess
+import h5py,numpy
+from examples.utility.wind_range import WindObjectPin,RangeLimits,WindRangeFile
+root=Path(sys.argv[2]).resolve()
+request=json.loads((root/'metadata-request.json').read_text())
+pin=WindObjectPin.from_dict(request['pin']);limits=RangeLimits.from_dict(request['limits'])
+original=json.loads((root/'metadata-result.json').read_text())
+blocks={}
+for path in (root/'ranges').glob('*-complete.json'):
+    event=json.loads(path.read_text());raw=(root/'ranges'/event['body_file']).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==event['sha256']
+    assert len(raw)==event['hi']-event['lo']+1
+    blocks[event['lo'],event['hi']]=raw
+calls=[]
+def fetch(pin_value,lo,hi,timeout):
+    assert pin_value==pin
+    raw=blocks[lo,hi];calls.append((lo,hi))
+    return 206,{'content-range':f'bytes {lo}-{hi}/{pin.size_bytes}','content-length':str(len(raw)),'etag':pin.etag},raw
+
+def forbidden(*a,**kw):raise RuntimeError('new process or socket denied')
+socket.socket=subprocess.Popen=forbidden
+
+def plain(value):
+    if isinstance(value,bytes):return value.decode()
+    if isinstance(value,numpy.generic):return plain(value.item())
+    if isinstance(value,numpy.ndarray):
+        assert value.size<=16
+        return plain(value.tolist())
+    if isinstance(value,(list,tuple)):return [plain(x) for x in value]
+    if value is None or isinstance(value,(str,int,float,bool)):return value
+    raise ValueError('unsupported metadata')
+with WindRangeFile(pin,limits,fetch=fetch) as reader:
+    with h5py.File(reader,'r') as file:
+        found={}
+        for name in request['dataset_names']:
+            assert isinstance(file.get(name,getlink=True),h5py.HardLink)
+            item=file[name]
+            metadata={'present':True,'shape':list(item.shape),'dtype':str(item.dtype),'chunks':list(item.chunks) if item.chunks else None,'compression':item.compression,'attribute_names':list(item.attrs),'attributes':{key:plain(item.attrs[key]) for key in item.attrs if key in {'units','scale_factor','add_offset','_FillValue','missing_value'}}}
+            assert metadata==original['datasets'][name]
+            found[name]={'shape':list(item.shape),'attributes':{key:plain(item.attrs[key]) for key in item.attrs}}
+    stats=reader.stats()
+result={'reproduced_original_metadata':True,'expanded_metadata':found,'logical_archive_reads':len(calls),'new_http_requests':0,'new_processes':0,'new_socket_connections':0,'dataset_values_indexed':False,'reserved_objects_accessed':False,'stats':stats,'source_qualified':False}
+(root/'metadata-replay.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({'reproduced_original_metadata':True,'logical_archive_reads':len(calls),'new_http_requests':0,'expanded_metadata':found}),flush=True)

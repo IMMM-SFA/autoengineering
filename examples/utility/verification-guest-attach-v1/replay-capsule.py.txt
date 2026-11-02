@@ -1,0 +1,39 @@
+"""Cold read of original bytes received from an authored native Unix fixture."""
+import importlib.abc
+import json
+from pathlib import Path
+import socket
+import subprocess
+import sys
+import tarfile
+import tempfile
+import time
+
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split('.')[0] in {'examples', 'torch', 'openmdao', 'pvlib', 'py_wake'}:
+            raise AssertionError('model import')
+sys.meta_path.insert(0, NoModels())
+from autoengineering.utility import guest_attach
+from autoengineering.utility.guest_bootstrap import read_capture
+from autoengineering.utility.guest_inputs import verify_guest_inputs
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+bundle = Path(__file__).parent
+expected = json.loads((bundle / 'expected-replay.json').read_text())
+with tempfile.TemporaryDirectory() as directory:
+    destination = Path(directory).resolve()
+    with tarfile.open(bundle / 'authored-native-capsule.tar.gz') as archive:
+        archive.extractall(destination, filter='data')
+    for path in destination.rglob('*'):
+        path.chmod(0o700 if path.is_dir() else 0o600)
+    def forbidden(*args, **kwargs):
+        raise AssertionError('cold replay cannot attach, execute, connect or sample a new clock')
+    guest_attach.attach = subprocess.Popen = socket.socket = time.monotonic = forbidden
+    owner = GuestOwnerJournal(destination / 'owner')
+    m = owner.manifest
+    package = verify_guest_inputs(owner.root, m.job, m.launch, m.claim)
+    capture = read_capture(destination / 'received', m.job, m.launch, package)
+    assert m.digest == expected['owner_digest']
+    assert package.digest == expected['package_digest']
+    assert capture.to_dict() == expected['capture']
+    print('Cold native-fixture capture agrees; no daemon, guest, model or new socket.')

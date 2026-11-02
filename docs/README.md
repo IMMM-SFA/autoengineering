@@ -11,6 +11,12 @@ working interfaces from research results and planned features.
 | [Model improvement criteria](model-improvement.md) | Proposed assessment of data, compute, and potential gain across modeling methods. |
 | [Roadmap](roadmap.md) | Model DAG, harness, dynamic web app, examples, visualizations, and method selection. |
 | [Local campaigns](campaigns.md) | Experimental trusted-adapter workflow, scientific acceptance, physical attempt accounting, CLI and recovery. |
+| [Worker contracts](agents.md) | Experimental four-role and single-agent workflows, records, permissions, serial dispatch and explicit pinned Codex configuration, with Part 3 limits. |
+| [Part 3 final audit](reviews/part-3-final-audit.md) | All seven bounded increments, current live conformance, matched development results, costs, retained failures and deferred scope. |
+| [Part 4 implementation plan](implementation-plans/part-4-interoperability.md) | Original BMI, optimizer, OpenMDAO and solar implementation scope and acceptance gates. |
+| [Utility comparisons](utility.md) | Implemented offline CLI, evidence contracts and outstanding Part 5 scope. |
+| [Utility handoff](utility-handoff.md) | Interim supported development scope, source-specific evidence and unresolved Part 5 requirements. |
+| [Part 5 implementation plan](implementation-plans/part-5-utility-confirmation.md) | Proposed independent utility suite, route comparisons, confirmation custody, accounting and acceptance gates. |
 | [Optimization guide](optimization.md) | Run configuration, APIs, recovery, and research backend limits. |
 | [BO status](bayesian-optimization-status.md) | Passing and adverse evidence at the reviewed revision. |
 | [Examples](../examples/README.md) | Checked examples, commands, inputs, and outputs. |
@@ -38,3 +44,8 @@ preserved so that protocols, decisions, and claims remain traceable:
 A historical plan may describe work as future even when the current status page records its
 completion. A preserved research memo may contain claims that need a new literature check before
 reuse. This documentation revision does not rerun or revalidate those external sources.
+
+The [interoperability guide](interoperability.md) describes the implemented
+adapter contracts, experimental Optuna policy and offline evidence reports.
+The [final Part 4 audit](reviews/part-4-completion-audit.md) records bounded macOS
+ARM64 qualification, installed evidence and deferred extensions.

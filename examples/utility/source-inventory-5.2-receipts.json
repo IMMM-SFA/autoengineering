@@ -1,0 +1,22 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "5.2-receipt-joining-partial",
+  "files": {
+    "src/autoengineering/utility/__init__.py": "2b8cf2841d3d40f2411eb7936932a61004a1ed79ee40d8fe616165f21080a30a",
+    "src/autoengineering/utility/contracts.py": "8bcdff6ca1bdc900b1fc74d0bc15c0feed7af618cd70c3cdf9571ff94e75a0c1",
+    "src/autoengineering/utility/controller.py": "14f5dcb9917d190b3aec264c5a9a7cb00d0053e7fea1433d2f05df0062117bd7",
+    "src/autoengineering/utility/costs.py": "9be1a94737d764286a60f25f46a2d819c541f24986844fe4e143ccb7b15a0b85",
+    "src/autoengineering/utility/report.py": "4a3ab92e882cfa54fb4951fe7616871294756b4ccdcd722bf3f0120bd47efbe1",
+    "src/autoengineering/utility/store.py": "0d3fc342a76202d7e20f9f458148a435d27ecc485dc658ff7b68e32150c1acf9",
+    "tests/test_utility_contracts.py": "fa57c79055373b209b4203facf68aa5a1ade161df9b0d9fbcf6a03ce232f625b",
+    "tests/test_utility_controller.py": "7df82257f091f4a97d38c5d4643058d9e5c00628a1a0a9660ce58eda5b103458",
+    "tests/test_utility_costs.py": "f193e30a1dcabb97de1b34607851b49f9c46b18f06364cfb2ea3a68cb8270e78",
+    "tests/test_utility_store.py": "6c8e33669b0e5b1165a10a16d6a5f9c1b704710e7db96d8c48e2fff26af4ec05"
+  },
+  "checks": {
+    "ruff": "repository-wide pass",
+    "focused_utility_and_batch": "62 passed in 19.74s",
+    "full_default": "running; no result claimed"
+  },
+  "scientific_execution": "not_attempted"
+}

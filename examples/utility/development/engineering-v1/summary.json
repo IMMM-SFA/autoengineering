@@ -1,0 +1,11 @@
+{
+  "status": "development_parity_passed",
+  "parity_physical_solves": 6,
+  "native_physical_solves": 12,
+  "total_physical_solves": 18,
+  "native_feasible": true,
+  "native_success": true,
+  "elapsed_seconds": 0.16423208406195045,
+  "utility_verdict": "not_attempted",
+  "cost_limits": "Native derivative counters are cumulative snapshots; do not sum them"
+}

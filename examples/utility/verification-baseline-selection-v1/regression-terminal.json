@@ -1,0 +1,25 @@
+{
+  "schema": "utility-batch-regression-terminal-v1",
+  "original_session": 36509,
+  "exit_code": 0,
+  "command": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility*.py tests/test_agent_batch*.py -q -p no:cacheprovider --basetemp=/private/tmp/utility-baseline-selection-regression-v1 --junitxml=examples/utility/verification-baseline-selection-v1/regression.xml",
+  "passed": 759,
+  "skipped": 26,
+  "duration_seconds": 655.24,
+  "junit_counts": {
+    "tests": 785,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 26
+  },
+  "source_pin_files": 12632,
+  "source_pin_sha256": "4186738da7517c7616c7ce7b7593c640808fa21b0cbdd5ab19eab66cc0af939c",
+  "all_pinned_sources_unchanged": true,
+  "junit_sha256": "ade2b1cbc1c095efde80f7c2ca7020a3ddbbfb529d340b2d8a4b4d8732b45ddb",
+  "log_sha256": "c882e4a32e95db25b9b316dec27fc1b9d28cf2aa5583232afbd59c6bd4fcc3c9",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "full_default_suite_rerun": false,
+  "bayes_suite_rerun": false,
+  "private_scoring_qualified": false
+}

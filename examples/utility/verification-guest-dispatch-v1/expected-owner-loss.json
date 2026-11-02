@@ -1,0 +1,53 @@
+{
+  "boundary": "unqualified-candidate",
+  "capture": null,
+  "journal_head": "47b099f04c156de4f2b83f1d4e3630df0d609be1690db77b5f44fca1a11c6d35",
+  "journal_phase": "cleaned",
+  "owner_digest": "7835ebb5a986d622017c98682044a4306ad6dfdc24040f8687caabce5729d7ad",
+  "plan_digest": "2edbd3b8ea6bef45c84db9329c0a87267909de3a652fa063b814cf43d1e055a2",
+  "schema": "utility-guest-dispatch-completion-v1",
+  "start_response": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "artifacts/88eced8fc2c593d66786fdb6274be593a4a05cf40a092475da637269ac9d811d/start-response-record.json",
+    "producer": "guest-dispatch",
+    "sha256": "88eced8fc2c593d66786fdb6274be593a4a05cf40a092475da637269ac9d811d",
+    "size_bytes": 279
+  },
+  "transport_status": "missing",
+  "watchdog": {
+    "absence": {
+      "media_type": "application/json",
+      "metadata": {},
+      "path": "artifacts/441093ccc8b214be836063440e0da07ad73d9f4fecc70ecaa3c4274650169bfa/observed-absent.json",
+      "producer": "guest-watchdog",
+      "sha256": "441093ccc8b214be836063440e0da07ad73d9f4fecc70ecaa3c4274650169bfa",
+      "size_bytes": 230
+    },
+    "before": {
+      "media_type": "application/json",
+      "metadata": {},
+      "path": "artifacts/f413265e0ea056c3d9277eaf8f760a408c5b06ee4d298db2708cef2222c5ca38/cleanup-before.json",
+      "producer": "guest-watchdog",
+      "sha256": "f413265e0ea056c3d9277eaf8f760a408c5b06ee4d298db2708cef2222c5ca38",
+      "size_bytes": 2564
+    },
+    "container_id": "1111111111111111111111111111111111111111111111111111111111111111",
+    "delete_intended": true,
+    "kill_intended": true,
+    "owner_digest": "7835ebb5a986d622017c98682044a4306ad6dfdc24040f8687caabce5729d7ad",
+    "parent_cleanup_head": null,
+    "plan_digest": "7af32f97c6291ec3e39c6cb6a673904b97846d0cd55539b91d6d98727fed59b0",
+    "reason": "owner_lost",
+    "result": "absent",
+    "schema": "utility-guest-watchdog-outcome-v1",
+    "stopped": {
+      "media_type": "application/json",
+      "metadata": {},
+      "path": "artifacts/48e87a4fdeeb0e37ddf1aa66f290d9b033cf246eb4b5ac5092f5609ee89b534f/cleanup-stopped.json",
+      "producer": "guest-watchdog",
+      "sha256": "48e87a4fdeeb0e37ddf1aa66f290d9b033cf246eb4b5ac5092f5609ee89b534f",
+      "size_bytes": 2564
+    }
+  }
+}

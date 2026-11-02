@@ -1,0 +1,169 @@
+{
+  "excluded_nodes": {},
+  "files": {
+    "owned-supervisor/auth/helper": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/auth/helper",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "6c5670be3e13cd1d1fcd7c7355ab3c7a9e2d6f6656f9a498a463f60fdd10a5f4",
+      "size_bytes": 292
+    },
+    "owned-supervisor/client.sb": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/client.sb",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "ccc2c34693392a37c0aa83fc873bdeb5c1ce821805d78bc1a06381f4028ce2b3",
+      "size_bytes": 2885
+    },
+    "owned-supervisor/home/.claude.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/home/.claude.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "b9154ea887b391dc526207e058d69ef824c7a9d98c9e73b644824f21666dfefa",
+      "size_bytes": 852
+    },
+    "owned-supervisor/home/.claude/backups/.claude.json.backup.1793263474506": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/home/.claude/backups/.claude.json.backup.1793263474506",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "12bc3bfeb1b8382e9e312066b584f80753953d8392c3c0d7b55e1b091c1cd162",
+      "size_bytes": 84
+    },
+    "owned-supervisor/home/.claude/telemetry/1p_failed_events.e70af844-9079-41f2-99bc-2b4e67fc5efc.b142b98f-8976-4376-a1e9-7c7193b1b862.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/home/.claude/telemetry/1p_failed_events.e70af844-9079-41f2-99bc-2b4e67fc5efc.b142b98f-8976-4376-a1e9-7c7193b1b862.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "f421f1bd1c0ec24f04aba9ada7fdfbad859853435394cf654838dd7ce7f07dcb",
+      "size_bytes": 151308
+    },
+    "owned-supervisor/home/helper-observed": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/home/helper-observed",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "482ce7c49ba2b9e9147924ec4c17f6efb139dadccf268be16df9977a41a35b79",
+      "size_bytes": 25
+    },
+    "owned-supervisor/native/intent.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/intent.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "1b771652a60e24f188bb05aaaffa7439004b30487630c0006eabad6f99dab5aa",
+      "size_bytes": 34
+    },
+    "owned-supervisor/native/job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "574fb04bc8d183cc5faf77c04dfc05f5730b89684e8d334a9df541ff26d119a9",
+      "size_bytes": 1797
+    },
+    "owned-supervisor/native/launch-gate.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/launch-gate.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "1b771652a60e24f188bb05aaaffa7439004b30487630c0006eabad6f99dab5aa",
+      "size_bytes": 34
+    },
+    "owned-supervisor/native/process.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/process.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "276ad30fcc32ec8842abd9330dc876672185d4d5fb0a38c80b07052ff50048d5",
+      "size_bytes": 96
+    },
+    "owned-supervisor/native/stdin.bin": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/stdin.bin",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "65cda07c62e12b0d478bfc6101530d44c1f462521714eebc9fc31b954faacc0d",
+      "size_bytes": 38
+    },
+    "owned-supervisor/native/watchdog-job.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/watchdog-job.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "570e24cec0560b77f01f977e1be4ac7503c7bf0111411401a2701138a4ddf019",
+      "size_bytes": 475
+    },
+    "owned-supervisor/native/watchdog-ready.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/watchdog-ready.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "2fbe1c50f43522ca362683f00bf09d463d862999465bde575ca5bdae373f6b72",
+      "size_bytes": 145
+    },
+    "owned-supervisor/native/watchdog-result.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/native/watchdog-result.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "84cc1790773542e78dd2feef480a015cb1054a52015adf985bc2a510f6557672",
+      "size_bytes": 170
+    },
+    "owned-supervisor/request-1-observation.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/request-1-observation.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "2dfdc28a6b3b123c15868eb40df5769c065cb9ef705dee5578f62faf79997836",
+      "size_bytes": 506
+    },
+    "owned-supervisor/request-1.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/request-1.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "6ad78cdca06009ee6f1eab4fe10ef814ef48b236bd3822a16f262934471d9d3b",
+      "size_bytes": 1177
+    },
+    "owned-supervisor/workspace/schema.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "owned-supervisor/workspace/schema.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "a0c534ad67a457bc708420b99aa3447f949d48ab69eb0a9a5bd1b111b3687e55",
+      "size_bytes": 131
+    },
+    "parent.stderr": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "parent.stderr",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "parent.stdout": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "parent.stdout",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "report.json": {
+      "media_type": "application/octet-stream",
+      "metadata": {},
+      "path": "report.json",
+      "producer": "synthetic-claude-policy-probe",
+      "sha256": "1e0c351d0a54dbc94072e088af2b40d681fb2e971b5b259193ec82b35888d4f9",
+      "size_bytes": 1783
+    }
+  },
+  "original_root": "/private/tmp/claude-owner-loss-v1",
+  "production_admission": false,
+  "total_bytes": 161832,
+  "version": "claude-policy-archive-1.0"
+}

@@ -1,0 +1,74 @@
+"""Bounded acquisition of seven exact pure-Python dependency wheels from PyPI.
+
+No install, model, image build, private data, retry or dependency resolution.
+Exact versions come from the existing tested native environment. Target Linux
+requirements are checked against the frozen base and these selected wheels.
+"""
+import hashlib,json,os,sys,urllib.request,urllib.parse
+from pathlib import Path
+from packaging.requirements import Requirement
+from packaging.specifiers import SpecifierSet
+from packaging.utils import canonicalize_name
+from autoengineering.campaign.serialization import digest,unique_json
+from examples.utility.inference_environment import verify_inputs
+root=Path.cwd();os.umask(0o077)
+proof=root/'examples/utility/verification-engineering-container-dependencies-v1'
+work=root/'outputs/engineering-container-wheels-v1'
+versions={'openmdao':'3.41.0','packaging':'26.3','requests':'2.34.2','urllib3':'2.8.0','certifi':'2026.10.23','charset-normalizer':'3.5.1','idna':'3.20'}
+assert not work.exists()
+work.mkdir(mode=0o700);(work/'wheels').mkdir(mode=0o700)
+def save(name,value):(proof/name).write_text(json.dumps(value,indent=2)+'\n')
+request={'scope':'public pinned engineering runtime dependencies only','versions':versions,'metadata_gets':7,'archive_gets':7,'metadata_response_limit_bytes':1048576,'maximum_archive_bytes':16777216,'maximum_total_archive_bytes':33554432,'per_get_timeout_seconds':30,'automatic_retries':0,'redirects_allowed':0,'pypi_openmdao_wheel_sha256':'7b0ced8500c6d713d9b92352316bd6ec85d311cc2383fbc05a6637ac2bd590cf','base_environment_digest':'aec404431cb50f0bf3e34362183dc74294ce47b8bd96eb52241245da80b4d824','script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'scientific_starts':0,'installs':0}
+save('request.json',request)
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+ def redirect_request(self,*a,**kw):raise ValueError('dependency acquisition refuses redirects')
+opener=urllib.request.build_opener(NoRedirect)
+operations=[]
+def get(url,limit,purpose):
+ parsed=urllib.parse.urlsplit(url)
+ assert parsed.scheme=='https' and parsed.hostname in {'pypi.org','files.pythonhosted.org'} and not parsed.username and not parsed.query and not parsed.fragment
+ i=len(operations)
+ intent={'url':url,'maximum_bytes':limit,'purpose':purpose}
+ save(f'{i:02d}-intent.json',intent);operations.append(intent)
+ with opener.open(urllib.request.Request(url,headers={'User-Agent':'autoengineering-coupled-runtime-preparation/1'}),timeout=30) as response:
+  assert response.status==200 and response.geturl()==url
+  raw=response.read(limit+1)
+  assert len(raw)<=limit,'response exceeds declared cap'
+  record={'status':response.status,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'content_type':response.headers.get('Content-Type')}
+ save(f'{i:02d}-result.json',record)
+ return raw,record
+selected=[]
+for name,version in versions.items():
+ raw,response=get(f'https://pypi.org/pypi/{name}/{version}/json',1048576,'package metadata')
+ data=unique_json(raw.decode());info=data['info']
+ assert canonicalize_name(info['name'])==name and info['version']==version
+ candidates=[v for v in data['urls'] if v['packagetype']=='bdist_wheel' and v['filename'].endswith('-py3-none-any.whl') and not v['yanked']]
+ assert len(candidates)==1,(name,len(candidates))
+ item=candidates[0]
+ assert item['size']<=16777216
+ selected.append({'name':name,'version':version,'metadata_response':response,'filename':item['filename'],'url':item['url'],'size_bytes':item['size'],'sha256':item['digests']['sha256'],'requires_python':info['requires_python'],'requires_dist':info['requires_dist'] or [],'license_expression':info.get('license_expression'),'provider':'PyPI version JSON and files.pythonhosted.org'})
+assert selected[0]['sha256']==request['pypi_openmdao_wheel_sha256']
+inputs=verify_inputs(root/'examples/utility/prepared-inference-environment-v6',expected_digest=request['base_environment_digest'])
+base={canonicalize_name(a.name):a.version for a in inputs.archives}
+provided=base|versions
+context={'extra':'','sys_platform':'linux','platform_system':'Linux','python_version':'3.12','python_full_version':'3.12.13','implementation_name':'cpython','implementation_version':'3.12.13','platform_python_implementation':'CPython','os_name':'posix','platform_machine':'x86_64'}
+requirements=[]
+for item in selected:
+ assert SpecifierSet(item['requires_python']).contains('3.12.13')
+ for text in item['requires_dist']:
+  req=Requirement(text)
+  if req.marker and not req.marker.evaluate(context):continue
+  name=canonicalize_name(req.name)
+  assert req.url is None and name in provided and req.specifier.contains(provided[name]),(item['name'],text,provided.get(name))
+  requirements.append({'package':item['name'],'requirement':text,'selected_version':provided[name]})
+assert sum(v['size_bytes'] for v in selected)<=33554432
+plan={'request_digest':digest(request),'wheels':selected,'linux_python312_requirements':requirements,'total_archive_bytes':sum(v['size_bytes'] for v in selected),'resolver_run':False,'runtime_qualified':False}
+save('download-plan.json',plan)
+for item in selected:
+ raw,response=get(item['url'],item['size_bytes'],'pinned wheel bytes')
+ assert len(raw)==item['size_bytes'] and hashlib.sha256(raw).hexdigest()==item['sha256']
+ (work/'wheels'/item['filename']).write_bytes(raw)
+completion={'request_digest':digest(request),'plan_digest':digest(plan),'metadata_gets':7,'archive_gets':7,'downloaded_archive_bytes':sum(v['size_bytes'] for v in selected),'all_archive_hashes_verified':True,'base_requirement_checks':requirements,'resolver_run':False,'new_scientific_starts':0,'new_installs':0,'runtime_qualified':False}
+save('complete.json',completion)
+(work/'complete.json').write_text(json.dumps(completion,indent=2)+'\n')
+print(json.dumps({'pinned_wheels':len(selected),'archive_bytes':completion['downloaded_archive_bytes'],'completion_digest':digest(completion)}))

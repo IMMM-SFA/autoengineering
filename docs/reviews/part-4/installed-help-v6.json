@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "package_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-wheel-install-v6/autoengineering/__init__.py",
+  "framework_imports": "blocked",
+  "help": "Usage: cli [OPTIONS] COMMAND [ARGS]...\n\n  Autoengineering: AI-assisted systems engineering for complex model chains.\n\nOptions:\n  --version  Show the version and exit.\n  --help     Show this message and exit.\n\nCommands:\n  agents       Run bounded worker workflows with fake or explicitly...\n  campaign     Run deterministic campaigns with supplied trusted adapters.\n  candidates   Scaffold a candidates YAML for a component (fill in via deep...\n  components   List all components in the system.\n  describe     Print a description of the system.\n  experiments  Render a saved experiment tree (autoresearch.jsonl).\n  graph        Print the system as a Mermaid diagram.\n  improve      Run the bounded auto-research loop over candidate replacements.\n  optimize     Run or resume a configured whole-system optimization study.\n  report       Generate an analysis report from validation results.\n  validate     Validate a component against baseline data.\n"
+}

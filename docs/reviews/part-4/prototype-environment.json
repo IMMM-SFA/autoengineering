@@ -1,0 +1,38 @@
+{
+  "bmipy": {
+    "version": "2.0.1",
+    "license": "MIT",
+    "license_expression": null,
+    "requires_python": ">=3.9"
+  },
+  "optuna": {
+    "version": "4.5.0",
+    "license": null,
+    "license_expression": null,
+    "requires_python": ">=3.8"
+  },
+  "ax-platform": {
+    "version": "1.1.2",
+    "license": null,
+    "license_expression": "MIT",
+    "requires_python": ">=3.10"
+  },
+  "openmdao": {
+    "version": "3.41.0",
+    "license": null,
+    "license_expression": "Apache-2.0",
+    "requires_python": ">=3.10"
+  },
+  "pvlib": {
+    "version": "0.15.2",
+    "license": null,
+    "license_expression": "BSD-3-Clause",
+    "requires_python": ">=3.10"
+  },
+  "torch": {
+    "version": "2.10.0",
+    "license": "BSD-3-Clause",
+    "license_expression": null,
+    "requires_python": ">=3.10"
+  }
+}

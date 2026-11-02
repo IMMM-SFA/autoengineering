@@ -1,0 +1,80 @@
+"""Recompute saved public dependency/image/probe facts without any live runtime."""
+import importlib.abc,sys
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'examples','openmdao','numpy','torch','pvlib','py_wake'}:raise AssertionError('model import')
+sys.meta_path.insert(0,NoModels())
+from pathlib import Path
+import hashlib,json,math,os,socket,subprocess,time
+def canonical_json(v):return json.dumps(v,sort_keys=True,separators=(",",":"),allow_nan=False)
+def digest(v):return hashlib.sha256(canonical_json(v).encode()).hexdigest()
+def unique_json(s):
+ def pairs(items):
+  d={}
+  for k,v in items:
+   if k in d:raise ValueError('duplicate JSON key')
+   d[k]=v
+  return d
+ def invalid(s):raise ValueError('nonfinite JSON')
+ return json.loads(s,object_pairs_hook=pairs,parse_constant=invalid)
+root=Path(sys.argv[1]).resolve()
+def forbidden(*a,**kw):raise AssertionError('live activity during metadata replay')
+def guard(event,args):
+ if event=='open':
+  path,mode,flags=args
+  if isinstance(path,int):raise AssertionError('unscoped descriptor')
+  if not Path(path).resolve().is_relative_to(root):raise AssertionError('outside metadata')
+  if any(c in (mode or '') for c in 'wax+') or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise AssertionError('write')
+ elif event=='import' or event.startswith(('socket.','subprocess.','os.exec')) or event in ('os.system','os.fork','os.posix_spawn'):raise AssertionError('runtime or import')
+socket.socket=subprocess.Popen=time.time=time.monotonic=time.perf_counter=forbidden
+sys.addaudithook(guard)
+def read(name):return unique_json((root/name).read_text())
+manifest=read('evidence-manifest.json')
+assert all(hashlib.sha256((root/n).read_bytes()).hexdigest()==h for n,h in manifest.items())
+request,plan,done=(read('dependencies/'+n) for n in ('request.json','download-plan.json','complete.json'))
+assert done['request_digest']==digest(request)==plan['request_digest'] and done['plan_digest']==digest(plan)
+assert done['metadata_gets']==done['archive_gets']==7 and done['all_archive_hashes_verified']
+assert sum(w['size_bytes'] for w in plan['wheels'])==done['downloaded_archive_bytes']<=33554432
+for i,w in enumerate(plan['wheels']):
+ assert Path(w['filename']).name==w['filename'] and w['filename'].endswith('-py3-none-any.whl')
+ for index,purpose in ((i,'package metadata'),(7+i,'pinned wheel bytes')):
+  intent,result=(read(f'dependencies/{index:02d}-{tail}.json') for tail in ('intent','result'))
+  assert intent['purpose']==purpose and result['status']==200
+  if index>=7:assert result['sha256']==w['sha256'] and result['bytes']==w['size_bytes']
+q,build=(read('image/'+n) for n in ('request.json','complete.json'))
+assert build['request_digest']==digest(q) and q['environment']['dependency_plan_digest']==digest(plan)
+assert q['environment_digest']==digest(q['environment'])==build['environment_digest']
+assert build['builds']==1 and build['pull_commands']==0 and build['scientific_starts']==0
+for i in range(9):
+ result=read(f'image/{i:02d}-result.json')
+ assert result['exit_code']==0 and result['log_sha256']==hashlib.sha256((root/f'image/{i:02d}.log').read_bytes()).hexdigest()
+image=read('image/08.log');assert image['Id']==build['image_id'] and image['Config']['Labels']==q['labels']
+assert hashlib.sha256((root/'image/Dockerfile.txt').read_bytes()).hexdigest()==q['files']['Dockerfile']
+probe,complete=(read('probe/'+n) for n in ('request.json','complete.json'))
+assert complete['request_digest']==digest(probe) and probe['image_id']==build['image_id']
+assert hashlib.sha256((root/'probe/body.py.txt').read_bytes()).hexdigest()==probe['body_sha256']
+assert probe['configuration']['Entrypoint'][-1]==(root/'probe/body.py.txt').read_text()
+raw=(root/'probe/output.log').read_bytes();client=read('probe/client.json')
+assert 0<len(raw)<=16384 and hashlib.sha256(raw).hexdigest()==client['output_sha256'] and client['exit_code']==0
+v=unique_json(raw.decode());assert v==complete['runtime_observed'] and v['model_digest']==probe['expected_model_digest'] and v['openmdao']=='3.41.0'
+assert len(v['rows'])==len(probe['expected_rows'])==24
+assert complete['coupled_model_starts']==complete['model_results_observed']==24
+assert complete['original_execution_exit_code']==1 and complete['cleanup_reconciled_without_retry']
+terminal=read('probe/terminal.json');created=read('probe/created.json');cleanup=read('probe/cleanup.json')
+assert terminal['Id']==created['Id']==complete['container_id']==cleanup['container_id']
+assert terminal['Image']==probe['image_id'] and terminal['State']['ExitCode']==0 and terminal['State']['Status']=='exited'
+assert cleanup['absent'] and cleanup['delete_attempts']==1 and cleanup['new_mutations']==0
+assert cleanup['original_cleanup_acknowledgment_parse_failed']
+assert v['observed']=={'effective_limits':{'memory.max':'1073741824','memory.swap.max':'0','pids.max':'16','cpu.max':'100000 100000'},'workspace_bytes':134217728,'root_read_only':True,'network_interfaces':['lo'],'uid':1000,'gid':1000,'seccomp':2,'capabilities':'none'}
+comparisons=[]
+for a,b in zip(v['rows'],probe['expected_rows'],strict=True):
+ assert a['scenario_id']==b['scenario_id'] and a['converged']==1 and 0<=a['residual_A']<=1e-10 and 0<=a['solver_iterations']<=100 and a['source_power_W']>=0
+ assert all(math.isfinite(n) for k,n in a.items() if k!='scenario_id')
+ row={'scenario_id':a['scenario_id']}
+ for key in ('source_power_W','node2_voltage_V'):
+  assert math.isclose(a[key],b[key],rel_tol=probe['rtol'],abs_tol=probe['atol'])
+  row[key+'_abs_difference']=abs(a[key]-b[key])
+ comparisons.append(row)
+assert comparisons==complete['comparisons']
+assert complete['all_cases_satisfy_strict_voltage']==all(r['node2_voltage_V']>=probe['minimum_voltage_V'] for r in v['rows'])
+print(json.dumps({'dependency_wheels':7,'archive_bytes':done['downloaded_archive_bytes'],'image_id':build['image_id'],'probe_container_creations':1,'probe_container_starts':1,'coupled_model_starts':24,'strict_voltage_all_pass':complete['all_cases_satisfy_strict_voltage'],'max_power_difference':max(r['source_power_W_abs_difference'] for r in comparisons),'max_voltage_difference':max(r['node2_voltage_V_abs_difference'] for r in comparisons),'original_execution_exit_code':1,'cleanup_reconciled':True,'new_model_starts':0,'new_daemon_calls':0,'model_imports':False,'runtime_qualified':False},sort_keys=True))

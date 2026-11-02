@@ -1,0 +1,11 @@
+{
+  "status": "prepared",
+  "root": "/private/tmp/claude-loopback-installed-v1",
+  "wheel": "/private/tmp/claude-loopback-installed-v1/wheels/autoengineering-0.2.0-py3-none-any.whl",
+  "wheel_sha256": "838f2ee582c078e68ae6228bbab54d5507488418777cad54677ad175a26aa048",
+  "host_source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "all_current_core_python_bytes_match": true,
+  "core_python_files": 181,
+  "guard_scope": "Python startup audit, not an OS boundary; isolated helper verifier bypasses sitecustomize",
+  "dependencies": "cached default paths, no editable activation or fresh minimal solve"
+}

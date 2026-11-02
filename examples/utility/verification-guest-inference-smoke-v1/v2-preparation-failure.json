@@ -1,0 +1,9 @@
+{
+  "status": "preparation_refused",
+  "reason": "JSON-only snapshot omitted declared model Python source required by selection-barrier validation",
+  "source_sha256": "b1b55d917f9f365d2e01057339f71bc20909b10df8ef5392e80c80dfbd6316d4",
+  "new_container_creations": 0,
+  "new_container_starts": 0,
+  "new_fitting_starts": 0,
+  "driver_copy_intent_present": false
+}

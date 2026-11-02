@@ -6,18 +6,35 @@ from click.testing import CliRunner
 
 from autoengineering.cli import cli
 from autoengineering.campaign.controller import CampaignController
-from examples.campaign_contracts.build_fixture import ROOT
+from examples.campaign_contracts.build_fixture import ROOT, fixture
+
+
+def fresh_spec(tmp_path):
+    path = tmp_path / "current-fixture.yaml"
+    fixture().to_yaml(path)
+    return path
 
 
 def test_cli_commands_and_direct_decision_agree(tmp_path):
     runner = CliRunner()
-    spec = ROOT / "examples/campaign_contracts/fixture.yaml"
-    validated = runner.invoke(cli, ["campaign", "validate", str(spec)])
+    spec = fresh_spec(tmp_path)
+    validated = runner.invoke(cli, ["campaign", "validate", str(spec), "--source-root", str(ROOT)])
     assert validated.exit_code == 0, validated.output
     assert json.loads(validated.stdout)["status"] == "ok"
     work = tmp_path / "cli"
     run = runner.invoke(
-        cli, ["campaign", "run", str(spec), "--workdir", str(work), "--max-new-evaluations", "1"]
+        cli,
+        [
+            "campaign",
+            "run",
+            str(spec),
+            "--source-root",
+            str(ROOT),
+            "--workdir",
+            str(work),
+            "--max-new-evaluations",
+            "1",
+        ],
     )
     assert run.exit_code == 0, run.output
     assert json.loads(run.stdout)["physical_attempts"] == 1
@@ -32,7 +49,9 @@ def test_cli_commands_and_direct_decision_agree(tmp_path):
     direct.advance()
     observed = json.loads(report.stdout)["records"]["decisions"][-1]
     assert observed == direct.state().decisions[-1].to_dict()
-    again = runner.invoke(cli, ["campaign", "run", str(spec), "--workdir", str(work)])
+    again = runner.invoke(
+        cli, ["campaign", "run", str(spec), "--source-root", str(ROOT), "--workdir", str(work)]
+    )
     assert again.exit_code == 2
 
 
@@ -44,7 +63,9 @@ def test_cli_idle_cancel_and_json_schema_error(tmp_path):
         [
             "campaign",
             "run",
-            str(ROOT / "examples/campaign_contracts/fixture.yaml"),
+            str(fresh_spec(tmp_path)),
+            "--source-root",
+            str(ROOT),
             "--workdir",
             str(work),
             "--max-new-evaluations",
@@ -67,7 +88,7 @@ def test_request_report_is_read_only_and_cancel_retries_preserve_response(tmp_pa
     from autoengineering.campaign.records import Request, Response
 
     controller = CampaignController.create(
-        ROOT / "examples/campaign_contracts/fixture.yaml",
+        fresh_spec(tmp_path),
         ROOT,
         tmp_path / "campaign",
         max_new_evaluations=0,
@@ -98,7 +119,7 @@ def test_invalid_utf8_has_a_bounded_transport_receipt(tmp_path):
     import hashlib
 
     controller = CampaignController.create(
-        ROOT / "examples/campaign_contracts/fixture.yaml",
+        fresh_spec(tmp_path),
         ROOT,
         tmp_path / "campaign",
         max_new_evaluations=0,
@@ -151,9 +172,7 @@ def test_valid_negative_decision_has_zero_exit_and_no_eligible_recommendation(tm
 def test_committed_markdown_links_resolve_to_immutable_records(tmp_path):
     import re
 
-    controller = CampaignController.create(
-        ROOT / "examples/campaign_contracts/fixture.yaml", ROOT, tmp_path / "report-links"
-    )
+    controller = CampaignController.create(fresh_spec(tmp_path), ROOT, tmp_path / "report-links")
     controller.advance()
     final = controller.store.replay().events[-1]
     report = next(ref for ref in final.artifacts if ref.media_type == "text/markdown")

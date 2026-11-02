@@ -1,0 +1,9 @@
+{
+  "wheel_sha256": "ea55a0ce0945f61796001fa44d7ccb5cbc30c6d5c76c7146f7b5d577d9ef8864",
+  "core_python_files": 199,
+  "server_sha256": "c2a4ccf2e2612d656d3d12c0776cd4a42328567f29383d2a31c77cf699c43082",
+  "socket_path": "/Users/cam/.orbstack/run/docker.sock",
+  "runtime_digest": "2e0fb3930a8c2f99a92031cbc9ab8ef78e07a914a349300799595f5306804ec3",
+  "original_root": "/private/tmp/utility-recovery-chain-normal-v1",
+  "installed_root": "/private/tmp/utility-recovery-chain-installed-v1"
+}

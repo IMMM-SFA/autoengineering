@@ -1,0 +1,5 @@
+{
+  "parent": "/private/tmp/autoengineering-v4-repro-native-v60otslr",
+  "basetemp": "/private/tmp/autoengineering-v4-repro-native-v60otslr/pytest",
+  "purpose": "independent authored failure reproduction; original full-suite temp root is untouched"
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "utility-baseline-confirmation-installed-execution-v1",
+  "runs": [
+    {
+      "mode": "follower-before",
+      "exit_code": 2
+    },
+    {
+      "mode": "interrupt",
+      "exit_code": 2
+    },
+    {
+      "mode": "normal",
+      "exit_code": 2
+    },
+    {
+      "mode": "recover",
+      "exit_code": 0
+    },
+    {
+      "mode": "replay",
+      "exit_code": 0
+    },
+    {
+      "mode": "follower-after",
+      "exit_code": 2
+    }
+  ],
+  "callback_invocations": 1,
+  "recoveries": 1,
+  "confirmation_accesses": 1,
+  "committed_source_scores": 1,
+  "follower_reservations": 0,
+  "original_charge_retained": true,
+  "fixture_only": true,
+  "private_scoring_qualified": false
+}

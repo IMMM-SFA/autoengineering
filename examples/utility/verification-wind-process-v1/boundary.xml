@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="7" time="8.303" timestamp="2026-10-28T16:53:25.043599-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_wind_process" name="test_original_wind_process_recovery_has_no_new_charge" time="1.544" /><testcase classname="tests.test_utility_wind_process" name="test_wind_saved_process_is_recovered_before_observation" time="1.486" /><testcase classname="tests.test_utility_wind_process" name="test_wind_failure_is_stopped_charged_and_not_retried[1-timeout]" time="0.621" /><testcase classname="tests.test_utility_wind_process" name="test_wind_failure_is_stopped_charged_and_not_retried[2-model_failure]" time="1.340" /><testcase classname="tests.test_utility_wind_process" name="test_wind_failure_is_stopped_charged_and_not_retried[3-model_failure]" time="1.487" /><testcase classname="tests.test_utility_wind_process" name="test_wind_reserved_without_launch_does_not_get_a_retry" time="0.591" /><testcase classname="tests.test_utility_wind_process" name="test_changed_wind_source_is_rejected_before_reservation" time="0.291"><failure message="ValueError: artifact type/size mismatch">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4323/test_changed_wind_source_is_re0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x12a842b70&gt;
+
+    def test_changed_wind_source_is_rejected_before_reservation(tmp_path, monkeypatch):
+        driver, batch, source = setup(tmp_path)
+    
+        def denied(*args, **kwargs):
+            raise AssertionError("changed source launched work")
+    
+        monkeypatch.setattr("autoengineering.utility.engineering_native.supervise_process", denied)
+        (source / GEOMETRY_PATH).write_text("changed")
+        with pytest.raises(StoreError):
+&gt;           driver.run()
+
+tests/test_utility_wind_process.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+examples/utility/wind_process.py:179: in run
+    verify_wind_sources(self.spec, self.source_root)
+examples/utility/wind_process.py:131: in verify_wind_sources
+    verify_sources(
+src/autoengineering/utility/engineering_process.py:82: in verify_sources
+    read_bytes(root, ref)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4323/test_changed_wind_source_is_re0/captured')
+reference = ArtifactRef(path='inputs/wind-geometry.json', sha256='be64b6de1b0bf03b2ea915f48e52c5014a06e84499233e226c430e0f178ce535', size_bytes=73, media_type='text/plain', producer='authored-fixture', metadata=mappingproxy({}))
+
+    def read_bytes(root: Path, reference: ArtifactRef, *, max_bytes: int = MAX_FILE_BYTES) -&gt; bytes:
+        path = confined_file(root, reference.path)
+        if reference.size_bytes &gt; max_bytes:
+            raise ValueError("artifact exceeds size limit")
+        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+        try:
+            metadata = os.fstat(descriptor)
+            if not stat.S_ISREG(metadata.st_mode) or metadata.st_size != reference.size_bytes:
+&gt;               raise ValueError("artifact type/size mismatch")
+E               ValueError: artifact type/size mismatch
+
+src/autoengineering/campaign/artifacts.py:38: ValueError</failure></testcase></testsuite></testsuites>

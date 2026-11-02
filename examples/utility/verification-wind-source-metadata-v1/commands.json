@@ -1,0 +1,7 @@
+{
+  "base": "python -m pytest tests/test_utility_wind_range.py tests/test_utility_confirmation_choices.py tests/test_utility_preparation.py tests/test_documentation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-wind-range-base-v1 --junitxml=examples/utility/verification-wind-source-metadata-v1/base-regression.xml",
+  "optional_hdf": "utility environment python -m pytest tests/test_utility_wind_range.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-wind-range-hdf-v1 --junitxml=examples/utility/verification-wind-source-metadata-v1/range-hdf.xml",
+  "probe": "utility environment python metadata-probe.py SOURCE_ROOT ARCHIVE_ROOT",
+  "replay": "utility environment python metadata-replay.py SOURCE_ROOT ARCHIVE_ROOT",
+  "environment": "existing utility Pixi environment for h5py; default Pixi environment for base tests; no dependency/lock changes"
+}

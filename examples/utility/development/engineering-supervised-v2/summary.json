@@ -1,0 +1,357 @@
+{
+  "purpose": "exposed engineering development; not independent confirmation",
+  "physical_reservations_before_resume": 3,
+  "physical_reservations_total": 6,
+  "verified_process_stops": 6,
+  "repeat_resume_added_reservations": 0,
+  "solver_diagnostics": [
+    {
+      "execution_digest": "65b2339df0f44a45d6d6962999660f7c28034ed4d83a186d1ca343475c6a33c5",
+      "job_digest": "ba272d613ce7553588c26ef85ff98baf950e5510bf688022388215eef6b38c4d",
+      "process_directory": "cases/calibration/engineering-processes/fccac9582106297974c5c2d0f609b39ee42f72027815c28700e9ff6aad9328c7/process",
+      "process_identity": {
+        "nonce": "engineering-fccac9582106297974c5c2d0f609b39e",
+        "pgid": 56629,
+        "pid": 56629,
+        "started": "Wed Oct 28 10:41:23 2026"
+      },
+      "process_status": "completed",
+      "profile": "supervised-engineering-v1",
+      "result": {
+        "job_digest": "ba272d613ce7553588c26ef85ff98baf950e5510bf688022388215eef6b38c4d",
+        "lifecycle_seconds": 0.10879904124885798,
+        "schema": "utility-engineering-result-v1",
+        "score": {
+          "checks": [
+            {
+              "evidence": [],
+              "name": "node_voltage",
+              "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+              "required": true,
+              "scope": "scenario",
+              "status": "pass",
+              "threshold": 0.62,
+              "value": 0.6614073284475915,
+              "version": "1"
+            }
+          ],
+          "forcing_digest": "bb3799002fd5be76b396add06c44798679bbfbe626e45f5b1a8a19e9629a9d2f",
+          "scenario_id": "low-ground",
+          "values": {
+            "source_power": 0.8976518977542693
+          }
+        },
+        "solver_units": {
+          "component_calls": "count",
+          "converged": "boolean",
+          "derivative_calls": "count",
+          "residual_norm": "A",
+          "residual_tolerance": "A",
+          "solver_iterations": "count"
+        },
+        "solver_work": {
+          "component_calls": 277.0,
+          "converged": 1.0,
+          "derivative_calls": 85.0,
+          "residual_norm": 3.893760314177541e-13,
+          "residual_tolerance": 1e-10,
+          "solver_iterations": 17.0
+        }
+      },
+      "status": "success",
+      "stop_verified": true
+    },
+    {
+      "execution_digest": "65b2339df0f44a45d6d6962999660f7c28034ed4d83a186d1ca343475c6a33c5",
+      "job_digest": "ee678776b3d8223a720e537d8db4fd5d7bbfdc50a74fed884a581cb61c060ce4",
+      "process_directory": "cases/calibration/engineering-processes/b38dd2fe650b9e33951ce204f23345a5bc4b5f24fb69546012a016ebcacbd06d/process",
+      "process_identity": {
+        "nonce": "engineering-b38dd2fe650b9e33951ce204f23345a5",
+        "pgid": 56678,
+        "pid": 56678,
+        "started": "Wed Oct 28 10:41:24 2026"
+      },
+      "process_status": "completed",
+      "profile": "supervised-engineering-v1",
+      "result": {
+        "job_digest": "ee678776b3d8223a720e537d8db4fd5d7bbfdc50a74fed884a581cb61c060ce4",
+        "lifecycle_seconds": 0.05718400003388524,
+        "schema": "utility-engineering-result-v1",
+        "score": {
+          "checks": [
+            {
+              "evidence": [],
+              "name": "node_voltage",
+              "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+              "required": true,
+              "scope": "scenario",
+              "status": "pass",
+              "threshold": 0.62,
+              "value": 0.7114073284360709,
+              "version": "1"
+            }
+          ],
+          "forcing_digest": "bdc40a732472852772486f8390de0b015835c1aa51b3c15b01d2d45d95cdf075",
+          "scenario_id": "nominal-ground",
+          "values": {
+            "source_power": 0.8976518977542585
+          }
+        },
+        "solver_units": {
+          "component_calls": "count",
+          "converged": "boolean",
+          "derivative_calls": "count",
+          "residual_norm": "A",
+          "residual_tolerance": "A",
+          "solver_iterations": "count"
+        },
+        "solver_work": {
+          "component_calls": 261.0,
+          "converged": 1.0,
+          "derivative_calls": 80.0,
+          "residual_norm": 1.3877787807814457e-17,
+          "residual_tolerance": 1e-10,
+          "solver_iterations": 16.0
+        }
+      },
+      "status": "success",
+      "stop_verified": true
+    },
+    {
+      "execution_digest": "65b2339df0f44a45d6d6962999660f7c28034ed4d83a186d1ca343475c6a33c5",
+      "job_digest": "6b0b1ea4e441fe666d279d127385d34d2062a50023655f714e9c7b9e85f82424",
+      "process_directory": "cases/calibration/engineering-processes/609c21c8e2d096502d512e70ee5e99c8813e6e7f20b96114a7f0205f17f43078/process",
+      "process_identity": {
+        "nonce": "engineering-609c21c8e2d096502d512e70ee5e99c8",
+        "pgid": 56710,
+        "pid": 56710,
+        "started": "Wed Oct 28 10:41:25 2026"
+      },
+      "process_status": "completed",
+      "profile": "supervised-engineering-v1",
+      "result": {
+        "job_digest": "6b0b1ea4e441fe666d279d127385d34d2062a50023655f714e9c7b9e85f82424",
+        "lifecycle_seconds": 0.05678770877420902,
+        "schema": "utility-engineering-result-v1",
+        "score": {
+          "checks": [
+            {
+              "evidence": [],
+              "name": "node_voltage",
+              "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+              "required": true,
+              "scope": "scenario",
+              "status": "pass",
+              "threshold": 0.62,
+              "value": 0.7614073284360708,
+              "version": "1"
+            }
+          ],
+          "forcing_digest": "564e590ccc29e781d94d9e3ddf4416c56a85d5f91c3df48b3e87540e236c437a",
+          "scenario_id": "high-ground",
+          "values": {
+            "source_power": 0.8976518977542585
+          }
+        },
+        "solver_units": {
+          "component_calls": "count",
+          "converged": "boolean",
+          "derivative_calls": "count",
+          "residual_norm": "A",
+          "residual_tolerance": "A",
+          "solver_iterations": "count"
+        },
+        "solver_work": {
+          "component_calls": 229.0,
+          "converged": 1.0,
+          "derivative_calls": 70.0,
+          "residual_norm": 1.3877787807814457e-17,
+          "residual_tolerance": 1e-10,
+          "solver_iterations": 14.0
+        }
+      },
+      "status": "success",
+      "stop_verified": true
+    },
+    {
+      "execution_digest": "65b2339df0f44a45d6d6962999660f7c28034ed4d83a186d1ca343475c6a33c5",
+      "job_digest": "060215cddce187f662683f4c868abd2cb8cf41e5e7ebeb998ec79ba6613a8d22",
+      "process_directory": "cases/calibration/engineering-processes/3531532f6c842a7626925b073792da202a0fa16f643a82fbb819554a4fbbdcd4/process",
+      "process_identity": {
+        "nonce": "engineering-3531532f6c842a7626925b073792da20",
+        "pgid": 56747,
+        "pid": 56747,
+        "started": "Wed Oct 28 10:41:26 2026"
+      },
+      "process_status": "completed",
+      "profile": "supervised-engineering-v1",
+      "result": {
+        "job_digest": "060215cddce187f662683f4c868abd2cb8cf41e5e7ebeb998ec79ba6613a8d22",
+        "lifecycle_seconds": 0.05902420822530985,
+        "schema": "utility-engineering-result-v1",
+        "score": {
+          "checks": [
+            {
+              "evidence": [],
+              "name": "node_voltage",
+              "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+              "required": true,
+              "scope": "scenario",
+              "status": "pass",
+              "threshold": 0.62,
+              "value": 0.6315278896725794,
+              "version": "1"
+            }
+          ],
+          "forcing_digest": "bb3799002fd5be76b396add06c44798679bbfbe626e45f5b1a8a19e9629a9d2f",
+          "scenario_id": "low-ground",
+          "values": {
+            "source_power": 0.11854625333655307
+          }
+        },
+        "solver_units": {
+          "component_calls": "count",
+          "converged": "boolean",
+          "derivative_calls": "count",
+          "residual_norm": "A",
+          "residual_tolerance": "A",
+          "solver_iterations": "count"
+        },
+        "solver_work": {
+          "component_calls": 293.0,
+          "converged": 1.0,
+          "derivative_calls": 90.0,
+          "residual_norm": 1.0516222766730754e-12,
+          "residual_tolerance": 1e-10,
+          "solver_iterations": 18.0
+        }
+      },
+      "status": "success",
+      "stop_verified": true
+    },
+    {
+      "execution_digest": "65b2339df0f44a45d6d6962999660f7c28034ed4d83a186d1ca343475c6a33c5",
+      "job_digest": "79b25642a62b25d908eed7ad1b2f27cf238ea817db4b3ec0a85baf21c54c3f01",
+      "process_directory": "cases/calibration/engineering-processes/5c41dfb2f3c8ad4fbd9fbfdc8dbf90173c04703ddc74985d082aa2945b698ed1/process",
+      "process_identity": {
+        "nonce": "engineering-5c41dfb2f3c8ad4fbd9fbfdc8dbf9017",
+        "pgid": 56778,
+        "pid": 56778,
+        "started": "Wed Oct 28 10:41:27 2026"
+      },
+      "process_status": "completed",
+      "profile": "supervised-engineering-v1",
+      "result": {
+        "job_digest": "79b25642a62b25d908eed7ad1b2f27cf238ea817db4b3ec0a85baf21c54c3f01",
+        "lifecycle_seconds": 0.05914708413183689,
+        "schema": "utility-engineering-result-v1",
+        "score": {
+          "checks": [
+            {
+              "evidence": [],
+              "name": "node_voltage",
+              "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+              "required": true,
+              "scope": "scenario",
+              "status": "pass",
+              "threshold": 0.62,
+              "value": 0.6815278895744674,
+              "version": "1"
+            }
+          ],
+          "forcing_digest": "bdc40a732472852772486f8390de0b015835c1aa51b3c15b01d2d45d95cdf075",
+          "scenario_id": "nominal-ground",
+          "values": {
+            "source_power": 0.1185462533365195
+          }
+        },
+        "solver_units": {
+          "component_calls": "count",
+          "converged": "boolean",
+          "derivative_calls": "count",
+          "residual_norm": "A",
+          "residual_tolerance": "A",
+          "solver_iterations": "count"
+        },
+        "solver_work": {
+          "component_calls": 277.0,
+          "converged": 1.0,
+          "derivative_calls": 85.0,
+          "residual_norm": 6.938893903907228e-18,
+          "residual_tolerance": 1e-10,
+          "solver_iterations": 17.0
+        }
+      },
+      "status": "success",
+      "stop_verified": true
+    },
+    {
+      "execution_digest": "65b2339df0f44a45d6d6962999660f7c28034ed4d83a186d1ca343475c6a33c5",
+      "job_digest": "7eacc0cb1f36df27204a2ec28e7cfdfc32588e00ac94e0cb5bfa8764136bff4d",
+      "process_directory": "cases/calibration/engineering-processes/ec040999a04ec4830ff54d9bd610ec2096166a4766033b3c951c7bec91c2e3ae/process",
+      "process_identity": {
+        "nonce": "engineering-ec040999a04ec4830ff54d9bd610ec20",
+        "pgid": 56809,
+        "pid": 56809,
+        "started": "Wed Oct 28 10:41:28 2026"
+      },
+      "process_status": "completed",
+      "profile": "supervised-engineering-v1",
+      "result": {
+        "job_digest": "7eacc0cb1f36df27204a2ec28e7cfdfc32588e00ac94e0cb5bfa8764136bff4d",
+        "lifecycle_seconds": 0.05910416692495346,
+        "schema": "utility-engineering-result-v1",
+        "score": {
+          "checks": [
+            {
+              "evidence": [],
+              "name": "node_voltage",
+              "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+              "required": true,
+              "scope": "scenario",
+              "status": "pass",
+              "threshold": 0.62,
+              "value": 0.7315278895744675,
+              "version": "1"
+            }
+          ],
+          "forcing_digest": "564e590ccc29e781d94d9e3ddf4416c56a85d5f91c3df48b3e87540e236c437a",
+          "scenario_id": "high-ground",
+          "values": {
+            "source_power": 0.1185462533365195
+          }
+        },
+        "solver_units": {
+          "component_calls": "count",
+          "converged": "boolean",
+          "derivative_calls": "count",
+          "residual_norm": "A",
+          "residual_tolerance": "A",
+          "solver_iterations": "count"
+        },
+        "solver_work": {
+          "component_calls": 245.0,
+          "converged": 1.0,
+          "derivative_calls": 75.0,
+          "residual_norm": 6.938893903907228e-18,
+          "residual_tolerance": 1e-10,
+          "solver_iterations": 15.0
+        }
+      },
+      "status": "success",
+      "stop_verified": true
+    }
+  ],
+  "recommendation": {
+    "action_id": "eval-000001",
+    "config": {
+      "source_current": 0.03456821138970554
+    },
+    "outcomes": {
+      "source_power": 0.11854625333653068
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration"
+  },
+  "utility_verdict": "not_attempted"
+}

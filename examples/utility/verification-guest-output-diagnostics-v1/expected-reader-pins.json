@@ -1,0 +1,12 @@
+{
+  "expected_request_digest": "01b09fc5ffec9667f45625efa3151adba2817c70176785ff70bd85e553de336a",
+  "expected_sources": {
+    "guest_output_diagnostics.py": "4f2fd141e80cbf4c92eee01ba80c8093d1c1d6691c7d762a8b1d7f40113c84cc",
+    "guest_resource_probe.py": "2d335d1463ec77dbba20dc4fe5949bf9f61953be0f780fbf3c3cc46ffb4e343d",
+    "guest_resources.py": "d2c2f16c6602d7280c51606308f64e8293fe1714f1b1e34f9ad9b3b94b153bda"
+  },
+  "expected_reader_sources": {
+    "guest_attach.py": "651842547dcac056a0ed5bfe4c060104ff23f7276fcf35f38ee6e0ff30541dad",
+    "guest_bootstrap.py": "67816fd1f22ec965ab3086c118c2586d3e66e2403624fd1a71637b56a0222127"
+  }
+}

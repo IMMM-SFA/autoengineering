@@ -1,0 +1,44 @@
+"""Cold guest composite score/accounting replay with no private scopes."""
+import importlib.abc
+from pathlib import Path
+import json,os,socket,subprocess,sys,tarfile,tempfile,time
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'examples','torch','openmdao','pvlib','py_wake'}:
+   raise AssertionError('model import')
+sys.meta_path.insert(0,NoModels())
+import numpy
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.costs import join_confirmation_costs
+from autoengineering.utility.scoring import ConfirmationReceipt,read_receipt
+from autoengineering.utility import composite_scoring,guest_executor,guest_archive,controller
+bundle=Path(__file__).parent
+expected=json.loads((bundle/'expected-public.json').read_text())
+with tempfile.TemporaryDirectory() as folder:
+ root=Path(folder).resolve()
+ with tarfile.open(bundle/'authored-guest-composite-public.tar.gz') as archive:
+  archive.extractall(root,filter='data')
+ for path in root.rglob('*'):
+  path.chmod(0o700 if path.is_dir() else 0o600)
+ public=root/'public'
+ def forbidden(*args,**kwargs):raise AssertionError('execution, array load, clock or source probe')
+ subprocess.Popen=socket.socket=numpy.load=time.monotonic=time.time=forbidden
+ guest_executor.publisher_identity=guest_archive.publisher_identity=forbidden
+ store=SuiteStore(public);store.replay();join_confirmation_costs(store)
+ active=[True]
+ def reads(event,args):
+  if not active[0] or event!='open' or isinstance(args[0],int):return
+  path=Path(args[0]).resolve();mode,flags=args[1:3]
+  if not path.is_relative_to(public):raise AssertionError('private or unrelated read')
+  writing=mode is not None and any(c in mode for c in 'wax+')
+  writing=writing or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND)
+  if writing:raise AssertionError('write')
+ sys.addaudithook(reads)
+ state=SuiteStore(public).replay()
+ assert len(state['confirmation_scores'])==1
+ assert next(iter(state['confirmation_scores'].values()))==expected['score_id']
+ assert read_receipt(public,expected['score_id'])==ConfirmationReceipt.from_dict(expected['receipt'])
+ costs={row.resource:row.quantity for row in join_confirmation_costs(SuiteStore(public))}
+ assert costs==expected['costs'] and costs['confirmation_container_starts']==2
+ print('Original guest composite score and both container costs agree from public bytes.')
+ active[0]=False

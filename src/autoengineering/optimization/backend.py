@@ -66,6 +66,22 @@ class OptimizerBackend(Protocol):
 
 
 @runtime_checkable
+class SuggestionEvidenceBackend(Protocol):
+    """Optional durable proposal evidence, called under the study writer lock."""
+
+    def prepare_suggestion(self, ledger: ObservationLedgerReader, directory) -> None: ...
+    def record_suggestion(self, ledger: ObservationLedgerReader, directory, action) -> None: ...
+    def verify_saved_suggestion(self, ledger: ObservationLedgerReader, directory, action) -> None: ...
+
+
+@runtime_checkable
+class ResultEvidenceBackend(Protocol):
+    """Replay committed results without executing an evaluator."""
+
+    def synchronize_results(self, ledger, directory, *, allow_action_id, links) -> None: ...
+
+
+@runtime_checkable
 class ScopedActionBackend(Protocol):
     """Extra controller hooks required only for partial function-network mode."""
 

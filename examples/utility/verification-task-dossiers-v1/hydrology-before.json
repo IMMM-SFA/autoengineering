@@ -1,0 +1,59 @@
+{
+  "status": "blocked_draft",
+  "transfer_claim": "new-period or new-scenario only after custody review",
+  "routes": [
+    "unchanged_baseline",
+    "conventional",
+    "single_agent",
+    "multi_agent"
+  ],
+  "regimes": [
+    "fixed_evaluations",
+    "fixed_total_cost"
+  ],
+  "repetitions": {
+    "planning_default": 10,
+    "frozen": false,
+    "freeze_rule": "Use development variability and minimum useful effect before confirmation access"
+  },
+  "budget_status": "No execution authorized. Profile exposed development inputs then freeze numeric caps including confirmation reserve.",
+  "analysis_status": "Freeze effect margin, secondary tolerances, paired interval method, seed and multiplicity policy before access.",
+  "confirmation": {
+    "partition": null,
+    "status": "unknown_exposure",
+    "access": "No worker access; trusted custodian only after suite selection barrier"
+  },
+  "human_expert": "not_attempted",
+  "task_id": "hydrology",
+  "family": "Observed hydrology",
+  "question": "Does supplied component replacement and inner calibration improve unseen-period discharge without breaking water balance?",
+  "baseline": "Existing Leaf River chain",
+  "candidate_pool": "Supplied deterministic chain alternatives; learned alternative blocked pending flux/state and training admission",
+  "conventional": "Sobol reference over frozen supplied bounds",
+  "primary_outcome": {
+    "name": "RMSE",
+    "units": "discharge units require source audit",
+    "direction": "minimize"
+  },
+  "physical_checks": [
+    "Explicit storage and flux closure",
+    "Nonnegative states",
+    "Bias tolerance",
+    "Causal warmup and gap handling"
+  ],
+  "blockers": [
+    "Independent basin or chronological partition with documented exposure",
+    "Hidden flux/storage accounting",
+    "Data rights and units closure",
+    "Training budget and causal artifact contract"
+  ],
+  "parameter_domains": "Not frozen; executable admission blocked",
+  "minimum_useful_gain": null,
+  "secondary_tolerances": null,
+  "source_closure": "See source inventory; data hashes and license closure pending",
+  "environment": "default",
+  "development_partition": "Previously exposed fixtures only; never confirmation",
+  "time_policy": "Freeze initialization, causal carryover, warmup, masks, gaps and embargo before execution",
+  "claim_limit": "Conditional prediction on explicitly admitted observations",
+  "development_evidence": "examples/utility/development/predictions-v1"
+}

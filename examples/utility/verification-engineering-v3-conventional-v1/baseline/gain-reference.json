@@ -1,0 +1,48 @@
+{
+  "actual_receipt_and_parity_checks": "verified in saved public development profile",
+  "binding": {
+    "absolute_gain": 0.012487250213233526,
+    "development_reference": {
+      "media_type": "application/json",
+      "metadata": {},
+      "path": "examples/utility/proposals/engineering-v3/development-reference.json",
+      "producer": "engineering-v3-public-reference",
+      "sha256": "ce54a00ed933c7062a18a530673d0d3759aca9987397e513b98b355e54c8fb8d",
+      "size_bytes": 478
+    },
+    "direction": "minimize",
+    "fraction": 0.05,
+    "metric_id": "mean_source_power",
+    "policy_source_sha256": "d8f6de6edd79817a6b958d6291c097c029b3c0401b3b3ec0b4b70739908e6a6d",
+    "receipt_qualification": "required; metadata declaration alone does not prove the numeric reference",
+    "reference_identity": "2c617af5fb6c2d23aa324faca99b44dc17fbe746f387dcf3f9b8734d32671d2e",
+    "reference_value": 0.24974500426467053,
+    "schema": "utility-proposed-absolute-gain-v1",
+    "starts_authorized": false,
+    "status": "reference_bound_not_admitted",
+    "task_id": "engineering",
+    "units": "W"
+  },
+  "confirmation_task_admitted": false,
+  "development_input_digest": "95698ee20beafd091747c003be214f4ba9665e32916f0571841e39d844c56d8f",
+  "final_suite_protocol_frozen": false,
+  "receipt": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "artifacts/5290b6c35f52c8e865549a499dcb353a2a35e87abe074048afaa0fc150c50302/receipt.json",
+    "producer": "trusted-batch-observer",
+    "sha256": "5290b6c35f52c8e865549a499dcb353a2a35e87abe074048afaa0fc150c50302",
+    "size_bytes": 32399
+  },
+  "reference": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "examples/utility/proposals/engineering-v3/development-reference.json",
+    "producer": "engineering-v3-public-reference",
+    "sha256": "ce54a00ed933c7062a18a530673d0d3759aca9987397e513b98b355e54c8fb8d",
+    "size_bytes": 478
+  },
+  "schema": "utility-engineering-v3-scoped-gain-reference-v1",
+  "scope": "only revised engineering-v3 public development definition; not v2 or earlier private draws",
+  "target_proposal_digest": "7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5"
+}

@@ -1,0 +1,28 @@
+{
+  "count": 109,
+  "by_recorded_reason": {
+    "Bayesian benchmark dependencies are unavailable": 1,
+    "Bayesian dependencies are not installed": 1,
+    "actual macOS data-memory limit unavailable; scorer correctly blocked": 2,
+    "collection skipped": 7,
+    "could not import 'ax': No module named 'ax'": 2,
+    "could not import 'bmipy': No module named 'bmipy'": 1,
+    "could not import 'openmdao': No module named 'openmdao'": 4,
+    "could not import 'openmdao.api': No module named 'openmdao'": 2,
+    "could not import 'optuna': No module named 'optuna'": 2,
+    "could not import 'pvlib': No module named 'pvlib'": 5,
+    "optional Bayesian dependencies": 29,
+    "optional Matplotlib rendering environment required": 5,
+    "optional OpenMDAO environment required": 6,
+    "optional TOPFARM environment required": 1,
+    "optional pvlib required": 1,
+    "optional wind environment required": 1,
+    "optional wind runtime": 7,
+    "requires common utility runtime and explicit verified solar cache": 2,
+    "requires explicit verified exposed OEDI cache and optional pvlib": 1,
+    "requires hybrid environment": 1,
+    "requires solar environment": 5,
+    "requires wind environment": 2,
+    "whole-system backend is unavailable": 21
+  }
+}

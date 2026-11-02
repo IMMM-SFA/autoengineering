@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-B",
+    "-X",
+    "pycache_prefix=/private/tmp/utility-path-recheck-v6-cache",
+    "-m",
+    "pytest",
+    "tests/test_research.py::TestRunComponent::test_command_kind_npz_contract",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/private/tmp/utility-path-recheck-v6",
+    "--junitxml=/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-current-base-v6/path-recheck.xml",
+    "--tb=short"
+  ],
+  "child_python": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+  "child_path_prefix": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin",
+  "fresh_bytecode_lookup_prefix": true,
+  "source_changes": false,
+  "full_suite_rerun": false,
+  "reason": "Terminal full-suite failure confirmed bare python command was absent",
+  "created_at_utc": "2026-10-31T21:24:58.679433+00:00"
+}

@@ -1,0 +1,93 @@
+{
+  "schema": "utility-cost-inputs-v1",
+  "suite_digest": "3bb17a3beb28b5962006e1b3fbf6b4534353c30e1d6d28423f7771e43d0d4979",
+  "load_callbacks": [
+    {
+      "grant": {
+        "suite_digest": "3bb17a3beb28b5962006e1b3fbf6b4534353c30e1d6d28423f7771e43d0d4979",
+        "cell_digest": "79a6df9a19d4652e6d22663e4c9e73170eeca9d7bbd87124afc63ac035239ce6",
+        "partition_digest": "7a8e83ea7ed788052629f9c5fff2ab14596fe6e5a50de40d43988bb31d6de43a",
+        "scorer_digest": "553a2db249493f35dcaa9c7780ae2f216a2cf772e5e8a64eba710c5552df9800",
+        "outcome_digest": "bfc11216c6e059135025b69b9ed5703834b72473573c4634dac8992cc23237f0",
+        "model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
+        "selection_digest": "e5ae5d141ab18086e3ad884d732c53b389118a0aaa9dc2798f77f8305458d403",
+        "resources": [
+          {
+            "name": "scientific_starts",
+            "units": "count",
+            "limit": 1.0,
+            "enforcement": "reservation"
+          },
+          {
+            "name": "load_model_starts",
+            "units": "count",
+            "limit": 24.0,
+            "enforcement": "reservation"
+          },
+          {
+            "name": "load_solver_iterations",
+            "units": "count",
+            "limit": 2400.0,
+            "enforcement": "reservation"
+          },
+          {
+            "name": "container_starts",
+            "units": "count",
+            "limit": 1.0,
+            "enforcement": "reservation"
+          },
+          {
+            "name": "active_time",
+            "units": "s",
+            "limit": 60.0,
+            "enforcement": "reservation"
+          }
+        ]
+      },
+      "registration": {
+        "schema": "utility-load-cost-registration-v2",
+        "binding_artifact": {
+          "path": "engineering-source-bindings/task.json",
+          "sha256": "921afdf920ce7b070f5f9b9ad9a67b5b27e20f24d793d0ca1472de2f708c7b9a",
+          "size_bytes": 926,
+          "media_type": "application/json",
+          "producer": "engineering-source",
+          "metadata": {}
+        },
+        "callback_source_digest": "88cf6e22ebbaa5fe6045c45676401e93e26d3296586a0ac02e577d8c34a5c368",
+        "policy": {
+          "schema": "utility-coupled-load-score-v1",
+          "expected_model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
+          "scorer_source_digest": "4d626d11aaeac0727f8820cc59968615fcaafe7789f979bf2def237531abf6a1",
+          "minimum_node2_voltage_V": 0.62,
+          "outcome": "mean_source_power",
+          "units": "W",
+          "maximum_cases": 24,
+          "residual_tolerance_A": 1e-10,
+          "fixed_solver_maximum_iterations": 100
+        },
+        "runtime": {
+          "schema": "utility-coupled-runtime-registration-v2",
+          "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+          "environment_digest": "1567a187b04e1e2d1fe3dd164098ee22579b79c78dd58b62d40dbbb1f2dc5afe",
+          "runtime_source_digest": "02edcd425b1cec825c213673726ce57e0d98b200908ae261c15a43c62e0d1ebf",
+          "entrypoint_source_digest": "4f8df511204e3625c2662eb38a5da90bb556ac78a4da9dacd00e47ae07f359f9",
+          "worker_source_digest": "cb8ccb30ec38cded2cade797d5e971bd222b506ef8a100184490ceb59e5d9c82",
+          "kernel_source_digest": "4d626d11aaeac0727f8820cc59968615fcaafe7789f979bf2def237531abf6a1",
+          "source_manifest_digest": "7ad8620ccb10377e5b09eac7e8c913b144272c1dbeec5a713c392656b915d86e",
+          "active_seconds": 45,
+          "boundary": "unqualified-candidate",
+          "transport_digest": "0b89869619f1768b21d855035aeb2a5fae554275a0f70a1eda73acb4af69ac7b"
+        }
+      },
+      "work_artifact": {
+        "path": "engineering-container-load-work/9cafd1aab6a3797cccb6fa8c496b9fcec7b53b98f9b85f2d632e9c12b09e188f.json",
+        "sha256": "6693c05cb38534d3dc146d2f75969258e0bf882fa8bd40cd99c29a68ae9b49f0",
+        "size_bytes": 2097,
+        "media_type": "application/json",
+        "producer": "engineering-container-load-work",
+        "metadata": {}
+      }
+    }
+  ]
+}

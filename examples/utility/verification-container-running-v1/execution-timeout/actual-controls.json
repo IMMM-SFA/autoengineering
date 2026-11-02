@@ -1,0 +1,32 @@
+{
+  "schema": "synthetic-running-container-fault-controls-v1",
+  "controls": [
+    {
+      "fault": "runtime-timeout",
+      "root": "/private/tmp/utility-running-runtime-timeout-v1",
+      "owner_pid": 91787,
+      "owner_exit": 0,
+      "container_id": "f735cc08b1214a926b5682a4991aae06feadbe2e078a77b13100034997a00fb0",
+      "nonce": "35e50fd68aea4cd199253af0374c1109",
+      "created_objects": 1,
+      "container_starts": 1,
+      "scoring_child_starts": null,
+      "running_and_paused_observed": true,
+      "cleanup_reason": "owner_pipe_eof",
+      "automatic_original_removal": true,
+      "live_absence_confirmed": true,
+      "observer_delete_requests": 0,
+      "accepted_scientific_result": false,
+      "replacement_attempts": 0,
+      "all_authored_input_copies_deleted": true
+    }
+  ],
+  "created_objects": 1,
+  "container_starts": 1,
+  "scoring_child_starts": null,
+  "private_scoring_qualified": false,
+  "real_confirmation_data_reads": 0,
+  "provider_calls": 0,
+  "image_pulls": 0,
+  "remote_jobs": 0
+}

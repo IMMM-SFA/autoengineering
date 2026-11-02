@@ -1,0 +1,9 @@
+{
+  "core_python_files": 224,
+  "build_inputs": 359,
+  "wheel_python_sources": 318,
+  "wheel_sha256": "55fc3857513cb4a7155fc058fe18fac0f3de469ccb7f820264469404cbbcfc9b",
+  "installed": false,
+  "guest_environment_replaced": false,
+  "image_built": false
+}

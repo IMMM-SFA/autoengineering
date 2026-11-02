@@ -1,0 +1,12 @@
+{
+  "package_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-wheel-install-v4/autoengineering/__init__.py",
+  "example_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-wheel-install-v4/examples/interoperability/bmi/run.py",
+  "wheel_sha256": "cbfe9aebd01a3ec23ffd4a69de23610e65a5351ca0894bc2b57f6a8d72ff25b6",
+  "report": {
+    "parity": "exact",
+    "physical_starts": 2,
+    "maximum_conservation_residual_mm": 2.220446049250313e-16,
+    "seconds": 0.0005458337254822254,
+    "time_profile": "scalar_daily_end"
+  }
+}

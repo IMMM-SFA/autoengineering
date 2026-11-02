@@ -10,7 +10,15 @@ Autoengineering 0.2.0 is a work-in-progress Python toolkit for evaluating and im
 - sequential whole-system parameter and architecture search; and
 - experimental function-network Bayesian optimization (BO) research backends.
 
-The package and Click CLI run locally and offline once dependencies and input data are available. The Python package does **not** call an LLM or search the literature. Agent skills under `.claude/skills/` and `.agents/skills/feynman/` handle research and propose candidates; executable implementations must be supplied separately.
+The scientific package and campaign controller run locally and offline once dependencies and input
+data are available. They do not call an LLM or search the literature. Agent skills under
+`.claude/skills/` and `.agents/skills/feynman/` handle research and propose candidates. The experimental
+`agents` CLI supports scripted fake-host replies and explicit Codex subscription configuration with
+a pinned native profile and prepared lease. Offline qualification grants no live-call authority.
+Current-source live conformance and the three-route Leaf River pilot passed. All routes chose
+the same candidate, with no objective gain from the agent routes. See
+`docs/reviews/part-3-final-audit.md` for exact source, platform and evidence limits. Executable
+scientific implementations must still be supplied through trusted admission.
 
 The experimental local campaign layer shares lifecycle, scientific acceptance and durable decisions
 across supplied trusted replacements and parameter searches. See `docs/campaigns.md` for its qualified
@@ -30,6 +38,7 @@ Start with `README.md`, `docs/workflow.md`, and `docs/optimization.md`. Use `doc
 - **Core dependencies:** NetworkX, PyYAML, NumPy, SciPy, pandas, Click, and Rich.
 - **Development tools:** pytest and Ruff. Ruff uses a 100-character line length.
 - **Optional BO:** BoTorch 0.17.2, plus PyTorch and scikit-learn in the Pixi `bayes` environment.
+- **Optional interoperability:** pinned Optuna 4.5.0, bmipy 2.0.1, OpenMDAO 3.41.0, pvlib 0.15.2 and psutil 7.2.2 in a separate `interoperability` environment. See `docs/interoperability.md` and its final audit. Linux runtime remains unverified.
 - **Optional benchmark comparator:** SMAC 2.x. SMAC is not a public CLI search policy.
 - **Optional examples:** pvlib, PyWake/TOPFARM, HOPP, BMI, and domain-specific solver/data dependencies in separate Pixi environments.
 
@@ -67,7 +76,7 @@ There is no JavaScript build, generated frontend, container build, or compilatio
 - `python`: import a `module:callable` and map positional array inputs and declared outputs;
 - `command`: execute a command with temporary NPZ input/output paths.
 
-`build_feedforward_runner(system, source_arrays)` executes an acyclic graph in topological order and returns arrays keyed by `component.port` and bare port names. A custom `run_chain(system)` can implement additional arithmetic or orchestration. The local BMI examples have their own BMI driver; the package-wide runner does not provide a general BMI backend.
+`build_feedforward_runner(system, source_arrays)` executes an acyclic graph in topological order and returns arrays keyed by `component.port` and bare port names. A custom `run_chain(system)` can implement additional arithmetic or orchestration. The local BMI examples retain their BMI driver. The ModelAdapter layer also provides a qualified scalar/daily BMI subset and a whole-Problem scalar OpenMDAO adapter through trusted factories. The package-wide graph runner does not provide a general BMI or coupled solver backend.
 
 `swap_component` creates a new system and retains connections. Preserve its copy behavior and baseline immutability. Compatible port names do not by themselves prove that a replacement is scientifically compatible.
 
@@ -79,7 +88,7 @@ Available metrics are `rmse`, `bias`, `relative_bias`, `correlation`, `nse`, and
 
 ### Whole-system optimization
 
-The public `optimize` command supports only the Release A `system` backend with `random`, `sobol`, or optional `botorch` policies. Each action evaluates the complete system. Architecture categories choose only among implementations already supplied by the evaluator; BO does not discover, implement, or train new models.
+The public `optimize` command supports only the Release A `system` backend with `random`, `sobol`, optional `botorch`, or experimental pinned `optuna` policies. Each action evaluates the complete system. Architecture categories choose only among implementations already supplied by the evaluator; BO does not discover, implement, or train new models.
 
 `OptimizationRunSpec` strictly deserializes the run YAML. It binds the objective, constraints, budget, noise mode, ordered search space, policy/options, evaluator factory, input files, target, and seed. `OptimizationStudy`, `ObservationLedger`, and the controller enforce budgets, explicit result statuses, durable action/result commits, recommendations, and compatible resume.
 

@@ -1,0 +1,185 @@
+{
+  "schema": "synthetic-container-creation-owner-controls-v1",
+  "controls": [
+    {
+      "name": "before-ack-cancel",
+      "root": "/private/tmp/utility-current-creation-owner-before-ack-cancel-v1",
+      "owner_pid": 7136,
+      "owner_exit": -15,
+      "phase": "before-ack",
+      "container_id": "8e1b26b1dff05ae06571298e71da18ff9cd9bcae37cfb77ee21ace012d7b05b8",
+      "nonce": "075f8b72779646cf8bee1f75c23c3ecf",
+      "created_objects": 1,
+      "container_starts": 0,
+      "scoring_starts": 0,
+      "watchdog_launched": false,
+      "metadata_only_reconciliation": true,
+      "all_job_label_copies_deleted": true,
+      "original_id_removed": true,
+      "live_absence_confirmed": true,
+      "observer_operations": [
+        {
+          "method": "GET",
+          "path": "/containers/ae-private-rmse-075f8b72779646cf8bee1f75c23c3ecf/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/8e1b26b1dff05ae06571298e71da18ff9cd9bcae37cfb77ee21ace012d7b05b8/json"
+        },
+        {
+          "method": "DELETE",
+          "path": "/containers/8e1b26b1dff05ae06571298e71da18ff9cd9bcae37cfb77ee21ace012d7b05b8?force=true"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/8e1b26b1dff05ae06571298e71da18ff9cd9bcae37cfb77ee21ace012d7b05b8/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/8e1b26b1dff05ae06571298e71da18ff9cd9bcae37cfb77ee21ace012d7b05b8/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/8e1b26b1dff05ae06571298e71da18ff9cd9bcae37cfb77ee21ace012d7b05b8/json"
+        }
+      ]
+    },
+    {
+      "name": "before-ack-owner-loss",
+      "root": "/private/tmp/utility-current-creation-owner-before-ack-owner-loss-v1",
+      "owner_pid": 7137,
+      "owner_exit": -9,
+      "phase": "before-ack",
+      "container_id": "e726916810785db544655029070c01bc8e465d35451e031ed2bccf94c14d5e7b",
+      "nonce": "be4e612f638c40708368f5f9c9c22f26",
+      "created_objects": 1,
+      "container_starts": 0,
+      "scoring_starts": 0,
+      "watchdog_launched": false,
+      "metadata_only_reconciliation": true,
+      "all_job_label_copies_deleted": true,
+      "original_id_removed": true,
+      "live_absence_confirmed": true,
+      "observer_operations": [
+        {
+          "method": "GET",
+          "path": "/containers/ae-private-rmse-be4e612f638c40708368f5f9c9c22f26/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/e726916810785db544655029070c01bc8e465d35451e031ed2bccf94c14d5e7b/json"
+        },
+        {
+          "method": "DELETE",
+          "path": "/containers/e726916810785db544655029070c01bc8e465d35451e031ed2bccf94c14d5e7b?force=true"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/e726916810785db544655029070c01bc8e465d35451e031ed2bccf94c14d5e7b/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/e726916810785db544655029070c01bc8e465d35451e031ed2bccf94c14d5e7b/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/e726916810785db544655029070c01bc8e465d35451e031ed2bccf94c14d5e7b/json"
+        }
+      ]
+    },
+    {
+      "name": "before-pipe-cancel",
+      "root": "/private/tmp/utility-current-creation-owner-before-pipe-cancel-v1",
+      "owner_pid": 7138,
+      "owner_exit": -15,
+      "phase": "before-pipe",
+      "container_id": "1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d",
+      "nonce": "91c00ce71ce34fce97e9c1d8f8dc0046",
+      "created_objects": 1,
+      "container_starts": 0,
+      "scoring_starts": 0,
+      "watchdog_launched": false,
+      "metadata_only_reconciliation": true,
+      "all_job_label_copies_deleted": true,
+      "original_id_removed": true,
+      "live_absence_confirmed": true,
+      "observer_operations": [
+        {
+          "method": "GET",
+          "path": "/containers/1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d/json"
+        },
+        {
+          "method": "DELETE",
+          "path": "/containers/1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d?force=true"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/1636e443eaf71af40f470e82c5d18e70eb9a9481b519544777e216b33875638d/json"
+        }
+      ]
+    },
+    {
+      "name": "before-pipe-owner-loss",
+      "root": "/private/tmp/utility-current-creation-owner-before-pipe-owner-loss-v1",
+      "owner_pid": 7139,
+      "owner_exit": -9,
+      "phase": "before-pipe",
+      "container_id": "4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5",
+      "nonce": "a28000f29d7442b088c2232a4440565e",
+      "created_objects": 1,
+      "container_starts": 0,
+      "scoring_starts": 0,
+      "watchdog_launched": false,
+      "metadata_only_reconciliation": true,
+      "all_job_label_copies_deleted": true,
+      "original_id_removed": true,
+      "live_absence_confirmed": true,
+      "observer_operations": [
+        {
+          "method": "GET",
+          "path": "/containers/4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5/json"
+        },
+        {
+          "method": "DELETE",
+          "path": "/containers/4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5?force=true"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5/json"
+        },
+        {
+          "method": "GET",
+          "path": "/containers/4a9e68755e0edc85832d67aa5ff7afd11cf9da8e31efdcb7fa78a1e56281bae5/json"
+        }
+      ]
+    }
+  ],
+  "created_objects": 4,
+  "container_starts": 0,
+  "scoring_starts": 0,
+  "private_scoring_qualified": false,
+  "real_confirmation_data_reads": 0,
+  "provider_calls": 0,
+  "image_pulls": 0,
+  "remote_jobs": 0
+}

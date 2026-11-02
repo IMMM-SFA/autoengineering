@@ -1,0 +1,318 @@
+{
+  "installed_root": "/private/tmp/utility-baseline-reuse-installed-v1",
+  "cases": [
+    {
+      "kind": "valid",
+      "store": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-baseline-reuse-guards-v1/public-fixtures/valid",
+      "plan": {
+        "schema": "utility-analysis-v1",
+        "contrasts": [
+          {
+            "task_id": "task",
+            "route_id": "multi",
+            "comparator_id": "conventional",
+            "outcome": "power",
+            "units": "W",
+            "direction": "minimize",
+            "minimum_gain": 0.1,
+            "minimum_feasible_rate": 1.0,
+            "confidence": 0.95,
+            "interval": "paired_student_t",
+            "resamples": 500,
+            "seed": 17,
+            "multiplicity": "single_prespecified"
+          }
+        ],
+        "missing_policy": "complete_pairs_and_full_denominators",
+        "dependence_policy_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "allocation": {
+        "score_digest": "32d6133144bd4831285b2e08b008ac351d82dc1629fbe0835a662ae3cbc0bdb8",
+        "cell_digests": [
+          "aab68a315bfbaa8bdfcfe22e1680b6c2f6b149e086a964f8c401e6d44248f20f",
+          "49961ca9e9a7253c875a34e45208350ed974f10841d9f45626662f142788a2cd"
+        ],
+        "allocation": [
+          0.5,
+          0.5
+        ],
+        "profile": "deterministic_frozen_reference"
+      },
+      "original_root": "/private/tmp/utility-baseline-reuse-fixtures-v1/valid",
+      "callbacks_during_preparation": 1
+    },
+    {
+      "kind": "reserved",
+      "store": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-baseline-reuse-guards-v1/public-fixtures/reserved",
+      "plan": {
+        "schema": "utility-analysis-v1",
+        "contrasts": [
+          {
+            "task_id": "task",
+            "route_id": "multi",
+            "comparator_id": "conventional",
+            "outcome": "power",
+            "units": "W",
+            "direction": "minimize",
+            "minimum_gain": 0.1,
+            "minimum_feasible_rate": 1.0,
+            "confidence": 0.95,
+            "interval": "paired_student_t",
+            "resamples": 500,
+            "seed": 17,
+            "multiplicity": "single_prespecified"
+          }
+        ],
+        "missing_policy": "complete_pairs_and_full_denominators",
+        "dependence_policy_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "allocation": {
+        "score_digest": "202b73a2d4f6039164bec4d121563284d43505dc3fb81469efffa1bf7fd70ef8",
+        "cell_digests": [
+          "aab68a315bfbaa8bdfcfe22e1680b6c2f6b149e086a964f8c401e6d44248f20f",
+          "49961ca9e9a7253c875a34e45208350ed974f10841d9f45626662f142788a2cd"
+        ],
+        "allocation": [
+          0.5,
+          0.5
+        ],
+        "profile": "deterministic_frozen_reference"
+      },
+      "original_root": "/private/tmp/utility-baseline-reuse-fixtures-v1/reserved",
+      "callbacks_during_preparation": 1
+    }
+  ],
+  "cross_scenario": {
+    "spec": {
+      "schema": "utility-suite-v1",
+      "suite_id": "fixture",
+      "tasks": [
+        {
+          "task_id": "task",
+          "family": "engineering",
+          "dossier_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "partition_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "outcome_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "candidate_digests": [
+            "1111111111111111111111111111111111111111111111111111111111111111"
+          ],
+          "required_capabilities": []
+        }
+      ],
+      "routes": [
+        {
+          "route_id": "conventional",
+          "kind": "baseline",
+          "configuration_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "grants_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "route_id": "multi",
+          "kind": "multi_agent",
+          "configuration_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "grants_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        }
+      ],
+      "budgets": [
+        {
+          "regime": "fixed_evaluations",
+          "caps": [
+            {
+              "name": "scientific_starts",
+              "units": "count",
+              "limit": 100.0,
+              "enforcement": "reservation"
+            },
+            {
+              "name": "host_invocations",
+              "units": "count",
+              "limit": 50.0,
+              "enforcement": "reservation"
+            },
+            {
+              "name": "training_starts",
+              "units": "count",
+              "limit": 0.0,
+              "enforcement": "reservation"
+            },
+            {
+              "name": "active_time",
+              "units": "s",
+              "limit": 600.0,
+              "enforcement": "reservation"
+            }
+          ],
+          "confirmation_reserve": [
+            {
+              "name": "scientific_starts",
+              "units": "count",
+              "limit": 2.0,
+              "enforcement": "reservation"
+            }
+          ]
+        }
+      ],
+      "cells": [
+        {
+          "task_id": "task",
+          "route_id": "conventional",
+          "regime": "fixed_evaluations",
+          "repetition": 0,
+          "seed": 0,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "task_id": "task",
+          "route_id": "multi",
+          "regime": "fixed_evaluations",
+          "repetition": 0,
+          "seed": 0,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "task_id": "task",
+          "route_id": "conventional",
+          "regime": "fixed_evaluations",
+          "repetition": 1,
+          "seed": 1,
+          "scenario_digest": "2222222222222222222222222222222222222222222222222222222222222222"
+        },
+        {
+          "task_id": "task",
+          "route_id": "multi",
+          "regime": "fixed_evaluations",
+          "repetition": 1,
+          "seed": 1,
+          "scenario_digest": "2222222222222222222222222222222222222222222222222222222222222222"
+        },
+        {
+          "task_id": "task",
+          "route_id": "conventional",
+          "regime": "fixed_evaluations",
+          "repetition": 2,
+          "seed": 2,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "task_id": "task",
+          "route_id": "multi",
+          "regime": "fixed_evaluations",
+          "repetition": 2,
+          "seed": 2,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+        }
+      ],
+      "source_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "lock_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "analysis_digest": "b4ce3eb715cbdac09adf258f816111d41572f9db88c5bd35c32b0d450b392389",
+      "exposure_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "protocol_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "plan": {
+      "schema": "utility-analysis-v1",
+      "contrasts": [
+        {
+          "task_id": "task",
+          "route_id": "multi",
+          "comparator_id": "conventional",
+          "outcome": "power",
+          "units": "W",
+          "direction": "minimize",
+          "minimum_gain": 0.1,
+          "minimum_feasible_rate": 1.0,
+          "confidence": 0.95,
+          "interval": "paired_student_t",
+          "resamples": 500,
+          "seed": 17,
+          "multiplicity": "single_prespecified"
+        }
+      ],
+      "missing_policy": "complete_pairs_and_full_denominators",
+      "dependence_policy_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "scores": [
+      {
+        "cell_digest": "aab68a315bfbaa8bdfcfe22e1680b6c2f6b149e086a964f8c401e6d44248f20f",
+        "score_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status": "success",
+        "outcome": "power",
+        "units": "W",
+        "value": 10.0,
+        "feasible": true,
+        "active_seconds": 1.0,
+        "reached_target": false
+      },
+      {
+        "cell_digest": "49961ca9e9a7253c875a34e45208350ed974f10841d9f45626662f142788a2cd",
+        "score_digest": "0c3da2e5a6277d45e899ef327304f4072fddffa13694f0eec9fa23b1afb37f33",
+        "status": "success",
+        "outcome": "power",
+        "units": "W",
+        "value": 8.0,
+        "feasible": true,
+        "active_seconds": 1.0,
+        "reached_target": false
+      },
+      {
+        "cell_digest": "4a8abf555cc0fa63ea28a4bb5b58af3d1aa2fb2929375c39907945887ed2401c",
+        "score_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status": "success",
+        "outcome": "power",
+        "units": "W",
+        "value": 10.0,
+        "feasible": true,
+        "active_seconds": 1.0,
+        "reached_target": false
+      },
+      {
+        "cell_digest": "6929f05c91a0f31ad54684d446431fccd7bb8bdad85aca1c484c5a8ba80be10d",
+        "score_digest": "2dae2ddd04797320480b585d3f37929703e4c488d8f77a3cb5d6591ff308bd32",
+        "status": "success",
+        "outcome": "power",
+        "units": "W",
+        "value": 8.0,
+        "feasible": true,
+        "active_seconds": 1.0,
+        "reached_target": false
+      },
+      {
+        "cell_digest": "dc0f5b7cbfde1748c80746dcc80c6bc5933812ac73f2d158a96afaecb25a2fa7",
+        "score_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status": "success",
+        "outcome": "power",
+        "units": "W",
+        "value": 10.0,
+        "feasible": true,
+        "active_seconds": 1.0,
+        "reached_target": false
+      },
+      {
+        "cell_digest": "1794aa65950797aa3d66496d4584eae89d6089fdcfab7a99eafa83f08bc54261",
+        "score_digest": "3647eea660b8838edabc8726840028f8446422e98e3f7f7ad5628f1ea1cfc5d3",
+        "status": "success",
+        "outcome": "power",
+        "units": "W",
+        "value": 8.0,
+        "feasible": true,
+        "active_seconds": 1.0,
+        "reached_target": false
+      }
+    ],
+    "allocation": {
+      "score_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "cell_digests": [
+        "aab68a315bfbaa8bdfcfe22e1680b6c2f6b149e086a964f8c401e6d44248f20f",
+        "4a8abf555cc0fa63ea28a4bb5b58af3d1aa2fb2929375c39907945887ed2401c",
+        "dc0f5b7cbfde1748c80746dcc80c6bc5933812ac73f2d158a96afaecb25a2fa7"
+      ],
+      "allocation": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "profile": "deterministic_frozen_reference"
+    }
+  },
+  "wheel_sha256": "c4d7633bcb1cb6e8015c04b44e4522fc08aecb88b50089e1d1fee33296925bb6",
+  "matched_core_files": 200
+}

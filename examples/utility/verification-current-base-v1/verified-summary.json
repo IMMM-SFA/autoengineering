@@ -1,0 +1,20 @@
+{
+  "testcases": 2725,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 109,
+  "terminal": {
+    "exit_code": 0,
+    "elapsed_seconds": 2141.0558359622955,
+    "pinned_files": 77844,
+    "changed_files": [],
+    "source_unchanged": true
+  },
+  "evidence_sha256": {
+    "tests.xml": "58e12bd35a959310bb7f08340a95e349f01fe1fb5255dcc6d87bf785b4a45f26",
+    "tests.log": "79a5e19e455e70906ea25ac74c5f21f5770ad7419cbf04ccc40133f240f6c94e",
+    "source-before.json": "e02a582f3e632c1ffc4048c1389e90f467de01ef6642f59473507e7b367bdfcb",
+    "source-after.json": "e02a582f3e632c1ffc4048c1389e90f467de01ef6642f59473507e7b367bdfcb",
+    "terminal.json": "21d949d0f3625dc1451e2b18bf82fc39e11e61da307e4a7d1f2396ce3b687053"
+  }
+}

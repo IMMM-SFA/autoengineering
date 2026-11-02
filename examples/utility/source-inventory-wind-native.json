@@ -1,0 +1,19 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "bounded-native-wind-development",
+  "files": {
+    "examples/utility/wind_native.py": "59434cb495802aee86993b3eddcae44575edb4779602f9aa55d58e0075c7b905",
+    "examples/utility/rehearse_wind.py": "b3762b2ed05b0a3d22c42173d2ec0d52addaa19bacabd18522fd0d6aa73c63e6",
+    "tests/test_utility_wind.py": "b6f1348e2859b7907d6cf4f9edbfa04e2fef6f8bfc2052026208e22cc2e5afb9"
+  },
+  "checks": {
+    "wind": "4 passed, 4 warnings in 3.77s",
+    "ruff": "repository-wide pass",
+    "rehearsal": "source hashes and native/budget-control callback ceilings verified"
+  },
+  "limits": [
+    "Native callbacks are separate resource quantities",
+    "NumPy binary-size warning retained",
+    "No independent weather confirmation"
+  ]
+}

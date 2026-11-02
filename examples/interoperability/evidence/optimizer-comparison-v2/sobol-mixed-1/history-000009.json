@@ -1,0 +1,1 @@
+{"action_id": "eval-000009", "configuration": {"x": 0.792596161365509, "y": 0.3060967344790697, "n": 4, "family": "quadratic"}, "result": {"status": "scientific_infeasible", "feasible": false, "objective": null, "constraint_residual": 0.09869289584457874}, "suggest_seconds": 0.006953834090381861, "tell_seconds": 0.007744499947875738, "evaluation_seconds": 2.750195562839508e-06}

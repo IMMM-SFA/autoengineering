@@ -1,0 +1,61 @@
+{
+  "files": {
+    "README.md": {
+      "sha256": "652ec43c541ba6104970d423ff2f8fe78fd5f0d1c50ffb4df823e8a3646d30fb",
+      "size_bytes": 1323
+    },
+    "daymet-v2-guide.html": {
+      "sha256": "cfaf5a4d9b294a44937ccb758f0e7d82eb2124417a923930be69ecc06e220d2e",
+      "size_bytes": 68375
+    },
+    "documentation-tests.xml": {
+      "sha256": "fd4f5bbe8ae0f9444c508753b32443ac5242e60253469580dbb94cf3ec82d50b",
+      "size_bytes": 2552
+    },
+    "fetch-guides.py.txt": {
+      "sha256": "784148f27f453c733fda90b90d24368d2991e75f7354359e29d00b90bd99a6c9",
+      "size_bytes": 1374
+    },
+    "fetch.py.txt": {
+      "sha256": "d0a4834a9f3fd589a3230d03d16464fe652c4a2ecbdacdfd8d3966d98949f1fb",
+      "size_bytes": 1218
+    },
+    "guide-requests.json": {
+      "sha256": "8187249cd00e12438a2d10c5bc83a63f0f85c6b7dc50a73a7f998fffceadb0de",
+      "size_bytes": 1048
+    },
+    "ncar-repository-root.json": {
+      "sha256": "4621620a4fe8e21eb5cf7de325827c2a45b8bf78902f337ee148ac34237d93c3",
+      "size_bytes": 697
+    },
+    "newman-2015.pdf": {
+      "sha256": "a43702085800f4d4b85517f3a931be613f639558a1f942be19d0bafab6a180fb",
+      "size_bytes": 4513636
+    },
+    "request.json": {
+      "sha256": "8559cd85bd5ebcde8d105d950c9ab7ce998454dc4320ed97c02cb491427000ec",
+      "size_bytes": 577
+    },
+    "source/examples/utility/hydrology_camels.py": {
+      "sha256": "2303c2fa30436cef6214f52d4a78f4e8eb790b377ac0039bf0eea5ba33ca3df3",
+      "size_bytes": 8007
+    },
+    "source/tests/test_utility_hydrology_camels.py": {
+      "sha256": "6c75a06f86c6072dcf7343713ab261100d6335678793bb62da87573839ea424c",
+      "size_bytes": 15018
+    },
+    "summary.json": {
+      "sha256": "be83119c89d79dabf7b60405c0a5ddf252268fd9d5d42d786811ab439172a3b4",
+      "size_bytes": 2033
+    },
+    "tests-before.xml": {
+      "sha256": "655f1371a2ee61b75816f82052484b63814e34b7f96fd3f99d0300bfd2017d13",
+      "size_bytes": 6254
+    },
+    "tests.xml": {
+      "sha256": "ca5e520ae07f250f7db2adada86a7085dd0ce22b4a424aa2a072f67ca1fcf454",
+      "size_bytes": 14857
+    }
+  },
+  "schema": "utility-camels-timing-file-manifest-v1"
+}

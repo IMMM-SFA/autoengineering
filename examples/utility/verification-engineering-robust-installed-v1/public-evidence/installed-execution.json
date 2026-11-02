@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "load_module": "/private/tmp/utility-robust-installed-v1/venv/lib/python3.12/site-packages/examples/utility/engineering_load.py",
+  "native_module": "/private/tmp/utility-robust-installed-v1/venv/lib/python3.12/site-packages/examples/utility/engineering_load_robust_native.py",
+  "fresh_scenario_processes": 24,
+  "native_processes": 1,
+  "original_reservations": 25,
+  "recovery_added_starts": 0,
+  "native_costs": {
+    "native_driver_process_starts": 1.0,
+    "native_inner_model_calls": 35.0,
+    "native_driver_derivative_calls": 280.0,
+    "native_driver_final_solver_iterations": 1.0,
+    "native_driver_final_component_calls": 906.0,
+    "native_scenario_solver_iterations": 404.0,
+    "native_scenario_component_calls": 6584.0,
+    "native_scenario_derivative_calls": 2020.0
+  },
+  "inherited_dependencies": "interoperability",
+  "configuration": {
+    "source_current": 0.022793262535515797
+  },
+  "mean_source_power_W": 0.05198172873029417,
+  "native_inner_solves": 35,
+  "original_checkout_content_denied": true,
+  "site_guard_in_parent_and_child_interpreter": true,
+  "domain_code_staged_from_verified_wheel": true,
+  "host_system": "Darwin",
+  "host_architecture": "arm64",
+  "python": "3.12.16",
+  "host_invocations": 0,
+  "independent_confirmation": false,
+  "final_scenarios_evaluated": false,
+  "private_scoring_admitted": false
+}

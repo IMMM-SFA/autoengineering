@@ -1,0 +1,13 @@
+{
+  "schema": "utility-camels-source-metadata-replay-v1",
+  "archive_bytes": 3406626583,
+  "archive_sha256": "bb90fca29a5bab8f0b300787a5ab5a669a366f40ba95b6877b631a81133f7e5d",
+  "logical_http_requests": 3,
+  "validated_rows": 12784,
+  "original_hour_zero_refusal_preserved": true,
+  "literal_hour_12_validation": "passed",
+  "source_or_timing_admission": false,
+  "private_archive_reads_in_replay": 0,
+  "observation_rows_loaded_in_replay": 0,
+  "model_calls": 0
+}

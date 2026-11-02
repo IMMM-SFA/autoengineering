@@ -1,0 +1,19 @@
+"""Read-only binding for a new development control; never rebind an old grant."""
+from pathlib import Path
+import hashlib,json,time
+from autoengineering.campaign.serialization import digest
+from examples.utility import engineering_container_runtime as owner
+root=Path.cwd();out=root/'examples/utility/verification-engineering-current-owner-v1'
+assert not (out/'runtime-binding.json').exists()
+old=json.loads((root/'examples/utility/verification-engineering-linux-worker-v1/request.json').read_text())
+runtime=owner.CoupledContainerRuntime(cli='/usr/local/bin/docker',endpoint='/Users/cam/.orbstack/run/docker.sock',api_version=old['api_version'],server_digest=old['server_digest'])
+runtime._verify_identity()
+version=runtime.api._json('GET','/version',deadline=time.monotonic()+10)
+image=runtime.api._json('GET','/images/'+owner.IMAGE+'/json',deadline=time.monotonic()+10)
+owner.verify_image(image)
+record={'schema':'utility-current-owner-runtime-binding-v1','scope':'New authored development control only; old consumed grant and source remain untouched',
+ 'api_version':old['api_version'],'server_digest':digest(version),'image':owner.IMAGE,
+ 'server_version':version.get('Version'),'image_identity':'passed','transport':runtime.transport,
+ 'read_only_daemon_requests':2,'container_create_or_start_calls':0,'private_source_reads':0,'model_calls':0,
+ 'source_pins':{name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ['examples/utility/engineering_container_runtime.py','examples/utility/engineering_container_watchdog.py','examples/utility/engineering_container_callback.py']}}
+(out/'runtime-binding.json').write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record))

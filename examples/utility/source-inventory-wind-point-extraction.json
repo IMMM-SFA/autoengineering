@@ -1,0 +1,17 @@
+{
+  "scope": "One actual 2007-only public development wind point extraction and raw-source replay; no modeled energy or task/private admission",
+  "predecessor": "examples/utility/source-inventory-wind-source-metadata.json",
+  "predecessor_sha256": "2f81cd5af4d2e928d0cb38917336cfed5f3df0060c63658fb92d037c0c7d137d",
+  "source_sha256": {
+    "examples/utility/wind_point_range.py": "5ec7312acb39a18b4019024adf30c295fb28a909833b487603d817b2d3a3a145",
+    "examples/utility/wind_point.py": "c722684609196e6b2adc3c65bb8360a586371dabf2413e12f6f464adc791c77b",
+    "examples/utility/wind_point_extract.py": "ca8a273cb3704a50e25ff832c9e5a8035246a4ac8ae1124c7d5cad9522786d4a",
+    "tests/test_utility_wind_point.py": "712449c4a142963fbe526896ffee1dfa8b591cb8f8436541f151a54e7ed602a7",
+    "tests/test_utility_wind_point_range.py": "9df311c67c7218d5845c991a0b7155a1ffbfc65b3e2488e9828c6b20d7d02605",
+    "tests/test_utility_wind_point_extract.py": "74b45b617d5884e11af6a9d4dfb414ed78929c9888935918f45289a80fa017ce",
+    "examples/utility/exposure-register.json": "ed62dedc3a3c595037bcf26ab3ac3448eb5de77b09a9795ab7ed7303dbb103fe"
+  },
+  "verification": "examples/utility/verification-wind-point-2007-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315
+}

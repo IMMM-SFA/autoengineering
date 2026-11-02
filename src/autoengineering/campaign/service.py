@@ -73,7 +73,15 @@ TRANSITIONS = {
     "review": TransitionRule(
         "controller",
         ("evidence_ready", "reconciliation_required"),
-        ("proposal_open", "selection_frozen", "evidence_ready", "evaluating"),
+        (
+            "proposal_open",
+            "selection_frozen",
+            "evidence_ready",
+            "evaluating",
+            "completed",
+            "report_ready",
+            "reconciliation_required",
+        ),
         "decision_or_reconciliation",
         2,
         "insufficient_evidence",

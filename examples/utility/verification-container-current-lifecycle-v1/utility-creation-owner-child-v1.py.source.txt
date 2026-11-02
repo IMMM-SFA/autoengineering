@@ -1,0 +1,41 @@
+from pathlib import Path
+import json
+import os
+import signal
+import sys
+
+sys.path.insert(0,sys.argv[1])
+from autoengineering.utility import private_container_runtime as module
+
+root=Path(sys.argv[2])
+settings=json.loads((root/'control.json').read_bytes())
+runtime=module.FixedScorerRuntime(Path(settings['endpoint']),server_sha256=settings['server_sha256'])
+assert runtime.identity==settings['runtime_identity']
+original_json=module.API.json
+original_request=module.API.request
+def request(api,method,path,value=None,**kwargs):
+    with (root/'creator-requests.jsonl').open('ab') as stream:
+        stream.write(module.encode({'method':method,'path':path})+b'\n')
+        stream.flush(); os.fsync(stream.fileno())
+    if method=='POST' and path.endswith('/start'):
+        raise AssertionError('pre-arm owner control attempted start')
+    return original_request(api,method,path,value,**kwargs)
+def terminate():
+    module.write(root/'owner-termination-intent.json',{
+        'pid':os.getpid(),'signal':settings['signal'],'phase':settings['phase'],
+    })
+    os.kill(os.getpid(),settings['signal'])
+    raise AssertionError('owner termination failed')
+def response(api,method,path,value=None,**kwargs):
+    result=original_json(api,method,path,value,**kwargs)
+    if method=='POST' and path.startswith('/containers/create?name='):
+        module.write(root/'transport-created.json',{'container_id':result['Id']})
+        if settings['phase']=='before-ack': terminate()
+    return result
+module.API.request=request
+module.API.json=response
+if settings['phase']=='before-pipe':
+    module.os.pipe=terminate
+runtime.run(root,api_version=settings['api_version'],job_sha256=settings['job_sha256'],
+            labels_sha256=settings['labels_sha256'])
+raise AssertionError('owner-loss control unexpectedly returned')

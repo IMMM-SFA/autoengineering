@@ -1,0 +1,32 @@
+"""Copy only public completion metadata; source rows, seed and packets stay private."""
+from pathlib import Path
+import hashlib,json,shutil
+from autoengineering.campaign.serialization import canonical_json
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.load_costs import CostEvidenceSpec
+from autoengineering.utility.report import accounting_report,render_markdown
+root=Path.cwd();out=root/'examples/utility/verification-engineering-current-owner-v1';work=root/'outputs/engineering-current-owner-v1'
+complete=json.loads((out/'complete.json').read_text());request=json.loads((out/'request.json').read_text())
+assert complete['container_creations']==complete['container_starts']==1 and complete['coupled_model_starts']==24
+public=out/'public';public.mkdir(mode=0o700);shutil.copytree(work/'suite',public/'suite')
+grant_digest=complete['execution']['grant_digest'];runtime=work/'callback-work'/grant_digest/'runtime'
+audit=public/'runtime';audit.mkdir(mode=0o700)
+for name in ('intent.json','create-intent.json','created.json','before.json','start-intent.json',
+ 'client.json','terminal.json','output.json','stop.json','delete-intent.json','cleanup.json','complete.json',
+ 'watchdog-plan.json','watchdog-ready.json','watchdog-bind.json','watchdog-bound.json','watchdog-outcome.json'):
+ shutil.copyfile(runtime/name,audit/name)
+for name in ['preflight-intent.json','preflight-complete.json']:
+ shutil.copyfile(work/'callback-work'/grant_digest/name,public/name)
+shutil.copyfile(work/'callback-work'/grant_digest/'complete.json',public/'original-completion-pin.json')
+for name in ['request.json','cost-inputs.json','complete.json','watchdog-process-absence.json','injected-fault.json']:
+ shutil.copyfile(out/name,public/name)
+store=SuiteStore(public/'suite');inputs=CostEvidenceSpec.from_json((public/'cost-inputs.json').read_text())
+legacy=accounting_report(store);report=accounting_report(store,cost_inputs=inputs)
+(public/'expected-legacy.json').write_text(canonical_json(legacy)+'\n')
+(public/'expected-accounting.json').write_text(canonical_json(report)+'\n');(public/'expected-accounting.md').write_text(render_markdown(report))
+assert not any(p.name in ('scenarios.json','packet.json','seed.json','preparation-claim.json') or p.name.startswith('case-') for p in public.rglob('*'))
+assert not any(b'"seed_hex"' in p.read_bytes() for p in public.rglob('*.json'))
+pins={str(p.relative_to(public)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(public.rglob('*')) if p.is_file()}
+(out/'public-pins.json').write_text(json.dumps(pins,indent=2)+'\n')
+shutil.copyfile('/private/tmp/engineering-current-owner-v1.log',out/'original.log')
+print(json.dumps({'public_files':len(pins),'private_payloads_copied':0,'new_model_starts_in_archive':0,'complete_cost_evidence':report['complete_cost_evidence']}))

@@ -1,0 +1,116 @@
+"""Verify native producer evidence without private drivers or optional models."""
+
+import argparse
+import builtins
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import socket
+import subprocess
+import sys
+import tempfile
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--source-root", type=Path, required=True)
+args = parser.parse_args()
+repo = args.source_root.resolve()
+root = Path(__file__).resolve().parent
+sys.path[:0] = [str(repo), str(repo / "src")]
+
+
+def denied(*args, **kwargs):
+    raise AssertionError("metadata reader attempted a private source, model or external process")
+
+
+original_import = builtins.__import__
+
+
+def guarded_import(name, *args, **kwargs):
+    if name.split(".")[0] in {
+        "py_wake", "matplotlib", "h5py", "netCDF4", "torch", "botorch", "tensorflow",
+    }:
+        raise AssertionError("metadata reader attempted an optional model import")
+    return original_import(name, *args, **kwargs)
+
+
+builtins.__import__ = guarded_import
+socket.socket = denied
+subprocess.Popen = denied
+
+manifest = json.loads((root / "manifest.json").read_text())
+for name, pin in manifest.items():
+    path = Path(name)
+    if path.is_absolute() or ".." in path.parts:
+        raise ValueError("archive path escapes its root")
+    components = [root.joinpath(*path.parts[:n]) for n in range(1, len(path.parts)+1)]
+    target = root / path
+    if (any(p.is_symlink() for p in components) or not target.is_file()
+            or pin["size_bytes"] > 8 * 1024**2):
+        raise ValueError("archive member is not a bounded regular file")
+    blob = target.read_bytes()
+    if len(blob) != pin["size_bytes"] or hashlib.sha256(blob).hexdigest() != pin["sha256"]:
+        raise ValueError("archive member changed")
+if list(root.rglob("*.f64le")):
+    raise ValueError("public native proof contains private driver payloads")
+
+from autoengineering.campaign.records import ArtifactRef, ModelSnapshot
+from autoengineering.campaign.serialization import digest
+from autoengineering.utility.scoring import ConfirmationGrant, ConfirmationReceipt, ConfirmationService
+from autoengineering.utility.store import SuiteStore
+from examples.utility import wind_annual_callback as callback
+from examples.utility import wind_annual_source as source
+from examples.utility.wind_parameters import WindGeometry
+
+request = json.loads((root / "native-request.json").read_text())
+result = json.loads((root / "native-result.json").read_text())
+expected = ConfirmationReceipt.from_json((root / "native-receipt.json").read_text())
+assert result["request_digest"] == digest(request)
+assert expected.digest == result["recovered_receipt_digest"]
+assert result["physical_model_starts"] == result["completed_physical_model_starts"] == 3
+assert result["private_payload_reads"] == 3
+assert result["verified_private_bytes"] == 420864
+assert result["new_model_starts_on_recovery_or_replay"] == 0
+assert result["new_source_reads_on_recovery_or_replay"] == 0
+assert result["task_admitted"] is result["private_boundary_qualified"] is False
+temporary = tempfile.TemporaryDirectory(prefix="utility-wind-native-metadata-")
+scope = Path(temporary.name).resolve()
+for name in ("suite", "public-source", "empty-private", "callback-work"):
+    (scope / name).mkdir(mode=0o700)
+for name in manifest:
+    if name.startswith(("suite/", "public-source/", "callback-work/")):
+        target = scope / name
+        target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        shutil.copyfile(root / name, target)
+for path in scope.rglob("*"):
+    if path.is_dir():
+        path.chmod(0o700)
+store = SuiteStore(scope / "suite")
+grant = ConfirmationGrant.from_dict(request["grant"])
+model = ArtifactRef.from_dict(request["model_artifact"])
+policy = callback.kernel.AnnualWindScorePolicy.from_dict(request["policy"])
+scorer = callback.TrustedAnnualWindScorer(
+    store, ArtifactRef.from_dict(request["source_binding_artifact"]),
+    scope / "public-source", scope / "empty-private", scope / "suite", scope / "callback-work",
+    geometry=WindGeometry.from_dict(request["geometry"]),
+    expected_model=ModelSnapshot.from_dict(request["expected_model"]), policy=policy,
+)
+source.open_for_confirmation = denied
+callback.kernel.score_annual = denied
+callback.kernel.wind_hourly._backend = denied
+callback.version = denied
+assert scorer.identity == grant.scorer_digest
+assert scorer.recover(grant, model) == expected.score
+work = scorer.public_work(grant, model)
+assert work == ArtifactRef.from_dict(result["work_artifact"])
+service = ConfirmationService(store, scorer, scorer_digest=scorer.identity,
+                              outcome_contract=scorer.outcome_contract)
+events = len(store.replay()["events"])
+assert service.confirm(grant) == service.recover(grant) == expected
+assert len(store.replay()["events"]) == events
+print(json.dumps({
+    "status": "verified producer metadata", "files_verified": len(manifest),
+    "new_model_starts": 0, "private_driver_reads": 0, "new_suite_events": 0,
+    "optional_model_imports": 0, "task_admitted": False,
+}, sort_keys=True))
+temporary.cleanup()

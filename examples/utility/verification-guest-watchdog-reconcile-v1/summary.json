@@ -1,0 +1,76 @@
+{
+  "schema": "utility-guest-watchdog-startup-cleanup-verification-v1",
+  "results": {
+    "focused": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "30",
+      "time": "52.692",
+      "timestamp": "2026-10-30T16:30:04.036461-07:00",
+      "hostname": "m5-mbp",
+      "modules": {
+        "tests.test_utility_guest_watchdog_reconcile": 12,
+        "tests.test_utility_guest_watchdog": 18
+      }
+    },
+    "regression": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "105",
+      "time": "344.821",
+      "timestamp": "2026-10-30T16:31:33.760277-07:00",
+      "hostname": "m5-mbp",
+      "modules": {
+        "tests.test_utility_guest_watchdog_reconcile": 16,
+        "tests.test_utility_guest_watchdog": 18,
+        "tests.test_utility_guest_dispatch": 28,
+        "tests.test_utility_guest_executor": 18,
+        "tests.test_utility_guest_creation_cleanup": 25
+      }
+    },
+    "final": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "34",
+      "time": "146.761",
+      "timestamp": "2026-10-30T16:38:02.676454-07:00",
+      "hostname": "m5-mbp",
+      "modules": {
+        "tests.test_utility_guest_watchdog_reconcile": 19,
+        "tests.test_utility_guest_composite": 15
+      }
+    }
+  },
+  "current_core_python_files": 224,
+  "final_source_pins_verified": true,
+  "original_cleanup_reason_window_and_intents_preserved": true,
+  "live_watchdog_lease_refuses_takeover": true,
+  "killed_owned_child_and_failed_Popen_checked": true,
+  "copied_control_scope_refused_before_mutation": true,
+  "guarded_relocated_original_cleanup_replay": true,
+  "legacy_guest_composite_replay": true,
+  "authored_daemon_observations": true,
+  "actual_container_execution": false,
+  "runtime_privacy_qualified": false,
+  "independent_scientific_confirmation": false,
+  "default_executor_or_cli_activation": false,
+  "full_default_suite_rerun": false,
+  "remaining": [
+    "unknown late creation and consumed uncertain removal require explicit resolution",
+    "strict synchronous filesystem timing",
+    "actual runtime/privacy qualification",
+    "current installed/macOS/Linux/second-host qualification",
+    "independent task admission and approved gains/tolerances",
+    "frozen scientific matrix and final report"
+  ],
+  "documentation_tests_passed": 19,
+  "ruff_passed": true,
+  "touched_E501_passed": true,
+  "whitespace_passed": true
+}

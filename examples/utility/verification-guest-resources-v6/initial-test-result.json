@@ -1,0 +1,5 @@
+{
+  "passed": 133,
+  "failed": 3,
+  "cause": "New catalogue member reached existing parametrized reader fixture, which still bound v5 environment and wheel. Fixture corrected to use each catalogued image labels. No production criterion relaxed."
+}

@@ -1,0 +1,33 @@
+{
+  "scope": "Current v6 installed inference, same-fit native parity and saved public recovery over authored exposed inputs",
+  "predecessor": "examples/utility/source-inventory-guest-resources-v6.json",
+  "predecessor_sha256": "fb50e27b14a50785dde23786c676df36b883738f9cce9a5e4d0cff1b6e5a2e34",
+  "current_source_sha256": {
+    "examples/utility/guest_inference_smoke.py": "d4c2fac2d05bbd098734247bbebc2e49804975941a50cbc308ff3a36610124f1",
+    "examples/utility/guest_prediction_parity.py": "c5775a4517a22596975fc5f886458e263a40f7a2471bf3ce8ee70a00bc5db632",
+    "examples/utility/guest_parity_reader.py": "3ec202119628319c53a65575de600393ad2c14a8411bea6523f512d76abf8b64",
+    "tests/test_utility_guest_inference_smoke.py": "d26b1f8522ea93eff21e9dafab46650288796b1c48dd6f93401f85b90a605a72",
+    "docs/utility.md": "981be362ab88707bd6b1be71dfd8b6feaa9f51e469398fbff7334e87032f89d0",
+    "docs/utility-handoff.md": "44c61979607bc6396031416bc0e100f9bc50e99cf29e12778ee7e18a457a13d8",
+    "docs/reviews/part-5-progress.md": "bae7e6025e97bc11c46ef043476cdc066d9558bd6c9bb94b0922ce10bd02e4bc",
+    "docs/reviews/part-5-completion-audit.md": "12f5639dc5c6303562d15730eec9bb4a07a1ac81ea95b56206f2b59724ca2036",
+    "examples/utility/guest-qualification-accounting-v10.json": "fefc6593aa12e17c66f88c0fcf9d031848a2daf3b9158bc98dc967b2f854f1fa",
+    "examples/utility/qualification-state-guest-v10.json": "e16ff63301245f87d7f7211b6f352b810023db82aa671ce975d449c181bd5363"
+  },
+  "verification": "examples/utility/verification-guest-inference-v6/summary.json",
+  "verification_sha256": "5b5bd25df2d54f132a1ffa4d357b36064c10b58c7cf4e20aec9eb2129a4c9606",
+  "related_regression_passed": 210,
+  "documentation_passed": 19,
+  "core_python_sources": 225,
+  "declared_guest_python_sources": 316,
+  "declared_guest_code_alignment": true,
+  "current_image": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
+  "new_guest_starts": 1,
+  "new_native_reference_starts": 1,
+  "new_fixture_fitting_starts": 1,
+  "current_default_checkpoint": "examples/utility/verification-current-base-v6/verified-summary.json",
+  "core_source_changed": false,
+  "full_suite_rerun": false,
+  "runtime_qualified": false,
+  "full_part_5_complete": false
+}

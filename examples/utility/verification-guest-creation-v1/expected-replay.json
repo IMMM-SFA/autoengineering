@@ -1,0 +1,16 @@
+{
+  "owner_digest": "2e91195af9fd27c39bb4c1f03b92b69bd6fe896e68f9ab553848718233ca3a9a",
+  "event_digests": [
+    "e246c1909eb7b9e2071d99e0b83527ec46ebb77a558507cd95b132ec905b2990",
+    "6ba9a298112b903998af5b5fa1bc1d225326ec2b4c87f4a60f760d722be9b678"
+  ],
+  "creation_response": {
+    "path": "artifacts/a962844ad74e1b654dd4cd7d21812bae1228d35183eb60e004bd0e181e085102/daemon-create-response-record.json",
+    "sha256": "a962844ad74e1b654dd4cd7d21812bae1228d35183eb60e004bd0e181e085102",
+    "size_bytes": 323,
+    "media_type": "application/json",
+    "producer": "guest-daemon-owner",
+    "metadata": {}
+  },
+  "scope": "authored canonical API projections; no actual daemon or container"
+}

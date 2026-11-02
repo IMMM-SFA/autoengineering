@@ -1,0 +1,20 @@
+{
+  "wheel": "autoengineering-0.2.0-py3-none-any.whl",
+  "sha256": "d556a4d7c4ab4215eb311d9f5fd1d1f9741fc553a22621e18836ca97f0f2f15b",
+  "all_core_python_bytes_match": true,
+  "optional_scientific_packages_present": false,
+  "original_checkout_python_opens": "denied",
+  "network_sockets": "denied",
+  "installed_rejection_reader": {
+    "rejected_action": "too-close",
+    "status": "scientific_infeasible",
+    "rejected_model_starts": 0,
+    "total_reservations": 1,
+    "new_events": 0,
+    "model_imports_and_dispatch": "denied",
+    "captured_input_reads": "denied",
+    "scope": "preflight rejection and physical stop accounting, not feasible output replay"
+  },
+  "dependency_scope": "cached default environment paths without editable activation; not a clean minimal dependency solve",
+  "boundary": "Python audit policy, not an OS private scorer boundary"
+}

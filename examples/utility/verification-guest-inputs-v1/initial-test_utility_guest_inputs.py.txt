@@ -1,0 +1,509 @@
+"""Authored transfer packages test custody and closure, not actual container use."""
+
+from dataclasses import replace
+from datetime import date
+import io
+from pathlib import Path
+import shutil
+import socket
+import subprocess
+import sys
+import tarfile
+import time
+
+import numpy as np
+import pytest
+
+from autoengineering.campaign.artifacts import put_bytes, reference, read_arrays
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.campaign.serialization import canonical_json, digest
+from autoengineering.campaign.store import StoreError, durable_write
+from autoengineering.utility import guest_inputs as module
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+from autoengineering.utility.guest_receipts import GuestLaunchIntent, GuestContainerPolicy
+from autoengineering.utility.inference_execution import FrozenGuestInferenceJob
+from autoengineering.utility.inference_guest import guest_executor_identity
+from autoengineering.utility.store import SuiteStore
+import test_utility_inference_guest as guest_fixture
+
+metadata = guest_fixture.metadata
+H = "1" * 64
+
+
+def prepared(tmp_path, metadata, *, authorize=True, bad_wheel=None):
+    original, grant, plan, environment, profile, _ = metadata
+    if bad_wheel is not None:
+        refs = tuple(
+            replace(ref, sha256="2" * 64) if ref.path == bad_wheel else ref
+            for ref in environment.wheel_python_sources
+        )
+        assert refs != environment.wheel_python_sources
+        environment = replace(environment, wheel_python_sources=refs)
+        profile = replace(
+            profile,
+            environment_inputs_digest=environment.digest,
+            wheel_python_sources_digest=digest([r.to_dict() for r in refs]),
+        )
+    source = original.root.parent / "source"
+    suite_root = tmp_path / "suite"
+    shutil.copytree(original.root, suite_root)
+    store = SuiteStore(suite_root)
+    drivers = tmp_path / "drivers"
+    drivers.mkdir(mode=0o700)
+    (drivers / "reserved").mkdir(mode=0o700)
+    arrays = read_arrays(
+        source, reference(source, "forcing.npz", media_type="application/x-npz", producer="author")
+    )
+    arrays = {name: np.r_[value, np.full(20, value[-1])] for name, value in arrays.items()}
+    arrays["day_of_year"] = np.array(
+        [
+            date.fromisoformat(d).timetuple().tm_yday
+            for d in grant.inference.forcing.ports[0].time.dates
+        ]
+    )
+    stream = io.BytesIO()
+    np.savez(stream, **arrays)
+    (drivers / "reserved/drivers.npz").write_bytes(stream.getvalue())
+    (drivers / "private-labels.json").write_text("AUTHORED-PRIVATE-CANARY")
+    forcing = reference(
+        drivers, "reserved/drivers.npz", media_type="application/x-npz", producer="author"
+    )
+    grant = replace(
+        grant,
+        inference=replace(
+            grant.inference, forcing=replace(grant.inference.forcing, artifact=forcing)
+        ),
+    )
+    envref = put_bytes(
+        store.root,
+        environment.to_json().encode(),
+        name="environment.json",
+        media_type="application/json",
+        producer="authored-metadata",
+    )
+    staged = ArtifactRef(
+        f"artifacts/{forcing.sha256}/drivers.npz",
+        forcing.sha256,
+        forcing.size_bytes,
+        forcing.media_type,
+        "inference",
+        {},
+    )
+    source_digest = digest([r.to_dict() for r in plan.source_inventory])
+    job = FrozenGuestInferenceJob(
+        "utility-frozen-inference-job-v2",
+        grant,
+        guest_executor_identity(source_digest, plan.lock.sha256, profile),
+        source_digest,
+        plan.source_inventory,
+        plan.lock,
+        "a" * 32,
+        staged,
+        profile,
+        envref,
+    )
+    claim = put_bytes(
+        store.root,
+        canonical_json(module._binding(job) | {"scope": job.claim_scope(None)}).encode(),
+        name="inference-claim.json",
+        media_type="application/json",
+        producer="authored-claim",
+    )
+    (store.root / "inference-claims").mkdir(mode=0o700)
+    durable_write(
+        store.root / "inference-claims" / f"{grant.digest}.json", claim.to_json().encode()
+    )
+    launch = GuestLaunchIntent(
+        "utility-guest-launch-intent-v1",
+        job.digest,
+        grant.digest,
+        job.executor_digest,
+        H,
+        claim.sha256,
+        job.nonce,
+        profile.image_id,
+        grant.inference.timeout_seconds,
+        GuestContainerPolicy(),
+    )
+    owner = GuestOwnerJournal.create(
+        tmp_path / "owner", job, launch, suite_root=store.root, claim=claim
+    )
+    if authorize:
+        attempt = "confirmation-" + grant.cell_digest[:48]
+        arguments = dict(
+            cell_digest=grant.cell_digest,
+            attempt_id=attempt,
+            child_digest=grant.digest,
+            phase="confirmation",
+        )
+        with store.writer():
+            store.append(
+                request_id="authored-reserve",
+                operation="reserve",
+                resources=grant.resources,
+                **arguments,
+            )
+            store.append(request_id="authored-start", operation="start", **arguments)
+            ref = put_bytes(
+                store.root,
+                grant.to_json().encode(),
+                name="confirmation-grant.json",
+                media_type="application/json",
+                producer="author",
+            )
+            store.append(
+                request_id="authored-access",
+                operation="confirmation_access",
+                result_digest=ref.sha256,
+                **arguments,
+            )
+    return owner, store, source, drivers
+
+
+def prepare(owner, store, source, drivers):
+    with store.writer(), owner.writer():
+        return module.prepare_guest_inputs(owner, store, source, drivers)
+
+
+def verify(owner):
+    m = owner.manifest
+    return module.verify_guest_inputs(owner.root, m.job, m.launch, m.claim)
+
+
+def test_exact_guest_closure_excludes_all_undeclared_and_fitting_arrays(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    opened = []
+    original = module.read_bytes
+
+    def read(root, ref, **kwargs):
+        opened.append((root, ref.path))
+        assert Path(ref.path).name not in {"fitting.npz", "comparison.npz", "private-labels.json"}
+        if root == drivers:
+            assert (owner.root / "input-intent.json").is_file()
+        return original(root, ref, **kwargs)
+
+    monkeypatch.setattr(module, "read_bytes", read)
+    package = prepare(owner, store, source, drivers)
+    assert verify(owner) == package
+    assert [(root, name) for root, name in opened if root == drivers] == [
+        (drivers, "reserved/drivers.npz")
+    ]
+    entries = {e.artifact.path: e for e in package.entries}
+    assert "job.json" in entries and "intent.json" in entries and "claim.json" in entries
+    assert sum(e.role == "driver" for e in package.entries) == 1
+    assert sum(e.role == "training_metadata" for e in package.entries) == 6
+    assert sum(e.role == "runtime_profile" for e in package.entries) == 1
+    assert not any(
+        e.artifact.path.endswith(("fitting.npz", "comparison.npz")) for e in package.entries
+    )
+    archive = original(owner.root, package.archive)
+    assert b"AUTHORED-PRIVATE-CANARY" not in archive
+    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:") as stream:
+        members = stream.getmembers()
+    assert all(
+        m.uid == m.gid == 1000 and m.mode == (0o700 if m.isdir() else 0o600) for m in members
+    )
+    assert all(m.isfile() or m.isdir() for m in members)
+
+
+@pytest.mark.parametrize(
+    "stage",
+    [
+        "guest_inputs_intended",
+        "guest_inputs_read",
+        "guest_inputs_archive",
+        "guest_inputs_committed",
+    ],
+)
+def test_interrupted_input_access_is_never_repeated(tmp_path, metadata, stage, monkeypatch):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+
+    def fail(value):
+        if value == stage:
+            raise RuntimeError("authored input interruption")
+
+    owner.fault = fail
+    with pytest.raises(RuntimeError):
+        prepare(owner, store, source, drivers)
+    assert (owner.root / "input-intent.json").is_file()
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("recovery cannot reopen input scopes")
+
+    monkeypatch.setattr(module, "_preflight", forbidden)
+    # The saved reader has no source/driver roots or execution callbacks.
+    if stage == "guest_inputs_committed":
+        shutil.rmtree(drivers)
+        assert verify(owner).job_digest == owner.manifest.job.digest
+    else:
+        with pytest.raises(ValueError):
+            verify(owner)
+    monkeypatch.undo()
+    with pytest.raises(StoreError, match="already intended"):
+        prepare(owner, store, source, drivers)
+
+
+def test_missing_reservation_refuses_before_driver_access_or_intent(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, source, drivers = prepared(tmp_path, metadata, authorize=False)
+    original = module.read_bytes
+
+    def read(root, ref, **kwargs):
+        assert root != drivers
+        return original(root, ref, **kwargs)
+
+    monkeypatch.setattr(module, "read_bytes", read)
+    with pytest.raises(StoreError, match="reservation"):
+        prepare(owner, store, source, drivers)
+    assert not (owner.root / "input-intent.json").exists()
+
+
+def test_no_partial_archive_or_output_is_accepted_as_completed_input_package(tmp_path, metadata):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    package = prepare(owner, store, source, drivers)
+    (owner.root / "input-package.json").unlink()
+    assert (owner.root / package.archive.path).is_file()
+    with pytest.raises(ValueError):
+        verify(owner)
+
+
+def test_driver_corruption_stays_charged_and_cannot_retry(tmp_path, metadata):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    (drivers / "reserved/drivers.npz").write_bytes(b"corrupt")
+    with pytest.raises(ValueError):
+        prepare(owner, store, source, drivers)
+    assert (owner.root / "input-intent.json").is_file()
+    assert not (owner.root / "input-package.json").exists()
+    with pytest.raises(StoreError, match="already intended"):
+        prepare(owner, store, source, drivers)
+
+
+@pytest.mark.parametrize(
+    "problem", ["manifest", "archive", "intent", "foreign_job", "foreign_claim"]
+)
+def test_missing_changed_or_foreign_package_refuses(tmp_path, metadata, problem):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    package = prepare(owner, store, source, drivers)
+    m = owner.manifest
+    if problem == "archive":
+        path = owner.root / package.archive.path
+        path.write_bytes(path.read_bytes() + b"extra")
+    elif problem == "intent":
+        (owner.root / "input-intent.json").write_text("{}")
+    elif problem == "manifest":
+        path = owner.root / "input-package.json"
+        path.write_text(replace(package, launch_digest="2" * 64).to_json())
+    elif problem == "foreign_claim":
+        with pytest.raises(ValueError):
+            module.verify_guest_inputs(
+                owner.root, m.job, m.launch, replace(m.claim, sha256="2" * 64)
+            )
+        return
+    else:
+        with pytest.raises(ValueError):
+            module.verify_guest_inputs(
+                owner.root, replace(m.job, nonce="b" * 32), m.launch, m.claim
+            )
+        return
+    with pytest.raises(ValueError):
+        verify(owner)
+
+
+def test_preparation_requires_both_owners(tmp_path, metadata):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    with pytest.raises(StoreError, match="suite writer"):
+        module.prepare_guest_inputs(owner, store, source, drivers)
+    with store.writer(), pytest.raises(StoreError, match="owner writer"):
+        module.prepare_guest_inputs(owner, store, source, drivers)
+    assert not (owner.root / "input-intent.json").exists()
+
+
+def test_completed_package_relocates_without_original_scopes_or_new_clock(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    package = prepare(owner, store, source, drivers)
+    copied = tmp_path / "copy"
+    shutil.copytree(owner.root, copied)
+    shutil.rmtree(drivers)
+    shutil.rmtree(store.root)
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("cold package verification cannot execute/connect/sample")
+
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    monkeypatch.setattr(socket, "socket", forbidden)
+    monkeypatch.setattr(time, "monotonic", forbidden)
+    m = owner.manifest
+    assert module.verify_guest_inputs(copied, m.job, m.launch, m.claim) == package
+
+
+@pytest.mark.parametrize(
+    "problem",
+    [
+        "symlink",
+        "hardlink",
+        "permissions",
+        "ownership",
+        "extra",
+        "duplicate",
+        "missing",
+        "content",
+        "compressed",
+        "trailing",
+        "pax",
+    ],
+)
+def test_refreshed_archive_hash_cannot_hide_bad_members(tmp_path, metadata, problem):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    package = prepare(owner, store, source, drivers)
+    original = module.read_bytes(owner.root, package.archive)
+    members = []
+    with tarfile.open(fileobj=io.BytesIO(original), mode="r:") as archive:
+        for member in archive:
+            data = archive.extractfile(member).read() if member.isfile() else None
+            members.append((member, data))
+    index = next(i for i, (member, _) in enumerate(members) if member.isfile())
+    member, data = members[index]
+    if problem in ("symlink", "hardlink"):
+        member.type = tarfile.SYMTYPE if problem == "symlink" else tarfile.LNKTYPE
+        member.linkname = "/private-labels"
+        member.size = 0
+        members[index] = (member, None)
+    elif problem == "permissions":
+        member.mode = 0o777
+    elif problem == "ownership":
+        member.uid = 0
+    elif problem == "duplicate":
+        members.append(members[index])
+    elif problem == "missing":
+        members.pop(index)
+    elif problem == "extra":
+        extra = tarfile.TarInfo("private-labels.json")
+        extra.size = 1
+        members.append((extra, b"x"))
+    elif problem == "content":
+        members[index] = (member, bytes([data[0] ^ 1]) + data[1:])
+    elif problem == "pax":
+        member.pax_headers = {"comment": "unexpected-extension"}
+    stream = io.BytesIO()
+    with tarfile.open(
+        fileobj=stream,
+        mode="w:gz" if problem == "compressed" else "w:",
+        format=tarfile.PAX_FORMAT if problem == "pax" else tarfile.USTAR_FORMAT,
+    ) as archive:
+        for member, data in members:
+            archive.addfile(member, io.BytesIO(data) if data is not None else None)
+    raw = stream.getvalue() + (b"hidden-trailing-data" if problem == "trailing" else b"")
+    ref = put_bytes(
+        owner.root,
+        raw,
+        name="modified-inputs.tar",
+        media_type="application/x-tar",
+        producer="authored-mutator",
+    )
+    (owner.root / "input-package.json").write_text(replace(package, archive=ref).to_json())
+    with pytest.raises(ValueError):
+        verify(owner)
+
+
+def test_refreshed_manifest_and_tar_cannot_add_fitting_payload(tmp_path, metadata):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    package = prepare(owner, store, source, drivers)
+    contents = module._contents(package, module.read_bytes(owner.root, package.archive))
+    raw = b"AUTHORED-FITTING-PAYLOAD"
+    added = module.GuestInputEntry(module._reference("fitting.npz", raw), "training_metadata")
+    entries = tuple(sorted((*package.entries, added), key=lambda e: e.artifact.path))
+    contents["fitting.npz"] = raw
+    ref = put_bytes(
+        owner.root,
+        module._tar(entries, contents),
+        name="expanded-inputs.tar",
+        media_type="application/x-tar",
+        producer="authored-mutator",
+    )
+    intent = module.unique_json((owner.root / "input-intent.json").read_text())
+    intent["entries_digest"] = digest([e.to_dict() for e in entries])
+    (owner.root / "input-intent.json").write_text(canonical_json(intent))
+    package = replace(package, entries=entries, archive=ref, intent_digest=digest(intent))
+    (owner.root / "input-package.json").write_text(package.to_json())
+    with pytest.raises(StoreError, match="unapproved inputs"):
+        verify(owner)
+
+
+def test_preparation_never_opens_any_source_array_or_private_label_file(
+    tmp_path, metadata, monkeypatch
+):
+    import os
+
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    old = os.open
+
+    def guarded(path, flags, *args, **kwargs):
+        p = Path(path)
+        if (p.is_relative_to(source) and p.suffix == ".npz") or p.name == "private-labels.json":
+            pytest.fail("ungranted private/fitting array access")
+        return old(path, flags, *args, **kwargs)
+
+    monkeypatch.setattr(os, "open", guarded)
+    assert prepare(owner, store, source, drivers).job_digest == owner.manifest.job.digest
+
+
+@pytest.mark.parametrize("path", ["../escape", "/absolute", "a/./b", "a//b", "a/../b"])
+def test_unsupported_transfer_paths_refuse(path):
+    with pytest.raises(ValueError):
+        module.GuestInputEntry(ArtifactRef(path, H, 1, "text/plain", "author", {}), "core_source")
+
+
+@pytest.mark.parametrize(
+    "path", ["autoengineering/__init__.py", "examples/utility/hydrology_runtime.py"]
+)
+def test_wheel_and_frozen_source_must_agree_before_driver_access(tmp_path, metadata, path):
+    owner, store, source, drivers = prepared(tmp_path, metadata, bad_wheel=path)
+    with pytest.raises(StoreError, match="wheel code differs"):
+        prepare(owner, store, source, drivers)
+    assert not (owner.root / "input-intent.json").exists()
+
+
+def test_cold_package_reader_uses_only_saved_bytes(tmp_path, metadata):
+    owner, store, source, drivers = prepared(tmp_path, metadata)
+    package = prepare(owner, store, source, drivers)
+    script = """
+import importlib.abc,sys
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'examples','torch','openmdao','pvlib','py_wake'}:
+   raise AssertionError('model import')
+sys.meta_path.insert(0,NoModels())
+from pathlib import Path
+from autoengineering.utility.guest_inputs import verify_guest_inputs
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+import numpy,subprocess,socket,os,time
+def forbidden(*args,**kwargs):raise AssertionError('execution/runtime/array access')
+numpy.load=subprocess.Popen=socket.socket=time.monotonic=forbidden
+root=Path(sys.argv[1]);allowed={p for p in root.rglob('*') if p.is_file()}
+old=Path.open;old_os=os.open
+def guarded(path,mode='r',*args,**kwargs):
+ if path not in allowed or any(c in mode for c in 'wax+'):raise AssertionError('ungranted access')
+ return old(path,mode,*args,**kwargs)
+def guarded_os(path,flags,*args,**kwargs):
+ if Path(path) not in allowed or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT):
+  raise AssertionError('ungranted access')
+ return old_os(path,flags,*args,**kwargs)
+Path.open=guarded;os.open=guarded_os
+manifest=GuestOwnerJournal(root).manifest
+package=verify_guest_inputs(root,manifest.job,manifest.launch,manifest.claim)
+assert package.boundary=='unqualified-candidate'
+print(package.digest)
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", script, str(owner.root)],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=30,
+    )
+    assert result.stdout.strip() == package.digest

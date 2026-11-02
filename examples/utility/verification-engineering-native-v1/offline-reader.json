@@ -1,0 +1,53 @@
+{
+  "state": "selection_frozen",
+  "native_driver_status": "success",
+  "outer_reservations": 16,
+  "native_inner_model_calls": 12,
+  "native_scenario_checks": [
+    {
+      "name": "node_voltage",
+      "version": "1",
+      "status": "fail",
+      "required": true,
+      "scope": "scenario",
+      "value": 0.6199999999999917,
+      "threshold": 0.62,
+      "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+      "evidence": []
+    },
+    {
+      "name": "node_voltage",
+      "version": "1",
+      "status": "pass",
+      "required": true,
+      "scope": "scenario",
+      "value": 0.6700000000000117,
+      "threshold": 0.62,
+      "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+      "evidence": []
+    },
+    {
+      "name": "node_voltage",
+      "version": "1",
+      "status": "pass",
+      "required": true,
+      "scope": "scenario",
+      "value": 0.7200000000000829,
+      "threshold": 0.62,
+      "reason": "Node voltage must satisfy the frozen absolute operating requirement",
+      "evidence": []
+    }
+  ],
+  "selected_configuration": {
+    "source_current": 0.03
+  },
+  "native_cost_quantities": {
+    "native_driver_process_starts": 1.0,
+    "native_inner_model_calls": 12.0,
+    "native_driver_derivative_calls": 250.0,
+    "native_scenario_derivative_calls": 255.0
+  },
+  "scientific_process_network_dispatch": "denied",
+  "scientific_registration_imports": "denied",
+  "utility_verdict": "not_attempted"
+}

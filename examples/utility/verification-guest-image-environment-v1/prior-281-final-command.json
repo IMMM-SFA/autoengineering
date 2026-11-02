@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_utility_guest_image_environment.py",
+    "tests/test_utility_guest_resource_probe.py",
+    "tests/test_utility_guest_resources.py",
+    "tests/test_utility_guest_resource_runner.py",
+    "tests/test_utility_guest_resource_reader.py",
+    "tests/test_utility_guest_identity.py",
+    "tests/test_utility_guest_image_build.py",
+    "tests/test_utility_guest_daemon.py",
+    "tests/test_utility_inference_guest.py",
+    "tests/test_documentation.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--tb=short",
+    "--basetemp=/private/tmp/autoengineering-image-env-final-448xewog/pytest",
+    "--junitxml=/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-guest-image-environment-v1/final.xml"
+  ],
+  "exit_code": 0,
+  "owned_fixture_permissions": true,
+  "project_bin_prepend": true
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "utility-baseline-selection-terminal-v1",
+  "focused_passed": 82,
+  "focused_duration_seconds": 66.25,
+  "regression_passed": 759,
+  "regression_skipped": 26,
+  "regression_duration_seconds": 655.24,
+  "documentation_passed": 19,
+  "ruff_exit_code": 0,
+  "installed_core_files_matching_source": 202,
+  "installed_logical_cells": 4,
+  "installed_scientific_process_starts": 1,
+  "cross_batch_logical_cells_tested": 34,
+  "private_scoring_qualified": false,
+  "independent_confirmation": false,
+  "goal_complete": false
+}

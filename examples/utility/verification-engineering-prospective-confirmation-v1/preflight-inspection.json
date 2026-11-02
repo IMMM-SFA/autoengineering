@@ -1,0 +1,23 @@
+{
+  "scope": "read-only current-state diagnosis after consumed scoring attempt; not callback or private-source replay",
+  "container_create_or_start_calls": 0,
+  "private_source_reads": 0,
+  "model_calls": 0,
+  "original_attempt_remains_charged": true,
+  "checks": [
+    {
+      "check": "runtime_identity",
+      "status": "passed"
+    },
+    {
+      "check": "daemon_version",
+      "current_digest": "ea4c3e8b16bc32fd76b530251ca11ce6fd4aeaf2342e7faa5577603259d00543",
+      "expected_digest": "c2a4ccf2e2612d656d3d12c0776cd4a42328567f29383d2a31c77cf699c43082",
+      "matches": false
+    },
+    {
+      "check": "image_identity",
+      "status": "passed"
+    }
+  ]
+}

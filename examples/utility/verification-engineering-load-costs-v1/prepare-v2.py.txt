@@ -1,0 +1,51 @@
+"""Copy verified public evidence and prepare an offline installed reader input."""
+from pathlib import Path
+import hashlib, json, shutil, sys
+sys.path.insert(0, str(Path.cwd()))
+from autoengineering.campaign.artifacts import reference
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.utility.confirmation import read_selected_state
+from autoengineering.utility.scoring import ConfirmationGrant, validate_grant
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.costs import join_confirmation_costs, reconcile
+from examples.utility.engineering_load_costs import LoadCostRegistration, join_load_costs
+from examples.utility.engineering_load_scoring import LoadScorePolicy
+from autoengineering.campaign.serialization import digest
+
+root = Path.cwd()
+old = root / 'examples/utility/verification-engineering-load-callback-v1'
+out = root / 'examples/utility/verification-engineering-load-costs-v1'
+expected = json.loads((old / 'expected-public.json').read_text())
+for name, sha in expected['files'].items():
+    assert hashlib.sha256((old / 'public' / name).read_bytes()).hexdigest() == sha
+public = out / 'public'
+public.mkdir(mode=0o700)
+shutil.copytree(old / 'public', public / 'native')
+store = SuiteStore(public / 'native/suite')
+intent = json.loads((public / 'native/callback-intent.json').read_text())
+request = json.loads((public / 'native/request.json').read_text())
+grant = ConfirmationGrant.from_dict(intent['grant'])
+selected = validate_grant(store, grant, store.replay()['frozen'])
+bound = read_selected_state(store.root, selected.selected_state)
+policy = LoadScorePolicy('utility-coupled-load-score-v1', bound.model.digest,
+    request['pins']['files']['examples/utility/engineering_load_scoring.py'], request['minimum_node2_voltage_V'])
+reg = LoadCostRegistration('utility-load-cost-registration-v1', ArtifactRef.from_dict(intent['source_binding_artifact']),
+    request['pins']['files']['examples/utility/engineering_load_callback.py'], policy)
+ref = reference(store.root, f'engineering-load-work/{grant.digest}.json',
+    media_type='application/json', producer='engineering-load-work')
+inputs = {'schema': 'utility-load-cost-reader-inputs-v1', 'grant': grant.to_dict(),
+          'registration': reg.to_dict(), 'work_artifact': ref.to_dict(),
+          'suite_digest': store.spec.digest, 'native_source_request_digest': digest(request),
+          'native_public_files': expected['files']}
+(public / 'inputs.json').write_text(json.dumps(inputs, indent=2) + '\n')
+records = join_load_costs(store, grant, reg, work_artifact=ref)
+combined = (*join_confirmation_costs(store), *records)
+result = {'inputs_digest': digest(inputs), 'load_costs': [r.to_dict() for r in records],
+          'joined_confirmation_costs': [r.to_dict() for r in combined],
+          'reconciliation': reconcile(combined, tuple(r.receipt_id for r in combined)),
+          'full_cost_evidence': False, 'task_admitted': False}
+(out / 'expected-costs.json').write_text(json.dumps(result, indent=2) + '\n')
+(out / 'input-pins.json').write_text(json.dumps({str(p.relative_to(public)): hashlib.sha256(p.read_bytes()).hexdigest()
+    for p in sorted(public.rglob('*')) if p.is_file()}, indent=2) + '\n')
+print(json.dumps({'public_inputs_verified': True, 'native_cost_records': len(records), 'new_models': 0,
+                  'full_cost_evidence': False, 'inputs_digest': digest(inputs)}))

@@ -1,0 +1,220 @@
+"""Local image-job orchestration fixtures; never call Docker or downloaded binaries."""
+
+import json
+import os
+import shutil
+import socket
+import subprocess
+import sys
+import time
+
+import pytest
+
+from autoengineering.campaign.serialization import digest
+from autoengineering.utility.guest_receipts import BOOTSTRAP_COMMAND, ENVIRONMENT
+from examples.utility import guest_image_build as module
+from examples.utility.guest_image_context import materialize
+import test_utility_guest_image_context as fixture
+
+IID = "sha256:" + "7" * 64
+
+
+def prepared(tmp_path, monkeypatch):
+    plan_root, plan, cache = fixture.prepared(tmp_path, monkeypatch)
+    context_root = tmp_path / "context"
+    context = materialize(plan_root, cache, expected_plan_digest=digest(plan), output=context_root)
+    cli = tmp_path / "authored-docker"
+    cli.write_text("#!/bin/sh\nexit 97\n")
+    cli.chmod(0o700)
+    endpoint = tmp_path / "authored-endpoint"
+    endpoint.write_text("metadata fixture, not a socket")
+    monkeypatch.setattr(module, "_endpoint", lambda p: {"fixture_scope": digest(str(p))})
+    bundle, work = tmp_path / "bundle", tmp_path / "work"
+    request = module.prepare(
+        context_root,
+        context_digest=digest(context),
+        cli=cli,
+        endpoint=endpoint,
+        work=work,
+        output=bundle,
+    )
+    calls = []
+    config = {
+        "Cmd": list(BOOTSTRAP_COMMAND),
+        "User": "1000:1000",
+        "WorkingDir": "/work",
+        "Entrypoint": [],
+        "Env": [f"{k}={v}" for k, v in ENVIRONMENT],
+    }
+
+    def run(argv, *, env, cwd, deadline, log):
+        step = len(calls)
+        calls.append((argv, dict(env)))
+        if step == 0:
+            content = json.dumps({"Os": "linux", "Arch": "arm64"})
+        elif step == 1:
+            content = f"Driver: docker\nEndpoint: unix://{endpoint}\nPlatforms: linux/amd64\n"
+        elif step == 3:
+            content = json.dumps(
+                {"Id": plan["base"]["image_id"], "Os": "linux", "Architecture": "amd64"}
+            )
+        elif step == 4:
+            (cwd / "image.id").write_text(IID + "\n")
+            (cwd / "build-metadata.json").write_text("{}")
+            content = "authored build complete, no actual image created"
+        elif step == 5:
+            content = json.dumps(
+                {"Id": IID, "Os": "linux", "Architecture": "amd64", "Config": config}
+            )
+        else:
+            content = "authored pull, no registry contacted"
+        log.write_text(content)
+        return 0
+
+    monkeypatch.setattr(module, "_run", run)
+    return bundle, request, work, calls, run
+
+
+def test_one_fixed_local_job_and_saved_completion(tmp_path, monkeypatch):
+    bundle, request, work, calls, _ = prepared(tmp_path, monkeypatch)
+    monkeypatch.setenv("DOCKER_CONTEXT", "UNREVIEWED-REMOTE")
+    monkeypatch.setenv("BUILDX_BUILDER", "UNREVIEWED-REMOTE")
+    monkeypatch.setenv("PRIVATE_LABEL", "MUST-NOT-REACH-CLIENT")
+    result = module.execute(bundle, expected_digest=digest(request))
+    assert len(calls) == 6 and result["image_id"] == IID
+    assert result["status"] == "candidate_image_built" and not result["runtime_qualified"]
+    assert not result["disk_quota_enforced"] and not result["daemon_cancellation_qualified"]
+    for argv, env in calls:
+        assert "--host" in argv and argv[argv.index("--host") + 1].startswith("unix://")
+        assert not any(k in env for k in ("PRIVATE_LABEL", "DOCKER_CONTEXT", "BUILDX_BUILDER"))
+        assert "--push" not in argv and "--secret" not in argv and "--ssh" not in argv
+    assert "--builder" in calls[4][0] and "--network" in calls[4][0]
+    assert (work / "config/config.json").read_text() == "{}"
+    assert module.read_completion(work, expected_digest=digest(result)) == result
+    with pytest.raises(ValueError, match="consumed"):
+        module.execute(bundle, expected_digest=digest(request))
+    assert len(calls) == 6
+
+
+@pytest.mark.parametrize("step", [0, 1, 2, 3, 4, 5])
+def test_each_failed_cli_leaves_consumed_job_without_another_command(tmp_path, monkeypatch, step):
+    bundle, request, work, calls, original = prepared(tmp_path, monkeypatch)
+
+    def fail(argv, **kwargs):
+        number = len(calls)
+        result = original(argv, **kwargs)
+        return 1 if number == step else result
+
+    monkeypatch.setattr(module, "_run", fail)
+    with pytest.raises(ValueError, match="command failed"):
+        module.execute(bundle, expected_digest=digest(request))
+    assert len(calls) == step + 1 and not (work / "complete.json").exists()
+    assert (work / f"{step:02d}-intent.json").exists()
+    with pytest.raises(ValueError, match="consumed"):
+        module.execute(bundle, expected_digest=digest(request))
+    assert len(calls) == step + 1
+
+
+@pytest.mark.parametrize(
+    "problem", ["remote_driver", "wrong_endpoint", "base_id", "image_id", "command", "environment"]
+)
+def test_semantic_drift_refuses_candidate_completion(tmp_path, monkeypatch, problem):
+    bundle, request, work, calls, original = prepared(tmp_path, monkeypatch)
+
+    def drift(argv, **kwargs):
+        step = len(calls)
+        status = original(argv, **kwargs)
+        path = kwargs["log"]
+        if step == 1 and problem in ("remote_driver", "wrong_endpoint"):
+            text = path.read_text()
+            text = (
+                text.replace("Driver: docker", "Driver: docker-container")
+                if problem == "remote_driver"
+                else text.replace("unix://", "tcp://")
+            )
+            path.write_text(text)
+        elif step == 3 and problem == "base_id":
+            value = json.loads(path.read_text())
+            value["Id"] = IID
+            path.write_text(json.dumps(value))
+        elif step == 5 and problem in ("image_id", "command", "environment"):
+            value = json.loads(path.read_text())
+            if problem == "image_id":
+                value["Id"] = "sha256:" + "9" * 64
+            elif problem == "command":
+                value["Config"]["Cmd"] = ["arbitrary-model"]
+            else:
+                value["Config"]["Env"] = []
+            path.write_text(json.dumps(value))
+        return status
+
+    monkeypatch.setattr(module, "_run", drift)
+    with pytest.raises(ValueError):
+        module.execute(bundle, expected_digest=digest(request))
+    assert not (work / "complete.json").exists()
+    if problem in ("remote_driver", "wrong_endpoint"):
+        assert len(calls) == 2
+
+
+def test_cold_completion_needs_no_original_live_scope(tmp_path, monkeypatch):
+    bundle, request, work, calls, _ = prepared(tmp_path, monkeypatch)
+    result = module.execute(bundle, expected_digest=digest(request))
+    relocated = tmp_path / "relocated"
+    shutil.copytree(work, relocated)
+    shutil.rmtree(work)
+    shutil.rmtree(bundle)
+    shutil.rmtree(tmp_path / "context")
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("cold build reader used live scope")
+
+    for name in ("_binary", "_endpoint", "_run"):
+        monkeypatch.setattr(module, name, forbidden)
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    monkeypatch.setattr(socket, "socket", forbidden)
+    monkeypatch.setattr(time, "monotonic", forbidden)
+    monkeypatch.setattr(time, "time", forbidden)
+    assert module.read_completion(relocated, expected_digest=digest(result)) == result
+    (relocated / "04.log").write_text("tampered")
+    with pytest.raises(ValueError):
+        module.read_completion(relocated, expected_digest=digest(result))
+
+
+def test_binary_changed_before_execution_starts_no_client(tmp_path, monkeypatch):
+    bundle, request, work, calls, _ = prepared(tmp_path, monkeypatch)
+    (tmp_path / "authored-docker").write_text("#!/bin/sh\nexit 0\n")
+    with pytest.raises(ValueError, match="client or local endpoint"):
+        module.execute(bundle, expected_digest=digest(request))
+    assert not work.exists() and not calls
+
+
+@pytest.mark.parametrize("problem", ["deadline", "output"])
+def test_owned_client_is_stopped_on_timeout_or_output_cap(tmp_path, monkeypatch, problem):
+    # This is the real Popen supervisor with an exact owned Python fixture, not Docker.
+    script = (
+        "import time;time.sleep(5)"
+        if problem == "deadline"
+        else "import sys;sys.stdout.write('x'*10000);sys.stdout.flush()"
+    )
+    deadline = time.monotonic() + 0.2 if problem == "deadline" else time.monotonic() + 5
+    if problem == "output":
+        monkeypatch.setattr(module, "MAX_LOG", 100)
+    with pytest.raises((TimeoutError, ValueError)):
+        module._run(
+            [sys.executable, "-I", "-c", script],
+            env=os.environ.copy(),
+            cwd=tmp_path,
+            deadline=deadline,
+            log=tmp_path / "client.log",
+        )
+
+
+def test_real_owned_client_success(tmp_path):
+    status = module._run(
+        [sys.executable, "-I", "-c", "print('authored-client')"],
+        env=os.environ.copy(),
+        cwd=tmp_path,
+        deadline=time.monotonic() + 5,
+        log=tmp_path / "client.log",
+    )
+    assert status == 0 and (tmp_path / "client.log").read_text().strip() == "authored-client"

@@ -1,0 +1,53 @@
+from pathlib import Path
+import builtins
+import io
+import json
+import os
+import socket
+import ssl
+import subprocess
+import sys
+
+base=Path(sys.argv[1]);configuration=json.loads((base/'installed-configuration.json').read_bytes())
+sys.path.insert(0,configuration['installed_root'])
+from autoengineering.utility import analysis
+from autoengineering.utility.analysis import AnalysisPlan,ScoredCell
+from autoengineering.utility.baselines import SharedBaseline
+from autoengineering.utility.contracts import UtilitySuiteSpec
+from autoengineering.utility.store import SuiteStore
+assert analysis.__file__.startswith(configuration['installed_root']+'/')
+assert not {'torch','botorch','openmdao','pvlib','py_wake','topfarm'} & set(sys.modules)
+originals=tuple(Path(c['original_root']) for c in configuration['cases'])
+def guard(function):
+    def checked(path,*args,**kwargs):
+        if isinstance(path,(str,bytes,os.PathLike)):
+            value=Path(os.fsdecode(path)).absolute()
+            assert not any(value.is_relative_to(root) for root in originals),'original fixture root opened'
+        return function(path,*args,**kwargs)
+    return checked
+builtins.open=guard(builtins.open);io.open=guard(io.open);os.open=guard(os.open)
+def denied(*args,**kwargs):raise AssertionError('reader attempted network or process start')
+socket.socket=denied;subprocess.Popen=denied
+checks=[]
+for case in configuration['cases']:
+    store=SuiteStore(case['store']);before=store.replay()
+    plan=AnalysisPlan.from_dict(case['plan']);allocation=SharedBaseline.from_dict(case['allocation'])
+    if case['kind']=='valid':
+        report=analysis.analyze_confirmation(store,plan,shared_baselines=(allocation,))
+        assert report['scored_cells']==2 and report['physical_score_receipts']==1
+        checks.append({'case':'valid','logical_scored_cells':2,'physical_receipts':1})
+    else:
+        try:analysis.analyze_confirmation(store,plan,shared_baselines=(allocation,))
+        except ValueError as error:assert 'charged confirmation' in str(error)
+        else:raise AssertionError('charged alias was accepted')
+        checks.append({'case':'reserved','rejected':True,'charge_retained':True})
+    after=store.replay();assert after['head']==before['head'] and after['used']==before['used']
+case=configuration['cross_scenario']
+try:
+    analysis.analyze(UtilitySuiteSpec.from_dict(case['spec']),AnalysisPlan.from_dict(case['plan']),tuple(ScoredCell.from_dict(s) for s in case['scores']),shared_baselines=(SharedBaseline.from_dict(case['allocation']),))
+except ValueError as error:assert 'scenario' in str(error)
+else:raise AssertionError('cross-scenario reuse was accepted')
+checks.append({'case':'different-scenarios','rejected':True})
+report={'schema':'utility-baseline-reuse-installed-verification-v1','checks':checks,'installed_core_files':200,'original_roots_network_and_process_denied':True,'optional_frameworks_not_imported':True,'new_scoring_callbacks':0,'model_or_provider_starts':0,'fixture_only':True,'private_scoring_qualified':False}
+(base/'installed-check.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps(report))

@@ -1,0 +1,148 @@
+{
+  "schema": "utility-mixed-rehearsal-checkpoint-v1",
+  "time_utc": "2026-10-28T22:26:46.575281+00:00",
+  "tests": {
+    "artifact-binding-final.xml": {
+      "tests": "11",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.361"
+    },
+    "artifact-binding-qualified.xml": {
+      "tests": "32",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "112.366"
+    },
+    "artifact-binding.xml": {
+      "tests": "10",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.501"
+    },
+    "campaign-json.xml": {
+      "tests": "17",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "40.771"
+    },
+    "contracts-final.xml": {
+      "tests": "503",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "17",
+      "time": "642.808"
+    },
+    "contracts.xml": {
+      "tests": "500",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "17",
+      "time": "611.430"
+    },
+    "documentation-closeout.xml": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.812"
+    },
+    "documentation-final.xml": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.732"
+    },
+    "documentation-seed.xml": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.751"
+    },
+    "documentation.xml": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.808"
+    },
+    "interoperability-final.xml": {
+      "tests": "26",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "49.724"
+    },
+    "optuna-seeds-owned.xml": {
+      "tests": "24",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "12.533"
+    },
+    "optuna-seeds.xml": {
+      "tests": "5",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.976"
+    },
+    "preparation-captured.xml": {
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.535"
+    },
+    "preparation-final.xml": {
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.994"
+    },
+    "preparation-json.xml": {
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "6.261"
+    },
+    "preparation-qualified.xml": {
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "6.572"
+    },
+    "preparation.xml": {
+      "tests": "1",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.372"
+    }
+  },
+  "source_files_verified": 224,
+  "changed_source_files": [],
+  "matrix": "development/mixed-v4 running; no final selection/reader result yet",
+  "utility_verdict": "not_attempted",
+  "confirmation": "not_attempted",
+  "remaining": [
+    "complete matrix and guarded reconstruction",
+    "wind public execution",
+    "complete costs and human effort",
+    "framework-exception recovery closeout",
+    "independent task admission and confirmation",
+    "private scoring qualification",
+    "Linux and second actual host",
+    "installed engineering execution",
+    "archive relocation"
+  ]
+}

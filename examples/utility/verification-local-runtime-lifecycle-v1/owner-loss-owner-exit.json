@@ -1,0 +1,7 @@
+{
+  "fault": "owner-loss",
+  "owner_pid": 37926,
+  "returncode": -9,
+  "expected_returncode": -9,
+  "output": "/private/tmp/utility-runtime-lifecycle-owner-loss-v1"
+}

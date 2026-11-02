@@ -1,0 +1,1 @@
+{"action_id": "eval-000001", "configuration": {"x": 0.4420024938881397, "y": 0.48888443037867546, "n": 3, "family": "quadratic"}, "result": {"status": "model_failure", "feasible": false, "objective": null, "reason": "frozen_failure_control"}, "suggest_seconds": 0.0013974583707749844, "tell_seconds": 0.0018846672028303146, "evaluation_seconds": 5.41098415851593e-07}

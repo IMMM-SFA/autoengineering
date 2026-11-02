@@ -1,0 +1,14 @@
+{
+  "environment": "bayes",
+  "python": "3.12.13",
+  "platform": "darwin",
+  "machine": "arm64",
+  "packages": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "torch": "2.13.0",
+    "botorch": "0.17.2",
+    "scikit-learn": "1.4.2",
+    "smac": "2.3.1"
+  }
+}

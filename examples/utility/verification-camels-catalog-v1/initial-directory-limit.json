@@ -1,0 +1,7 @@
+{
+  "status": "local_bound_refusal_after_footer",
+  "reason": "directory is 2811679 bytes, above initial 2 MiB parser guard",
+  "observations_read": false,
+  "repeat_requests": 0,
+  "next_step": "Resume saved footer; permit at most 3 MiB directory within original 4 MiB response budget"
+}

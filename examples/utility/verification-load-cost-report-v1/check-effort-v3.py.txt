@@ -1,0 +1,44 @@
+"""Positive v2/v3 effort compatibility on explicit authored logs, no models."""
+from pathlib import Path
+import json,sys
+root=Path.cwd();sys.path[:0]=[str(root),str(root/'tests')]
+from autoengineering.utility.load_costs import CostEvidenceSpec
+from autoengineering.utility.reporting import EffortReportSpec,CostReportSpec,ReportSpec,comparative_report,export_report,verify_export
+from autoengineering.utility.analysis import ContrastSpec,EffortAnalysisPlan,EffortCriterion
+from autoengineering.utility.effort import EffortPlan,EffortScope,HumanTimeSource,HumanTimeLog,EffortClosure,EffortInputs
+from autoengineering.utility.uncertainty import DependencePlan,BoundScenarioUncertaintySpec
+from test_utility_confirmation import selected_suite
+from test_utility_contracts import suite,H
+from test_utility_effort import put
+out=root/'examples/utility/verification-load-cost-report-v1'
+work=Path('/private/tmp/utility-load-cost-report-v1/effort-v3');work.mkdir(mode=0o700)
+cells=tuple(c.digest for c in suite().cells)
+policy=EffortPlan('utility-effort-policy-v1',(EffortScope('common','preparation','common_setup',cells,(.5,.5)),),('timer',),2,'first_use')
+dependence=DependencePlan('utility-dependence-v1',(),(BoundScenarioUncertaintySpec('utility-scenario-uncertainty-v2','task','W','minimize',('low','high'),'fixed_scenario_census','fixed_design_cases',H,500,.999,17,H),))
+contrast=ContrastSpec('task','multi','conventional','power','W','minimize',.1,1.,.95,'paired_student_t',500,17,'single_prespecified')
+plan=EffortAnalysisPlan('utility-analysis-v3',(contrast,),'complete_pairs_and_full_denominators',dependence.digest,
+ effort_policy_digest=policy.digest,effort_criteria=(EffortCriterion('task','multi','conventional',.05,10.),))
+store,_,_=selected_suite(work,analysis_plan=plan)
+source=HumanTimeSource('utility-human-time-source-v1','setup',H,'setup','timer',1000.,1040.)
+log=HumanTimeLog(**(source.to_dict()|{'schema':'utility-human-time-v1','scope_id':'common','evidence':put(store.root,source)}))
+closure=EffortClosure('utility-effort-closure-v1','common','closed',(put(store.root,log),),log.evidence)
+effort=EffortInputs('utility-effort-inputs-v1',put(store.root,policy),(put(store.root,closure),))
+old=EffortReportSpec('utility-report-inputs-v2',store.spec.digest,put(store.root,plan),put(store.root,dependence),(),effort=put(store.root,effort))
+inputs=CostEvidenceSpec('utility-cost-inputs-v1',store.spec.digest,())
+new=CostReportSpec('utility-report-inputs-v3',store.spec.digest,old.analysis,old.dependence,(),costs=put(store.root,inputs),effort=old.effort)
+assert ReportSpec.from_json(old.to_json()).to_json()==old.to_json()
+assert ReportSpec.from_json(new.to_json())==new
+before=store.replay()['head']
+a,b=comparative_report(store,old),comparative_report(store,new)
+assert a['accounting']['human_effort']==b['accounting']['human_effort']
+assert a['analysis']==b['analysis'] and not b['complete_cost_evidence']
+assert a['accounting']['schema']=='utility-accounting-v1' and b['accounting']['schema']=='utility-accounting-v2'
+manifest=export_report(store,new,work/'export')
+assert len(manifest['files'])==13
+assert verify_export(store,new,work/'export')['status']=='verified_reconstruction'
+assert store.replay()['head']==before
+result={'authored_logs_only':True,'v2_serialization_exact':True,'v3_roundtrip_verified':True,
+ 'effort_fields_and_analysis_equal':True,'v3_export_reconstructed_files':13,'suite_journal_unchanged':True,
+ 'new_model_calls':0,'measured_human_effort_claim':False,'full_cost_evidence':False}
+(out/'effort-v3-result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

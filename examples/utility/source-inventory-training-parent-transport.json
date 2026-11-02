@@ -1,0 +1,38 @@
+{
+  "created_utc": "2026-10-30T11:55:57.054424+00:00",
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "0c602cbcd0e08a900cf32401692ca26708a62853fe5f9dad4e058e2af0032e73",
+    "docs/reviews/part-5-progress.md": "c17a726b0e2958956460047e2efafb522c0146e66b9a1b5e39a84c7e64376e5d",
+    "docs/utility.md": "1bf298dc72e8549a24776438abc7c135e901b702a582304154980d3fc7236461",
+    "examples/utility/README.md": "393c2a5ba87b434338fa7f048c0de6534831073457f74050bbff8e354a5ee914",
+    "examples/utility/hydrology_learned.py": "91246769f8039e31728d6ff824f24fc4afabed1a27e9b89ec71980b7d6742ee0",
+    "examples/utility/tasks/hydrology.json": "38373d15eb2b2f4ab1a26e56e35bd67a6d31104ee596528e13c43999fcdbba20",
+    "src/autoengineering/adapters/contracts.py": "37a25cef976c130184a9e96bdd521fb4c08b9afff7374676b121d2a2d453994e",
+    "src/autoengineering/campaign/artifacts.py": "d272a35132a8a3302a930da47e4bae2b8ea78ad5546da0d063c3c81da16fa258",
+    "src/autoengineering/campaign/controller.py": "d61559fc7182738aa3a253466510ce4880c34e821285a1db9c01abbb3568b1f4",
+    "tests/test_campaign_training_artifacts.py": "d5fcd888775d438b236ff2363a3aaf6d6b7466d8b16b7c4aa2fd6d3d3bfdcc86"
+  },
+  "limits": [
+    "successful completed envelopes only; no failed-worker training receipt capture",
+    "supervised scalar transport fixtures use a separately authored training envelope",
+    "no learned-worker, real-task or independent/private admission",
+    "training cost parent validation, suite reservations and reporting remain open"
+  ],
+  "modified_previous_core_python_files": [
+    "src/autoengineering/adapters/contracts.py",
+    "src/autoengineering/campaign/artifacts.py",
+    "src/autoengineering/campaign/controller.py"
+  ],
+  "predecessor": "examples/utility/source-inventory-hydrology-training-costs.json",
+  "predecessor_sha256": "2a75983590c40d36e614cc954d413256ede9230e383b8b06084e1a2a314cc025",
+  "schema": "utility-source-increment-v1",
+  "scope": "successful training artifact/bundle retention in original campaign lifecycle commits",
+  "unchanged_previous_packaged_python_files": 283,
+  "verification": {
+    "diff_check": "passed",
+    "later_capture_documentation": "28 passed, 2 process cases deselected in 1.45s",
+    "lint": "passed",
+    "new_full_base_result": "not yet available",
+    "related_campaign_regression": "81 passed in 83.16s"
+  }
+}

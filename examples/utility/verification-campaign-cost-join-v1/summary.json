@@ -1,0 +1,41 @@
+{
+  "scope": "public campaign lifecycle cost joins and saved-worker batch recovery",
+  "initial_focused_before_recovery_extension": {
+    "passed": 63,
+    "seconds": 59.07
+  },
+  "initial_integration_before_recovery_extension": {
+    "passed": 73,
+    "seconds": 154.58
+  },
+  "first_recovery_fixture_run": {
+    "failed": 2,
+    "passed": 9,
+    "reason": "RuntimeError caught by service, not actual control loss"
+  },
+  "corrected_recovery_before_final_seed_pgid_checks": {
+    "passed": 24,
+    "seconds": 78.73
+  },
+  "final_tests": {
+    "passed": 200,
+    "seconds": 315.6
+  },
+  "fixed_source_during_each_run": true,
+  "source_hashes_verified_after_tests": true,
+  "installed": {
+    "wheel_sha256": "cc5b50e4b4cf38cbc8b7a51e029d2aa19b0271ce47c2379ab3fdc82ca5bfa759",
+    "matched_core_python_files": 195,
+    "dependency_setup": "fresh venv, wheel extraction, cached base dependencies; no editable activation or fresh solve"
+  },
+  "installed_rows": {
+    "normal": 4,
+    "recovered": 2,
+    "legacy": 2
+  },
+  "installed_denial_controls": 6,
+  "new_provider_or_independent_scientific_calls": 0,
+  "legacy_receipts": "unknown costs, charged and not rewritten",
+  "full_default_bayes_frozen_matrices": "not_attempted",
+  "part_5": "incomplete"
+}

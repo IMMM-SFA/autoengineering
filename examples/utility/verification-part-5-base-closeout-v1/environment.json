@@ -1,0 +1,22 @@
+{
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "platform": "darwin",
+  "machine": "arm64",
+  "packages": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "networkx": "3.6.1",
+    "PyYAML": "6.0.3",
+    "pandas": "3.0.5",
+    "click": "8.3.1",
+    "rich": "14.3.3",
+    "pytest": "9.0.2",
+    "torch": null,
+    "botorch": null,
+    "matplotlib": null,
+    "openmdao": null,
+    "py-wake": null,
+    "topfarm": null
+  },
+  "scope": "metadata only, not a fresh dependency solve or platform qualification"
+}

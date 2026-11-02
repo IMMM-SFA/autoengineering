@@ -1,0 +1,17 @@
+{
+  "scope": "actual image assembly and guarded saved-completion verification; no new runtime admission",
+  "predecessor": "examples/utility/source-inventory-guest-build-base.json",
+  "predecessor_sha256": "78fc6ca5c9cd7655a6161d47613724697c053d2bb26c65d96187c20fd33e8f06",
+  "image_id": "sha256:fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399",
+  "completion_digest": "28d422cf3dc61628de0e2db9410a644ab683e31b3e77906c5e5a679a23e0e966",
+  "public_evidence_sha256": {
+    "examples/utility/verification-guest-build-actual-v1/summary.json": "7f9378ab88f0611aaeee74f01244d67ee417d6286a2192fa39db6dd89667d75c",
+    "examples/utility/verification-guest-build-actual-v1/complete.json": "28d422cf3dc61628de0e2db9410a644ab683e31b3e77906c5e5a679a23e0e966",
+    "examples/utility/verification-guest-build-actual-v1/request.json": "c5fe7f7072d84cb436c5fa866cc39fe7b70506692ec4774c68f68424469ce0ec",
+    "examples/utility/verification-guest-build-actual-v1/build.log": "7c2a337b3be55e5e940975c8ad293f87379d344c3bed79ca258979a81667cdc6",
+    "examples/utility/verification-guest-build-actual-v1/image-inspect.json": "cd87ffe635dc96e10aaff072a2568471ec9fadc6875e7c157d9cf75f2699857c",
+    "examples/utility/verification-guest-build-actual-v1/cold-build-reader.py.txt": "5d2cfbb7cd8d17fabdc304da117653720bd782cbb8cec43a8613ab857b6b1d87",
+    "examples/utility/verification-guest-build-actual-v1/cold-reader.log": "a2f42896eaccf59d384e54b8aaa249ffe82479d383dcaed5120b7b1f35c4b1be",
+    "examples/utility/verification-guest-build-actual-v1/authorization.json": "0052c3c0edadeb538e49478655ee7f91c02c76bcadf1b74a8de7552015f0e244"
+  }
+}

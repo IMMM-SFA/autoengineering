@@ -1,0 +1,19 @@
+{
+  "wheel_sha256": "9fbcc13f477bcc315d29b795e2118a02cbc28f48e85b054ec35e4715c9668ba5",
+  "python_files": 233,
+  "core_files": 224,
+  "example_files": 9,
+  "copied_inputs": 245,
+  "all_package_payloads_match_inputs": true,
+  "installed_payloads_match_wheel": true,
+  "build_exit_code": 0,
+  "install_exit_code": 0,
+  "target": "/private/tmp/utility-load-costs-install-v1/installed",
+  "input_scope": "/private/tmp/utility-load-costs-install-v1/inputs",
+  "network_or_dependency_installation": false,
+  "inherited_native_dependencies": true,
+  "release_or_linux_qualification": false,
+  "builds": 1,
+  "installs": 1,
+  "first_wrapper_failure": "initial-refusal.json"
+}

@@ -1,0 +1,23 @@
+{
+  "kind": "direct",
+  "ground_V": -0.05,
+  "result": {
+    "outputs": {
+      "node1_voltage": 4.9073554472137255,
+      "node2_voltage": 0.6429001685862956,
+      "resistor1_current": 0.04957355447213726,
+      "resistor2_current": 0.000426445527862743,
+      "diode_current": 0.000426445527862743
+    },
+    "work": {
+      "converged": true,
+      "residual_norm": 1.3807856767689142e-15,
+      "residual_tolerance": 1e-10,
+      "solver_iterations": 18,
+      "component_calls": 293,
+      "derivative_calls": 90
+    },
+    "node2_current_derivative": null
+  },
+  "seconds": 0.08164400001987815
+}

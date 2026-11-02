@@ -1,0 +1,10 @@
+{
+  "module": "/private/tmp/claude-composition-installed-v1/venv/lib/python3.12/site-packages/autoengineering/agents/hosts/claude_brokered.py",
+  "checks": {
+    "checkout": "denied",
+    "external_connect": "denied",
+    "external_lookup": "denied",
+    "unapproved_process": "denied"
+  },
+  "child_guard_inherited": false
+}

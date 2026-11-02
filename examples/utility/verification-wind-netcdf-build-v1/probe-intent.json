@@ -1,0 +1,21 @@
+{
+  "schema": "utility-wind-netcdf-probe-intent-v1",
+  "subprocesses": 4,
+  "timeout_seconds_each": 30,
+  "checks": [
+    "48 authored hours",
+    "mask and fill",
+    "compressed float64",
+    "packed int16 at 1e-12 absolute tolerance",
+    "CF time conversion",
+    "xarray netcdf4 backend",
+    "compound float pairs",
+    "variable length integer arrays",
+    "variable length strings",
+    "cross-reader compatibility"
+  ],
+  "warning_policy": "Set always after NumPy import; record all messages; require no candidate binary-compatibility warning",
+  "scientific_model_calls": 0,
+  "private_source_reads": 0,
+  "existing_environment_changes": false
+}

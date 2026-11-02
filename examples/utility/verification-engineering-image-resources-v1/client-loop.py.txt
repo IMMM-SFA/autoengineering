@@ -1,0 +1,40 @@
+def _run(argv, *, env, cwd, deadline, log):
+    """One owned process group. Stopping it does not prove daemon cancellation."""
+    if time.monotonic() >= deadline:
+        raise TimeoutError("original build client deadline expired")
+    process = subprocess.Popen(
+        argv,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=cwd,
+        env=env,
+        start_new_session=True,
+    )
+    size = 0
+    try:
+        with log.open("xb") as output, selectors.DefaultSelector() as selector:
+            os.fchmod(output.fileno(), 0o600)
+            selector.register(process.stdout, selectors.EVENT_READ)
+            while selector.get_map():
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("original build client deadline expired")
+                for key, _ in selector.select(min(0.1, remaining)):
+                    data = os.read(key.fileobj.fileno(), 65536)
+                    if not data:
+                        selector.unregister(key.fileobj)
+                        continue
+                    size += len(data)
+                    if size > MAX_LOG:
+                        raise ValueError("build client output exceeds envelope")
+                    output.write(data)
+            status = process.wait(timeout=max(0.01, deadline - time.monotonic()))
+            output.flush()
+            os.fsync(output.fileno())
+            if time.monotonic() >= deadline:
+                raise TimeoutError("original build client deadline expired before log commit")
+        return status
+    finally:
+        _kill_client(process)
+        process.stdout.close()

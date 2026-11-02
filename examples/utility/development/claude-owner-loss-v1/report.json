@@ -1,0 +1,58 @@
+{
+  "version": "claude-owner-loss-probe-1.0",
+  "source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "status": "passed_limited_scope",
+  "parent_killed": true,
+  "parent_returncode": -9,
+  "native_identity_before_fault": {
+    "nonce": "claude-controlled-peer",
+    "pgid": 79198,
+    "pid": 79198,
+    "started": "Thu Oct 29 01:44:34 2026"
+  },
+  "authenticated_peer_request_before_fault": {
+    "bytes": 1177,
+    "output_config": {
+      "effort": "high"
+    },
+    "path": "/v1/messages?beta=true",
+    "requested_model": "claude-sonnet-4-6",
+    "sha256": "6ad78cdca06009ee6f1eab4fe10ef814ef48b236bd3822a16f262934471d9d3b",
+    "stream": true,
+    "synthetic_auth_matched": true,
+    "tools": [
+      {
+        "description": "return the final response as structured JSON",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "handoff_json": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "handoff_json"
+          ],
+          "type": "object"
+        },
+        "name": "StructuredOutput"
+      }
+    ]
+  },
+  "watchdog_stop": {
+    "job_sha256": "570e24cec0560b77f01f977e1be4ac7503c7bf0111411401a2701138a4ddf019",
+    "nonce": "watchdog-b3c8f8cbc9c6482d8cded3c64e61354e",
+    "reason": "owner_lost",
+    "stopped": true
+  },
+  "completion_missing": true,
+  "native_outcome": "unknown_owner_loss",
+  "handoff": null,
+  "original_job_sha256": "574fb04bc8d183cc5faf77c04dfc05f5730b89684e8d334a9df541ff26d119a9",
+  "recovery_refused": true,
+  "extra_native_jobs": 0,
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "production_admission": false,
+  "scope": "owned supervisor death after synthetic request; no provider, model or real key"
+}

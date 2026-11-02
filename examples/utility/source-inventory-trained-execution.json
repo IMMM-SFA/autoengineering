@@ -1,0 +1,44 @@
+{
+  "created_utc": "2026-10-30T15:00:57.321023+00:00",
+  "current_core_python_files": 206,
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "80d72b4fbf4bed061c19801068ebbbffe2081ea05f797ddeae311ccf978c65e8",
+    "docs/reviews/part-5-progress.md": "9c1044b06119ef6511971cd68fc2a29a3202d6b542e37c970e2c91f7ff333b4d",
+    "docs/reviews/part-5-readiness.md": "a1d000034ad0d636992f4e94176df942b17afe771c1ffc0bc68129c2cba4b5f1",
+    "docs/utility-handoff.md": "d9f9588a04cb2b0da9eb2dc62a8ba416dba0048988869b1de08ec24fa7cfde05",
+    "docs/utility.md": "cd63ca058fc657cfaa4f64cc5997616f7ffe3f368f702d35ec0b517f924cad94",
+    "examples/utility/README.md": "faa4316795860ded0c9f2ec0f6aa9c1881cbee6882c986c9da71833dc560d3df",
+    "examples/utility/verification-trained-execution-v1/coordinator-regression.log": "3a9732cf3509bd56e63486181c202f2b35992b1b263146064bc82faf3a2bac0d",
+    "examples/utility/verification-trained-execution-v1/documentation.log": "b2d3bef6f464b098e2296c43f9d2808b09b22d4ae49a33cb897ae8f2889bde36",
+    "examples/utility/verification-trained-execution-v1/final-trained-state-runtime.log": "c459b1d4429b2363b93ec53101d9a8f1f126292d5e11e50aff5e2d9e6b41f734",
+    "examples/utility/verification-trained-execution-v1/initial-routes.log": "177a5565e495d65173b3b1ed03769086f928174c947f08481ecd8b95afc287ce",
+    "examples/utility/verification-trained-execution-v1/mixed-rehearsal.log": "e6ce24532f0ff4df9a085bad48206e2f6f8e3db793f63851e02979637a1659f7",
+    "examples/utility/verification-trained-execution-v1/pre-dispatch-refusal.log": "8acb9b446feb53c90065f69edc00817b736ad510167978e0d13183ef85a21898",
+    "src/autoengineering/utility/controller.py": "201f42fe007600c8189037581240b5fc7ca6e13e6b4d8a9bf62b7874efa35195",
+    "src/autoengineering/utility/execution.py": "f6920055dc191f267b0a795b288979e958aa54d679c7250c027cb0a84814f358",
+    "src/autoengineering/utility/mixed_execution.py": "1b30ead1631a3f1f019dd66e4af124b07565a310135320abdaca0f6f75d7c42e",
+    "tests/test_utility_campaign_training_costs.py": "beb517799b89d2c812dc861cc91d047464607cf0b021754b9669b0dc76443f50",
+    "tests/test_utility_trained_execution.py": "3eb55ec1532de09b37649456223a9ae651c9c76b89853ab04834ff9ea14f4888"
+  },
+  "limits": [
+    "authored supplied-model scripted rehearsals, not live agent or learned-candidate discovery evidence",
+    "private scoring, learned-alternative admission and independent task admission remain open",
+    "active-fit kill/cancellation and remaining resource measurement coverage remain open",
+    "full default checkpoint predates this increment",
+    "no installed package, optional environment, second host or platform qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-training-terminal.json",
+  "predecessor_sha256": "adf86373ba7b72b2c14982ac1b640e6f6a2b48427f23489afe9403721da1dae9",
+  "schema": "utility-source-increment-v1",
+  "scope": "exact trained selection writing and bounded scripted prediction/mixed route execution",
+  "verification": {
+    "coordinator_regression": "50 passed in 210.59s",
+    "diff_check": "passed",
+    "final_documentation": "19 passed in 0.83s",
+    "final_trained_state_runtime": "43 passed in 53.79s",
+    "formatting": "AST equality verified in three modules",
+    "lint": "passed",
+    "pre_dispatch_refusal": "3 passed in 2.89s",
+    "separate_mixed_rehearsal": "1 passed in 7.16s"
+  }
+}

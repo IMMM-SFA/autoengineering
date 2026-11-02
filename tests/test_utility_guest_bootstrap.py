@@ -1,0 +1,499 @@
+"""Authored stdio transport/orchestration checks, not Linux/container qualification."""
+
+from dataclasses import replace
+import io
+import json
+from pathlib import Path
+import shutil
+import socket
+import struct
+import subprocess
+import time
+
+import numpy as np
+import pytest
+
+from autoengineering.campaign.artifacts import put_bytes
+from autoengineering.campaign.records import CheckResult
+from autoengineering.campaign.serialization import canonical_json
+from autoengineering.utility import guest_bootstrap as module
+from autoengineering.utility import guest_observations, inference_guest, inference_worker
+from autoengineering.utility.guest_receipts import (
+    GuestContainerPolicy,
+    GuestLaunchIntent,
+    GuestStdinPolicy,
+)
+from autoengineering.utility.inference_execution import (
+    FrozenGuestInferenceJob,
+    FrozenInferenceResult,
+)
+from autoengineering.utility.inference_execution import PHYSICAL_CHECKS
+import test_utility_guest_inputs as input_fixture
+
+metadata = input_fixture.metadata
+H = "1" * 64
+
+
+def prepared(tmp_path, metadata, *, stdin=True):
+    owner, store, source, drivers = input_fixture.prepared(
+        tmp_path, metadata, policy=GuestStdinPolicy() if stdin else GuestContainerPolicy()
+    )
+    package = input_fixture.prepare(owner, store, source, drivers)
+    return owner, package
+
+
+def receiver(path):
+    path.mkdir(mode=0o700)
+    (path / "artifacts").mkdir(mode=0o700)
+    return path
+
+
+def authored_result(root, job, *, status="success"):
+    outputs = predictions = None
+    checks = ()
+    if status in ("success", "scientific_infeasible"):
+        stream = io.BytesIO()
+        np.savez(stream, prediction=np.ones(140), soil=np.ones(140), reservoir=np.ones(140))
+        outputs = put_bytes(
+            root,
+            stream.getvalue(),
+            name="outputs.npz",
+            media_type="application/x-npz",
+            producer="inference",
+        )
+        checks = tuple(
+            CheckResult(
+                n,
+                "1",
+                "fail" if status == "scientific_infeasible" and i == 0 else "pass",
+                True,
+                "outputs",
+                0,
+                0,
+                "authored",
+                (),
+            )
+            for i, n in enumerate(PHYSICAL_CHECKS)
+        )
+        if status == "success":
+            predictions = put_bytes(
+                root,
+                json.dumps(
+                    {
+                        "model_sha256": job.grant.model_digest,
+                        "partition_digest": job.grant.partition_digest,
+                        "selection_digest": job.grant.selection_digest,
+                        "prediction": [1.0] * 140,
+                    }
+                ).encode(),
+                name="predictions.json",
+                media_type="application/json",
+                producer="inference",
+            )
+    result = FrozenInferenceResult(
+        "utility-frozen-inference-result-v1",
+        job.grant.digest,
+        job.executor_digest,
+        job.nonce,
+        status,
+        outputs,
+        predictions,
+        checks,
+        1.0 if outputs is not None else None,
+    )
+    (root / "worker-result.json").write_text(result.to_json())
+    return result
+
+
+def response(tmp_path, owner, status="success"):
+    request, _ = module.decode_request(io.BytesIO(module.encode_request(owner)))
+    origin = receiver(tmp_path / "authored-result")
+    result = authored_result(origin, request.job, status=status)
+    return module.encode_response(origin, request), result
+
+
+def test_versioned_stdin_policy_preserves_fixed_limits_and_old_bytes(tmp_path, metadata):
+    owner, package = prepared(tmp_path, metadata)
+    m = owner.manifest
+    decoded = GuestLaunchIntent.from_json(m.launch.to_json())
+    assert isinstance(decoded.policy, GuestStdinPolicy)
+    assert GuestContainerPolicy().stdin is False and GuestStdinPolicy().stdin is True
+    assert (
+        GuestStdinPolicy().inference_limits_digest == GuestContainerPolicy().inference_limits_digest
+    )
+    request = guest_observations.configuration(m.job, decoded)
+    assert request["AttachStdin"] is request["OpenStdin"] is request["StdinOnce"] is True
+    assert request["Tty"] is False and request["HostConfig"]["NetworkMode"] == "none"
+    assert request["Entrypoint"][-1] == "autoengineering.utility.guest_bootstrap"
+    assert request["Cmd"] == ["/work/job.json"]
+    old = replace(m.launch, policy=GuestContainerPolicy())
+    assert GuestLaunchIntent.from_json(old.to_json()).to_json() == old.to_json()
+    assert guest_observations.configuration(m.job, old)["OpenStdin"] is False
+
+
+def test_request_roundtrip_is_exact_and_excludes_ungranted_payload(tmp_path, metadata):
+    owner, package = prepared(tmp_path, metadata)
+    raw = module.encode_request(owner)
+    assert b"AUTHORED-PRIVATE-CANARY" not in raw
+    request, contents = module.decode_request(io.BytesIO(raw))
+    assert request.package == package and request.job == owner.manifest.job
+    assert set(contents) == {entry.artifact.path for entry in package.entries}
+    assert not any(
+        Path(p).name in ("fitting.npz", "comparison.npz", "private-labels.json") for p in contents
+    )
+
+
+def test_legacy_policy_cannot_enter_stdio_bootstrap(tmp_path, metadata):
+    owner, _ = prepared(tmp_path, metadata, stdin=False)
+    with pytest.raises(ValueError, match="legacy"):
+        module.encode_request(owner)
+
+
+@pytest.mark.parametrize(
+    "problem",
+    [
+        "magic",
+        "zero_header",
+        "large_header",
+        "header_truncated",
+        "body_truncated",
+        "trailing",
+        "content",
+        "foreign_package",
+    ],
+)
+def test_bad_request_refuses_before_workspace_or_worker(tmp_path, metadata, problem):
+    owner, _ = prepared(tmp_path, metadata)
+    raw = module.encode_request(owner)
+    offset = len(module.REQUEST_MAGIC)
+    if problem == "magic":
+        raw = b"wrong!!!\n" + raw[offset:]
+    elif problem == "zero_header":
+        raw = module.REQUEST_MAGIC + struct.pack("!I", 0)
+    elif problem == "large_header":
+        raw = module.REQUEST_MAGIC + struct.pack("!I", module.MAX_HEADER + 1)
+    elif problem == "header_truncated":
+        raw = raw[: offset + 8]
+    elif problem == "body_truncated":
+        raw = raw[:-1]
+    elif problem == "trailing":
+        raw += b"extra"
+    elif problem == "content":
+        raw = raw[:-10241] + bytes([raw[-10241] ^ 1]) + raw[-10240:]
+    else:
+        request, _ = module.decode_request(io.BytesIO(raw))
+        document = request.to_dict()
+        document["package"]["job_digest"] = "2" * 64
+        header = canonical_json(document).encode()
+        # A bad binding must refuse from the header, before requesting a body.
+        raw = module.REQUEST_MAGIC + struct.pack("!I", len(header)) + header
+    with pytest.raises(ValueError):
+        module.decode_request(io.BytesIO(raw))
+
+
+@pytest.mark.parametrize(
+    "status",
+    ["success", "scientific_infeasible", "model_failure", "infrastructure_failure", "timeout"],
+)
+def test_response_keeps_original_status_and_recovers_without_original_stream(
+    tmp_path, metadata, monkeypatch, status
+):
+    owner, package = prepared(tmp_path, metadata)
+    raw, result = response(tmp_path, owner, status)
+    destination = receiver(tmp_path / "received")
+    m = owner.manifest
+    captured = module.capture_response(destination, io.BytesIO(raw), m.job, m.launch, package)
+    recovered = FrozenInferenceResult.from_json(
+        module.read_bytes(destination, captured.worker_result).decode()
+    )
+    assert recovered == result and recovered.lifecycle_seconds == result.lifecycle_seconds
+    shutil.rmtree(tmp_path / "authored-result")
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("saved transport recovery cannot execute/connect/resample")
+
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    monkeypatch.setattr(socket, "socket", forbidden)
+    monkeypatch.setattr(time, "monotonic", forbidden)
+    assert module.read_capture(destination, m.job, m.launch, package) == captured
+    if status != "success":
+        assert recovered.predictions is None
+    with pytest.raises(ValueError, match="already exists"):
+        module.capture_response(destination, io.BytesIO(b""), m.job, m.launch, package)
+
+
+@pytest.mark.parametrize(
+    "problem",
+    ["truncated", "trailing", "artifact", "foreign_job", "foreign_package", "header_limit"],
+)
+def test_bad_response_never_publishes_completed_capture(tmp_path, metadata, problem):
+    owner, package = prepared(tmp_path, metadata)
+    raw, _ = response(tmp_path, owner)
+    if problem == "truncated":
+        raw = raw[:-1]
+    elif problem == "trailing":
+        raw += b"extra"
+    elif problem == "artifact":
+        raw = raw[:-1] + bytes([raw[-1] ^ 1])
+    elif problem == "header_limit":
+        raw = module.RESPONSE_MAGIC + struct.pack("!I", module.MAX_RESULT_HEADER + 1)
+    else:
+        stream = io.BytesIO(raw)
+        header = module._header(
+            stream, module.RESPONSE_MAGIC, module.GuestBootstrapResponse, module.MAX_RESULT_HEADER
+        )
+        header = replace(
+            header, **{"job_digest" if problem == "foreign_job" else "package_digest": "2" * 64}
+        )
+        raw = module._frame(module.RESPONSE_MAGIC, header, module.MAX_RESULT_HEADER) + stream.read()
+    destination = receiver(tmp_path / "received")
+    m = owner.manifest
+    with pytest.raises(ValueError):
+        module.capture_response(destination, io.BytesIO(raw), m.job, m.launch, package)
+    assert not (destination / "bootstrap-capture.json").exists()
+    assert not list((destination / "artifacts").iterdir())
+
+
+def test_real_host_runtime_mismatch_refuses_before_extract_or_model(
+    tmp_path, metadata, monkeypatch
+):
+    owner, _ = prepared(tmp_path, metadata)
+    try:
+        observed = inference_guest.observe_python()
+    except ValueError:
+        observed = None
+    if observed == owner.manifest.job.guest.python:
+        pytest.skip("this negative fixture needs a different observed interpreter")
+    raw = module.encode_request(owner)
+    work = tmp_path / "guest-work"
+    work.mkdir(mode=0o700)
+    monkeypatch.setattr(inference_worker, "main", lambda *_: pytest.fail("worker started"))
+    with pytest.raises(ValueError, match="interpreter differs"):
+        module.run(work, io.BytesIO(raw), io.BytesIO())
+    assert not list(work.iterdir())
+
+
+def test_authored_bootstrap_orchestration_invokes_one_stub_and_returns_before_exit(
+    tmp_path, metadata, monkeypatch
+):
+    owner, package = prepared(tmp_path, metadata)
+    request = module.encode_request(owner)
+    work = tmp_path / "guest-work"
+    work.mkdir(mode=0o700)
+    calls = []
+    # Authored hooks exercise orchestration only. No real model runs under a
+    # simulated interpreter or installed-wheel qualification claim.
+    monkeypatch.setattr(inference_guest, "observe_python", lambda: owner.manifest.job.guest.python)
+    monkeypatch.setattr(FrozenGuestInferenceJob, "validate_runtime", lambda *_: None)
+
+    def worker(path):
+        job = FrozenGuestInferenceJob.from_json(path.read_text())
+        calls.append(job.digest)
+        print("AUTHORED-STUB-DIAGNOSTIC")
+        authored_result(path.parent, job)
+
+    monkeypatch.setattr(inference_worker, "main", worker)
+    outgoing = io.BytesIO()
+    assert module.run(work, io.BytesIO(request), outgoing) == 0
+    assert calls == [owner.manifest.job.digest]
+    assert b"AUTHORED-STUB-DIAGNOSTIC" not in outgoing.getvalue()
+    m = owner.manifest
+    capture = module.capture_response(
+        receiver(tmp_path / "received"), io.BytesIO(outgoing.getvalue()), m.job, m.launch, package
+    )
+    assert capture.job_digest == m.job.digest
+    with pytest.raises(ValueError, match="fresh empty"):
+        module.run(work, io.BytesIO(request), io.BytesIO())
+    assert len(calls) == 1
+
+
+def test_raw_worker_exceptions_never_enter_bootstrap_stdout(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(module.sys, "argv", ["bootstrap", "/work/job.json"])
+
+    def fail(*args):
+        raise RuntimeError("AUTHORED-PRIVATE-PATH-OR-DATA")
+
+    monkeypatch.setattr(module, "run", fail)
+    assert module.main() == 2
+    captured = capsys.readouterr()
+    assert captured.out == captured.err == ""
+
+
+class Fragmented(io.BytesIO):
+    def read(self, size=-1):
+        return super().read(min(size, 17) if size >= 0 else size)
+
+
+class ShortWriter(io.BytesIO):
+    def write(self, raw):
+        return super().write(raw[:13])
+
+
+def test_stream_fragmentation_and_short_writes_preserve_every_byte(tmp_path, metadata):
+    owner, package = prepared(tmp_path, metadata)
+    raw = module.encode_request(owner)
+    request, _ = module.decode_request(Fragmented(raw))
+    assert request.package == package
+    response_raw, _ = response(tmp_path, owner)
+    output = ShortWriter()
+    module._write(output, response_raw)
+    assert output.getvalue() == response_raw
+    m = owner.manifest
+    capture = module.capture_response(
+        receiver(tmp_path / "received"), Fragmented(response_raw), m.job, m.launch, package
+    )
+    assert capture.job_digest == m.job.digest
+
+
+def test_capture_corruption_is_not_repaired_by_stream_replay(tmp_path, metadata):
+    owner, package = prepared(tmp_path, metadata)
+    raw, _ = response(tmp_path, owner)
+    m = owner.manifest
+    destination = receiver(tmp_path / "received")
+    captured = module.capture_response(destination, io.BytesIO(raw), m.job, m.launch, package)
+    path = destination / captured.worker_result.path
+    path.write_bytes(path.read_bytes() + b" ")
+    with pytest.raises(ValueError):
+        module.read_capture(destination, m.job, m.launch, package)
+    with pytest.raises(ValueError, match="already exists"):
+        module.capture_response(destination, io.BytesIO(raw), m.job, m.launch, package)
+
+
+def test_noncanonical_original_worker_result_refuses_without_relabeling_bytes(tmp_path, metadata):
+    owner, _ = prepared(tmp_path, metadata)
+    request, _ = module.decode_request(io.BytesIO(module.encode_request(owner)))
+    origin = receiver(tmp_path / "authored-result")
+    authored_result(origin, request.job)
+    path = origin / "worker-result.json"
+    path.write_text(path.read_text() + " ")
+    with pytest.raises(ValueError, match="not canonical"):
+        module.encode_response(origin, request)
+
+
+def test_transport_capture_reaches_existing_guest_archive_reader(tmp_path, metadata):
+    from autoengineering.utility import guest_receipts as receipts
+
+    owner, package = prepared(tmp_path, metadata)
+    raw, _ = response(tmp_path, owner)
+    store_root = owner.suite_root
+    m = owner.manifest
+    captured = module.capture_response(store_root, io.BytesIO(raw), m.job, m.launch, package)
+    observations = input_fixture.creation(owner)
+    with owner.writer():
+        owner.record("start_intent")
+        owner.record("started", observations["started"])
+        owner.record(
+            "stopped", {"inspect": observations["stopped"], "reason": None, "elapsed_seconds": None}
+        )
+        owner.record("cleanup_intent")
+        owner.record("cleaned", observations["cleanup"])
+
+    def save(record, name):
+        return put_bytes(
+            store_root,
+            record.to_json().encode(),
+            name=name,
+            media_type="application/json",
+            producer="authored-stdio",
+        )
+
+    start, stop, cleaned = owner.projections()
+    capture = receipts.GuestResultCapture(
+        "utility-guest-result-capture-v1",
+        m.job.digest,
+        m.job.nonce,
+        "complete",
+        captured.worker_result,
+        captured.worker_result.sha256,
+    )
+    result = FrozenInferenceResult.from_json(
+        module.read_bytes(store_root, captured.worker_result).decode()
+    )
+    intent = put_bytes(
+        store_root,
+        canonical_json(input_fixture.module._binding(m.job)).encode(),
+        name="worker-intent.json",
+        media_type="application/json",
+        producer="author",
+    )
+    archive = receipts.GuestInferenceArchive(
+        "utility-guest-inference-archive-v1",
+        save(m.job, "stdio-job.json"),
+        intent,
+        m.claim,
+        save(m.launch, "stdio-launch.json"),
+        save(start, "stdio-start.json"),
+        save(stop, "stdio-stop.json"),
+        save(cleaned, "stdio-cleanup.json"),
+        save(capture, "stdio-capture.json"),
+        result.outputs,
+        result.predictions,
+    )
+    verified = receipts.verify_guest_archive(
+        store_root,
+        save(archive, "stdio-archive.json"),
+        m.job.grant,
+        source_digest=m.job.source_digest,
+        lock_digest=m.job.lock.sha256,
+        executor_digest=m.job.executor_digest,
+        runtime_digest=m.launch.runtime_digest,
+    )
+    assert verified.status == "success" and verified.boundary == "unqualified-candidate"
+    assert verified.lifecycle_seconds is None and verified.result.lifecycle_seconds == 1.0
+
+
+def test_saved_capture_cold_process_uses_only_public_original_bytes(tmp_path, metadata):
+    import sys
+
+    owner, package = prepared(tmp_path, metadata)
+    raw, _ = response(tmp_path, owner)
+    root = receiver(tmp_path / "received")
+    m = owner.manifest
+    captured = module.capture_response(root, io.BytesIO(raw), m.job, m.launch, package)
+    (root / "reader-inputs.json").write_text(
+        canonical_json(
+            {
+                "job": m.job.to_dict(),
+                "launch": m.launch.to_dict(),
+                "package": package.to_dict(),
+            }
+        )
+    )
+    script = """
+import importlib.abc,sys,json
+class NoModels(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,*args):
+  if fullname.split('.')[0] in {'examples','torch','openmdao','pvlib','py_wake'}:
+   raise AssertionError('model import')
+sys.meta_path.insert(0,NoModels())
+from pathlib import Path
+from autoengineering.utility.guest_bootstrap import read_capture
+from autoengineering.utility.inference_execution import FrozenGuestInferenceJob
+from autoengineering.utility.guest_receipts import GuestLaunchIntent
+from autoengineering.utility.guest_inputs import GuestInputPackage
+root=Path(sys.argv[1]);inputs=json.loads((root/'reader-inputs.json').read_text())
+job=FrozenGuestInferenceJob.from_dict(inputs['job'])
+launch=GuestLaunchIntent.from_dict(inputs['launch'])
+package=GuestInputPackage.from_dict(inputs['package'])
+import numpy,subprocess,socket,os,time
+def forbidden(*args,**kwargs):raise AssertionError('execution/runtime/array access')
+numpy.load=subprocess.Popen=socket.socket=time.monotonic=forbidden
+allowed={p for p in root.rglob('*') if p.is_file()};old=Path.open;old_os=os.open
+def guarded(path,mode='r',*args,**kwargs):
+ if path not in allowed or any(c in mode for c in 'wax+'):raise AssertionError('ungranted access')
+ return old(path,mode,*args,**kwargs)
+def guarded_os(path,flags,*args,**kwargs):
+ if Path(path) not in allowed or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT):
+  raise AssertionError('ungranted access')
+ return old_os(path,flags,*args,**kwargs)
+Path.open=guarded;os.open=guarded_os
+print(read_capture(root,job,launch,package).response_digest)
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", script, str(root)],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=30,
+    )
+    assert result.stdout.strip() == captured.response_digest

@@ -1,0 +1,44 @@
+{
+  "authored_hydrology_lifecycle_exercised": true,
+  "core_wheel_input_pins_unchanged": 239,
+  "documentation_tests": 19,
+  "errors": 0,
+  "failures": 0,
+  "focused_tests": 99,
+  "four_dossiers_and_proposal": "original pins unchanged",
+  "full_default_suite": "not rerun; production code unchanged",
+  "lint": "passed",
+  "offline_metadata_verifier": "passed with socket and subprocess denied",
+  "real_scientific_runs": 0,
+  "schema": "utility-camels-catalog-verification-v1",
+  "skips": 0,
+  "source_pins": {
+    "docs/reviews/part-5-camels-catalog-review.md": {
+      "sha256": "31f32ce9207fd7608f057da077d387f814a687acb08ffb003fd5c3ab7a74ae54",
+      "size_bytes": 3103
+    },
+    "docs/utility.md": {
+      "sha256": "191345442474c2066ffa54e9b720a117ed60a4226f04dfb52ebe1a4c9b25cceb",
+      "size_bytes": 207668
+    },
+    "examples/utility/hydrology_camels.py": {
+      "sha256": "ba2ec207fc2aba1aa9ce8ec9f22c5ae2fbd38fed070ac462ff83caf36f48e89e",
+      "size_bytes": 7950
+    },
+    "examples/utility/hydrology_camels_archive.py": {
+      "sha256": "29a1f58801e969e3cae16637ad77707bf480ad159871d6fdc12896b817071213",
+      "size_bytes": 8740
+    },
+    "examples/utility/hydrology_partitions.py": {
+      "sha256": "2a2d687f0224f07e49774cfec931ebe4127b526f164a17417c2ad4951980ef91",
+      "size_bytes": 10223
+    },
+    "tests/test_utility_hydrology_camels.py": {
+      "sha256": "31589332fbee7c53e50df5097f38ad286665d1059c8eccfab5ef4f26f013c27a",
+      "size_bytes": 13932
+    }
+  },
+  "status": "metadata_and_authored_checks_passed_not_task_admission",
+  "task_admitted": false,
+  "time_series_members_opened": 0
+}

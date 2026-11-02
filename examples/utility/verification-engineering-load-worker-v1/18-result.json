@@ -1,0 +1,1 @@
+{"diagnostics":{"component_calls":245.0,"converged":1.0,"derivative_calls":75.0,"residual_norm":1.8973538018496328e-17,"residual_tolerance":1e-10,"solver_iterations":15.0},"elapsed_seconds":0.00468470761552453,"feasible":true,"node2_voltage_V":0.726374291561733,"scenario_id":"authored-18","source_power_W":0.27174569156641054}

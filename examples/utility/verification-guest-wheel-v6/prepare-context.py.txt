@@ -1,0 +1,27 @@
+"""Materialize the successor recipe from the existing verified archive cache."""
+from pathlib import Path
+import json,sys
+sys.path.insert(0,str(Path.cwd()))
+from autoengineering.campaign.serialization import digest
+from examples.utility import guest_image,guest_image_context
+from examples.utility.inference_environment import verify_inputs
+root=Path.cwd();out=root/'examples/utility/verification-guest-wheel-v6'
+prepared=json.loads((out/'prepared-inputs.json').read_text())
+environment=root/'examples/utility/prepared-inference-environment-v6'
+plan_root=root/'examples/utility/prepared-guest-image-v6'
+plan=guest_image.prepare(environment,expected_digest=prepared['inputs_digest'],source_root=root,output=plan_root)
+assert guest_image.verify(plan_root,expected_digest=digest(plan))==plan
+cache=root/'outputs/guest-runtime-archives-v1'
+context=root/'outputs/guest-build-context-v6'
+manifest=guest_image_context.materialize(plan_root,cache,expected_plan_digest=digest(plan),output=context)
+assert guest_image_context.verify(context,expected_digest=digest(manifest))==manifest
+inputs=verify_inputs(context/'proof/environment',expected_digest=prepared['inputs_digest'])
+assert len(inputs.wheel_python_sources)==316
+result={'plan_digest':digest(plan),'context_digest':digest(manifest),'environment_digest':inputs.digest,
+ 'context_path':str(context.relative_to(root)),'copied_file_bytes':manifest['copied_file_bytes'],
+ 'payload_bytes':manifest['payload_bytes'],'context_files':len(manifest['files']),
+ 'existing_archive_cache_used':True,'new_network_requests':0,'new_dependency_installations':0,
+ 'image_built':False,'new_container_starts':0,'runtime_qualified':False,
+ 'known_next_step':'Image assembly and the explicit-environment derivative precede any new image qualification'}
+(out/'context-result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

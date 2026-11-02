@@ -1,0 +1,18 @@
+{
+  "policy": {
+    "index_sha256": "0bc6c31d04c8b894bf119c39d4c45c1e9cffb1ccf5b585a94565740dea1e48df",
+    "regular_files": 58,
+    "scope": "byte archive; limited original probe scope, not qualified host admission"
+  },
+  "composition": {
+    "index_sha256": "f0c01327fa1da1c649fa3fd2c2edea50db19627846e49526c6e1e41283e31535",
+    "regular_files": 45,
+    "scope": "byte archive; limited original probe scope, not qualified host admission"
+  },
+  "privacy": {
+    "index_sha256": "541a8f35e3bb77b72640a1a6a382833c5ddb73f5d2fccf7580b23c276c9ea916",
+    "regular_files": 53,
+    "scope": "19 synthetic syscall controls using an explicit trusted Claude renderer hook and executable substitution; preference service privacy and actual host qualification remain unverified",
+    "driver_sha256": "b4915db4c5d687a89f3d4bdebfdb4bb98552625bb8bd6e4081de050fd2756dd6"
+  }
+}

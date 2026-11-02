@@ -1,0 +1,87 @@
+{
+  "backend": "substituted authored backend; PyWake metadata declaration patched in tests",
+  "container_starts": 0,
+  "data": "authored driver arrays only; no acquired/reserved weather",
+  "dossiers_and_proposal": "original pins unchanged",
+  "full_cost_evidence": false,
+  "full_default_suite": "not rerun for this example increment",
+  "junit": {
+    "sha256": "a62f1cc58d1b4400d10959520d5415295a3a8e626821d7eea1cc5f4e6e8ae0a1",
+    "size_bytes": 17720
+  },
+  "lint": {
+    "command": "pixi run lint",
+    "status": "passed"
+  },
+  "native_callback_execution": "not attempted",
+  "private_runtime": "not qualified",
+  "remaining": [
+    "native callback execution",
+    "qualified private runtime and owner-loss controls",
+    "common cost/report join",
+    "installed readers",
+    "four-family admission and independent study"
+  ],
+  "schema": "utility-wind-annual-callback-verification-v1",
+  "scientific_model_starts": 0,
+  "scope": "joins existing suite access, sealed source, annual kernel, public work pin and metadata-only recovery",
+  "source_acquisition_requests": 0,
+  "source_pins": {
+    "docs/reviews/part-5-wind-annual-callback.md": {
+      "sha256": "41db00c6f9626414292714fc8786da90c30e3ddd212d85bc6866066200370309",
+      "size_bytes": 4344
+    },
+    "examples/utility/wind_annual.py": {
+      "sha256": "685fba50d0f7f26f0362c486d5bb8bb48045db229d54aaf970edc2885d13b4aa",
+      "size_bytes": 7310
+    },
+    "examples/utility/wind_annual_callback.py": {
+      "sha256": "3145aef0009c74a9aa2b1444b117d705eafe67ec7f5f440a6559844f5323bd49",
+      "size_bytes": 18725
+    },
+    "examples/utility/wind_annual_scoring.py": {
+      "sha256": "80e03cbf827447fa45334de7c9b1a165b11c13df5e57e0481beb3c4264291bda",
+      "size_bytes": 10990
+    },
+    "examples/utility/wind_annual_source.py": {
+      "sha256": "2bab27e011865f9ec2ff1690530338d35d0046a4529c73328257167045bbf8ef",
+      "size_bytes": 14715
+    },
+    "tests/test_documentation.py": {
+      "sha256": "88c129785baad1dd77bfc10afcfc6264290eecf48fcbc3ceed525c678b3b102b",
+      "size_bytes": 10449
+    },
+    "tests/test_utility_confirmation.py": {
+      "sha256": "b676dd7a9632788def7432998cf23a11a2643563aa8acfa21f87e1b80aabaecb",
+      "size_bytes": 14318
+    },
+    "tests/test_utility_engineering_source_binding.py": {
+      "sha256": "d434d75118c029e6a08cb173827cd1843c7b5d11aed5a38cf4f19c1dcaca0064",
+      "size_bytes": 8878
+    },
+    "tests/test_utility_wind_annual.py": {
+      "sha256": "822713d0a875b003645d69722305593675fb8053c74fb0a1edf27b3c6b2c27ec",
+      "size_bytes": 7091
+    },
+    "tests/test_utility_wind_annual_callback.py": {
+      "sha256": "14a2c9a5c6213bdc9bd259b98af3b621e5c11c89d3c652ede96b3ae7d54b7e2f",
+      "size_bytes": 12583
+    },
+    "tests/test_utility_wind_annual_scoring.py": {
+      "sha256": "5a5a30a2f2c61a43d380d462a7f610e22164dd8ae45f9f392695e6a763855741",
+      "size_bytes": 9576
+    },
+    "tests/test_utility_wind_annual_source.py": {
+      "sha256": "f14aba733036710f0fdc22dc9a44ae13c61f9caac4bd18a1110139869a182c9f",
+      "size_bytes": 11797
+    }
+  },
+  "status": "authored_callback_and_recovery_verified_not_admitted",
+  "task_admitted": false,
+  "test_counts": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 120
+  }
+}

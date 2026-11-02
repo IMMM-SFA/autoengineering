@@ -1,0 +1,21 @@
+{
+  "schema": "utility-camels-range-continuation-request-v1",
+  "previous_request_sha256": "23956379a24fd837d5b2688820edf99d7ba8babafe5b34df52af400085d707d4",
+  "previous_failure_sha256": "b93d915bb1678e17144c1cc5a2eaf5c07efb343c66e6d8380debe3745b2ec033",
+  "prefix_bytes_retained": 2726297600,
+  "additional_body_bytes_cap": 680328983,
+  "logical_http_requests_additional_cap": 1,
+  "logical_http_requests_cumulative_cap": 3,
+  "socket_timeout_seconds": 30,
+  "elapsed_logical_limit_seconds": 900,
+  "active_http_deadline_mechanism": "SIGALRM real-time timer; metadata/cleanup after interruption is outside that bound",
+  "automatic_retries": 0,
+  "range_start": 2726297600,
+  "range_end": 3406626582,
+  "archive_size_bytes": 3406626583,
+  "archive_md5": "8e9a466710e8270b58f01d332a87184f",
+  "producer_sha256": "56a4daa8fe8f62779d358f878dfcb97f8c455f7bb6f732614bbbc7bb2e25fb5e",
+  "reason": "Continue a known terminal partial public download, preserving the previous resource charge and exact prefix",
+  "observation_members_opened": 0,
+  "scientific_model_calls": 0
+}

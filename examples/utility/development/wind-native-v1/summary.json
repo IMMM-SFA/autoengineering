@@ -1,0 +1,13 @@
+{
+  "native_status": "converged",
+  "native_feasible": true,
+  "wake_calls": 2,
+  "gradient_calls": 1,
+  "budget_control_status": "budget_exhausted",
+  "budget_control_wake_calls": 1,
+  "budget_control_gradient_calls": 1,
+  "final_layout_evaluations": 2,
+  "elapsed_seconds": 3.143030915874988,
+  "utility_verdict": "not_attempted",
+  "cost_limits": "Gradient callbacks include differentiated wake work; keep units separate"
+}

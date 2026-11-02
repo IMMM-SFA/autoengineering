@@ -1,0 +1,78 @@
+"""Read current or legacy CLI accounting using installed core modules only."""
+import sys
+from pathlib import Path
+site,root,pins_path=(Path(p).resolve() for p in sys.argv[1:4])
+mode=sys.argv[4]
+sys.path.insert(0,str(site))
+import importlib.abc
+class Denied(importlib.abc.MetaPathFinder):
+    def find_spec(self,fullname,*a):
+        if fullname.split('.')[0] in {'examples','openmdao','torch','botorch','pvlib','py_wake','topfarm','h5py','bmipy'}:
+            raise RuntimeError('example and optional runtime imports denied')
+sys.meta_path.insert(0,Denied())
+import hashlib,json,os,socket,subprocess,time
+from click.testing import CliRunner
+from autoengineering.cli import cli
+from autoengineering.utility.command import utility
+from autoengineering.utility import reporting
+from autoengineering.utility.baseline_selection import follower_group
+from autoengineering.utility.baseline_execution import frozen_baseline_allocations
+from autoengineering.agents.batch import BatchSpec,BatchStore
+from autoengineering.campaign.serialization import digest
+if mode=='current':
+    from autoengineering.utility.load_costs import CostEvidenceSpec
+    from autoengineering.utility.load_container_costs import ContainerLoadCostRegistration
+pins=json.loads(pins_path.read_text())
+legacy=(root/'expected-legacy.json').read_text()
+expected=(root/'expected-accounting.json').read_text()
+markdown=(root/'expected-accounting.md').read_text()
+inputs=json.loads((root/'cost-inputs.json').read_text())
+for name,module in tuple(sys.modules.items()):
+    if name=='autoengineering' or name.startswith('autoengineering.'):
+        origin=getattr(module,'__file__',None)
+        if origin is not None:assert Path(origin).resolve().is_relative_to(site),name
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def denied(*a,**kw):raise RuntimeError('process network or clock denied')
+subprocess.Popen=socket.socket=time.time=time.monotonic=denied
+
+def audit(event,args):
+    if event=='open':
+        path,mode,flags=args
+        if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise RuntimeError('write denied')
+        if isinstance(path,int):
+            st=os.fstat(path)
+            if (st.st_dev,st.st_ino) not in inodes:raise RuntimeError('outside descriptor denied')
+        elif not Path(os.fsdecode(path)).absolute().is_relative_to(root):raise RuntimeError('outside public scope denied')
+    if event=='import' or event.startswith(('socket.','subprocess.','os.exec','os.fork','os.posix_spawn')):
+        raise RuntimeError('new import or execution denied')
+sys.addaudithook(audit)
+for name,sha in pins.items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+runner=CliRunner()
+plain=runner.invoke(cli,['utility','report',str(root/'suite')])
+assert plain.exit_code==0,(plain.output,plain.exception)
+assert plain.output==legacy
+if mode=='current':
+    args=['utility','report',str(root/'suite'),'--cost-inputs',str(root/'cost-inputs.json')]
+    result=runner.invoke(cli,args)
+    assert result.exit_code==0,(result.output,result.exception)
+    assert result.output==expected
+    again=runner.invoke(cli,args)
+    assert again.output==result.output and again.exit_code==0
+    text=runner.invoke(cli,[*args,'--format','markdown'])
+    assert text.exit_code==0 and text.output==markdown+'\n'
+    verified=runner.invoke(cli,['utility','verify',str(root/'suite'),'--cost-inputs',str(root/'cost-inputs.json')])
+    assert verified.exit_code==0,(verified.output,verified.exception)
+    verified=json.loads(verified.output)
+    assert verified['status']=='verified_integrity' and verified['cost_inputs_digest']==digest(inputs)
+    document=json.loads(result.output)
+    assert not document['complete_cost_evidence'] and document['cost_limits']
+    quantities={r['resource']:r['quantity'] for r in document['physical_receipt_costs']['known_totals']}
+    assert quantities['confirmation_container_starts']==1
+    assert quantities['confirmation_container_lifecycle_duration']==.5
+    assert quantities['load_model_starts']==24 and quantities['load_solver_iterations']==96
+    assert quantities['load_component_calls']==480 and quantities['load_component_linearize_calls']==24
+assert not any(n=='examples' or n.startswith('examples.') for n in sys.modules)
+print(json.dumps({'mode':mode,'installed_core_only':True,'legacy_cli_bytes_exact':True,
+    'current_cost_json_markdown_verify_reconstructed':mode=='current','examples_imported':False,
+    'new_model_calls':0,'private_source_reads':0,'new_processes_after_initialization':0,
+    'network':0,'full_cost_evidence':False,'task_admitted':False}))

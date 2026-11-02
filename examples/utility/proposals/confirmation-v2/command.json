@@ -1,0 +1,18 @@
+{
+  "prepare": {
+    "method": "confirmation_choices.write",
+    "source_root": "worktree",
+    "output": "examples/utility/proposals/confirmation-v2",
+    "models_started": 0,
+    "observations_accessed": false
+  },
+  "regression": {
+    "command": "python -m pytest tests/test_utility_confirmation_choices.py tests/test_utility_preparation.py tests/test_documentation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-confirmation-choices-final-v2 --junitxml=examples/utility/proposals/confirmation-v2/final-current.xml",
+    "exit_code": 0
+  },
+  "metadata_fetch": {
+    "request": "metadata-refresh/request.json",
+    "result": "metadata-refresh/result.json",
+    "observation_files_requested": false
+  }
+}

@@ -1,0 +1,53 @@
+from pathlib import Path
+import builtins
+import csv
+import io
+import json
+import os
+import socket
+import ssl
+import subprocess
+import sys
+
+base=Path(sys.argv[1]);c=json.loads((base/'installed-configuration.json').read_bytes())
+legacy=json.loads((base/'legacy-inputs.json').read_bytes())
+sys.path.insert(0,c['installed_root'])
+from autoengineering.utility.analysis import AnalysisPlan,analyze_confirmation
+from autoengineering.utility.baselines import SharedBaseline
+from autoengineering.utility.reporting import ReportSpec,comparative_report,export_report,verify_export
+from autoengineering.utility.store import SuiteStore
+import autoengineering.utility.baseline_execution as implementation
+assert implementation.__file__.startswith(c['installed_root']+'/')
+assert not {'torch','botorch','openmdao','pvlib','py_wake','topfarm'} & set(sys.modules)
+blocked=(Path('/private/tmp/utility-baseline-confirmation-fixture-v1'),Path('/private/tmp/utility-baseline-reuse-fixtures-v1'))
+def guard(function):
+    def checked(path,*args,**kwargs):
+        if isinstance(path,(str,bytes,os.PathLike)):
+            value=Path(os.fsdecode(path)).absolute()
+            assert not any(value.is_relative_to(root) for root in blocked),'original root opened'
+        return function(path,*args,**kwargs)
+    return checked
+builtins.open=guard(builtins.open);io.open=guard(io.open);os.open=guard(os.open)
+def denied(*args,**kwargs):raise AssertionError('offline reader attempted network or process')
+socket.socket=denied;subprocess.Popen=denied
+store=SuiteStore(base/'public-suite');before=store.replay()
+request=ReportSpec.from_json((base/'report-inputs.json').read_text())
+report=comparative_report(store,request)
+assert report['analysis']['scored_cells']==2 and report['analysis']['physical_score_receipts']==1
+assert [r['confirmation_reused'] for r in report['cells']]==[False,True]
+export_report(store,request,base/'export')
+verified=verify_export(store,request,base/'export');assert verified['status']=='verified_reconstruction'
+rows=list(csv.DictReader(io.StringIO((base/'export/cost-allocations.csv').read_text())))
+rows=[r for r in rows if r['resource']=='confirmation_reservations']
+assert len(rows)==2 and len({r['receipt_id'] for r in rows})==1
+assert [float(r['allocation']) for r in rows]==[.25,.75]
+assert sum(float(r['allocated_quantity']) for r in rows)==1
+assert store.replay()['head']==before['head']
+old_store=SuiteStore(base/'legacy-suite')
+assert old_store.spec.schema=='utility-suite-v1' and 'baseline_reuse' not in old_store.spec.to_dict()
+assert old_store.spec.to_json()==(base/'legacy-suite/suite.json').read_text().strip()
+old_report=analyze_confirmation(old_store,AnalysisPlan.from_dict(legacy['plan']),shared_baselines=(SharedBaseline.from_dict(legacy['allocation']),))
+assert old_report['scored_cells']==2 and old_report['physical_score_receipts']==1
+result={'schema':'utility-baseline-confirmation-installed-reader-v1','installed_core_files':201,'logical_scored_cells':2,'physical_receipts':1,'allocated_confirmation_reservations':[.25,.75],'allocation_total':1,'source_and_reuse_markers':[False,True],'export_reconstruction_verified':True,'journal_unchanged':True,'legacy_v1_bytes_and_digest_preserved':True,'original_roots_network_and_process_denied':True,'optional_frameworks_not_imported':True,'private_scoring_qualified':False,'independent_confirmation':False}
+(base/'installed-reader.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

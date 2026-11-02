@@ -1,0 +1,272 @@
+{
+  "schema": "utility-guest-qualification-evidence-map-v6",
+  "original_proposal_path": "examples/utility/prepared-guest-image-v1/qualification-proposal.json",
+  "original_proposal_sha256": "21fa4b8f0d2206be5e2fd7cf73d72a8dad846f3f919db154c563a34466d19a7d",
+  "original_proposal_unchanged": true,
+  "complete_matrix": false,
+  "image_id": "sha256:516cb2702eb45d99264dc90622fea8de4de987f68b4266ba8c86da4c312390de",
+  "cases": [
+    {
+      "case_id": "wrong_source",
+      "kind": "inference_preflight",
+      "max_creations": 0,
+      "max_starts": 0,
+      "status": "separate_preflight_evidence",
+      "evidence": "examples/utility/verification-guest-preflight-controls-v1/complete.json",
+      "limits": "exact facade refusal under zero-access guards; no daemon or kernel refusal"
+    },
+    {
+      "case_id": "wrong_model",
+      "kind": "inference_preflight",
+      "max_creations": 0,
+      "max_starts": 0,
+      "status": "separate_preflight_evidence",
+      "evidence": "examples/utility/verification-guest-preflight-controls-v1/complete.json",
+      "limits": "exact facade refusal under zero-access guards; no daemon or kernel refusal"
+    },
+    {
+      "case_id": "wrong_fit_seed",
+      "kind": "inference_preflight",
+      "max_creations": 0,
+      "max_starts": 0,
+      "status": "separate_preflight_evidence",
+      "evidence": "examples/utility/verification-guest-preflight-controls-v1/complete.json",
+      "limits": "exact facade refusal under zero-access guards; no daemon or kernel refusal"
+    },
+    {
+      "case_id": "wrong_axis",
+      "kind": "inference_preflight",
+      "max_creations": 0,
+      "max_starts": 0,
+      "status": "separate_preflight_evidence",
+      "evidence": "examples/utility/verification-guest-preflight-controls-v1/complete.json",
+      "limits": "exact facade refusal under zero-access guards; no daemon or kernel refusal"
+    },
+    {
+      "case_id": "wrong_partition",
+      "kind": "inference_preflight",
+      "max_creations": 0,
+      "max_starts": 0,
+      "status": "separate_preflight_evidence",
+      "evidence": "examples/utility/verification-guest-preflight-controls-v1/complete.json",
+      "limits": "exact facade refusal under zero-access guards; no daemon or kernel refusal"
+    },
+    {
+      "case_id": "cancel_before_access",
+      "kind": "inference_preflight",
+      "max_creations": 0,
+      "max_starts": 0,
+      "status": "separate_preflight_evidence",
+      "evidence": "examples/utility/verification-guest-preflight-controls-v1/complete.json",
+      "limits": "exact facade refusal under zero-access guards; no daemon or kernel refusal"
+    },
+    {
+      "case_id": "frozen_prediction_parity",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_parity_evidence",
+      "evidence": "examples/utility/verification-guest-prediction-parity-v1/complete.json",
+      "limits": "one reused completed guest inference and one separately reserved native reference; no new guest run"
+    },
+    {
+      "case_id": "physical_veto",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "not_attempted",
+      "evidence": null,
+      "handler_status": "actual_daemon_handler_missing"
+    },
+    {
+      "case_id": "invalid_numeric_output",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "not_attempted",
+      "evidence": null,
+      "handler_status": "actual_daemon_handler_missing"
+    },
+    {
+      "case_id": "oversized_stdout",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "not_attempted",
+      "evidence": null,
+      "handler_status": "actual_daemon_handler_missing"
+    },
+    {
+      "case_id": "malformed_stdio",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "not_attempted",
+      "evidence": null,
+      "handler_status": "actual_daemon_handler_missing"
+    },
+    {
+      "case_id": "cancel_after_create",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 0,
+      "status": "actual_unstarted_cancellation_evidence",
+      "evidence": "examples/utility/verification-guest-cancellation-controls-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "two local unstarted cancellations only; running cancellation and owner loss remain open"
+    },
+    {
+      "case_id": "cancel_before_start",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 0,
+      "status": "actual_unstarted_cancellation_evidence",
+      "evidence": "examples/utility/verification-guest-cancellation-controls-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "two local unstarted cancellations only; running cancellation and owner loss remain open"
+    },
+    {
+      "case_id": "cancel_running",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "actual_running_guest_cancellation_evidence",
+      "evidence": "examples/utility/verification-guest-running-cancellation-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "cancelled after observed running START before input transfer; not model-compute interruption; original start and unknown lifecycle time retained"
+    },
+    {
+      "case_id": "owner_loss_before_watchdog_ready",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 0,
+      "status": "actual_exact_process_loss_evidence",
+      "evidence": "examples/utility/verification-guest-owner-loss-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "actual owner SIGKILL after watchdog plan before its child spawn; explicit parent cleanup required, no autonomous pre-watchdog cleanup claim"
+    },
+    {
+      "case_id": "watchdog_child_loss_before_start",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 0,
+      "status": "actual_exact_process_loss_evidence",
+      "evidence": "examples/utility/verification-guest-owner-loss-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "actual SIGKILL of exact owned ready watchdog handle after attach; START refused and explicit production startup cleanup"
+    },
+    {
+      "case_id": "owner_loss_running",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "actual_exact_process_loss_evidence",
+      "evidence": "examples/utility/verification-guest-owner-loss-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "actual owner SIGKILL after observed running guest START, before input transfer; not model-compute interruption evidence"
+    },
+    {
+      "case_id": "owner_loss_after_capture",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "actual_exact_process_loss_evidence",
+      "evidence": "examples/utility/verification-guest-owner-loss-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "actual owner SIGKILL after model capture before stop journal; saved successful result recovered with unknown lifecycle time and no new inference"
+    },
+    {
+      "case_id": "lost_create_response",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 0,
+      "status": "actual_producer_acknowledgment_loss_evidence",
+      "evidence": "examples/utility/verification-guest-response-loss-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "successful real daemon responses withheld by a producer wrapper; not network outage or actual owner-process loss"
+    },
+    {
+      "case_id": "lost_start_response",
+      "kind": "fixed_authored_inference",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "actual_producer_acknowledgment_loss_evidence",
+      "evidence": "examples/utility/verification-guest-response-loss-v1/complete.json",
+      "handler_status": "implemented_and_executed",
+      "limits": "successful real daemon responses withheld by a producer wrapper; not network outage or actual owner-process loss"
+    },
+    {
+      "case_id": "memory_limit",
+      "kind": "separate_diagnostic_profile_required",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_resource_evidence",
+      "evidence": "examples/utility/verification-guest-resources-v2/summary.json",
+      "limits": "six derivative diagnostic starts; no model/private/owner-loss qualification"
+    },
+    {
+      "case_id": "pid_limit",
+      "kind": "separate_diagnostic_profile_required",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_resource_evidence",
+      "evidence": "examples/utility/verification-guest-resources-v2/summary.json",
+      "limits": "six derivative diagnostic starts; no model/private/owner-loss qualification"
+    },
+    {
+      "case_id": "workspace_limit",
+      "kind": "separate_diagnostic_profile_required",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_resource_evidence",
+      "evidence": "examples/utility/verification-guest-resources-v2/summary.json",
+      "limits": "six derivative diagnostic starts; no model/private/owner-loss qualification"
+    },
+    {
+      "case_id": "read_only_root",
+      "kind": "separate_diagnostic_profile_required",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_resource_evidence",
+      "evidence": "examples/utility/verification-guest-resources-v2/summary.json",
+      "limits": "six derivative diagnostic starts; no model/private/owner-loss qualification"
+    },
+    {
+      "case_id": "network_denied",
+      "kind": "separate_diagnostic_profile_required",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_resource_evidence",
+      "evidence": "examples/utility/verification-guest-resources-v2/summary.json",
+      "limits": "six derivative diagnostic starts; no model/private/owner-loss qualification"
+    },
+    {
+      "case_id": "host_canary_denied",
+      "kind": "separate_diagnostic_profile_required",
+      "max_creations": 1,
+      "max_starts": 1,
+      "status": "separate_resource_evidence",
+      "evidence": "examples/utility/verification-guest-resources-v2/summary.json",
+      "limits": "six derivative diagnostic starts; no model/private/owner-loss qualification"
+    }
+  ],
+  "separate_evidence_cases": 22,
+  "remaining_actual_daemon_cases": 4,
+  "remaining_proposed_max_creations": 4,
+  "remaining_proposed_max_starts": 4,
+  "unspent_allowance_is_not_new_execution_authority": true,
+  "accounting": "Retain every consumed request, failed preparation, container and uncertain cleanup separately. This map creates no allowance or retry and refunds nothing.",
+  "native_reference_starts_separately_counted": 1,
+  "private_scoring_starts": 1,
+  "runtime_qualified": false,
+  "independent_confirmation": false,
+  "predecessor": "examples/utility/qualification-state-guest-v5.json",
+  "predecessor_sha256": "2128ecb7b8abe258ef56b57065165b08832051de852b9ebee2ed10c04585ec1e",
+  "supplemental_actual_composite": {
+    "evidence": "examples/utility/verification-guest-composite-actual-v1/summary.json",
+    "evidence_sha256": "b72168febd295eb7215e0b225bb2f333908618dfa7350ce3ad736452096759b0",
+    "inference_container_starts": 1,
+    "fixed_scorer_container_starts": 1,
+    "scope": "actual application-owned chain on authored inputs; outside original 26-case proposal; no remaining adverse case reclassified"
+  }
+}

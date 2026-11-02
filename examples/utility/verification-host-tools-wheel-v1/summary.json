@@ -1,0 +1,22 @@
+{
+  "core_python_files": 224,
+  "build_inputs": 359,
+  "wheel_python_sources": 318,
+  "wheel_sha256": "55fc3857513cb4a7155fc058fe18fac0f3de469ccb7f820264469404cbbcfc9b",
+  "installed": false,
+  "guest_environment_replaced": false,
+  "image_built": false,
+  "schema": "utility-host-tools-wheel-verification-v1",
+  "all_build_input_pins_unchanged": true,
+  "isolated_cli_help_checks": 5,
+  "guarded_saved_readers": 3,
+  "real_archive_and_context_readers": true,
+  "authored_build_metadata_only": true,
+  "documentation_tests": 19,
+  "pending_image_request_unchanged": true,
+  "actual_image_job_started": false,
+  "dependency_installation": false,
+  "runtime_qualified": false,
+  "independent_confirmation": false,
+  "earlier_tar_mode_failure_retained": true
+}

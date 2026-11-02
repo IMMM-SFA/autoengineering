@@ -107,6 +107,78 @@ def test_synthetic_confirmation_is_once_and_freeze_cannot_reopen_selection(tmp_p
     assert len(controller.state().budget.attempts) == 3
 
 
+def test_queued_cancellation_prevents_confirmation_execution(tmp_path):
+    from autoengineering.campaign.spec import ConfirmationSpec
+
+    spec = fixture()
+    confirmation = replace(
+        spec.data[-1], id="confirmation", role="confirmation", prior_exposure="unexposed"
+    )
+    spec = replace(
+        spec,
+        data=(*spec.data, confirmation),
+        confirmation=ConfirmationSpec("once", "confirmation", "eligibility-v1"),
+    )
+    controller = create(tmp_path, spec=spec, limit=2)
+    assert controller.advance().state == "selection_frozen"
+    selected = controller.state().frozen_id
+    controller = CampaignController.open(controller.store.root, max_new_evaluations=1)
+    controller.cancel("stop-confirmation")
+    response = controller.request("confirm", request_id="cancelled-confirmation")
+    assert response.status == "ok"
+    assert controller.store.replay().state == "completed"
+    assert controller.state().outcome == "cancelled"
+    assert controller.state().frozen_id == selected
+    assert len(controller.state().budget.attempts) == 2
+    assert controller.request("confirm").error == "invalid_transition"
+    assert controller.request("propose", {"proposal_id": "new"}).error == "invalid_transition"
+    assert len(controller.state().budget.attempts) == 2
+
+
+def test_confirmation_cancellation_preserves_unknown_attempt_and_frozen_choice(tmp_path):
+    from autoengineering.campaign.records import AttemptRecord
+    from autoengineering.campaign.spec import ConfirmationSpec
+
+    spec = fixture()
+    confirmation = replace(
+        spec.data[-1], id="confirmation", role="confirmation", prior_exposure="unexposed"
+    )
+    spec = replace(
+        spec,
+        data=(*spec.data, confirmation),
+        confirmation=ConfirmationSpec("once", "confirmation", "eligibility-v1"),
+    )
+    controller = create(tmp_path, spec=spec, limit=2)
+    assert controller.advance().state == "selection_frozen"
+    state = controller.state()
+    attempt = AttemptRecord(
+        "unknown-confirmation",
+        "confirmation-reservation",
+        "launched",
+        None,
+        "confirmation-nonce",
+        None,
+        None,
+        True,
+        None,
+    )
+    budget = state.budget.reserve(attempt.reservation_id, 1).start(attempt)
+    with controller.store.writer():
+        controller._checkpoint(
+            "evaluating",
+            replace(state, budget=budget, phase="confirmation"),
+            "uncertain-confirmation-fixture",
+        )
+    controller.cancel("stop-unknown-confirmation")
+    response = controller.request("confirm")
+    assert response.status == "ok"
+    assert controller.store.replay().state == "reconciliation_required"
+    assert controller.state().budget == budget
+    assert controller.state().frozen_id == state.frozen_id
+    assert controller.state().outcome == state.outcome
+    assert len(controller.state().budget.attempts) == 3
+
+
 def test_failed_confirmation_does_not_reopen_selection(tmp_path, monkeypatch):
     from autoengineering.campaign.spec import ConfirmationSpec
     from autoengineering.campaign.acceptance import DEFAULT_CHECKS
@@ -228,3 +300,23 @@ def test_declared_bundle_must_match_executing_adapter_and_engine(tmp_path, chang
     with pytest.raises(ValueError):
         CampaignController.create(specification, source, tmp_path / "must-not-create")
     assert not (tmp_path / "must-not-create").exists()
+
+
+@pytest.mark.parametrize("suffix", [".json", ".JSON"])
+def test_json_campaign_creation_preserves_scientific_notation(tmp_path, suffix):
+    spec = fixture()
+    spec = replace(spec, execution=replace(spec.execution, timeout_seconds=1e-5))
+    path = tmp_path / ("scientific-input" + suffix)
+    path.write_text(spec.to_json())
+    controller = CampaignController.create(path, ROOT, tmp_path / "campaign")
+    assert controller.spec == spec
+    assert controller.spec.execution.timeout_seconds == 1e-5
+    assert not controller.state().budget.attempts
+
+
+def test_json_campaign_creation_rejects_duplicate_keys_before_writes(tmp_path):
+    path = tmp_path / "duplicate.json"
+    path.write_text('{"name":"first","name":"second"}')
+    with pytest.raises(ValueError, match="duplicate"):
+        CampaignController.create(path, ROOT, tmp_path / "campaign")
+    assert not (tmp_path / "campaign").exists()

@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="25" time="128.664" timestamp="2026-10-28T14:19:31.543911-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_parent_runs_both_executors_and_freezes_one_manifest" time="0.566"><failure message="autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_parent_runs_both_ex0')
+
+    def test_mixed_parent_runs_both_executors_and_freezes_one_manifest(tmp_path):
+        store, plan, source = setup(tmp_path)
+        assert ScriptedMixedPlan.from_json(plan.to_json()) == plan
+&gt;       first = ScriptedMixedCoordinator(store, plan, source).run(max_new_cells=1)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_mixed_execution.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;autoengineering.utility.mixed_execution.ScriptedMixedCoordinator object at 0x1019af6b0&gt;
+store = &lt;autoengineering.utility.store.SuiteStore object at 0x143880860&gt;
+plan = ScriptedMixedPlan(schema='utility-scripted-mixed-v1', routes=RoutePlan(schema='utility-routes-v1', task_routes=(TaskRo...untime_identity='8d19760cc9bf867eeba626fec11f3095488e75039a3d5eacfb557c9d11cf24fd', purpose='exposed_development_only')
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_parent_runs_both_ex0/eng/captured')
+fault = None
+
+    def __init__(self, store, plan: ScriptedMixedPlan, source_root, *, fault=None):
+        self.store, self.plan, self.source_root = store, plan, checked_directory(source_root)
+        self.runtime = UtilityController(store)
+        self.fault = fault or (lambda stage: None)
+        self._resume_scenarios = False
+        if plan.runtime_identity != engineering_runtime_identity():
+            raise StoreError("mixed interpreter/package environment differs from frozen plan")
+        if plan.digest != store.spec.protocol_digest:
+            raise StoreError("mixed protocol differs from frozen suite")
+        routes, cells = plan.routes.expand(store.spec.tasks, store.spec.budgets)
+        if routes != store.spec.routes or cells != store.spec.cells:
+            raise StoreError("mixed execution matrix differs from frozen suite")
+        if (
+            plan.lock.sha256 != store.spec.lock_digest
+            or digest([r.to_dict() for r in plan.source_inventory]) != store.spec.source_digest
+        ):
+            raise StoreError("mixed source or lock identity differs")
+        for name in (
+            "worker_seconds",
+            "elapsed_seconds",
+            "workspace_bytes",
+            "transcript_bytes",
+            "max_invocations",
+            "max_tasks",
+            "max_repairs",
+        ):
+            if getattr(plan.worker_limits, name) &gt; getattr(plan.batch_limits, name):
+                raise StoreError("mixed worker limits exceed child batch")
+        self.campaigns = {t.task_id: t.campaign for t in plan.campaigns}
+        self.prediction_tasks = {
+            t.task_id for t in plan.campaigns if isinstance(t, TaskPredictionCampaign)
+        }
+        if set(self.campaigns) != {t.task_id for t in store.spec.tasks}:
+            raise StoreError("mixed campaigns do not cover the assigned tasks")
+        for task in store.spec.tasks:
+            campaign = self.campaigns[task.task_id]
+            if task.task_id not in self.prediction_tasks:
+                validate_engineering_task(task, campaign, self.source_root)
+                continue
+            validate_prediction_inputs(campaign, self.source_root)
+            snapshots = CampaignController.supplied_snapshots(SimpleNamespace(spec=campaign))
+            for ref in (
+                *campaign.provenance.sources,
+                campaign.baseline.system,
+                *campaign.baseline.model.source_bundle,
+                *(ref for snapshot in snapshots for ref in snapshot.model.source_bundle),
+            ):
+                read_bytes(self.source_root, ref)
+            pool = tuple(
+                dict.fromkeys(
+                    (
+                        campaign.baseline.model.digest,
+                        *(s.model.digest for s in snapshots),
+                    )
+                )
+            )
+            if (
+                task.family not in ("hydrology", "solar")
+                or task.candidate_digests != pool
+                or task.partition_digest != digest([d.to_dict() for d in campaign.data])
+                or task.outcome_digest != campaign.acceptance.digest
+            ):
+&gt;               raise StoreError("prediction task/model/partition/outcome identity differs")
+E               autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs
+
+src/autoengineering/utility/mixed_execution.py:148: StoreError</failure></testcase><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_rejects_task_outcome_before_allocation" time="0.570" /><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_cli_resume_preserves_plan_and_exports_shared_proposal" time="0.673"><failure message="AssertionError: {&quot;error&quot;:&quot;invalid_utility_evidence&quot;,&quot;status&quot;:&quot;error&quot;}&#10;  &#10;assert 2 == 0&#10; +  where 2 = &lt;Result SystemExit(2)&gt;.exit_code">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_cli_resume_preserve0')
+
+    def test_mixed_cli_resume_preserves_plan_and_exports_shared_proposal(tmp_path):
+        import json
+        from click.testing import CliRunner
+        from autoengineering.cli import cli
+    
+        store, plan, source = setup(tmp_path)
+        path = tmp_path / "execution.json"
+        path.write_text(plan.to_json())
+        common = [str(store.root), str(path), "--source-root", str(source), "--scripted-development"]
+        runner = CliRunner()
+        first = runner.invoke(cli, ["utility", "run", *common, "--max-new-cells", "1"])
+&gt;       assert first.exit_code == 0, first.output
+E       AssertionError: {"error":"invalid_utility_evidence","status":"error"}
+E         
+E       assert 2 == 0
+E        +  where 2 = &lt;Result SystemExit(2)&gt;.exit_code
+
+tests/test_utility_mixed_execution.py:190: AssertionError</failure></testcase><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_plan_rejects_changed_prediction_lock" time="0.474" /><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_changed_prediction_bytes_reject_before_allocation" time="0.488" /><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_agent_routes_use_both_existing_brokers" time="0.540"><failure message="autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_agent_routes_use_bo0')
+
+    def test_mixed_agent_routes_use_both_existing_brokers(tmp_path):
+        store, plan, source = setup(tmp_path, kind="multi_agent")
+&gt;       coordinator = ScriptedMixedCoordinator(store, plan, source)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_mixed_execution.py:222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;autoengineering.utility.mixed_execution.ScriptedMixedCoordinator object at 0x143815820&gt;
+store = &lt;autoengineering.utility.store.SuiteStore object at 0x147f66990&gt;
+plan = ScriptedMixedPlan(schema='utility-scripted-mixed-v1', routes=RoutePlan(schema='utility-routes-v1', task_routes=(TaskRo...untime_identity='8d19760cc9bf867eeba626fec11f3095488e75039a3d5eacfb557c9d11cf24fd', purpose='exposed_development_only')
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_agent_routes_use_bo0/eng/captured')
+fault = None
+
+    def __init__(self, store, plan: ScriptedMixedPlan, source_root, *, fault=None):
+        self.store, self.plan, self.source_root = store, plan, checked_directory(source_root)
+        self.runtime = UtilityController(store)
+        self.fault = fault or (lambda stage: None)
+        self._resume_scenarios = False
+        if plan.runtime_identity != engineering_runtime_identity():
+            raise StoreError("mixed interpreter/package environment differs from frozen plan")
+        if plan.digest != store.spec.protocol_digest:
+            raise StoreError("mixed protocol differs from frozen suite")
+        routes, cells = plan.routes.expand(store.spec.tasks, store.spec.budgets)
+        if routes != store.spec.routes or cells != store.spec.cells:
+            raise StoreError("mixed execution matrix differs from frozen suite")
+        if (
+            plan.lock.sha256 != store.spec.lock_digest
+            or digest([r.to_dict() for r in plan.source_inventory]) != store.spec.source_digest
+        ):
+            raise StoreError("mixed source or lock identity differs")
+        for name in (
+            "worker_seconds",
+            "elapsed_seconds",
+            "workspace_bytes",
+            "transcript_bytes",
+            "max_invocations",
+            "max_tasks",
+            "max_repairs",
+        ):
+            if getattr(plan.worker_limits, name) &gt; getattr(plan.batch_limits, name):
+                raise StoreError("mixed worker limits exceed child batch")
+        self.campaigns = {t.task_id: t.campaign for t in plan.campaigns}
+        self.prediction_tasks = {
+            t.task_id for t in plan.campaigns if isinstance(t, TaskPredictionCampaign)
+        }
+        if set(self.campaigns) != {t.task_id for t in store.spec.tasks}:
+            raise StoreError("mixed campaigns do not cover the assigned tasks")
+        for task in store.spec.tasks:
+            campaign = self.campaigns[task.task_id]
+            if task.task_id not in self.prediction_tasks:
+                validate_engineering_task(task, campaign, self.source_root)
+                continue
+            validate_prediction_inputs(campaign, self.source_root)
+            snapshots = CampaignController.supplied_snapshots(SimpleNamespace(spec=campaign))
+            for ref in (
+                *campaign.provenance.sources,
+                campaign.baseline.system,
+                *campaign.baseline.model.source_bundle,
+                *(ref for snapshot in snapshots for ref in snapshot.model.source_bundle),
+            ):
+                read_bytes(self.source_root, ref)
+            pool = tuple(
+                dict.fromkeys(
+                    (
+                        campaign.baseline.model.digest,
+                        *(s.model.digest for s in snapshots),
+                    )
+                )
+            )
+            if (
+                task.family not in ("hydrology", "solar")
+                or task.candidate_digests != pool
+                or task.partition_digest != digest([d.to_dict() for d in campaign.data])
+                or task.outcome_digest != campaign.acceptance.digest
+            ):
+&gt;               raise StoreError("prediction task/model/partition/outcome identity differs")
+E               autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs
+
+src/autoengineering/utility/mixed_execution.py:148: StoreError</failure></testcase><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_resume_after_original_response_preserves_reservations[engineering_scientific_response_saved]" time="0.534"><failure message="autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_resume_after_origin0')
+stage = 'engineering_scientific_response_saved'
+
+    @pytest.mark.parametrize(
+        "stage", ["engineering_scientific_response_saved", "scripted_scientific_response_saved"]
+    )
+    def test_mixed_resume_after_original_response_preserves_reservations(tmp_path, stage):
+        store, plan, source = setup(tmp_path)
+    
+        class OwnerLost(BaseException):
+            pass
+    
+        def lost(current):
+            if current == stage:
+                raise OwnerLost()
+    
+&gt;       coordinator = ScriptedMixedCoordinator(store, plan, source, fault=lost)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_mixed_execution.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;autoengineering.utility.mixed_execution.ScriptedMixedCoordinator object at 0x142fee8a0&gt;
+store = &lt;autoengineering.utility.store.SuiteStore object at 0x147dca630&gt;
+plan = ScriptedMixedPlan(schema='utility-scripted-mixed-v1', routes=RoutePlan(schema='utility-routes-v1', task_routes=(TaskRo...untime_identity='8d19760cc9bf867eeba626fec11f3095488e75039a3d5eacfb557c9d11cf24fd', purpose='exposed_development_only')
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_resume_after_origin0/eng/captured')
+fault = &lt;function test_mixed_resume_after_original_response_preserves_reservations.&lt;locals&gt;.lost at 0x1018aa520&gt;
+
+    def __init__(self, store, plan: ScriptedMixedPlan, source_root, *, fault=None):
+        self.store, self.plan, self.source_root = store, plan, checked_directory(source_root)
+        self.runtime = UtilityController(store)
+        self.fault = fault or (lambda stage: None)
+        self._resume_scenarios = False
+        if plan.runtime_identity != engineering_runtime_identity():
+            raise StoreError("mixed interpreter/package environment differs from frozen plan")
+        if plan.digest != store.spec.protocol_digest:
+            raise StoreError("mixed protocol differs from frozen suite")
+        routes, cells = plan.routes.expand(store.spec.tasks, store.spec.budgets)
+        if routes != store.spec.routes or cells != store.spec.cells:
+            raise StoreError("mixed execution matrix differs from frozen suite")
+        if (
+            plan.lock.sha256 != store.spec.lock_digest
+            or digest([r.to_dict() for r in plan.source_inventory]) != store.spec.source_digest
+        ):
+            raise StoreError("mixed source or lock identity differs")
+        for name in (
+            "worker_seconds",
+            "elapsed_seconds",
+            "workspace_bytes",
+            "transcript_bytes",
+            "max_invocations",
+            "max_tasks",
+            "max_repairs",
+        ):
+            if getattr(plan.worker_limits, name) &gt; getattr(plan.batch_limits, name):
+                raise StoreError("mixed worker limits exceed child batch")
+        self.campaigns = {t.task_id: t.campaign for t in plan.campaigns}
+        self.prediction_tasks = {
+            t.task_id for t in plan.campaigns if isinstance(t, TaskPredictionCampaign)
+        }
+        if set(self.campaigns) != {t.task_id for t in store.spec.tasks}:
+            raise StoreError("mixed campaigns do not cover the assigned tasks")
+        for task in store.spec.tasks:
+            campaign = self.campaigns[task.task_id]
+            if task.task_id not in self.prediction_tasks:
+                validate_engineering_task(task, campaign, self.source_root)
+                continue
+            validate_prediction_inputs(campaign, self.source_root)
+            snapshots = CampaignController.supplied_snapshots(SimpleNamespace(spec=campaign))
+            for ref in (
+                *campaign.provenance.sources,
+                campaign.baseline.system,
+                *campaign.baseline.model.source_bundle,
+                *(ref for snapshot in snapshots for ref in snapshot.model.source_bundle),
+            ):
+                read_bytes(self.source_root, ref)
+            pool = tuple(
+                dict.fromkeys(
+                    (
+                        campaign.baseline.model.digest,
+                        *(s.model.digest for s in snapshots),
+                    )
+                )
+            )
+            if (
+                task.family not in ("hydrology", "solar")
+                or task.candidate_digests != pool
+                or task.partition_digest != digest([d.to_dict() for d in campaign.data])
+                or task.outcome_digest != campaign.acceptance.digest
+            ):
+&gt;               raise StoreError("prediction task/model/partition/outcome identity differs")
+E               autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs
+
+src/autoengineering/utility/mixed_execution.py:148: StoreError</failure></testcase><testcase classname="tests.test_utility_mixed_execution" name="test_mixed_resume_after_original_response_preserves_reservations[scripted_scientific_response_saved]" time="0.530"><failure message="autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_resume_after_origin1')
+stage = 'scripted_scientific_response_saved'
+
+    @pytest.mark.parametrize(
+        "stage", ["engineering_scientific_response_saved", "scripted_scientific_response_saved"]
+    )
+    def test_mixed_resume_after_original_response_preserves_reservations(tmp_path, stage):
+        store, plan, source = setup(tmp_path)
+    
+        class OwnerLost(BaseException):
+            pass
+    
+        def lost(current):
+            if current == stage:
+                raise OwnerLost()
+    
+&gt;       coordinator = ScriptedMixedCoordinator(store, plan, source, fault=lost)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_mixed_execution.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;autoengineering.utility.mixed_execution.ScriptedMixedCoordinator object at 0x142feee10&gt;
+store = &lt;autoengineering.utility.store.SuiteStore object at 0x147f652b0&gt;
+plan = ScriptedMixedPlan(schema='utility-scripted-mixed-v1', routes=RoutePlan(schema='utility-routes-v1', task_routes=(TaskRo...untime_identity='8d19760cc9bf867eeba626fec11f3095488e75039a3d5eacfb557c9d11cf24fd', purpose='exposed_development_only')
+source_root = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_mixed_resume_after_origin1/eng/captured')
+fault = &lt;function test_mixed_resume_after_original_response_preserves_reservations.&lt;locals&gt;.lost at 0x147db7560&gt;
+
+    def __init__(self, store, plan: ScriptedMixedPlan, source_root, *, fault=None):
+        self.store, self.plan, self.source_root = store, plan, checked_directory(source_root)
+        self.runtime = UtilityController(store)
+        self.fault = fault or (lambda stage: None)
+        self._resume_scenarios = False
+        if plan.runtime_identity != engineering_runtime_identity():
+            raise StoreError("mixed interpreter/package environment differs from frozen plan")
+        if plan.digest != store.spec.protocol_digest:
+            raise StoreError("mixed protocol differs from frozen suite")
+        routes, cells = plan.routes.expand(store.spec.tasks, store.spec.budgets)
+        if routes != store.spec.routes or cells != store.spec.cells:
+            raise StoreError("mixed execution matrix differs from frozen suite")
+        if (
+            plan.lock.sha256 != store.spec.lock_digest
+            or digest([r.to_dict() for r in plan.source_inventory]) != store.spec.source_digest
+        ):
+            raise StoreError("mixed source or lock identity differs")
+        for name in (
+            "worker_seconds",
+            "elapsed_seconds",
+            "workspace_bytes",
+            "transcript_bytes",
+            "max_invocations",
+            "max_tasks",
+            "max_repairs",
+        ):
+            if getattr(plan.worker_limits, name) &gt; getattr(plan.batch_limits, name):
+                raise StoreError("mixed worker limits exceed child batch")
+        self.campaigns = {t.task_id: t.campaign for t in plan.campaigns}
+        self.prediction_tasks = {
+            t.task_id for t in plan.campaigns if isinstance(t, TaskPredictionCampaign)
+        }
+        if set(self.campaigns) != {t.task_id for t in store.spec.tasks}:
+            raise StoreError("mixed campaigns do not cover the assigned tasks")
+        for task in store.spec.tasks:
+            campaign = self.campaigns[task.task_id]
+            if task.task_id not in self.prediction_tasks:
+                validate_engineering_task(task, campaign, self.source_root)
+                continue
+            validate_prediction_inputs(campaign, self.source_root)
+            snapshots = CampaignController.supplied_snapshots(SimpleNamespace(spec=campaign))
+            for ref in (
+                *campaign.provenance.sources,
+                campaign.baseline.system,
+                *campaign.baseline.model.source_bundle,
+                *(ref for snapshot in snapshots for ref in snapshot.model.source_bundle),
+            ):
+                read_bytes(self.source_root, ref)
+            pool = tuple(
+                dict.fromkeys(
+                    (
+                        campaign.baseline.model.digest,
+                        *(s.model.digest for s in snapshots),
+                    )
+                )
+            )
+            if (
+                task.family not in ("hydrology", "solar")
+                or task.candidate_digests != pool
+                or task.partition_digest != digest([d.to_dict() for d in campaign.data])
+                or task.outcome_digest != campaign.acceptance.digest
+            ):
+&gt;               raise StoreError("prediction task/model/partition/outcome identity differs")
+E               autoengineering.campaign.store.StoreError: prediction task/model/partition/outcome identity differs
+
+src/autoengineering/utility/mixed_execution.py:148: StoreError</failure></testcase><testcase classname="tests.test_utility_engineering_execution" name="test_engineering_plan_executes_cells_and_exports_exact_suite_selection" time="11.802" /><testcase classname="tests.test_utility_engineering_execution" name="test_saved_engineering_response_resumes_original_scientific_work[baseline]" time="2.392" /><testcase classname="tests.test_utility_engineering_execution" name="test_saved_engineering_response_resumes_original_scientific_work[conventional]" time="8.566" /><testcase classname="tests.test_utility_engineering_execution" name="test_saved_engineering_response_resumes_original_scientific_work[multi_agent]" time="15.025" /><testcase classname="tests.test_utility_engineering_execution" name="test_plan_or_source_change_refuses_before_parent_dispatch" time="0.402" /><testcase classname="tests.test_utility_engineering_execution" name="test_public_cli_runs_and_resumes_engineering_plan_without_sealing" time="7.656"><failure message="AssertionError: {&quot;error&quot;:&quot;invalid_utility_evidence&quot;,&quot;status&quot;:&quot;error&quot;}&#10;  &#10;assert 2 == 0&#10; +  where 2 = &lt;Result SystemExit(2)&gt;.exit_code">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4284/test_public_cli_runs_and_resum0')
+
+    def test_public_cli_runs_and_resumes_engineering_plan_without_sealing(tmp_path):
+        import json
+        from click.testing import CliRunner
+        from autoengineering.cli import cli
+    
+        store, plan, source = setup(tmp_path)
+        path = tmp_path / "engineering-plan.json"
+        path.write_text(plan.to_json())
+        common = [str(store.root), str(path), "--source-root", str(source), "--scripted-development"]
+        runner = CliRunner()
+        first = runner.invoke(cli, ["utility", "run", *common, "--max-new-cells", "1"])
+        assert first.exit_code == 0, first.output
+        assert runner.invoke(cli, ["utility", "run", *common]).exit_code == 2
+        resumed = runner.invoke(cli, ["utility", "resume", *common])
+&gt;       assert resumed.exit_code == 0, resumed.output
+E       AssertionError: {"error":"invalid_utility_evidence","status":"error"}
+E         
+E       assert 2 == 0
+E        +  where 2 = &lt;Result SystemExit(2)&gt;.exit_code
+
+tests/test_utility_engineering_execution.py:233: AssertionError</failure></testcase><testcase classname="tests.test_utility_engineering_execution" name="test_runtime_drift_and_legacy_execution_refuse_before_dispatch" time="0.340" /><testcase classname="tests.test_utility_engineering_execution" name="test_grouped_permissions_and_native_jobs_are_case_scoped" time="19.619" /><testcase classname="tests.test_utility_engineering_execution" name="test_cli_pending_scenarios_require_explicit_original_request_continuation" time="2.827" /><testcase classname="tests.test_utility_engineering_execution" name="test_archive_interruption_reuses_finished_science_without_reexecution" time="2.414" /><testcase classname="tests.test_utility_execution" name="test_scripted_coordinator_pauses_at_cell_boundary_and_resumes" time="10.528" /><testcase classname="tests.test_utility_execution" name="test_changed_source_or_plan_rejects_before_dispatch" time="0.092" /><testcase classname="tests.test_utility_execution" name="test_cli_run_resume_and_selection_proposal" time="10.289" /><testcase classname="tests.test_utility_execution" name="test_saved_scientific_response_resumes_without_repeating_physical_start[conventional]" time="9.919" /><testcase classname="tests.test_utility_execution" name="test_saved_scientific_response_resumes_without_repeating_physical_start[multi]" time="10.817" /><testcase classname="tests.test_utility_execution" name="test_unresolved_or_cancelled_cell_blocks_resume[pending_host]" time="5.201" /><testcase classname="tests.test_utility_execution" name="test_unresolved_or_cancelled_cell_blocks_resume[cancelled]" time="5.023" /></testsuite></testsuites>

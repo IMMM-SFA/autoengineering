@@ -1,0 +1,23 @@
+{
+  "created_utc": "2026-10-31T09:44:46.682845+00:00",
+  "prior_full_default": "examples/utility/verification-current-base-v5/verified-summary.json",
+  "changed_pins_since_full_default": [
+    "examples/utility/guest_image_build.py",
+    "tests/test_utility_guest_image_build.py"
+  ],
+  "core_changed": [],
+  "source_sha256": {
+    "examples/utility/guest_image_build.py": "a8302ac396e47b61771bfc193b5ef2282c76188dd087a2636a22c9db4b206566",
+    "tests/test_utility_guest_image_build.py": "4ad7309002e1e3fe416eafa289aabf2a52ad1df1c53629f329ea0662713995ae"
+  },
+  "new_request_digest": "4b292a07a2161f2acb68d08785db6a5c83fd5ef0e17fc06914dbbda6d901eaf5",
+  "new_request_executed": false,
+  "original_work_preserved": true,
+  "runtime_qualified": false,
+  "regression": {
+    "tests": 101,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

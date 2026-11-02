@@ -1,0 +1,21 @@
+........................................................................ [ 22%]
+..............ssss........s.......................ssss.s.............s.. [ 45%]
+.ss..........................................................ss......... [ 67%]
+........................................................................ [ 90%]
+...............................                                          [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_utility_engineering.py:11: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:32: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:56: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:69: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering_process.py:174: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_figures.py:69: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:83: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:101: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:118: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:138: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_prediction_tasks.py:34: optional pvlib required
+SKIPPED [2] tests/test_utility_private_scoring.py:37: actual macOS data-memory limit unavailable; scorer correctly blocked
+SKIPPED [1] tests/test_utility_wind.py:32: optional wind environment required
+SKIPPED [1] tests/test_utility_wind.py:52: optional TOPFARM environment required
+304 passed, 15 skipped in 122.23s (0:02:02)

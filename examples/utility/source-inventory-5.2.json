@@ -1,0 +1,23 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "5.2-store-contracts-partial",
+  "files": {
+    "src/autoengineering/utility/__init__.py": "2b8cf2841d3d40f2411eb7936932a61004a1ed79ee40d8fe616165f21080a30a",
+    "src/autoengineering/utility/contracts.py": "8bcdff6ca1bdc900b1fc74d0bc15c0feed7af618cd70c3cdf9571ff94e75a0c1",
+    "src/autoengineering/utility/costs.py": "c67123962331f44596e39b3545af259b1252d96f769badd72b21034c40b84538",
+    "src/autoengineering/utility/store.py": "0d3fc342a76202d7e20f9f458148a435d27ecc485dc658ff7b68e32150c1acf9",
+    "tests/test_utility_contracts.py": "fa57c79055373b209b4203facf68aa5a1ade161df9b0d9fbcf6a03ce232f625b",
+    "tests/test_utility_costs.py": "7f53a6e3bb64831bc48ae02a7122023a927aa1b62f60c66b5ff680a500543935",
+    "tests/test_utility_store.py": "6c8e33669b0e5b1165a10a16d6a5f9c1b704710e7db96d8c48e2fff26af4ec05"
+  },
+  "verification": {
+    "repository_ruff": "passed",
+    "utility_and_legacy_campaign_contracts_recovery": "61 passed in 36.98s, with process inspection available",
+    "store_after_two_additional_tests": "10 passed in 1.49s"
+  },
+  "limits": [
+    "No child dispatch",
+    "No confirmation execution",
+    "No full default or optional suite run"
+  ]
+}

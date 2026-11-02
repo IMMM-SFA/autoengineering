@@ -1,0 +1,45 @@
+{
+  "protocol": {
+    "schema_version": 1,
+    "model": "OpenMDAO-3.41.0-resistor-diode-circuit",
+    "purpose": "development_only_coupled_electrical_design",
+    "seed": 17,
+    "source_current_bounds_A": [
+      0.01,
+      0.1
+    ],
+    "ground_voltage_V": 0.0,
+    "target_diode_voltage_V": 0.65,
+    "node1_limit_V": 10.0,
+    "node2_limit_V": 0.8,
+    "parity_currents_A": [
+      0.01,
+      0.05,
+      0.1
+    ],
+    "voltage_atol_V": 1e-10,
+    "current_atol_A": 1e-12,
+    "parity_rtol": 1e-10,
+    "kirchhoff_atol_A": 1e-10,
+    "derivative_atol": 1e-05,
+    "derivative_rtol": 1e-05,
+    "optimizer_evaluations": 12,
+    "native_max_iterations": 20,
+    "native_coupled_solve_ceiling": 100,
+    "wall_seconds": 120,
+    "memory_bytes": 4294967296,
+    "native_budget_comparison": "unmatched_if_inner_solve_ceiling_differs"
+  },
+  "sources": {
+    "fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+    "run.py": "12e5e84864a67a785b8e2c4b016b578d9f517ed35f50254098bb8ce60d998259",
+    "model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a"
+  },
+  "upstream_circuit_sha256": "e3d227b27cc7d48d500d8522a1d28c3922c9a76bffc09e47c572ac04d7c56ef8",
+  "versions": {
+    "openmdao": "3.41.0",
+    "optuna": "4.5.0",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  }
+}

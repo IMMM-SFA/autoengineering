@@ -1,0 +1,15 @@
+{
+  "wheel_sha256": "72bb3bf16fcdb77997ce336cf04773b090eff5bc3ecb759881eaa16ee6641422",
+  "python_files": 226,
+  "example_python_files": 0,
+  "copied_inputs": 238,
+  "all_package_payloads_match_inputs": true,
+  "installed_payloads_match_wheel": true,
+  "build_exit_code": 0,
+  "install_exit_code": 0,
+  "target": "/private/tmp/utility-container-live-report-v1/installed",
+  "public_scope": "/private/tmp/utility-container-live-report-v1/public",
+  "network_or_dependency_installation": false,
+  "inherited_native_dependencies": true,
+  "release_or_linux_qualification": false
+}

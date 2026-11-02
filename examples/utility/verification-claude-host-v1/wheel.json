@@ -1,0 +1,7 @@
+{
+  "wheel_sha256": "88a5c39b619f100afb26d5ae23f2c2eedf7ccee9337ab617b2902388ba9c0594",
+  "core_python_files_verified": 190,
+  "host_source_identity": "dd06d8ff96bed0d21b40134a4271307dce1d7a4552f8b28ffa19ce12da45e88b",
+  "guard_scope": "test parent denies original checkout opens, external network/lookup and arbitrary subprocesses; fixed Python/ps and loopback permitted; isolated children do not inherit audit hook",
+  "dependencies": "cached base site path, no editable activation or new dependency solve"
+}

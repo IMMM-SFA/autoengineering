@@ -1,0 +1,191 @@
+[
+  {
+    "cell": "ax-continuous-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 7.435332957655191,
+    "peak_sampled_group_rss_bytes": 484753408
+  },
+  {
+    "cell": "ax-continuous-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 24.879561457782984,
+    "peak_sampled_group_rss_bytes": 490553344
+  },
+  {
+    "cell": "ax-continuous-2",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.5664775418117642,
+    "peak_sampled_group_rss_bytes": 456048640
+  },
+  {
+    "cell": "ax-mixed-0",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.2069719159044325,
+    "peak_sampled_group_rss_bytes": 474218496
+  },
+  {
+    "cell": "ax-mixed-1",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.077570041641593,
+    "peak_sampled_group_rss_bytes": 461373440
+  },
+  {
+    "cell": "ax-mixed-2",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.1939851250499487,
+    "peak_sampled_group_rss_bytes": 462766080
+  },
+  {
+    "cell": "ax-conditional-0",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.064562249928713,
+    "peak_sampled_group_rss_bytes": 465698816
+  },
+  {
+    "cell": "ax-conditional-1",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.0594205828383565,
+    "peak_sampled_group_rss_bytes": 456704000
+  },
+  {
+    "cell": "ax-conditional-2",
+    "exit_code": 1,
+    "stop": null,
+    "elapsed_seconds": 2.2394662499427795,
+    "peak_sampled_group_rss_bytes": 447463424
+  },
+  {
+    "cell": "optuna-continuous-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8679241249337792,
+    "peak_sampled_group_rss_bytes": 133758976
+  },
+  {
+    "cell": "optuna-continuous-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8453222503885627,
+    "peak_sampled_group_rss_bytes": 130547712
+  },
+  {
+    "cell": "optuna-continuous-2",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8607055828906596,
+    "peak_sampled_group_rss_bytes": 132497408
+  },
+  {
+    "cell": "optuna-mixed-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.9775370829738677,
+    "peak_sampled_group_rss_bytes": 134545408
+  },
+  {
+    "cell": "optuna-mixed-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 1.0099399583414197,
+    "peak_sampled_group_rss_bytes": 136429568
+  },
+  {
+    "cell": "optuna-mixed-2",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.9816579166799784,
+    "peak_sampled_group_rss_bytes": 134725632
+  },
+  {
+    "cell": "optuna-conditional-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.9739033752121031,
+    "peak_sampled_group_rss_bytes": 133627904
+  },
+  {
+    "cell": "optuna-conditional-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8732019579038024,
+    "peak_sampled_group_rss_bytes": 133693440
+  },
+  {
+    "cell": "optuna-conditional-2",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.9785719588398933,
+    "peak_sampled_group_rss_bytes": 132759552
+  },
+  {
+    "cell": "sobol-continuous-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8594980002380908,
+    "peak_sampled_group_rss_bytes": 126074880
+  },
+  {
+    "cell": "sobol-continuous-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.9014686667360365,
+    "peak_sampled_group_rss_bytes": 128712704
+  },
+  {
+    "cell": "sobol-continuous-2",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8896150416694582,
+    "peak_sampled_group_rss_bytes": 127893504
+  },
+  {
+    "cell": "sobol-mixed-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.9012051252648234,
+    "peak_sampled_group_rss_bytes": 128499712
+  },
+  {
+    "cell": "sobol-mixed-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8752566250041127,
+    "peak_sampled_group_rss_bytes": 127713280
+  },
+  {
+    "cell": "sobol-mixed-2",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8959038751199841,
+    "peak_sampled_group_rss_bytes": 125468672
+  },
+  {
+    "cell": "sobol-conditional-0",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8635938749648631,
+    "peak_sampled_group_rss_bytes": 124960768
+  },
+  {
+    "cell": "sobol-conditional-1",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8682920001447201,
+    "peak_sampled_group_rss_bytes": 124878848
+  },
+  {
+    "cell": "sobol-conditional-2",
+    "exit_code": 0,
+    "stop": null,
+    "elapsed_seconds": 0.8511368329636753,
+    "peak_sampled_group_rss_bytes": 128090112
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "response": {
+    "url": "https://zenodo.org/api/records/15529996",
+    "final_url": "https://zenodo.org/api/records/15529996",
+    "status": 200,
+    "body_bytes": 14840,
+    "sha256": "5dc33eb71816153a1e1b071dd19434bcb59c4bc0b11222b7e9bccae59b829a72"
+  },
+  "selected_file": {
+    "id": "c0e9d42c-1e36-40a5-b8c3-78c444f26526",
+    "key": "basin_timeseries_v1p2_metForcing_obsFlow.zip",
+    "size": 3406626583,
+    "checksum": "md5:8e9a466710e8270b58f01d332a87184f",
+    "links": {
+      "self": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content"
+    }
+  }
+}

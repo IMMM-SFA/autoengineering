@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="49" time="203.897" timestamp="2026-10-30T15:35:53.441384-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_guest_executor" name="test_facade_owns_prepare_create_dispatch_export_and_cold_recovery" time="12.931" /><testcase classname="tests.test_utility_guest_executor" name="test_initialization_loss_can_reconcile_metadata_but_never_dispatch[guest_executor_init_intended]" time="0.892" /><testcase classname="tests.test_utility_guest_executor" name="test_initialization_loss_can_reconcile_metadata_but_never_dispatch[guest_executor_inference-claims_published]" time="0.883" /><testcase classname="tests.test_utility_guest_executor" name="test_initialization_loss_can_reconcile_metadata_but_never_dispatch[guest_executor_inference-owners_published]" time="0.891" /><testcase classname="tests.test_utility_guest_executor" name="test_initialization_loss_can_reconcile_metadata_but_never_dispatch[guest_executor_owner_claim_copied]" time="0.988" /><testcase classname="tests.test_utility_guest_executor" name="test_initialization_loss_can_reconcile_metadata_but_never_dispatch[guest_executor_owner_manifest_saved]" time="0.897" /><testcase classname="tests.test_utility_guest_executor" name="test_initialization_loss_can_reconcile_metadata_but_never_dispatch[guest_executor_owner_ready]" time="0.992" /><testcase classname="tests.test_utility_guest_executor" name="test_no_access_reservation_means_no_init_claim_or_daemon" time="0.169" /><testcase classname="tests.test_utility_guest_executor" name="test_saved_dispatch_recovers_without_original_source_or_driver_reads[guest_executor_dispatched-success]" time="9.968" /><testcase classname="tests.test_utility_guest_executor" name="test_saved_dispatch_recovers_without_original_source_or_driver_reads[guest_capture_saved-success]" time="8.965" /><testcase classname="tests.test_utility_guest_executor" name="test_saved_dispatch_recovers_without_original_source_or_driver_reads[after_daemon_start-infrastructure_failure]" time="8.392" /><testcase classname="tests.test_utility_guest_executor" name="test_cancellation_after_input_intent_precedes_reserved_driver_read" time="0.997" /><testcase classname="tests.test_utility_guest_executor" name="test_preparation_cannot_reset_deadline_before_daemon_creation" time="1.315" /><testcase classname="tests.test_utility_guest_executor" name="test_changed_registration_refuses_before_claim_or_driver_access[publisher]" time="0.475" /><testcase classname="tests.test_utility_guest_executor" name="test_changed_registration_refuses_before_claim_or_driver_access[runtime]" time="0.481" /><testcase classname="tests.test_utility_guest_executor" name="test_second_workspace_cannot_replace_original_initialization" time="0.693" /><testcase classname="tests.test_utility_guest_executor" name="test_unknown_partial_files_and_missing_completed_owner_are_not_reset" time="0.896" /><testcase classname="tests.test_utility_guest_executor" name="test_fresh_recovery_only_facade_needs_no_driver_source_api_or_clock" time="9.920"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 26, in &lt;module&gt;&#10;    File &quot;/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/guest_executor.py&quot;, line 175, in for_recovery&#10;    File &quot;/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/guest_executor.py&quot;, line 199, in _charged&#10;    File &quot;/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/store.py&quot;, line 221, in replay&#10;    File &quot;/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/store.py&quot;, line 167, in _reduce&#10;    File &quot;/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/confirmation.py&quot;, line 187, in validate_manifest&#10;    File &quot;&lt;frozen importlib._bootstrap&gt;&quot;, line 1360, in _find_and_load&#10;    File &quot;&lt;frozen importlib._bootstrap&gt;&quot;, line 1331, in _find_and_load_unlocked&#10;    File &quot;&lt;frozen importlib._bootstrap&gt;&quot;, line 935, in _load_unlocked&#10;    File &quot;&lt;frozen importlib._bootstrap_external&gt;&quot;, line 995, in exec_module&#10;    File &quot;&lt;frozen importlib._bootstrap_external&gt;&quot;, line 1091, in get_code&#10;    File &quot;&lt;frozen importlib._bootstrap_external&gt;&quot;, line 1190, in get_data&#10;    File &quot;&lt;string&gt;&quot;, line 22, in saved&#10;  AssertionError: ungranted read&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/pyt..._bootstrap_external&gt;&quot;, line 1190, in get_data\n  File &quot;&lt;string&gt;&quot;, line 22, in saved\nAssertionError: ungranted read\n').returncode">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4774/test_fresh_recovery_only_facad0')
+metadata = (&lt;autoengineering.utility.store.SuiteStore object at 0x1204ddd60&gt;, CompositeConfirmationGrant(suite_digest='7102db8224...vate/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4774/authored-guest-metadata0/wheel-layout'))
+
+    def test_fresh_recovery_only_facade_needs_no_driver_source_api_or_clock(tmp_path, metadata):
+        import subprocess
+        import sys
+    
+        with prepared(tmp_path, metadata) as (executor, grant, peer, _):
+            result = execute(executor, grant)
+            calls = tuple(peer.calls)
+            shutil.rmtree(executor.work_root)
+            shutil.rmtree(executor.driver_root)
+            script = """
+    import importlib.abc,sys
+    class NoModels(importlib.abc.MetaPathFinder):
+     def find_spec(self,fullname,*args):
+      if fullname.split('.')[0] in {'examples','torch','openmdao','pvlib','py_wake'}:raise AssertionError('model import')
+    sys.meta_path.insert(0,NoModels())
+    from pathlib import Path
+    import os,socket,subprocess,time,numpy
+    from autoengineering.utility.guest_executor import GuestRoutingExecutor
+    from autoengineering.utility.guest_receipts import VerifiedGuestExecution
+    from autoengineering.utility.store import SuiteStore
+    from autoengineering.utility.scoring import ConfirmationGrant
+    from autoengineering.utility import guest_executor,guest_archive
+    root=Path(sys.argv[1]);grant=ConfirmationGrant.from_json(sys.argv[2])
+    expected=VerifiedGuestExecution.from_json(sys.argv[4])
+    def forbidden(*args,**kwargs):raise AssertionError('execution, source probe, array load or clock')
+    subprocess.Popen=socket.socket=numpy.load=time.monotonic=time.time=forbidden
+    guest_executor.publisher_identity=guest_archive.publisher_identity=forbidden
+    def saved(event,args):
+     if event!='open' or isinstance(args[0],int):return
+     path=Path(args[0]).resolve();mode,flags=args[1:3]
+     if not path.is_relative_to(root):raise AssertionError('ungranted read')
+     if (mode is not None and any(c in mode for c in 'wax+')) or flags&amp;(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise AssertionError('write')
+    sys.addaudithook(saved)
+    store=SuiteStore(root)
+    executor=GuestRoutingExecutor.for_recovery(store,grant,Path(sys.argv[3]))
+    assert executor.source_root is executor.driver_root is executor.api is None
+    assert executor.recover(grant)==expected
+    try:executor.execute(grant)
+    except ValueError as error:assert 'recovery-only' in str(error)
+    else:raise AssertionError('recovery facade executed')
+    print('Fresh recovery facade agrees from original public metadata only.')
+    """
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-I",
+                    "-c",
+                    script,
+                    str(executor.store.root),
+                    grant.to_json(),
+                    str(executor.work_root),
+                    result.to_json(),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=20,
+            )
+&gt;           assert completed.returncode == 0, completed.stderr
+E           AssertionError: Traceback (most recent call last):
+E               File "&lt;string&gt;", line 26, in &lt;module&gt;
+E               File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/guest_executor.py", line 175, in for_recovery
+E               File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/guest_executor.py", line 199, in _charged
+E               File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/store.py", line 221, in replay
+E               File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/store.py", line 167, in _reduce
+E               File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/src/autoengineering/utility/confirmation.py", line 187, in validate_manifest
+E               File "&lt;frozen importlib._bootstrap&gt;", line 1360, in _find_and_load
+E               File "&lt;frozen importlib._bootstrap&gt;", line 1331, in _find_and_load_unlocked
+E               File "&lt;frozen importlib._bootstrap&gt;", line 935, in _load_unlocked
+E               File "&lt;frozen importlib._bootstrap_external&gt;", line 995, in exec_module
+E               File "&lt;frozen importlib._bootstrap_external&gt;", line 1091, in get_code
+E               File "&lt;frozen importlib._bootstrap_external&gt;", line 1190, in get_data
+E               File "&lt;string&gt;", line 22, in saved
+E             AssertionError: ungranted read
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/pyt..._bootstrap_external&gt;", line 1190, in get_data\n  File "&lt;string&gt;", line 22, in saved\nAssertionError: ungranted read\n').returncode
+
+tests/test_utility_guest_executor.py:454: AssertionError</failure></testcase><testcase classname="tests.test_utility_guest_archive" name="test_public_export_preserves_original_outputs_without_private_capsule" time="13.270" /><testcase classname="tests.test_utility_guest_archive" name="test_wrong_explicit_pins_cannot_verify_guest_dispatch[publisher_digest]" time="0.072" /><testcase classname="tests.test_utility_guest_archive" name="test_wrong_explicit_pins_cannot_verify_guest_dispatch[source_digest]" time="0.015" /><testcase classname="tests.test_utility_guest_archive" name="test_wrong_explicit_pins_cannot_verify_guest_dispatch[lock_digest]" time="0.015" /><testcase classname="tests.test_utility_guest_archive" name="test_wrong_explicit_pins_cannot_verify_guest_dispatch[executor_digest]" time="0.016" /><testcase classname="tests.test_utility_guest_archive" name="test_wrong_explicit_pins_cannot_verify_guest_dispatch[runtime_digest]" time="0.032" /><testcase classname="tests.test_utility_guest_archive" name="test_public_archive_relocates_without_owner_capsule_or_execution" time="0.162" /><testcase classname="tests.test_utility_guest_archive" name="test_late_cancellation_with_complete_capture_cannot_become_score_input" time="8.400" /><testcase classname="tests.test_utility_guest_archive" name="test_default_confirmation_service_does_not_admit_published_candidate" time="0.214" /><testcase classname="tests.test_utility_guest_archive" name="test_publication_interruption_reuses_saved_evidence_without_new_start[before_guest_archive_intent]" time="9.832" /><testcase classname="tests.test_utility_guest_archive" name="test_publication_interruption_reuses_saved_evidence_without_new_start[after_guest_archive_intent]" time="10.047" /><testcase classname="tests.test_utility_guest_archive" name="test_publication_interruption_reuses_saved_evidence_without_new_start[guest_archive_outputs_saved]" time="10.338" /><testcase classname="tests.test_utility_guest_archive" name="test_publication_interruption_reuses_saved_evidence_without_new_start[guest_archive_projection_saved]" time="9.819" /><testcase classname="tests.test_utility_guest_archive" name="test_publication_interruption_reuses_saved_evidence_without_new_start[before_guest_archive_publish]" time="9.901" /><testcase classname="tests.test_utility_guest_archive" name="test_publication_interruption_reuses_saved_evidence_without_new_start[after_guest_archive_publish]" time="8.691" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[publisher]" time="0.146" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[stop]" time="0.112" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[journal]" time="0.103" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[capture]" time="0.110" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[input]" time="0.101" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[cancel]" time="0.105" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[status]" time="0.117" /><testcase classname="tests.test_utility_guest_archive" name="test_tampered_public_projection_cannot_reclassify_original_execution[response]" time="0.116" /><testcase classname="tests.test_utility_guest_archive" name="test_unobserved_start_remains_charged_without_exported_started_receipt" time="4.217" /><testcase classname="tests.test_utility_guest_archive" name="test_legacy_local_archive_reader_cannot_accept_guest_dispatch" time="0.001" /><testcase classname="tests.test_utility_guest_archive" name="test_original_worker_failure_status_is_not_replaced_by_transport_success[scientific_infeasible]" time="8.607" /><testcase classname="tests.test_utility_guest_archive" name="test_original_worker_failure_status_is_not_replaced_by_transport_success[model_failure]" time="8.608" /><testcase classname="tests.test_utility_guest_archive" name="test_original_worker_failure_status_is_not_replaced_by_transport_success[infrastructure_failure]" time="8.593" /><testcase classname="tests.test_utility_guest_archive" name="test_failed_or_timed_out_dispatch_exports_no_scoring_outputs[lost_start-infrastructure_failure]" time="7.445" /><testcase classname="tests.test_utility_guest_archive" name="test_failed_or_timed_out_dispatch_exports_no_scoring_outputs[truncated-infrastructure_failure]" time="7.789" /><testcase classname="tests.test_utility_guest_archive" name="test_failed_or_timed_out_dispatch_exports_no_scoring_outputs[idle-timeout]" time="15.069" /></testsuite></testsuites>

@@ -1,0 +1,4 @@
+{
+  "src/autoengineering/utility/guest_watchdog.py": "6aa35ddf82754b57f1a08c304070804cfde1cac8483585105c508d69f543aab9",
+  "tests/test_utility_guest_watchdog.py": "b84abddb61dc700d5ce73d186e0004114046fe9eaaad59ad489fade714be7517"
+}

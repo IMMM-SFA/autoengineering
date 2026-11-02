@@ -1,0 +1,11 @@
+{
+  "original_private_completion_digest": "1e6c687dd6df50c6b604d979459420d9a31c898686bd2c961d1f4f2f1891011a",
+  "field": "derivative_counter_scope",
+  "original_description": "explicit compute_totals calls, not all Newton Jacobian operations",
+  "correct_description": "component _linearize invocations, including Newton linearization; not FLOPs",
+  "derivative_counter_value": 1950,
+  "instrumented_factory_source_sha256": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+  "numeric_results_changed": false,
+  "new_model_starts": 0,
+  "current_source_changed_only_description": true
+}

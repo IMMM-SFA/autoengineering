@@ -1,0 +1,41 @@
+"""Reconstruct charged accounting with private/runtime access denied."""
+from pathlib import Path
+import builtins,hashlib,json,socket,subprocess,sys
+original_import=builtins.__import__
+def guarded_import(name,*args,**kwargs):
+    if name.split('.')[0] in {'examples','openmdao','py_wake','pvlib','torch','botorch','tensorflow'}:
+        raise AssertionError('scientific module import denied')
+    return original_import(name,*args,**kwargs)
+def denied(*args,**kwargs):raise AssertionError('runtime access denied')
+builtins.__import__=guarded_import
+socket.socket=denied
+subprocess.Popen=denied
+import autoengineering
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.load_costs import CostEvidenceSpec
+from autoengineering.utility.report import accounting_report
+root=Path(__file__).resolve().parent
+public=root/'public'
+package=Path(autoengineering.__file__).resolve().parent
+pins=json.loads((root/'public-pins.json').read_text())
+for name,pin in pins.items():
+    assert hashlib.sha256((public/name).read_bytes()).hexdigest()==pin
+initializing=True
+def audit(event,args):
+    if event.startswith(('socket.','subprocess.')):raise AssertionError('external work denied')
+    if event=='open':
+        name,mode,flags=args
+        if isinstance(name,(str,bytes)):
+            path=Path(name).resolve()
+            if not path.is_relative_to(public.resolve()) and not (initializing and path.is_relative_to(package)):
+                raise AssertionError('outside public metadata read denied')
+            if mode and any(c in mode for c in 'wax+'):raise AssertionError('write denied')
+sys.addaudithook(audit)
+store=SuiteStore(public/'suite')
+inputs=CostEvidenceSpec.from_json((public/'cost-inputs.json').read_text())
+warm=accounting_report(store,cost_inputs=inputs)
+initializing=False
+result=accounting_report(store,cost_inputs=inputs)
+assert warm==result==json.loads((public/'accounting.json').read_text())
+assert not result['complete_cost_evidence'] and not store.replay()['confirmation_scores']
+print(json.dumps({'accounting_reconstructed':True,'confirmation_score':False,'complete_cost_evidence':False,'new_model_or_source_calls':0,'post_initialization_public_only_file_reads':True}))

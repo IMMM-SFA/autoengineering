@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "load_module": "/private/tmp/utility-load-installed-v1/installed/examples/utility/engineering_load.py",
+  "native_module": "/private/tmp/utility-load-installed-v1/installed/examples/utility/engineering_load_native.py",
+  "fixed_scenario_processes": 2,
+  "native_processes": 1,
+  "original_reservations": 3,
+  "recovery_added_starts": 0,
+  "native_costs": {
+    "native_driver_process_starts": 1.0,
+    "native_inner_model_calls": 13.0,
+    "native_driver_derivative_calls": 275.0,
+    "native_driver_final_solver_iterations": 1.0,
+    "native_driver_final_component_calls": 895.0,
+    "native_scenario_solver_iterations": 36.0,
+    "native_scenario_component_calls": 586.0,
+    "native_scenario_derivative_calls": 180.0
+  },
+  "inherited_dependencies": "interoperability",
+  "final_scenarios_evaluated": false,
+  "private_scoring_admitted": false
+}

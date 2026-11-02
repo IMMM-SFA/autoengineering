@@ -1,0 +1,36 @@
+from pathlib import Path
+import json
+import os
+import shutil
+import sys
+
+base=Path(sys.argv[1]);c=json.loads((base/'installed-configuration.json').read_bytes())
+sys.path.insert(0,c['installed_root']);os.environ['PYTHONPATH']=c['installed_root']
+from click.testing import CliRunner
+from autoengineering.cli import cli
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.execution import ScriptedCoordinator,ScriptedExecutionPlan
+from autoengineering.utility.report import accounting_report
+import autoengineering.utility.execution as implementation
+assert implementation.__file__.startswith(c['installed_root']+'/')
+args=[c['suite'],c['plan_path'],'--source-root',c['source_root'],'--scripted-development']
+runner=CliRunner();results=[]
+for command,extra in (('run',['--max-new-cells','1']),('resume',[])):
+    result=runner.invoke(cli,['utility',command,*args,*extra])
+    (base/('installed-'+command+'.log')).write_text(result.output)
+    assert result.exit_code==0,(command,result.output,repr(result.exception))
+    results.append({'command':command,'exit_code':result.exit_code,'result':json.loads(result.output)})
+store=SuiteStore(c['suite']);plan=ScriptedExecutionPlan.from_json(Path(c['plan_path']).read_text())
+coordinator=ScriptedCoordinator(store,plan,Path(c['source_root']))
+manifest=coordinator.selection_manifest();selection=Path(c['root'])/'selection.json';selection.write_text(manifest.to_json())
+result=runner.invoke(cli,['utility','freeze',c['suite'],str(selection)])
+(base/'installed-freeze.log').write_text(result.output);assert result.exit_code==0,result.output
+assert len({r.selected_state.sha256 for r in manifest.cells})==1
+report=accounting_report(store);assert not report['evidence_blockers']
+rows=[r for r in report['receipts'] if r['resource']=='campaign_process_starts']
+assert len(rows)==1 and rows[0]['quantity']==1 and len(rows[0]['cell_digests'])==4
+assert sum(rows[0]['allocation'])==1
+shutil.copytree(store.root,base/'public-suite')
+summary={'schema':'utility-baseline-selection-installed-execution-v1','commands':results,'freeze_exit_code':result.exit_code,'installed_core_files':202,'logical_finished_cells':4,'scientific_process_starts':1,'shared_selected_states':1,'metadata_followers':3,'inherited_base_dependencies':True,'fixture_only':True,'private_scoring_qualified':False}
+(base/'installed-execution.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps({k:v for k,v in summary.items() if k!='commands'}))

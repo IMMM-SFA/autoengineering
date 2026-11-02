@@ -1,0 +1,18 @@
+{
+  "scope": "Installed authored CSV preparation, module CLI and offline public/reserved readers outside checkout",
+  "predecessor": "examples/utility/source-inventory-solar-csv.json",
+  "predecessor_sha256": "153c3d26a89c324e0d609d95135267aaf2ffc095bbc39e2b2786dad90f549170",
+  "source_sha256": {
+    "examples/utility/solar_csv_demo.py": "d461c320d4d2a601cf5d16cb76f91deeba7858b3f0aa19199887480f40199d08",
+    "examples/utility/fixtures/solar-csv-plan-v1.json": "f32702df9429572aa371d6a17c435191eaef673302a3bd20160f58a04034d477",
+    "examples/utility/fixtures/solar-csv-rows-v1.json": "71362fb9f20c1122d04d108c9e68d594570237a8c62a7eeff3cb774cd74fa29b",
+    "tests/test_utility_solar_csv_demo.py": "d2ed462b2821971cbc04b1ddd8ecca34f60fc2da5f59acda02d31e89b297115f"
+  },
+  "verification": "examples/utility/verification-solar-csv-installed-v1/summary.json",
+  "wheel_sha256": "812459ca5c944bf8fb027ef44b8244b31613bf0510142be52e43419a20e2b7db",
+  "wheel_python_files": 231,
+  "copied_build_inputs": 245,
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "new_demo_in_frozen_guest_wheel": false
+}

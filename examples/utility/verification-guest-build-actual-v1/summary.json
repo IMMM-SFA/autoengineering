@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-10-31T11:07:40.888982+00:00",
+  "request_digest": "c5fe7f7072d84cb436c5fa866cc39fe7b70506692ec4774c68f68424469ce0ec",
+  "completion_digest": "28d422cf3dc61628de0e2db9410a644ab683e31b3e77906c5e5a679a23e0e966",
+  "image_id": "sha256:fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399",
+  "elapsed_seconds": 45.40991362510249,
+  "platform": [
+    "linux",
+    "amd64"
+  ],
+  "image_size_bytes": 1019479486,
+  "seven_client_commands_exited_zero": true,
+  "source_sha256": "2c98439f3716846d072d8187f828e6ba104dfc6ca1c66c84fe141d2fbe3ba93c",
+  "cold_reader_exit_code": 0,
+  "cold_reader_scope": "fresh subprocess; source imports before guard; relocated saved data only after guard; not installed-package qualification",
+  "relocated_private_proof_file_count": 31,
+  "relocated_private_proof_bytes": 74134974,
+  "runtime_qualified": false,
+  "daemon_cancellation_qualified": false,
+  "disk_quota_enforced": false,
+  "image_payload_published": false
+}

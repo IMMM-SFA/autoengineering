@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="1.501" timestamp="2026-10-28T14:46:42.215594-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_confirmation" name="test_barrier_covers_entire_matrix_and_never_reopens" time="0.017" /><testcase classname="tests.test_utility_confirmation" name="test_pending_work_cannot_be_hidden_as_not_attempted" time="0.006" /><testcase classname="tests.test_utility_confirmation" name="test_freeze_commit_interruption_is_idempotent[before_selection_freeze]" time="0.013" /><testcase classname="tests.test_utility_confirmation" name="test_freeze_commit_interruption_is_idempotent[after_selection_freeze]" time="0.012" /><testcase classname="tests.test_utility_confirmation" name="test_manifest_tamper_blocks_replay" time="0.008" /><testcase classname="tests.test_utility_confirmation" name="test_finished_children_pin_barrier_evidence" time="0.140" /><testcase classname="tests.test_utility_confirmation" name="test_selected_snapshot_requires_child_attestation_and_frozen_candidate" time="0.121" /><testcase classname="tests.test_utility_confirmation" name="test_selected_parameters_must_match_evaluation_and_attested_state" time="0.121" /><testcase classname="tests.test_utility_confirmation" name="test_legacy_selected_manifests_cannot_omit_parameter_state" time="0.000" /><testcase classname="tests.test_utility_confirmation" name="test_large_selected_artifacts_seal_without_expanding_batch_receipts" time="0.132"><failure message="ValueError: selected parameter states require selection schema v2">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4300/test_large_selected_artifacts_0')
+
+    def test_large_selected_artifacts_seal_without_expanding_batch_receipts(tmp_path):
+        from autoengineering.utility.controller import UtilityController
+        from autoengineering.utility.confirmation import validate_manifest
+    
+        store, manifest, _ = selected_suite(tmp_path, source_metadata_padding=70000)
+        selected = manifest.cells[0]
+        assert selected.model.size_bytes &gt; 65536 and selected.selected_state.size_bytes &gt; 65536
+        state = store.replay()
+        allocation, _ = state["attempts"][selected.attempt_id]
+        child, bindings = UtilityController(store)._child(allocation.child_digest)
+        case = next(b.case_id for b in bindings if b.cell_digest == selected.cell_digest)
+        assert all(ref.size_bytes &lt;= 65536 for ref in child.replay().finished[case].evidence)
+        with pytest.raises(StoreError, match="absent"):
+            validate_manifest(
+                store,
+&gt;               replace(manifest, schema="utility-selection-v1"),
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                state["attempts"],
+                state["events"],
+            )
+
+tests/test_utility_confirmation.py:297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.pixi/envs/default/lib/python3.12/dataclasses.py:1588: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;string&gt;:7: in __init__
+    ???
+src/autoengineering/campaign/serialization.py:117: in __post_init__
+    self._validate()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = SelectionManifest(schema='utility-selection-v1', suite_digest='1f6586ec65efb0156241d9a045db1b7d7c58ec2caab64d1e2df3665...c4c602e2e6b5d7807639d2fc133271cb8f727d8631192', model=None, reason='Authored selection fixture', selected_state=None)))
+
+    def _validate(self):
+        sha256(self.suite_digest)
+        sha256(self.protocol_digest)
+        if self.schema == "utility-selection-v1" and any(
+            c.status == "selected" for c in self.cells
+        ):
+&gt;           raise ValueError("selected parameter states require selection schema v2")
+E           ValueError: selected parameter states require selection schema v2
+
+src/autoengineering/utility/confirmation.py:127: ValueError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,19 @@
+[11/01/26 15:21:04] ERROR    listing git files failed - pretending     git.py:26
+                             there aren't any                                   
+warning: no previously-included files found matching 'examples/data'
+warning: no previously-included files found matching 'src/netCDF4/_netCDF4.c'
+warning: build_py: byte-compiling is disabled, skipping.
+
+src/netCDF4/_netCDF4.c:80745:33: warning: comparison of integers of different signs: 'int' and 'size_t' (aka 'unsigned long') [-Wsign-compare]
+ 80745 |   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_8; __pyx_t_2+=1) {
+       |                       ~~~~~~~~~ ^ ~~~~~~~~~
+src/netCDF4/_netCDF4.c:84910:33: warning: comparison of integers of different signs: 'int' and 'size_t' (aka 'unsigned long') [-Wsign-compare]
+ 84910 |   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_13; __pyx_t_2+=1) {
+       |                       ~~~~~~~~~ ^ ~~~~~~~~~~
+2 warnings generated.
+ld: warning: duplicate -rpath '/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/lib' ignored
+ld: warning: building for macOS-11.0, but linking with dylib '/opt/homebrew/opt/netcdf/lib/libnetcdf.22.dylib' which was built for newer version 26.0
+ld: warning: building for macOS-11.0, but linking with dylib '/opt/homebrew/opt/hdf5/lib/libhdf5_hl.320.dylib' which was built for newer version 26.0
+ld: warning: building for macOS-11.0, but linking with dylib '/opt/homebrew/opt/hdf5/lib/libhdf5.320.dylib' which was built for newer version 26.0
+warning: install_lib: byte-compiling is disabled, skipping.
+

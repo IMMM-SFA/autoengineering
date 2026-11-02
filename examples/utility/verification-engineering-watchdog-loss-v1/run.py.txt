@@ -1,0 +1,63 @@
+"""Two watchdog SIGKILL controls; parent must refuse and remove exact container."""
+from pathlib import Path
+import json,os,signal,subprocess,sys,time,uuid,shutil
+from autoengineering.campaign.serialization import canonical_json,digest
+from autoengineering.utility.guest_daemon import GuestDaemonAPI
+from examples.utility import engineering_container_runtime as owner
+
+root=Path.cwd();os.umask(0o077)
+p=root/'examples/utility/verification-engineering-watchdog-loss-v1'
+work=root/'outputs/engineering-watchdog-loss-v1';assert not work.exists();work.mkdir(mode=0o700)
+old=json.loads((root/'examples/utility/verification-engineering-linux-worker-v1/request.json').read_bytes())
+endpoint='/Users/cam/.orbstack/run/docker.sock'
+api=GuestDaemonAPI(endpoint,api_version=old['api_version'],server_digest=old['server_digest'])
+results=[]
+for mode in ('ready_unstarted','running_before_input'):
+    scope=work/mode;scope.mkdir(mode=0o700)
+    nonce=uuid.uuid4().hex;name='ae-coupled-load-'+nonce
+    config=owner.configuration(nonce,'1'*64,digest({'watchdog_loss_control':mode}))
+    q={'schema':'utility-coupled-watchdog-loss-control-v1','mode':mode,'name':name,
+       'configuration':config,'endpoint':endpoint,'api_version':old['api_version'],'server_digest':old['server_digest'],
+       'owner_source_sha256':owner.source_identity(),'watchdog_source_sha256':owner.supervision.source_identity(),
+       'max_creations':1,'max_starts':int(mode=='running_before_input'),'source_reads':0,'packet_submitted':False}
+    (scope/'request.json').write_text(canonical_json(q))
+    bootstrap='import sys,runpy;sys.path.insert(0,sys.argv[1]);sys.argv=sys.argv[2:];runpy.run_path(sys.argv[0],run_name="__main__")'
+    argv=[sys.executable,'-I','-B','-c',bootstrap,str(root),str(p/'owner.py.txt'),str(scope)]
+    with (scope/'owner-output.log').open('xb') as log:
+        process=subprocess.Popen(argv,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+        try:
+            deadline=time.monotonic()+15
+            while not (scope/'owner-boundary.json').exists():
+                assert process.poll() is None,'owner exited before boundary'
+                assert time.monotonic()<deadline,'owner boundary timed out'
+                time.sleep(.05)
+            boundary=json.loads((scope/'owner-boundary.json').read_bytes())
+            assert boundary['owner_pid']==process.pid
+            (scope/'kill-intent.json').write_text(canonical_json({'watchdog_pid':boundary['watchdog_pid'],
+                'owner_pid':process.pid,'signal':'SIGKILL','container_id':boundary['container_id']}))
+            os.kill(boundary['watchdog_pid'],signal.SIGKILL)
+            assert process.wait(timeout=15)==0,'owner failed to complete refusal/cleanup'
+            loss=json.loads((scope/'watchdog-loss.json').read_bytes())
+            refusal=json.loads((scope/'owner-refusal.json').read_bytes())
+            assert loss['watchdog_pid']==boundary['watchdog_pid'] and loss['exit_code']==-signal.SIGKILL
+            assert loss['score_authority_revoked'] is True and refusal['score_published'] is False
+            cleanup=json.loads((scope/'cleanup.json').read_bytes())
+            assert cleanup['absent'] is True and cleanup['container_id']==boundary['container_id']
+            assert api.inspect(boundary['container_id'],deadline=time.monotonic()+5) is None
+            ps=subprocess.run(['/bin/ps','-p',str(boundary['watchdog_pid']),'-o','pid=,stat='],capture_output=True,text=True)
+            assert not ps.stdout.strip()
+            (scope/'watchdog-process-absence.json').write_text(canonical_json({'watchdog_pid':boundary['watchdog_pid'],
+                'ps_exit_code':ps.returncode,'ps_stdout':ps.stdout,'absent':True}))
+            result={'mode':mode,'container_id':boundary['container_id'],'owner_pid':process.pid,
+                'watchdog_pid':boundary['watchdog_pid'],'container_creations':1,'container_starts':q['max_starts'],
+                'watchdog_sigkill_observed':True,'owner_refused_result':True,'original_container_absent':True,
+                'watchdog_process_absent':True,'packet_submitted':False,'source_reads':0,'model_results_observed':0}
+            results.append(result);print(canonical_json(result),flush=True)
+        finally:
+            if process.poll() is None:os.kill(process.pid,signal.SIGKILL);process.wait(timeout=5)
+summary={'schema':'utility-coupled-watchdog-loss-development-v1','cases':results,'container_creations':2,
+    'container_starts':1,'watchdog_sigkills':2,'private_payloads_submitted':0,'source_reads':0,
+    'model_results_observed':0,'model_work_total':None,'complete_interruption_matrix':False,
+    'during_model_computation_watchdog_loss_qualified':False,'runtime_qualified':False,'private_boundary_qualified':False}
+(p/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+for mode in ('ready_unstarted','running_before_input'):shutil.copytree(work/mode,p/mode)

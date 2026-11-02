@@ -1,0 +1,11 @@
+{
+  "scope": "administrative context-resolution correction; not a full source inventory",
+  "predecessor": "examples/utility/source-inventory-guest-build-plugin.json",
+  "predecessor_sha256": "bc28b2923c5f097b1df4a0e3db0285b5be9ee871aaf99848f431411ae5ab2a24",
+  "source_sha256": {
+    "examples/utility/guest_image_build.py": "97bea8046d547b15fa259ffe251ac58f6a0b2940ca1fe43b7833322a3265441b",
+    "tests/test_utility_guest_image_build.py": "8de3b1892a6b2ecbcbecdce2247caa09e2ddbd6f1a45a177cd841cebb1d2f816"
+  },
+  "verification": "examples/utility/verification-guest-build-context-v1/summary.json",
+  "prepared_request": "examples/utility/prepared-guest-build-v3/request.json"
+}

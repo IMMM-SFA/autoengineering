@@ -1,0 +1,34 @@
+{
+  "OS_deadline_qualified": false,
+  "automatic_retries": 0,
+  "batch_spec_digest": "6036b9efcb622328f50938ef23d9debf0ad4184d823abb7d51abe7ee9ad6bf57",
+  "confirmation_access": false,
+  "environment": {
+    "machine": "arm64",
+    "numpy": "2.5.4",
+    "openmdao": "3.41.0",
+    "python": "3.12.16",
+    "scipy": "1.18.1",
+    "system": "Darwin"
+  },
+  "fixed_source_current_A": 0.05,
+  "framework_source_sha256": "e3d227b27cc7d48d500d8522a1d28c3922c9a76bffc09e47c572ac04d7c56ef8",
+  "input_digest": "95698ee20beafd091747c003be214f4ba9665e32916f0571841e39d844c56d8f",
+  "maximum_analytical_reference_solves": 24,
+  "maximum_coupled_model_starts": 24,
+  "maximum_root_steps_per_reference": 200,
+  "model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
+  "producer_sha256": "ae2e3cb89ff25068d77575d0364948592d52f9e9c4894ed27e227852c8395bd6",
+  "proposal_digest": "7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5",
+  "schema": "utility-engineering-v3-baseline-request-v1",
+  "source_pins": {
+    "examples/interoperability/circuit/fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+    "examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+    "examples/utility/engineering.py": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+    "examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "examples/utility/engineering_scenarios.py": "8b9c0d109898e853a82c77a79d93034939d0d96a56028807df1d9b3a74da0e5a",
+    "pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+    "tests/test_utility_engineering_load_robust_native.py": "c4436205e7a7823c54622d1c235068849b21f72f32b6b17d739809f7c86460fc"
+  },
+  "source_visibility": "public development only"
+}

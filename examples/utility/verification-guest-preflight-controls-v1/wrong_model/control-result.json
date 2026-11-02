@@ -1,0 +1,1 @@
+{"attempted_forbidden_operations":{"daemon_requests":0,"driver_or_array_reads":0,"processes":0,"sockets":0},"case":"wrong_model","expected":["StoreError","confirmation model is not the sealed selection"],"observed":["StoreError","confirmation model is not the sealed selection"],"original_parent_reservation_retained":true,"passed":true,"physical_starts":0}

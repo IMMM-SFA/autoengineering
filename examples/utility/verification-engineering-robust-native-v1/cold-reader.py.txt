@@ -1,0 +1,43 @@
+"""Installed core-only receipt reconstruction; no domain code or original roots."""
+import importlib.abc
+import sys
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split('.')[0] in {'examples','openmdao','torch','pvlib','py_wake'}:
+            raise AssertionError('model import during receipt reconstruction')
+sys.meta_path.insert(0,NoModels())
+from pathlib import Path
+import hashlib,json,math,os,socket,subprocess,time
+root=Path(sys.argv[1]).resolve();sys.path.insert(0,sys.argv[2])
+import autoengineering
+assert Path(autoengineering.__file__).is_relative_to(Path(sys.argv[2]))
+from autoengineering.agents.batch import BatchStore
+from autoengineering.utility.engineering_native import NativeDriverSpec,NativeDriverReport,verify_native_report,native_cost_records
+from autoengineering.utility.scenario_costs import join_scenario_costs
+from autoengineering.utility.outcomes import EngineeringEvaluation
+spec=NativeDriverSpec.from_json((root/'native-spec.json').read_text())
+report=NativeDriverReport.from_json((root/'native-report.json').read_text())
+value=EngineeringEvaluation.from_json((root/'scientific-evaluation.json').read_text())
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def forbidden(*args,**kwargs):raise AssertionError('live activity during receipt reconstruction')
+def guard(event,args):
+    if event=='open':
+        p,mode,flags=args
+        if isinstance(p,int):
+            st=os.fstat(p)
+            if (st.st_dev,st.st_ino) not in inodes:raise AssertionError('outside descriptor')
+        elif not Path(p).resolve().is_relative_to(root):raise AssertionError('outside evidence')
+        if any(x in (mode or '') for x in 'wax+') or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_APPEND|os.O_TRUNC):raise AssertionError('write')
+    elif event=='import' or event.startswith(('socket.','subprocess.','os.exec')) or event in ('os.system','os.fork','os.posix_spawn'):raise AssertionError('runtime or import')
+socket.socket=subprocess.Popen=time.time=time.monotonic=time.perf_counter=forbidden
+sys.addaudithook(guard)
+batch=BatchStore(root/'batch')
+verify_native_report(batch,'first',spec,report)
+costs={r.resource:r.quantity for r in native_cost_records(report,'0'*64)}
+scenario_costs=join_scenario_costs(batch,{'first':'0'*64,'second':'1'*64})
+assert len(batch.replay().reservations)==25 and not batch.replay().pending
+assert value.evaluation.eligible and len(value.scenarios)==24
+mean=math.fsum(s.values['source_power'] for s in value.scenarios)/24
+assert math.isclose(mean,value.evaluation.metrics['source_power'],rel_tol=1e-14)
+assert costs['native_inner_model_calls']==35
+print(json.dumps({'native_costs':costs,'scenario_cost_records':len(scenario_costs),'scientific_mean_power_W':mean,'science_reservations':25,'installed_core_only':True,'new_models':0,'new_science_starts':0,'model_imports':False,'runtime_qualified':False},sort_keys=True))

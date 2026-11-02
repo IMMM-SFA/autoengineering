@@ -1,0 +1,15 @@
+{
+  "scope": "Preselection exact source binding composed with unchanged confirmation service and authored scoring callback",
+  "predecessor": "examples/utility/source-inventory-engineering-generated-scenarios.json",
+  "predecessor_sha256": "b094d1fde214efa3ef7b11eede416cec752e43780df4a70821256803a9d7027f",
+  "source_sha256": {
+    "examples/utility/engineering_source_binding.py": "fb4b5f815f5cd48f7d024aa30a0d7edd3f2169dff4d298d7c0b002326243282c",
+    "tests/test_utility_engineering_source_binding.py": "d434d75118c029e6a08cb173827cd1843c7b5d11aed5a38cf4f19c1dcaca0064",
+    "tests/test_utility_confirmation.py": "58197578e1d3ae6c292c8f753ff983ec1b1231355869cd5b0a997e2b5c6e07dc",
+    "examples/utility/exposure-register.json": "8ab9bd4eb4ce676db078ee82cf37643658f24b7c37e1040a73be0d5a93e97bb7"
+  },
+  "verification": "examples/utility/verification-engineering-source-binding-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "new_binding_in_guest_wheel": false
+}

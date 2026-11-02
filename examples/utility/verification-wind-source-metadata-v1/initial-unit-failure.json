@@ -1,0 +1,7 @@
+{
+  "tests_passed": 17,
+  "tests_failed": 1,
+  "cause": "RawIOBase default write method raises NotImplementedError; read-only contract expected UnsupportedOperation",
+  "correction": "explicitly refuse write and truncate in the read-only reader",
+  "live_requests_before_correction": 0
+}

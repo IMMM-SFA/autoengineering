@@ -1,0 +1,14 @@
+{
+  "schema": "utility-guest-resource-observation-v1",
+  "mode": "host_canary_denied",
+  "nonce": "72f423ae33394a10a267b6fcc7f55954",
+  "container_id": "4558ae6d054b39f6ee575e62b5fec1466d660a2bfc9f1d74f4918cd27560c10e",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "configuration_digest": "c5dc0ea53d5088dc7e343cc3587ba19cd0825bf41e96c30fb2250beb12790297",
+  "output_sha256": "8deef26945a8878513df49494c11730646e8cfe4040e90de704af4800cbb38c3",
+  "result": {
+    "errno": "ENOENT"
+  },
+  "runtime_qualified": false,
+  "owner_loss_qualified": false
+}

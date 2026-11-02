@@ -1,0 +1,81 @@
+[11/01/26 15:24:55] ERROR    listing git files failed - pretending     git.py:26
+                             there aren't any                                   
+warning: no previously-included files found matching 'examples/data'
+warning: no previously-included files found matching 'src/netCDF4/_netCDF4.c'
+warning: build_py: byte-compiling is disabled, skipping.
+
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+                except:
+                    raise KeyError('attribute %s has unsupported datatype' % attname)
+        with nogil:
+            ierr = nc_get_att(_grpid, varid, attname, PyArray_BYTES(value_arr))
+        _ensure_nc_success(ierr, err_cls=AttributeError)
+        if value_arr.shape == ():
+                           ^
+------------------------------------------------------------
+src/netCDF4/_netCDF4.pyx:1726:27: Invalid types for '==' (npy_intp *, tuple object)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/build_meta.py", line 438, in build_wheel
+    return _build(['bdist_wheel'])
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/build_meta.py", line 429, in _build
+    return self._build_with_temp_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/build_meta.py", line 410, in _build_with_temp_dir
+    self.run_setup()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/build_meta.py", line 317, in run_setup
+    exec(code, locals())  # noqa: S102 # exec is intentional here
+    ^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 497, in <module>
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/__init__.py", line 117, in setup
+    return distutils.core.setup(**attrs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/core.py", line 168, in setup
+    return run_commands(dist)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/core.py", line 184, in run_commands
+    dist.run_commands()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/dist.py", line 1028, in run_commands
+    self.run_command(cmd)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/dist.py", line 1106, in run_command
+    super().run_command(command)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/dist.py", line 1047, in run_command
+    cmd_obj.run()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/command/bdist_wheel.py", line 385, in run
+    self.run_command("build")
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/cmd.py", line 342, in run_command
+    self.distribution.run_command(command)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/dist.py", line 1106, in run_command
+    super().run_command(command)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/dist.py", line 1047, in run_command
+    cmd_obj.run()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/command/build.py", line 137, in run
+    self.run_command(cmd_name)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/cmd.py", line 342, in run_command
+    self.distribution.run_command(command)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/dist.py", line 1106, in run_command
+    super().run_command(command)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/dist.py", line 1047, in run_command
+    cmd_obj.run()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/command/build_ext.py", line 95, in run
+    _build_ext.run(self)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/command/build_ext.py", line 382, in run
+    self.build_extensions()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/command/build_ext.py", line 498, in build_extensions
+    self._build_extensions_serial()
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/_distutils/command/build_ext.py", line 524, in _build_extensions_serial
+    self.build_extension(ext)
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/setuptools/command/build_ext.py", line 260, in build_extension
+    _build_ext.build_extension(self, ext)
+  File "/private/tmp/utility-wind-netcdf-build-v1/build-deps/Cython/Distutils/build_ext.py", line 131, in build_extension
+    new_ext = cythonize(
+              ^^^^^^^^^^
+  File "/private/tmp/utility-wind-netcdf-build-v1/build-deps/Cython/Build/Dependencies.py", line 1153, in cythonize
+    cythonize_one(*args)
+  File "/private/tmp/utility-wind-netcdf-build-v1/build-deps/Cython/Build/Dependencies.py", line 1297, in cythonize_one
+    raise CompileError(None, pyx_file)
+Cython.Compiler.Errors.CompileError: src/netCDF4/_netCDF4.pyx

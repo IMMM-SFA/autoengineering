@@ -1,0 +1,15 @@
+{
+  "scope": "incremental actual unstarted cancellation and saved cleanup/transfer verification; not full source/platform/private or independent utility qualification",
+  "predecessor": "examples/utility/source-inventory-guest-parity-preflight.json",
+  "predecessor_sha256": "0d9eef56f933bab6169fef6c7f117e5ab471367e7f5a076f967a21a88c1a2002",
+  "source_sha256": {
+    "examples/utility/guest_cancellation_controls.py": "f0a096b814d7fb7a5b892adf61f3bbfb54cf134598f78e3d7ab3d80c6dc3973d",
+    "examples/utility/guest_cancellation_reader.py": "4e410ba93534e47942a62b671b39e523452927a1828e3cd79168f75f875125b5",
+    "tests/test_utility_guest_cancellation_controls.py": "645680dc58ba708e1691ad6be19019ebff9484a787a21f7f901ba8ec4922b73e",
+    "tests/test_utility_guest_cancellation_reader.py": "eacdebfbf4307842d4c1de80d592452c2bac78261fe6604f3d7f750551328b00"
+  },
+  "verification": "examples/utility/verification-guest-cancellation-controls-v1/summary.json",
+  "qualification_evidence_map": "examples/utility/qualification-state-guest-v2.json",
+  "core_sources_unchanged": 224,
+  "declared_wheel_sources_unchanged": 315
+}

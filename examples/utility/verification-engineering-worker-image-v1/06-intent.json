@@ -1,0 +1,10 @@
+{
+  "command": [
+    "image",
+    "inspect",
+    "localhost/ae-coupled-worker-source-960162e60c154f418f72ca47f4fb5511:frozen",
+    "--format",
+    "{{json .}}"
+  ],
+  "request_digest": "8fd8cbd09e66751d8462571920b228b7393e43a82fbbbd685b288588a957db81"
+}

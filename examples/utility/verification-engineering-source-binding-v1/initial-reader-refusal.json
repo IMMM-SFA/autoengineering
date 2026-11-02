@@ -1,0 +1,6 @@
+{
+  "reason": "The first guarded reconstruction lacked BatchSpec/BatchStore and then baseline-selection helper initialization. Both lazy imports were refused. The corrected checker primes these metadata modules before its first guarded replay.",
+  "new_models": 0,
+  "new_private_reads": 0,
+  "new_scoring": 0
+}

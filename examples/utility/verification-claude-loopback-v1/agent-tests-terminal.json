@@ -1,0 +1,11 @@
+{
+  "session_id": 74728,
+  "exit_code": 0,
+  "passed": 939,
+  "reported_seconds": 1175.53,
+  "host_source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "checked_at_utc": "2026-10-29T08:46:32.266520+00:00",
+  "scope": "all tests/test_agent*.py and tests/test_claude_policy_archive.py at collection; native archive tests were verified separately",
+  "core_source_fixed_during_run": true,
+  "frozen_science_matrix_rerun": false
+}

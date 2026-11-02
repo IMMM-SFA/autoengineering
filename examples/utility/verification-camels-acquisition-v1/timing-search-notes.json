@@ -1,0 +1,25 @@
+{
+  "schema": "utility-camels-additional-timing-search-v1",
+  "scope": "Method descriptions only; no source observations, figures or hydrographs inspected",
+  "queries": [
+    "CAMELS Daymet forcing leap year December 31 interpolation Newman 2015",
+    "CAMELS Daymet lump cida forcing leap.txt hour zero date documentation",
+    "CAMELS leap interpolated Daymet forcing calendar"
+  ],
+  "sources": [
+    {
+      "url": "https://hess.copernicus.org/articles/29/5791/2025/index.html",
+      "finding": "CAMELS-SPAT describes linear interpolation for its Daymet v4 R1 missing year-end day; not proof of the legacy v2 processing",
+      "access": "search-result method text only"
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13230898",
+      "finding": "MACH describes Daymet v4 interpolation; comparison mentions CAMELS v2 but does not establish its original transformation",
+      "access": "search-result method text only; direct find returned a browser-check page"
+    }
+  ],
+  "legacy_source_timing_resolved": false,
+  "modern_processing_rules_transferred_to_legacy_source": false,
+  "observational_or_performance_values_inspected": false,
+  "search_http_exchange_count": "unknown"
+}

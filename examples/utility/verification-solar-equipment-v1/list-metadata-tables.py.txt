@@ -1,0 +1,23 @@
+from pathlib import Path
+import urllib.request,urllib.error,hashlib,json,time
+root=Path(__file__).resolve().parent
+items=json.loads((root/'requests.json').read_text())
+requests=[('prize-change-log-listing.xml', 'https://oedi-data-lake.s3.amazonaws.com/?list-type=2&prefix=pvdaq%2F2023-solar-data-prize%2Fchange_log&max-keys=20'), ('metrics-parquet-listing.xml', 'https://oedi-data-lake.s3.amazonaws.com/?list-type=2&prefix=pvdaq%2Fparquet%2Fmetrics%2F&max-keys=10'), ('inverters-parquet-listing.xml', 'https://oedi-data-lake.s3.amazonaws.com/?list-type=2&prefix=pvdaq%2Fparquet%2Finverters%2F&max-keys=10'), ('modules-parquet-listing.xml', 'https://oedi-data-lake.s3.amazonaws.com/?list-type=2&prefix=pvdaq%2Fparquet%2Fmodules%2F&max-keys=10')]
+for name,url in requests:
+    item={'path':name,'url':url,'max_body_bytes':512*1024,'status':'intent','automatic_retries':False}
+    items.append(item)
+    receipt=root/'requests.json'
+    receipt.write_text(json.dumps(items,indent=2)+'\n')
+    start=time.monotonic()
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Autoengineering-source-metadata-review/0.2'}),timeout=40) as response:
+            data=response.read(item['max_body_bytes']+1)
+            if len(data)>item['max_body_bytes']:raise ValueError('metadata body bound')
+            with (root/name).open('xb') as output:output.write(data)
+            item.update(status='complete',http_status=response.status,final_url=response.url,body_bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
+    except Exception as error:
+        item.update(status='failed',error_type=type(error).__name__)
+        if isinstance(error,urllib.error.HTTPError):item['http_status']=error.code
+    item.update(elapsed_seconds=time.monotonic()-start,total_network_bytes=None,total_http_exchanges=None)
+    receipt.write_text(json.dumps(items,indent=2)+'\n')
+    print(json.dumps(item),flush=True)

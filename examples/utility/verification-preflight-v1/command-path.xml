@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="1.363" timestamp="2026-10-28T22:45:44.832383-07:00" hostname="m5-mbp"><testcase classname="tests.test_research.TestRunComponent" name="test_command_kind_npz_contract" time="0.070" /></testsuite></testsuites>

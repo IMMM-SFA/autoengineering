@@ -1,0 +1,1 @@
+{"completion_digest": "58b25cd13e33f1063b2a3bc0fb95dcbcc5b751dd1152a87e353ac0432d5e6b98", "container_id": "c785ad6ca93f868ccbf800288f53f0f9782b7c71f174af1853c3e01371a26aeb", "status": "infrastructure_failure", "model_result": null, "lifecycle_seconds": null, "charged_inference_starts": 1, "new_container_starts": 0, "new_processes": 0, "runtime_qualified": false}

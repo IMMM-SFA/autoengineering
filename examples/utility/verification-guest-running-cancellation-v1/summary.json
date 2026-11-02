@@ -1,0 +1,50 @@
+{
+  "scope": "actual running guest cancellation after START before input transfer; not model-compute interruption",
+  "request_digest": "8153da1705cf2bdb9d3d5c7faae4d3ab4d62f5f1af4feeb23fa3a7c89ba017e1",
+  "completion_digest": "1109b241cabe528692c185095cff91674300e18b5cd47aa461002dff025a96ef",
+  "container_creations": 1,
+  "container_starts": 1,
+  "charged_inference_starts": 1,
+  "control_watchdogs": 1,
+  "saved_status": "infrastructure_failure",
+  "saved_model_result": null,
+  "lifecycle_seconds": null,
+  "fitting_starts": 0,
+  "scoring_starts": 0,
+  "original_container_absent": true,
+  "watchdog_pid_absent": true,
+  "retry_daemon_requests": 0,
+  "runtime_qualified": false,
+  "private_confirmation": false,
+  "public_proof": {
+    "sha256": "2d3223ddd8680781c686e7e227b2340ff62a9a92c41bff6a07bb0cee5e5a13c3",
+    "size_bytes": 1010543,
+    "files": 157,
+    "uncompressed_bytes": 5034275,
+    "contains": "original owner/cleanup/API/failed-receipt proof, known exposed meteorological input tar, source/fit metadata; no fitting or private labels"
+  },
+  "cold_recovery": {
+    "exit_code": 0,
+    "public_archive_extraction_verified": true,
+    "new_processes": 0,
+    "new_starts": 0,
+    "original_work_root_required": false,
+    "separate_source_or_driver_root_required": false,
+    "after_guard": "only relocated proof path/inode reads; writes, imports, clocks, array loading, sockets and processes denied",
+    "source_and_dependencies_initialized_before_guard": true,
+    "installed_package_qualification": false
+  },
+  "verification": {
+    "tests": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 18.693,
+    "exit_code": 0,
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "core_sources_unchanged": 224,
+    "declared_wheel_sources_unchanged": 315,
+    "full_default_rerun": false
+  }
+}

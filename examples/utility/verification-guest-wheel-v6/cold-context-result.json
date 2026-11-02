@@ -1,0 +1,14 @@
+{
+  "relocated_context_verified": true,
+  "declared_guest_python_sources": 316,
+  "core_python_sources": 225,
+  "context_files": 67,
+  "copied_file_bytes": 275254359,
+  "original_source_or_cache_reads": 0,
+  "network": 0,
+  "processes": 0,
+  "model_calls": 0,
+  "image_built": false,
+  "runtime_qualified": false,
+  "exit_code": 0
+}

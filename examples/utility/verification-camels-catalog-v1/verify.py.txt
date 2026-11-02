@@ -1,0 +1,73 @@
+"""Offline reconstruction of saved catalog/range evidence. No fetching."""
+import hashlib
+import json
+from pathlib import Path
+import struct
+import zlib
+
+root = Path(__file__).resolve().parent
+receipts = []
+for path in sorted(root.glob('*.request.json')):
+    record = json.loads(path.read_text())
+    record['name'] = path.name.removesuffix('.request.json')
+    receipts.append(record)
+receipts += json.loads((root/'archive-requests.json').read_text())
+assert len(receipts) == 10
+for record in receipts:
+    assert record['status'] == 'complete'
+    data = (root/record['name']).read_bytes()
+    assert len(data) == record['body_bytes']
+    assert hashlib.sha256(data).hexdigest() == record['sha256']
+    if record.get('range'):
+        first,last = record['range']
+        assert record['http_status'] == 206 and len(data) == last-first+1
+        assert record['content_range'] == f'bytes {first}-{last}/3406626583'
+catalog = json.loads((root/'zenodo-record.json').read_text())
+assert catalog['doi'] == '10.5065/D6MW2F4D'
+assert catalog['metadata']['version'] == '1.2'
+assert catalog['metadata']['access_right'] == 'open'
+assert catalog['metadata']['license']['id'] == 'cc-by-4.0'
+entry = next(f for f in catalog['files'] if f['key'] == 'readme.txt')
+assert hashlib.md5((root/'standalone-readme.txt').read_bytes()).hexdigest() == entry['checksum'][4:]
+end = struct.unpack('<4s4H2IH',(root/'archive-footer.bin').read_bytes())
+assert end[:5] == (b'PK\x05\x06',0,0,17728,17728)
+central = (root/'archive-directory.bin').read_bytes()
+assert len(central) == end[5] and end[5]+end[6] == 3406626583-22
+files = []
+position = 0
+while position < len(central):
+    item = struct.unpack('<4s6H3I5H2I',central[position:position+46])
+    assert item[0] == b'PK\x01\x02'
+    n,e,c = item[10:13]
+    name = central[position+46:position+46+n].decode('utf-8' if item[3]&2048 else 'cp437')
+    files.append({'name':name,'compressed_bytes':item[8],'uncompressed_bytes':item[9],
+                  'compression':item[4],'crc32':item[7],'local_header_offset':item[16]})
+    position += 46+n+e+c
+assert position == len(central) and len(files) == end[4]
+for name in ('basin_dataset_public_v1p2/basin_mean_forcing/daymet/02/01491000_lump_cida_forcing_leap.txt',
+             'basin_dataset_public_v1p2/usgs_streamflow/02/01491000_streamflow_qc.txt'):
+    assert sum(f['name'] == name for f in files) == 1
+selected = [f for f in files if f['name'].startswith('basin_dataset_public_v1p2/readme')]
+block = (root/'archive-readme-block.bin').read_bytes()
+start = min(f['local_header_offset'] for f in selected)
+stop = start + len(block)
+assert len(selected) == 7
+assert all(f in selected for f in files if start <= f['local_header_offset'] < stop)
+for item in selected:
+    offset = item['local_header_offset']-start
+    header = struct.unpack('<4s5H3I2H',block[offset:offset+30])
+    n,e = header[9:11]
+    assert block[offset+30:offset+30+n].decode('utf-8') == item['name']
+    value = zlib.decompress(block[offset+30+n+e:offset+30+n+e+item['compressed_bytes']],-15)
+    assert len(value) == item['uncompressed_bytes'] and zlib.crc32(value) == item['crc32']
+    assert value == (root/Path(item['name']).name).read_bytes()
+summary = next(f for f in files if f['name'] == 'basin_dataset_public_v1p2/dataset_summary.txt')
+value = zlib.decompress((root/'summary-compressed.bin').read_bytes(),-15)
+assert len(value) == summary['uncompressed_bytes'] and zlib.crc32(value) == summary['crc32']
+assert value == (root/'dataset_summary.txt').read_bytes()
+review = json.loads((root/'source-review.json').read_text())
+assert review['saved_final_response_body_bytes'] == sum(r['body_bytes'] for r in receipts) == 2886194
+assert review['task_admitted'] is False and review['full_archive_md5_verified'] is False
+assert review['time_series_members_opened'] == 0 and review['http_etag_available'] is False
+print(json.dumps({'saved_response_bodies_verified':10,'directory_entries':len(files),
+                  'archive_documentation_members_verified':8,'task_admitted':False}))

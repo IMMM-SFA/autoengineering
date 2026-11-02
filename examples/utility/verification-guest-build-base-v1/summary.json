@@ -1,0 +1,31 @@
+{
+  "created_utc": "2026-10-31T11:00:37.459167+00:00",
+  "regression": {
+    "tests": 114,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "source_sha256": {
+    "examples/utility/guest_image_build.py": "2c98439f3716846d072d8187f828e6ba104dfc6ca1c66c84fe141d2fbe3ba93c",
+    "tests/test_utility_guest_image_build.py": "db0cda4c8006daa04d4a008492e0fbfc61753959e8d49941d406957acca8654f",
+    "tests/fixtures/guest-base-manifest.raw": "623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+    "tests/fixtures/guest-base-inspect.json": "a10438fc316400a9b318701e79d9f3d8298b234bf856f7867b4d30c765c7d85f"
+  },
+  "changed_v5_pins": [
+    "examples/utility/guest_image_build.py",
+    "tests/test_utility_guest_image_build.py"
+  ],
+  "new_test_inputs": [
+    "tests/fixtures/guest-base-manifest.raw",
+    "tests/fixtures/guest-base-inspect.json"
+  ],
+  "core_changed": [],
+  "request_digest": "c5fe7f7072d84cb436c5fa866cc39fe7b70506692ec4774c68f68424469ce0ec",
+  "v4_work_absent": true,
+  "v3_base_pull_completed": true,
+  "image_build_attempted": false,
+  "five_saved_pre_build_responses_pass_new_rule": true,
+  "runtime_qualified": false,
+  "primary_source": "https://github.com/moby/moby/blob/master/daemon/containerd/image_inspect.go"
+}

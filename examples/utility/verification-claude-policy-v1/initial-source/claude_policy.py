@@ -1,0 +1,163 @@
+"""Candidate macOS policy for the fixed Claude bare/API-helper transport.
+
+Rendering is not qualification. Numeric IPv4 endpoints are operator-owned pins,
+not DNS or TLS validation. No existing native Codex qualification is reused.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from ipaddress import IPv4Address
+import json
+from pathlib import Path
+import sys
+
+from autoengineering.campaign.artifacts import confined_file
+from autoengineering.campaign.serialization import Record
+from autoengineering.campaign.store import checked_directory
+
+VERSION = "claude-helper-policy-1.0"
+
+
+@dataclass(frozen=True)
+class ClaudeEgress(Record):
+    address: str
+    port: int
+
+    def _validate(self):
+        if str(IPv4Address(self.address)) != self.address or not 0 < self.port < 65536:
+            raise ValueError("Claude endpoint requires canonical numeric IPv4 and port")
+
+
+@dataclass(frozen=True)
+class ClaudePolicy(Record):
+    schema: str
+    workspace: str
+    home: str
+    executable: str
+    helper: str
+    python: str
+    python_root: str
+    credential_files: tuple[str, ...]
+    endpoints: tuple[ClaudeEgress, ...]
+    forbidden_roots: tuple[str, ...]
+
+    def _validate(self):
+        if self.schema != VERSION:
+            raise ValueError("unsupported Claude policy version")
+        if not 1 <= len(self.forbidden_roots) <= 32 or not 0 <= len(self.credential_files) <= 4:
+            raise ValueError("Claude policy needs bounded explicit private roots/files")
+        if len(self.endpoints) > 16 or len(set((e.address, e.port) for e in self.endpoints)) != len(
+            self.endpoints
+        ):
+            raise ValueError("Claude policy endpoints must be unique and bounded")
+        directories = (self.workspace, self.home, self.python_root, *self.forbidden_roots)
+        files = (self.executable, self.helper, self.python, *self.credential_files)
+        for name in (*directories, *files):
+            p = Path(name)
+            if not p.is_absolute() or ".." in p.parts or str(p) != name:
+                raise ValueError("Claude policy paths must be canonical absolute paths")
+        for name in directories:
+            p = Path(name)
+            # Public Python runtime roots need not be owner-private. Other
+            # directories are supplied by the trusted caller, never a worker.
+            if name in (self.workspace, self.home):
+                checked_directory(p)
+            if any(x.is_symlink() for x in (p, *p.parents)) or not p.is_dir():
+                raise ValueError("Claude policy directory is missing or symlinked")
+        for name in files:
+            p = Path(name)
+            confined_file(p.parent, p.name)
+        writable = Path(self.home)
+        workspace = Path(self.workspace)
+        if (
+            writable == workspace
+            or writable.is_relative_to(workspace)
+            or workspace.is_relative_to(writable)
+        ):
+            raise ValueError("Claude home and worker workspace must be separate")
+        if any(
+            Path(n).is_relative_to(writable) or Path(n).is_relative_to(workspace) for n in files
+        ):
+            raise ValueError(
+                "Claude helper/credentials cannot be in client-writable or worker scope"
+            )
+        runtime = Path(self.python_root)
+        if not Path(self.python).is_relative_to(runtime) or any(
+            runtime.is_relative_to(p) or p.is_relative_to(runtime) for p in (workspace, writable)
+        ):
+            raise ValueError("Claude helper runtime must be separate and contain its interpreter")
+        if len(set(self.forbidden_roots)) != len(self.forbidden_roots):
+            raise ValueError("Claude private roots must be unique")
+        trees = (
+            workspace,
+            writable,
+            Path(self.python_root),
+            Path("/usr/lib"),
+            Path("/System/Library"),
+        )
+        for forbidden in map(Path, self.forbidden_roots):
+            if any(t.is_relative_to(forbidden) or forbidden.is_relative_to(t) for t in trees):
+                raise ValueError("Claude private root overlaps allowed trees")
+            if any(Path(n).is_relative_to(forbidden) for n in files):
+                raise ValueError("Claude private root contains an allowed file")
+        if len(set(self.credential_files)) != len(self.credential_files):
+            raise ValueError("Claude credential paths must be unique")
+
+
+def render_claude_policy(spec: ClaudePolicy) -> str:
+    """Produce deny-default SBPL. This function opens no credential contents."""
+    if sys.platform != "darwin":
+        raise ValueError("Claude macOS policy is unsupported on this platform")
+    # Recheck path state before rendering. A prior valid object is not permission
+    # to follow a later symlink or expose a changed path hierarchy.
+    spec = ClaudePolicy.from_dict(spec.to_dict())
+    trees = (spec.workspace, spec.home, spec.python_root, "/usr/lib", "/System/Library")
+    literals = (
+        spec.executable,
+        spec.helper,
+        spec.python,
+        *spec.credential_files,
+        "/",
+        "/dev/null",
+        "/dev/random",
+        "/dev/urandom",
+        "/etc",
+        "/private/etc/ssl/openssl.cnf",
+    )
+    metadata = sorted({str(p) for name in (*trees, *literals) for p in Path(name).parents})
+
+    def quote(p):
+        return json.dumps(str(p), ensure_ascii=True)
+
+    lines = [
+        "(version 1)",
+        "(deny default)",
+        "(deny process-info*)",
+        "(allow process-info* (target self))",
+        '(allow sysctl-read (sysctl-name-prefix "hw.") (sysctl-name "kern.osrelease") (sysctl-name "kern.osversion") (sysctl-name "kern.ostype") (sysctl-name "kern.osproductversion"))',
+        "(allow process-fork)",
+        "(allow process-exec "
+        + " ".join(
+            "(literal " + quote(n) + ")" for n in (spec.executable, spec.helper, spec.python)
+        )
+        + ")",
+        "(allow file-read* "
+        + " ".join("(subpath " + quote(n) + ")" for n in trees)
+        + " "
+        + " ".join("(literal " + quote(n) + ")" for n in literals)
+        + ")",
+        "(allow file-read-metadata "
+        + " ".join("(literal " + quote(n) + ")" for n in metadata)
+        + ")",
+        "(allow file-write* (subpath " + quote(spec.home) + ') (literal "/dev/null"))',
+    ]
+    if spec.endpoints:
+        lines.append(
+            "(allow network-outbound "
+            + " ".join(
+                "(remote ip " + quote(e.address + ":" + str(e.port)) + ")" for e in spec.endpoints
+            )
+            + ")"
+        )
+    return "\n".join(lines) + "\n"

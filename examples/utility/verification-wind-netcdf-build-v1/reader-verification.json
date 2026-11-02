@@ -1,0 +1,11 @@
+{
+  "schema": "utility-wind-netcdf-archive-replay-v1",
+  "builds_charged": 3,
+  "logical_http_requests_charged": 7,
+  "upstream_passed": 8,
+  "upstream_failed": 5,
+  "candidate_promoted": false,
+  "new_model_calls": 0,
+  "native_binary_imports": 0,
+  "verification": "passed"
+}

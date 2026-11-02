@@ -1,0 +1,94 @@
+{
+  "version": "claude-controlled-peer-probe-1.2",
+  "case": "timeout",
+  "source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "runtime": {
+    "platform": "darwin",
+    "machine": "arm64"
+  },
+  "inventory": {
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "sha256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+    "version": "2.1.310 (Claude Code)",
+    "supported_flags": [
+      "--print",
+      "--bare",
+      "--output-format",
+      "--input-format",
+      "--json-schema",
+      "--model",
+      "--tools",
+      "--disable-slash-commands",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "--setting-sources",
+      "--settings",
+      "--no-session-persistence",
+      "--permission-mode",
+      "--max-budget-usd"
+    ]
+  },
+  "policy_specification": {
+    "schema": "claude-helper-policy-1.4",
+    "workspace": "/private/tmp/claude-loopback-timeout-v1/workspace",
+    "home": "/private/tmp/claude-loopback-timeout-v1/home",
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "helper": "/private/tmp/claude-loopback-timeout-v1/auth/helper",
+    "python": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
+    "python_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default",
+    "credential_files": [],
+    "endpoints": [
+      {
+        "address": "localhost",
+        "port": 51982
+      }
+    ],
+    "forbidden_roots": [
+      "/private/tmp/claude-loopback-timeout-v1/private",
+      "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
+    ]
+  },
+  "native_helper_observed": true,
+  "requests": [
+    {
+      "path": "/v1/messages?beta=true",
+      "bytes": 1166,
+      "sha256": "ad760c525d071eded2248cc6a312019e1ce168076f29b3a08b8a2240d545cfbf",
+      "synthetic_auth_matched": true,
+      "requested_model": "claude-sonnet-4-6",
+      "stream": true,
+      "tools": [
+        {
+          "name": "StructuredOutput",
+          "description": "return the final response as structured JSON",
+          "input_schema": {
+            "additionalProperties": false,
+            "properties": {
+              "handoff_json": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "handoff_json"
+            ],
+            "type": "object"
+          }
+        }
+      ],
+      "output_config": {
+        "effort": "high"
+      }
+    }
+  ],
+  "process_status": "timeout",
+  "returncode": 143,
+  "stopped": true,
+  "transport_error": "invalid_claude_result",
+  "structured_output": null,
+  "job_sha256": "3e8ef2712417d8bce11db3abce79d9255e48ed8bf882c7fbd39f45efa7aa38e4",
+  "recovery": null,
+  "production_admission": false,
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "scope": "authored local peer, synthetic helper, no external endpoint or model"
+}

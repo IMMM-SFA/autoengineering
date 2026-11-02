@@ -1,0 +1,39 @@
+import hashlib, json, shutil, subprocess, sys
+from pathlib import Path
+from autoengineering.campaign.serialization import digest
+root=Path.cwd()
+out=root/'examples/utility/verification-guest-resources-v6'
+data=out/'evidence'
+shutil.copytree(root/'outputs/guest-resources-v6',data)
+(data/'producer-sources').mkdir()
+for name in ('guest_resource_runner.py','guest_resources.py','guest_resource_probe.py'):
+    shutil.copyfile(root/'examples/utility/prepared-guest-resources-v6'/(name+'.txt'), data/'producer-sources'/(name+'.txt'))
+for name in ('guest_resource_reader.py','guest_resources.py','guest_resource_runner.py','guest_resource_probe.py'):
+    shutil.copyfile(root/'examples/utility'/name,out/(name+'.txt'))
+for name in ('test_utility_guest_resources.py','test_utility_guest_resource_runner.py','test_utility_guest_resource_reader.py'):
+    shutil.copyfile(root/'tests'/name,out/(name+'.txt'))
+shutil.copyfile('/private/tmp/utility-resource-v6-unit-2.xml',out/'unit.xml')
+(out/'initial-test-result.json').write_text(json.dumps({'passed':133,'failed':3,'cause':'New catalogue member reached existing parametrized reader fixture, which still bound v5 environment and wheel. Fixture corrected to use each catalogued image labels. No production criterion relaxed.'},indent=2)+'\n')
+expected=digest(json.loads((data/'complete.json').read_text()))
+source_sha=hashlib.sha256((root/'examples/utility/guest_resource_reader.py').read_bytes()).hexdigest()
+relocated=Path('/private/tmp/utility-resource-v6-relocated')
+shutil.copytree(data,relocated)
+def cold(path,label):
+    p=subprocess.run([sys.executable,'-B',str(out/'cold-resource-reader.py.txt'),str(path),expected,str(root),source_sha],cwd='/private/tmp',text=True,capture_output=True)
+    (out/(label+'.stdout.txt')).write_text(p.stdout)
+    (out/(label+'.stderr.txt')).write_text(p.stderr)
+    return p
+p=cold(relocated,'cold')
+assert p.returncode==0,p.stderr
+altered=Path('/private/tmp/utility-resource-v6-tampered')
+shutil.copytree(relocated,altered)
+cleanup=altered/'memory_limit/cleanup.json'
+v=json.loads(cleanup.read_text()); v['absent']=False; cleanup.write_text(json.dumps(v))
+p2=cold(altered,'tampered')
+assert p2.returncode!=0 and 'cleanup is unverified' in p2.stderr,p2.stderr
+files={str(p.relative_to(data)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data.rglob('*') if p.is_file()}
+(out/'evidence-inventory.json').write_text(json.dumps(files,indent=2,sort_keys=True)+'\n')
+c=json.loads((data/'complete.json').read_text())
+summary={'scope':'Six actual resource probes of the v6 source-aligned candidate image','image_id':c['cases'][0]['observation']['image_id'],'request_digest':c['request_digest'],'completion_digest':expected,'container_creations':6,'container_starts':6,'cases':[{'mode':x['observation']['mode'],'result':x['observation']['result'],'elapsed_seconds':x['elapsed_seconds'],'original_container_absent':x['cleanup']['absent']} for x in c['cases']],'cold_reader':{'relocated':True,'exit_code':p.returncode,'verified_files':len(files),'verified_bytes':sum((data/k).stat().st_size for k in files),'tampered_cleanup_refused':True,'tamper_exit_code':p2.returncode,'new_processes_after_guard':0,'new_network_after_guard':0,'writes_after_guard':0,'source_imports_before_guard':True},'related_tests':{'passed':136,'failed':0,'skipped':0},'host_scope':'Local OrbStack Linux amd64 emulation on macOS ARM64, not independent physical x86','scientific_starts':0,'fitting_starts':0,'private_label_reads':0,'image_pulls':0,'host_mounts':0,'automatic_retries':0,'runtime_qualified':False,'owner_loss_qualified':False,'full_part_5_complete':False}
+(out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps(summary,indent=2))

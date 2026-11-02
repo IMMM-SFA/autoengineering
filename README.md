@@ -21,9 +21,10 @@ for improving models are also needed.
 | --- | --- |
 | Describe a model system | YAML components, ports, connections, graph queries, and Mermaid diagrams. |
 | Validate and prioritize | Array metrics and a heuristic ranking of component weaknesses. The ranking does not estimate the gain from replacing a component. |
-| Deep research | Agent skills investigate alternatives and record citations, rationale, and executable candidates. The Python package makes no LLM calls. |
+| Deep research | Agent skills investigate alternatives and record citations, rationale, and executable candidates. The scientific controller makes no LLM calls. The optional worker CLI supports scripted replies and an explicitly configured native adapter. |
 | Test replacements | `auto_improve` tries candidates in order, records failures and reversions, and retains changes that improve its fitness score. |
 | Local campaigns | Experimental immutable contracts, trusted adapter lifecycle, scientific checks, sequential calibration, event replay, and local CLI. See [campaigns](docs/campaigns.md) for current qualification limits. |
+| Experimental worker workflows | Four serial roles or a supplied-only single agent, bounded handoffs, brokered scientific requests and private evidence reports. Scripted replies run offline. Codex requires an explicit pinned native profile and prepared lease. Current-source live conformance and the three-route Leaf River pilot passed. All routes chose the same candidate; the agent routes added overhead without objective gain. See the [final audit](docs/reviews/part-3-final-audit.md). See [worker workflows](docs/agents.md). |
 | Whole-system BO | The Release A workflow runs sequential, constrained optimization with durable records and resume. Random and Sobol search are available alongside optional BoTorch. |
 | Function-network research | A component representation and full-observability BO backend have checked evidence. Partial-observability BO remains experimental after failed comparison gates. |
 
@@ -116,6 +117,7 @@ Run commands with `pixi run autoengineering`.
 | `experiments <autoresearch.jsonl>` | Render an experiment tree. |
 | `optimize <system.yaml> <optimization.yaml> --workdir <path>` | Start or resume whole-system optimization. |
 | `campaign` | Run experimental deterministic campaigns with supplied trusted adapters. See [the campaign guide](docs/campaigns.md). |
+| `agents` | Run supplied workflows with scripted or explicitly configured Codex hosts and inspect their evidence. Generated source needs separate qualification and trusted admission. See [worker workflows](docs/agents.md). |
 
 The [workflow guide](docs/workflow.md) describes the Python interfaces. The Claude agent and
 research skills under `.claude/` provide an agent entry point to the same package.
@@ -148,3 +150,7 @@ and explicit validation limits.
 
 BSD-3-Clause. Copyright (c) 2025, Battelle Memorial Institute. Research skills adapt feynman.is and
 alphaXiv's openresearch-cli. See [NOTICE](NOTICE) for attribution.
+
+The experimental `utility` commands validate and prepare comparison records, seal
+selections and verify offline evidence. Independent confirmation, live suite
+routes and comparative utility remain unfinished. See [Utility comparisons](docs/utility.md).

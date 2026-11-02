@@ -1,0 +1,6 @@
+Original actual execution session 99071, terminal exit code 0.
+One baseline and four Sobol calls through existing owned scientific processes.
+Request digest 7de981c0a0a24dfe9c9af396225f6425a8fe024f35b6d7c86a7e28ebfa600e06
+Completion digest 802911f64381ea6906d69ba36faadc275e3178ec5bf16c034652fc75a32ee328
+A separate post-execution call to the already frozen engineering_decision rule retained the baseline from saved observations. This reader call performs no new scientific work.
+Initial preparation v1 stopped on an absent namespace-package __init__.py before any model or supervisor. The failed scope remains in outputs/wind-hourly-study-v1. Corrected v2 copied the namespace layout and ran once.

@@ -1,0 +1,15 @@
+{
+  "url": "https://api.datacite.org/dois/10.5065/D6MW2F4D",
+  "max_body_bytes": 524288,
+  "started_utc": "2026-11-01T21:56:26.215987+00:00",
+  "automatic_retries": false,
+  "status": "complete",
+  "http_status": 200,
+  "final_url": "https://api.datacite.org/dois/10.5065/D6MW2F4D",
+  "body_bytes": 11942,
+  "sha256": "6c778eea1c36af74a4f7725e24efcbf9ff68b069497160984d5ceefae2bc199d",
+  "content_type": "application/json; charset=utf-8",
+  "elapsed_seconds": 0.7836321671493351,
+  "total_network_bytes": null,
+  "total_http_exchanges": null
+}

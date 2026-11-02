@@ -1,0 +1,33 @@
+{
+  "schema": "utility-default-verification-result-v1",
+  "verified_utc": "2026-10-30T17:21:36.611214+00:00",
+  "original_session_id": 64681,
+  "observed_exit_code": 0,
+  "pytest_summary": "2812 passed, 120 skipped in 2495.24s (0:41:35)",
+  "junit": {
+    "cases": 2932,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 120,
+    "passed": 2812
+  },
+  "pinned_files": 480,
+  "changed_pinned_files": [],
+  "added_core_or_test_python": [],
+  "removed_core_or_test_python": [],
+  "core_python_files": 211,
+  "pin_scope": "core Python, test Python, direct utility example Python, current increment docs and project configuration; not an exhaustive snapshot of input/fixture data or historical archives",
+  "sha256": {
+    "pytest.log": "85d9d24cddfbce71ed86f1638744634048b215c684569ce687b8b3e3fdb85552",
+    "junit.xml": "799e9dd304f5add8045386d358709394dcc9efa7117d5f4eb1217c614d759f60",
+    "source-pins.json": "2fc3e86209cec6294c334f101a5bbe9946a1aa6dadfd412eb59fc00e74829f7a",
+    "launch.json": "2ae4888301fc3bee89989911ea797e3d56879be27e0a0edef3a38e694974dcdc"
+  },
+  "limits": [
+    "default macOS ARM64 environment only",
+    "skipped tests are not qualified",
+    "pin scope is not an exhaustive input/fixture/archive snapshot",
+    "does not qualify private inference/container boundaries, independent data or utility",
+    "no new installed workflow, Linux, second-host, live-provider or independent-run qualification"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "member": {
+    "name": "basin_dataset_public_v1p2/dataset_summary.txt",
+    "compressed_bytes": 1616,
+    "uncompressed_bytes": 4884,
+    "compression": 8,
+    "crc32": 1487038020,
+    "local_header_offset": 38338752
+  },
+  "sha256": "5a844abcb5264019acdf97f73f6d3cd215ec414857acb6c8764a9b915633ae9b",
+  "bytes": 4884,
+  "crc32_verified": true
+}

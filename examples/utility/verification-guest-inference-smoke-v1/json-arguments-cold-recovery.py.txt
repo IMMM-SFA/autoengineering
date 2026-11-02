@@ -1,0 +1,75 @@
+"""Verify an actual relocated public guest archive without model imports."""
+
+import importlib.abc
+import sys
+
+
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split(".")[0] in {"examples", "torch", "openmdao", "pvlib", "py_wake"}:
+            raise AssertionError("model import during saved recovery")
+
+
+sys.meta_path.insert(0, NoModels())
+from pathlib import Path
+import json
+import os
+import socket
+import subprocess
+import time
+import numpy
+from autoengineering.utility.guest_executor import GuestRoutingExecutor
+from autoengineering.utility.guest_receipts import VerifiedGuestExecution
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.scoring import ConfirmationGrant
+from autoengineering.utility import guest_executor, guest_archive
+
+root = Path(sys.argv[1]).resolve()
+grant = ConfirmationGrant.from_json(sys.argv[2])
+expected = VerifiedGuestExecution.from_json(sys.argv[3])
+allowed_inodes = {(path.stat().st_dev, path.stat().st_ino)
+                  for path in root.rglob("*") if path.is_file()}
+
+
+def forbidden(*args, **kwargs):
+    raise AssertionError("execution, source probe, array load or clock during saved recovery")
+
+
+subprocess.Popen = socket.socket = numpy.load = time.monotonic = time.time = forbidden
+guest_executor.publisher_identity = guest_archive.publisher_identity = forbidden
+
+
+def saved(event, args):
+    if event == "open":
+        if isinstance(args[0], int):
+            info = os.fstat(args[0])
+            if (info.st_dev, info.st_ino) not in allowed_inodes:
+                raise AssertionError("unscoped descriptor read")
+        elif not Path(args[0]).resolve().is_relative_to(root):
+            raise AssertionError("outside public metadata read")
+        mode, flags = args[1:3]
+        if any(c in (mode or "") for c in "wax+") or flags & (
+            os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND
+        ):
+            raise AssertionError("write during saved recovery")
+    elif event == "import" or event.startswith(("socket.", "subprocess.", "os.exec")):
+        raise AssertionError("import, socket or subprocess after initialization")
+    elif event in ("os.system", "os.fork", "os.posix_spawn"):
+        raise AssertionError("execution during saved recovery")
+
+
+store = SuiteStore(root)
+store.replay()  # Initialize metadata code before restricting all later imports.
+sys.addaudithook(saved)
+store = SuiteStore(root)
+executor = GuestRoutingExecutor.for_recovery(store, grant, Path("/unavailable-original-work"))
+assert executor.source_root is executor.driver_root is executor.api is None
+assert executor.recover(grant) == expected
+try:
+    executor.execute(grant)
+except ValueError as error:
+    assert "recovery-only" in str(error)
+else:
+    raise AssertionError("saved recovery permitted execution")
+print(json.dumps({"execution_digest": expected.digest, "status": expected.status,
+                  "container_starts": expected.container_starts, "restarted": False}))

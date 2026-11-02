@@ -1,0 +1,112 @@
+"""Execute only the eight prepared public diagnostics; no automatic retries."""
+import ast,hashlib,json,os,re,selectors,subprocess,time
+from pathlib import Path
+from autoengineering.campaign.serialization import canonical_json,digest,unique_json
+from autoengineering.utility.guest_daemon import GuestDaemonAPI
+from examples.utility import guest_image_build as build,guest_resources as policy
+
+root=Path.cwd();p=root/'examples/utility/verification-engineering-image-resources-v1'
+work=root/'outputs/engineering-image-resources-v1'
+q=unique_json((work/'request.json').read_text())
+assert digest(q)=='e1490096d83976a5f92677f3fbc84c64b7d371cefd20e9f6d2a666f2942619cf'
+assert not (work/'execution-intent.json').exists()
+for name,pin in q['sources'].items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==pin
+assert build._binary(q['cli'])==q['binary'] and build._endpoint(q['endpoint'])==q['endpoint_identity']
+namespace={'__name__':'fixed_coupled_resource_policy','__file__':str(Path(policy.__file__))}
+exec(compile((p/'policy-source.py.txt').read_text(),'archived-resource-policy','exec'),namespace)
+def fixed_labels(image_id):
+    if image_id!=q['image_id']:raise ValueError('diagnostic image differs')
+    return dict(q['image_labels'])
+namespace['image_labels']=fixed_labels
+original_arguments=namespace['_arguments'];extra=('output_small','output_overrun')
+def arguments(mode,nonce,canary):
+    if mode in extra:
+        if re.fullmatch('[0-9a-f]{32}',nonce) is None or canary is not None:raise ValueError('output probe args differ')
+    else:original_arguments(mode,nonce,canary)
+namespace['_arguments']=arguments
+# Capture the existing owned-client loop with a smaller diagnostic output cap.
+text=Path(build.__file__).read_text();tree=ast.parse(text)
+runner=ast.get_source_segment(text,next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='_run'))
+MAX_LOG=16384;_kill_client=build._kill_client
+exec(runner)
+(p/'client-loop.py.txt').write_text(runner)
+api=GuestDaemonAPI(q['endpoint'],api_version=q['daemon']['api_version'],server_digest=q['daemon']['server_digest'])
+assert api.profile.to_dict()==q['daemon']
+def save(target,name,value):
+    (target/name).write_text(json.dumps(value,indent=2)+'\n')
+save(work,'execution-intent.json',{'request_digest':digest(q),'creations_reserved':8,'starts_reserved':8,'automatic_retries':0,'scientific_starts':0})
+assert digest(api._json('GET','/version',deadline=time.monotonic()+10))==q['daemon']['server_digest']
+image=api._json('GET','/images/'+q['image_id']+'/json',deadline=time.monotonic()+10)
+namespace['verify_image'](image,q['image_id']);save(p,'image.json',image)
+(work/'cli-config').mkdir(mode=0o700);(work/'cli-config/config.json').write_text('{}')
+env={k:os.environ[k] for k in ('PATH','HOME','LANG','LC_ALL','TMPDIR') if k in os.environ}
+env.update(DOCKER_CONFIG=str(work/'cli-config'),DOCKER_HOST='unix://'+q['endpoint'])
+results=[]
+for case in q['cases']:
+    mode,nonce,canary=case['mode'],case['nonce'],case['canary']
+    scope=work/mode;scope.mkdir(mode=0o700)
+    config=case['configuration'];body=config['Entrypoint'][-1]
+    assert hashlib.sha256(body.encode()).hexdigest()==case['body_sha256']
+    assert namespace['_configuration'](mode,nonce,body,canary=canary,image_id=q['image_id'])==config
+    deadline=time.monotonic()+60;cid=None
+    save(scope,'create-intent.json',{'name':case['name'],'configuration_digest':digest(config)})
+    try:
+        created=api._json('POST','/containers/create?name='+case['name'],config,expected=201,deadline=deadline)
+        cid=created['Id'];assert re.fullmatch('[0-9a-f]{64}',cid);save(scope,'created.json',created)
+        before=api.inspect(cid,deadline=deadline)
+        namespace['verify_owned'](before,mode,nonce,cid=cid,canary=canary,source=body,image_id=q['image_id'])
+        assert before['State']['Status']=='created' and before['State']['Running'] is False
+        save(scope,'before.json',before)
+        argv=[q['cli'],'--config',str(work/'cli-config'),'--host','unix://'+q['endpoint'],'start','--attach',cid]
+        save(scope,'start-intent.json',{'container_id':cid,'starts_reserved':1,'argv_digest':digest(argv)})
+        code=_run(argv,env=env,cwd=scope,deadline=deadline,log=scope/'output.log')
+        raw=(scope/'output.log').read_bytes()
+        save(scope,'client.json',{'exit_code':code,'output_bytes':len(raw),'output_sha256':hashlib.sha256(raw).hexdigest()})
+        terminal=api.inspect(cid,deadline=deadline);save(scope,'terminal.json',terminal)
+        if mode not in extra:
+            observation=namespace['verify_terminal'](terminal,raw,mode,nonce,cid=cid,canary=canary,source=body,image_id=q['image_id'])
+            assert code==(137 if mode=='memory_limit' else 0)
+        else:
+            namespace['verify_owned'](terminal,mode,nonce,cid=cid,source=body,image_id=q['image_id'])
+            state=terminal['State']
+            assert code==0 and state['Status']=='exited' and state['ExitCode']==0 and state['OOMKilled'] is False
+            value=unique_json(raw.decode())
+            assert (value['schema'],value['mode'],value['nonce'])==('utility-coupled-output-control-v1',mode,nonce)
+            assert value['observed']==namespace['OBSERVED']
+            capture=value['capture']
+            assert capture['output_limit_bytes']==16384 and capture['result'] is None
+            assert capture['private_boundary_qualified'] is False
+            if mode=='output_small':
+                assert capture['captured_bytes']==4096 and capture['child_exit_code']==0
+                assert capture['child_signal'] is None and capture['output_limited'] is False
+            else:
+                assert capture['captured_bytes']==16384 and capture['child_signal']==25
+                assert capture['child_exit_code'] is None and capture['output_limited'] is True
+            assert b'x'*64 not in raw and b'y'*64 not in raw
+            observation={'schema':'utility-coupled-public-output-observation-v1','mode':mode,'nonce':nonce,
+                'container_id':cid,'image_id':q['image_id'],'capture':capture,'runtime_qualified':False}
+        save(scope,'observation.json',observation)
+    except BaseException as error:
+        save(scope,'failure.json',{'error_type':type(error).__name__,'attempt_consumed':True,'automatic_retry_forbidden':True,'container_id':cid})
+        raise
+    finally:
+        cleanup_deadline=time.monotonic()+10
+        if cid is not None:
+            current=api.inspect(cid,deadline=cleanup_deadline)
+            if current is not None:
+                namespace['verify_owned'](current,mode,nonce,cid=cid,canary=canary,source=body,image_id=q['image_id'])
+                save(scope,'delete-intent.json',{'container_id':cid,'force':True})
+                status,body_reply=api._request('DELETE','/containers/'+cid+'?force=1',deadline=cleanup_deadline)
+                assert status==204 and body_reply==b''
+            assert api.inspect(cid,deadline=cleanup_deadline) is None
+            save(scope,'cleanup.json',{'container_id':cid,'absent':True,'runtime_qualified':False})
+    results.append({'mode':mode,'container_id':cid,'container_creations':1,'container_starts':1,'original_container_absent':True,'observation':observation})
+    print(canonical_json({'mode':mode,'container_id':cid,'passed':True,'original_container_absent':True}),flush=True)
+summary={'schema':'utility-coupled-image-resource-controls-v1','request_digest':digest(q),'image_id':q['image_id'],
+    'cases':results,'container_creations':8,'container_starts':8,'scientific_starts':0,'private_source_reads':0,
+    'automatic_retries':0,'six_resource_controls_complete':True,'two_public_output_controls_complete':True,
+    'scope':'fixed diagnostic commands on the exact image, not scientific-owner interruption qualification',
+    'runtime_qualified':False,'private_boundary_qualified':False,'independent_physical_host_qualified':False}
+save(p,'summary.json',summary)
+import shutil
+for case in q['cases']:shutil.copytree(work/case['mode'],p/case['mode'])

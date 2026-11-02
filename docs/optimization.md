@@ -119,7 +119,7 @@ Its top-level fields are:
 | `schema_version` | Run schema, currently `1.0`. |
 | `study` | Objective, scientific constraints, budget, noise mode, architecture, and seed. |
 | `search_space` | Ordered categorical, continuous, and integer parameters. |
-| `policy` | `random`, `sobol`, or `botorch`. |
+| `policy` | `random`, `sobol`, `botorch`, or experimental `optuna`. |
 | `policy_options` | Integer BoTorch settings; empty for random and Sobol. |
 | `evaluator_factory` | A `module:callable` that receives the loaded `System` and returns an evaluator. |
 | `input_files` | Files included in run identity and resolved from the optimization file directory. |
@@ -473,3 +473,58 @@ does not authorize replacing committed observations.
 Without a verified result, pending-action recovery retains its established zero-cost
 `infrastructure_failure`. A campaign still retains the associated physical attempt and unknown
 cost. The child zero is not proof that no model executed.
+
+## Experimental Optuna policy
+
+Part 4 selects pinned Optuna 4.5.0 for serial whole-system search after the
+[prototype comparison](reviews/part-4/optimizer-comparison-v2.md). It remains
+experimental. Install `autoengineering[optuna]` or use the separate Pixi
+`optuna` environment. Existing solve groups do not include this dependency.
+
+```sh
+pixi install -e optuna
+pixi run -e optuna autoengineering optimize system.yaml \
+  examples/optimization_chain/optimization-optuna.yaml \
+  --workdir outputs/optimization-chain-optuna --max-new-evaluations 3
+pixi run -e optuna autoengineering optimize system.yaml \
+  examples/optimization_chain/optimization-optuna.yaml \
+  --workdir outputs/optimization-chain-optuna --resume
+```
+
+The policy reconstructs an in-memory TPE session from committed ledger entries
+and verifies every historical action, including configuration and seed. The controller owns pending
+actions, physical work and result commits. There is no optimizer database,
+framework execution, automatic retry or pruning. Failed or infeasible outcomes
+project to Optuna FAIL without invented objectives. Final recommendations come
+from successful feasible ledger observations, not an Optuna best-trial cache.
+
+Proposal intent precedes the in-memory ask. Saved proposals retain logical
+experiment/trial IDs before physical dispatch. Tell-intent and synchronization
+receipts bind the exact committed result, proposal and ledger prefix. Campaign
+receipts link existing physical attempt IDs. Standalone studies retain their
+action-ledger accounting. Missing or conflicting committed evidence blocks
+resume. An exact pending-result transition can finish interrupted synchronization
+without relaunching the model. These records apply to disposable serial sessions,
+not remote clients or persistent framework databases.
+
+Options are positive integers: `min_initial` (default 4) and
+`candidate_retry_limit` (default 64). Duplicate sampled configurations cause
+no physical work and no fabricated result. Exhaustion of a small enumerable
+space is distinguished from hitting the sampling retry limit. Conditional
+numeric parameters are sampled only when their categorical selectors activate
+them. Ambiguous bool/integer categories fail before search.
+
+Resume binds options, framework and numeric dependency versions, Python/platform
+and implementation bytes. A changed environment or proposal mismatch requires
+reconciliation or a new study. Partial framework imports are not required by
+base imports or CLI help. See the [completion audit](reviews/part-4-completion-audit.md)
+for current qualification and regression evidence, including installed examples
+and reports.
+
+Optuna keeps study seeds in the immutable run identity. Nonnegative seeds through `2**32 - 1`
+pass directly to its pinned sampler. Larger seeds use one `uint32` value from
+`numpy.random.SeedSequence(seed).generate_state(1, dtype=numpy.uint32)`. The backend
+identity records `numpy-seedsequence-u32-v1` and the resulting sampler seed. This
+supports the utility suite's paired 63-bit seeds without relabelling a study or
+silently truncating its seed. Existing 32-bit sampler streams retain their earlier
+seed values. Changed backend source identities still require a fresh study.

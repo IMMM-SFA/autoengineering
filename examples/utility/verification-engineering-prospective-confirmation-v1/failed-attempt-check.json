@@ -1,0 +1,16 @@
+{
+  "actual_work_totals_from_receipts": null,
+  "automatic_retry_allowed": false,
+  "callback_work_scope_empty": true,
+  "charged_grant_retained": true,
+  "complete_cost_evidence": false,
+  "confirmation_score_committed": false,
+  "container_execution_receipt": null,
+  "grant_digest": "3cc64024330bdefac8aafdd45f7301223395a71307ee6f08d70b07bbedd17e79",
+  "new_model_starts": 0,
+  "new_source_payload_reads": 0,
+  "original_attempt_source_pins_verified": true,
+  "private_payload_read_receipt_present": false,
+  "scope": "original consumed attempt; no source/runtime replay",
+  "suite_digest": "acdec6757357f58da021fb90ecdca441c9f63062a10fba44d2cbcdc958d51a37"
+}

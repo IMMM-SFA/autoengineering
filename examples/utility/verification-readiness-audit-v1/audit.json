@@ -1,0 +1,102 @@
+{
+  "schema": "utility-readiness-audit-v1",
+  "recorded_at_utc": "2026-10-30T06:52:51.146014+00:00",
+  "plan": {
+    "path": "docs/implementation-plans/part-5-utility-confirmation.md",
+    "sha256": "900470cb336205868cda41da0caf4741470bd902d6e3e9806c94b5e60d49080a"
+  },
+  "core_sources_unchanged": 199,
+  "task_dossiers": [
+    {
+      "path": "examples/utility/tasks/engineering.json",
+      "sha256": "abd523b751ef618157e416377d40b393dec3d26ce06026e92e6fa329b8ea5cba",
+      "task_id": "engineering",
+      "status": "blocked_draft",
+      "confirmation": {
+        "partition": null,
+        "status": "unknown_exposure",
+        "access": "No worker access; trusted custodian only after suite selection barrier"
+      },
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null,
+      "blockers": [
+        "Freeze final voltage requirement, useful-gain margin and genuinely unseen operating/load scenarios before evaluation",
+        "Freeze final source-current domain and native-driver/solver budgets",
+        "Independent scenario and confirmation runtime admission; current scientific integration is development evidence only"
+      ]
+    },
+    {
+      "path": "examples/utility/tasks/hydrology.json",
+      "sha256": "d3184d21d9544e9bdccdcac2e20b6a0b8b3b12077472bef6dcd1d675217bed3d",
+      "task_id": "hydrology",
+      "status": "blocked_draft",
+      "confirmation": {
+        "partition": null,
+        "status": "unknown_exposure",
+        "access": "No worker access; trusted custodian only after suite selection barrier"
+      },
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null,
+      "blockers": [
+        "Independent basin or chronological partition with documented exposure and custody",
+        "Independent source rights, spatial support, units, quality flags and masks",
+        "Freeze preprocessing, warmup, initialization and final parameter domains for the admitted task",
+        "No admitted learned candidate with causal training and conservative stores/fluxes"
+      ]
+    },
+    {
+      "path": "examples/utility/tasks/solar.json",
+      "sha256": "9966f009698b82baea93cbe2d5653943d4f651214c5d807b6f67b31561e3e8db",
+      "task_id": "solar",
+      "status": "blocked_draft",
+      "confirmation": {
+        "partition": null,
+        "status": "unknown_exposure",
+        "access": "No worker access; trusted custodian only after suite selection barrier"
+      },
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null,
+      "blockers": [
+        "Untouched measured AC partition, exposure/custody review and exact acquisition hashes",
+        "Independent partition rights, timestamp, channel, missingness and quality-mask closure",
+        "Freeze calibration bounds, useful-gain margin, physical limits and causal initialization before confirmation"
+      ]
+    },
+    {
+      "path": "examples/utility/tasks/wind.json",
+      "sha256": "263e24a969c4d617f6a940eafbcf6c2e1517c3ff3b15bdd6bff3f8bd897d290d",
+      "task_id": "wind",
+      "status": "blocked_draft",
+      "confirmation": {
+        "partition": null,
+        "status": "unknown_exposure",
+        "access": "No worker access; trusted custodian only after suite selection barrier"
+      },
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null,
+      "blockers": [
+        "Independent weather/scenario source, exposure/custody and rights",
+        "Qualified protected confirmation path; supplied-resource execution is a public/development profile and must not publish private weather in its source bundle",
+        "Freeze final geometry, lease interpretation, resource bins, information grants and native inner-work budgets; direction quadrature alone is not independent weather"
+      ]
+    }
+  ],
+  "independent_protocol_exists": false,
+  "public_cli_confirmation_available": false,
+  "programmatic_confirmation_available": true,
+  "private_scoring_qualified": false,
+  "full_frozen_experiment_executed": false,
+  "goal_complete": false,
+  "blocker_audit": "First consolidated readiness audit after current-source lifecycle closure; no complete-goal or blocked-status claim.",
+  "no_private_labels_opened": true,
+  "no_model_or_provider_started": true,
+  "evidence": {
+    "src/autoengineering/utility/command.py": "29163b8b40f3f46f0617d5f4c5a63fbfefb7ab02dcbf82596b0a4bfd2beba24e",
+    "src/autoengineering/utility/scoring.py": "cb7dc5a206f3b85d7f3b09521205470b538b1178b5d614a0381a8910cf00f8ed",
+    "examples/utility/exposure-register.json": "3e6e7be19baf57f8b71313c6503f23389161a4f415ab27c4e8066e84002b26e5",
+    "examples/utility/verification-container-current-lifecycle-v1/terminal.json": "5e1a376b96eda0b700b5aa3376798b2dbc3f9c7e6c46c90934146e4bf2cc8290",
+    "examples/utility/verification-container-current-lifecycle-v1/offline-verification.json": "a1baed94d9dc6bb2933db012fab0f9c947d92e9973dbeee84091ef603c9fc9de",
+    "examples/utility/verification-container-recovery-chain-v1/regression-terminal.json": "87e0454c0612f3bf952d050a084db24851c333b7894574de1911d7554dae2b1c",
+    "examples/utility/verification-container-recovery-chain-v1/regression.xml": "4b1d474493446a9e0cbbd1fd406bd82574abb9bf8f29be9303db87cc07f9f026"
+  }
+}

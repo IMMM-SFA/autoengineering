@@ -1,0 +1,313 @@
+"""Versioned coupled-container metadata and offline cost joins.
+
+Receipts are trusted producer evidence. They confer no runtime admission, do not
+open private sources, and cannot authorize execution or recover a missing score.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+import re
+from typing import Literal
+
+from autoengineering.campaign.artifacts import read_bytes
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.campaign.serialization import Record, canonical_json, digest, unique_json
+from .contracts import sha256
+from .execution_receipts import ConfirmationContainerExecution
+from .load_costs import (
+    CounterWork,
+    LoadCostRegistration,
+    _charged_scope,
+    _project_work_costs,
+)
+from .scoring import PublicScore
+
+WORK_DIRECTORY = "engineering-container-load-work"
+OBSERVED = {
+    "effective_limits": {
+        "memory.max": "1073741824",
+        "memory.swap.max": "0",
+        "pids.max": "16",
+        "cpu.max": "100000 100000",
+    },
+    "workspace_bytes": 134217728,
+    "root_read_only": True,
+    "network_interfaces": ["lo"],
+    "uid": 1000,
+    "gid": 1000,
+    "seccomp": 2,
+    "capabilities": "none",
+}
+
+
+@dataclass(frozen=True)
+class CoupledRuntimeRegistration(Record):
+    schema: Literal["utility-coupled-runtime-registration-v1"]
+    image_id: str
+    environment_digest: str
+    runtime_source_digest: str
+    entrypoint_source_digest: str
+    worker_source_digest: str
+    kernel_source_digest: str
+    source_manifest_digest: str
+    active_seconds: Literal[45] = 45
+    boundary: Literal["unqualified-candidate"] = "unqualified-candidate"
+
+    @classmethod
+    def from_dict(cls, value):
+        if (
+            cls is CoupledRuntimeRegistration
+            and isinstance(value, Mapping)
+            and value.get("schema") == "utility-coupled-runtime-registration-v2"
+        ):
+            return BoundCoupledRuntimeRegistration.from_dict(value)
+        return super().from_dict(value)
+
+    def _validate(self):
+        if re.fullmatch(r"sha256:[0-9a-f]{64}", self.image_id) is None:
+            raise ValueError("coupled runtime needs a pinned image")
+        for name, value in self.to_dict().items():
+            if name.endswith("_digest"):
+                sha256(value)
+
+
+@dataclass(frozen=True, kw_only=True)
+class BoundCoupledRuntimeRegistration(CoupledRuntimeRegistration):
+    schema: Literal["utility-coupled-runtime-registration-v2"]
+    transport_digest: str
+
+    def _validate(self):
+        super()._validate()
+        sha256(self.transport_digest)
+
+
+@dataclass(frozen=True, kw_only=True)
+class ContainerLoadCostRegistration(LoadCostRegistration):
+    schema: Literal["utility-load-cost-registration-v2"]
+    runtime: CoupledRuntimeRegistration
+
+    def _validate(self):
+        super()._validate()
+        if self.runtime.kernel_source_digest != self.policy.scorer_source_digest:
+            raise ValueError("coupled runtime kernel differs from score policy")
+
+    @property
+    def code_digest(self):
+        return digest(
+            {
+                "schema": "utility-container-load-callback-v1",
+                "source": self.callback_source_digest,
+                "kernel_policy": self.policy.digest,
+                "expected_model": self.policy.expected_model_digest,
+                "outcome": self.outcome.digest,
+                "runtime": self.runtime.digest,
+            }
+        )
+
+
+@dataclass(frozen=True)
+class WorkerWork(Record):
+    schema: Literal["utility-coupled-load-worker-result-v1"]
+    score: PublicScore
+    attempted_model_starts: int
+    completed_model_starts: int
+    known_completed_inner_work: CounterWork
+    last_attempt_inner_work_unknown: bool
+    automatic_retries: Literal[0]
+    private_boundary_qualified: Literal[False]
+
+    @property
+    def total_inner_work(self):
+        return None if self.last_attempt_inner_work_unknown else self.known_completed_inner_work
+
+    def _validate(self):
+        a, c = self.attempted_model_starts, self.completed_model_starts
+        if not 1 <= a <= 24 or not 0 <= c <= a:
+            raise ValueError("coupled worker case counts differ")
+        if self.known_completed_inner_work.solver_iterations > 100 * c:
+            raise ValueError("coupled worker solver allowance exceeded")
+        score = self.score
+        if score.outcome != "mean_source_power" or score.units != "W":
+            raise ValueError("coupled worker outcome differs")
+        if score.status == "model_failure":
+            if not self.last_attempt_inner_work_unknown or a != c + 1:
+                raise ValueError("failed coupled work must retain its unknown last attempt")
+            if score.value is not None or score.feasible is not None:
+                raise ValueError("failed coupled worker cannot return an objective")
+        else:
+            if self.last_attempt_inner_work_unknown or (a, c) != (24, 24):
+                raise ValueError("coupled worker success needs all 24 evaluations")
+            if score.status == "success":
+                if score.feasible is not True or score.value is None or score.value < 0:
+                    raise ValueError("coupled score success differs")
+            elif score.status == "scientific_infeasible":
+                if score.feasible is not False or score.value is not None:
+                    raise ValueError("coupled veto cannot become an objective penalty")
+            else:
+                raise ValueError("unsupported coupled worker score status")
+
+
+def decode_worker_output(raw):
+    """Read only the fixed public protocol, never executable model modules."""
+    if type(raw) is not bytes or not 0 < len(raw) <= 16384:
+        raise ValueError("coupled worker output size differs")
+    value = unique_json(raw.decode())
+    if (
+        not isinstance(value, dict)
+        or set(value)
+        != {"schema", "observed", "worker", "private_boundary_qualified", "owner_loss_qualified"}
+        or value["schema"] != "utility-coupled-container-result-v1"
+        or value["private_boundary_qualified"] is not False
+        or value["owner_loss_qualified"] is not False
+        or canonical_json(value["observed"]) != canonical_json(OBSERVED)
+    ):
+        raise ValueError("coupled container output differs")
+    wrapped = value["worker"]
+    if not isinstance(wrapped, dict) or set(wrapped) != {
+        "schema",
+        "mode",
+        "output_limit_bytes",
+        "captured_bytes",
+        "child_signal",
+        "child_exit_code",
+        "output_limited",
+        "result",
+        "private_boundary_qualified",
+    }:
+        raise ValueError("coupled capture fields differ")
+    expected = {
+        "schema": "utility-coupled-load-output-v1",
+        "mode": "score",
+        "output_limit_bytes": 16384,
+        "child_signal": None,
+        "child_exit_code": 0,
+        "output_limited": False,
+        "private_boundary_qualified": False,
+    }
+    if any(canonical_json(wrapped[k]) != canonical_json(v) for k, v in expected.items()):
+        raise ValueError("coupled capture did not complete")
+    count = wrapped["captured_bytes"]
+    work = WorkerWork.from_dict(wrapped["result"])
+    if (
+        type(count) is not int
+        or not 0 < count < 16384
+        or count != len(canonical_json(wrapped["result"]).encode()) + 1
+    ):
+        raise ValueError("coupled child capture size differs")
+    return work
+
+
+@dataclass(frozen=True)
+class ContainerLoadWorkReceipt(Record):
+    schema: Literal["utility-container-load-work-v1"]
+    grant_digest: str
+    scorer_digest: str
+    source_binding_digest: str
+    policy_digest: str
+    packet_sha256: str
+    output_artifact: ArtifactRef
+    execution: ConfirmationContainerExecution
+    task_admitted: Literal[False] = False
+    private_boundary_qualified: Literal[False] = False
+    automatic_retries: Literal[0] = 0
+
+    def _validate(self):
+        for name in (
+            "grant_digest",
+            "scorer_digest",
+            "source_binding_digest",
+            "policy_digest",
+            "packet_sha256",
+        ):
+            sha256(getattr(self, name))
+        if (self.execution.grant_digest, self.execution.scorer_digest) != (
+            self.grant_digest,
+            self.scorer_digest,
+        ):
+            raise ValueError("coupled work execution belongs to another grant")
+        if (self.output_artifact.media_type, self.output_artifact.producer) != (
+            "application/json",
+            "engineering-container-output",
+        ) or self.output_artifact.metadata:
+            raise ValueError("coupled output artifact role differs")
+
+
+def verify_runtime_execution(execution, runtime, *, grant, score):
+    if not isinstance(execution, ConfirmationContainerExecution) or (
+        execution.grant_digest,
+        execution.scorer_digest,
+        execution.score_digest,
+        execution.runtime_digest,
+        execution.image_id,
+        execution.runtime_source_digest,
+        execution.wrapper_source_digest,
+        execution.worker_source_digest,
+    ) != (
+        grant.digest,
+        grant.scorer_digest,
+        score.digest,
+        runtime.digest,
+        runtime.image_id,
+        runtime.runtime_source_digest,
+        runtime.entrypoint_source_digest,
+        runtime.worker_source_digest,
+    ):
+        raise ValueError("coupled execution registration or score differs")
+
+
+def validate_container_resources(grant, runtime):
+    resources = {r.name: r for r in grant.resources}
+    starts = resources.get("container_starts")
+    active = resources.get("active_time")
+    if starts is None or (starts.units, starts.enforcement, starts.limit) != (
+        "count",
+        "reservation",
+        1,
+    ):
+        raise ValueError("coupled scorer needs one reserved container start")
+    if (
+        active is None
+        or (active.units, active.enforcement) != ("s", "reservation")
+        or (active.limit < runtime.active_seconds)
+    ):
+        raise ValueError("coupled runtime exceeds active-time allocation")
+
+
+def join_container_load_costs(store, grant, registration, *, work_artifact=None):
+    """Verify original source/grant/output pins without opening source cases."""
+    if not isinstance(registration, ContainerLoadCostRegistration):
+        raise ValueError("coupled container registration required")
+    fixed, access, receipt = _charged_scope(store, grant, registration)
+    validate_container_resources(grant, registration.runtime)
+    work = None
+    if work_artifact is not None:
+        if (
+            not isinstance(work_artifact, ArtifactRef)
+            or work_artifact.path != f"{WORK_DIRECTORY}/{grant.digest}.json"
+            or work_artifact.media_type != "application/json"
+            or work_artifact.producer != "engineering-container-load-work"
+            or work_artifact.metadata
+            or access is None
+        ):
+            raise ValueError("coupled container work role or access differs")
+        proof = ContainerLoadWorkReceipt.from_json(
+            read_bytes(store.root, work_artifact, max_bytes=65536).decode()
+        )
+        if (
+            proof.grant_digest,
+            proof.scorer_digest,
+            proof.source_binding_digest,
+            proof.policy_digest,
+        ) != (grant.digest, grant.scorer_digest, fixed.digest, registration.policy.digest):
+            raise ValueError("coupled work belongs to another source or callback")
+        work = decode_worker_output(read_bytes(store.root, proof.output_artifact, max_bytes=16384))
+        verify_runtime_execution(
+            proof.execution, registration.runtime, grant=grant, score=work.score
+        )
+        if receipt is not None and (
+            receipt.score != work.score or receipt.execution != proof.execution
+        ):
+            raise ValueError("coupled work differs from committed score or execution")
+    return _project_work_costs(grant, work)

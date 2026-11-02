@@ -1,0 +1,9 @@
+{
+  "package": "setuptools-scm",
+  "version": "8.3.1",
+  "reason": "Declared sdist build requirement absent in wind environment",
+  "previous_requests_charged": 5,
+  "additional_requests_cap": 2,
+  "cumulative_requests_cap": 7,
+  "cumulative_bytes_cap": 19000000
+}

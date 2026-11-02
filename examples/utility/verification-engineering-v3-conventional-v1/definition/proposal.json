@@ -1,0 +1,244 @@
+{
+  "baseline": {
+    "model": {
+      "dependency_bundle": "6ea642cb575ad69f292d352ea46d2c9e3c4129ff55c7a49559c7300032f9ce18",
+      "graph_digest": "8a0d9238ef7b5643f759373a04a0622bbc11296191ba912f6d8151574904a3c7",
+      "implementations": {
+        "circuit": "openmdao-3.41.0"
+      },
+      "inputs": [
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "ground_voltage",
+          "time": null,
+          "units": "V"
+        },
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "resistor1_ohm",
+          "time": null,
+          "units": "ohm"
+        },
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "resistor2_ohm",
+          "time": null,
+          "units": "ohm"
+        }
+      ],
+      "outputs": [
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "node1_voltage",
+          "time": null,
+          "units": "V"
+        },
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "node2_voltage",
+          "time": null,
+          "units": "V"
+        },
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "resistor1_current",
+          "time": null,
+          "units": "A"
+        },
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "resistor2_current",
+          "time": null,
+          "units": "A"
+        },
+        {
+          "coordinate_digest": "467d6afa2d1c2ead7595d9a972c176174f026614e7726cfeabeffa9b159f9139",
+          "coordinates": [],
+          "dimensions": [],
+          "dtype_family": "float",
+          "grid_id": "scalar",
+          "missing": "forbid",
+          "name": "diode_current",
+          "time": null,
+          "units": "A"
+        }
+      ],
+      "source_bundle": [
+        {
+          "media_type": "text/plain",
+          "metadata": {},
+          "path": "examples/utility/engineering.py",
+          "producer": "utility-circuit",
+          "sha256": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+          "size_bytes": 8691
+        },
+        {
+          "media_type": "text/plain",
+          "metadata": {},
+          "path": "examples/interoperability/circuit/model.py",
+          "producer": "utility-circuit",
+          "sha256": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+          "size_bytes": 3057
+        },
+        {
+          "media_type": "text/plain",
+          "metadata": {},
+          "path": "examples/interoperability/circuit/fixture.py",
+          "producer": "utility-circuit",
+          "sha256": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+          "size_bytes": 1818
+        },
+        {
+          "media_type": "text/plain",
+          "metadata": {},
+          "path": "pixi.lock",
+          "producer": "utility-circuit",
+          "sha256": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+          "size_bytes": 666693
+        },
+        {
+          "media_type": "text/plain",
+          "metadata": {},
+          "path": "examples/utility/engineering_load.py",
+          "producer": "utility-circuit-load",
+          "sha256": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+          "size_bytes": 8118
+        }
+      ]
+    },
+    "model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
+    "source_current_A": 0.05
+  },
+  "claim": "new generated operating scenarios under the supplied circuit, not empirical predictive skill",
+  "confirmation_seed_or_rows_generated": false,
+  "confirmation_source_policy": {
+    "algorithm": "hmac-sha256-52bit-v1",
+    "bounds": {
+      "ground_voltage": [
+        -0.02,
+        0.02
+      ],
+      "resistor1_ohm": [
+        90.0,
+        110.0
+      ],
+      "resistor2_ohm": [
+        9000.0,
+        11000.0
+      ]
+    },
+    "count": 24,
+    "generation_stage": "before_any_suite_selection",
+    "sampler_source_sha256": "8b9c0d109898e853a82c77a79d93034939d0d96a56028807df1d9b3a74da0e5a",
+    "schema": "utility-engineering-generated-scenarios-v1",
+    "seed_bytes": 32,
+    "task_id": "engineering",
+    "weights": "uniform"
+  },
+  "confirmation_source_policy_digest": "df835420b7450f8443d7c19d7a2acd004f28106824f009b6f92fd46fc3d68d52",
+  "design_domain": {
+    "source_current_A": [
+      0.01,
+      0.1
+    ]
+  },
+  "development_definition_uses_old_proposed_reserve_grid": false,
+  "development_input_digest": "95698ee20beafd091747c003be214f4ba9665e32916f0571841e39d844c56d8f",
+  "development_profile_caps": {
+    "CPU_or_RSS_cap_qualified": false,
+    "OS_deadline_qualified": false,
+    "analytical_reference_solves": 24,
+    "automatic_retries": 0,
+    "container_starts": 0,
+    "coupled_model_starts": 24,
+    "host_calls": 0,
+    "maximum_solver_iterations_per_case": 100,
+    "per_case_reservation_seconds": 10,
+    "private_source_reads": 0
+  },
+  "final_suite_protocol_frozen": false,
+  "historical_v2_proposal_rewritten": false,
+  "open_gates": [
+    "authoritative development receipts and parity checks",
+    "conventional recipe and route/matrix/numeric-budget freeze",
+    "fresh one-use confirmation generation under final suite identity",
+    "current-daemon protected execution and interruption qualification",
+    "complete independent utility comparison and cost analysis"
+  ],
+  "primary": {
+    "aggregation": "equal_case_mean",
+    "direction": "minimize",
+    "metric_id": "mean_source_power",
+    "units": "W"
+  },
+  "public_reference_check": {
+    "diode_Is_A": 1e-15,
+    "diode_Vt_V": 0.025875,
+    "maximum_bisection_steps_per_case": 200,
+    "method": "independent scalar Kirchhoff/diode equation solved by bisection",
+    "power_absolute_tolerance_W": 1e-08,
+    "voltage_absolute_tolerance_V": 1e-07
+  },
+  "question": "Can a fixed source-current design reduce modeled mean source power while satisfying all declared load-case voltage and constitutive checks?",
+  "schema": "utility-engineering-revised-study-proposal-v3",
+  "secondary_policy": {
+    "all_cases_required": true,
+    "constitutive_residual_max_A": 1e-10,
+    "maximum_solver_iterations_per_case": 100,
+    "minimum_absolute_node2_voltage_V": 0.62,
+    "per_case_power_degradation_fraction_max": 0.01
+  },
+  "source_pins": {
+    "examples/interoperability/circuit/fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+    "examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+    "examples/utility/engineering.py": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+    "examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "examples/utility/engineering_scenarios.py": "8b9c0d109898e853a82c77a79d93034939d0d96a56028807df1d9b3a74da0e5a",
+    "pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+    "tests/test_utility_engineering_load_robust_native.py": "c4436205e7a7823c54622d1c235068849b21f72f32b6b17d739809f7c86460fc"
+  },
+  "status": "development_definition_frozen_confirmation_not_admitted",
+  "task_admitted": false,
+  "task_id": "engineering",
+  "useful_gain_policy": {
+    "absolute_gain": null,
+    "fraction_of_development_baseline": 0.05,
+    "freeze_before_confirmation": true,
+    "reference": "same fixed 0.05 A baseline and exact public development inputs"
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "blockers": [
+    "ac_channel_inverter_join_missing",
+    "module_inverter_join_missing",
+    "string_topology_missing",
+    "timestamp_support_and_availability_unqualified",
+    "equipment_parameters_and_limits_unqualified",
+    "source_quality_and_exposure_unqualified"
+  ],
+  "clock_support_qualified": false,
+  "decoder": {
+    "external_extension_autoload": false,
+    "external_extension_install": false,
+    "name": "DuckDB CLI",
+    "user_init": "/dev/null",
+    "version": "v1.5.5 d8cdaa33fd"
+  },
+  "failed_responses": [
+    {
+      "http_status": 404,
+      "path": "current-system.json"
+    },
+    {
+      "http_status": 404,
+      "path": "metrics-2107.parquet"
+    }
+  ],
+  "listings": {
+    "csv-root-listing.xml": {
+      "contents": 7,
+      "prefixes": 2,
+      "truncated": false
+    },
+    "inverters-listing.xml": {
+      "contents": 0,
+      "prefixes": 0,
+      "truncated": false
+    },
+    "inverters-parquet-listing.xml": {
+      "contents": 1,
+      "prefixes": 0,
+      "truncated": false
+    },
+    "metrics-listing.xml": {
+      "contents": 0,
+      "prefixes": 0,
+      "truncated": false
+    },
+    "metrics-parquet-listing.xml": {
+      "contents": 10,
+      "prefixes": 0,
+      "truncated": true
+    },
+    "modules-listing.xml": {
+      "contents": 0,
+      "prefixes": 0,
+      "truncated": false
+    },
+    "modules-parquet-listing.xml": {
+      "contents": 1,
+      "prefixes": 0,
+      "truncated": false
+    },
+    "parquet-root-listing.xml": {
+      "contents": 0,
+      "prefixes": 9,
+      "truncated": false
+    },
+    "prize-change-log-listing.xml": {
+      "contents": 5,
+      "prefixes": 0,
+      "truncated": false
+    },
+    "pvdaq-root-listing.xml": {
+      "contents": 1,
+      "prefixes": 3,
+      "truncated": false
+    }
+  },
+  "metadata_path": "examples/utility/proposals/confirmation-v2/metadata-refresh/2107_system_metadata.json",
+  "metadata_sha256": "17e4f7f448fcb2bec43f7610b40c1f7f4fc794ccc185e41dcde0514afba73ae5",
+  "observation_objects_requested": false,
+  "observations_or_labels_inspected": false,
+  "pagination": "none; first metrics listing truncated, no catalog enumeration",
+  "prize_log_initial": {
+    "change": "inverter 15 header typo only",
+    "new_header": "inv_15_ac_power_inv_149653",
+    "new_object": "2107_electrical_data_v1.csv",
+    "old_header": "inv_15_ac_power_iinv_149653",
+    "old_object": "2107_electrical_data.csv",
+    "selected_inverter_01_mapping_established": false,
+    "source_date": "2025-02-17"
+  },
+  "prize_log_latest": {
+    "change": "2025 data increments; no equipment or clock repair stated",
+    "source_date": "2026-05-19"
+  },
+  "regular_metadata_table_counts": [
+    {
+      "metadata_table": "inverters",
+      "site_2107_rows": 0,
+      "total_rows": 165
+    },
+    {
+      "metadata_table": "modules",
+      "site_2107_rows": 0,
+      "total_rows": 166
+    }
+  ],
+  "regular_tables_can_supply_site_join": false,
+  "saved_final_response_body_bytes": 341350,
+  "schema": "utility-solar-equipment-source-review-v1",
+  "scientific_model_calls": 0,
+  "selected_ac_review_digest": "e99d1b530e9b5b56e5d5d11972911fb8b2ea0f993c537d3d674bfbd83fe5b8bd",
+  "source_exposure_note": "Search snippets showed channel names and tutorial descriptions; rendered notebooks, tables and plots were not opened",
+  "status": "equipment_and_clock_unadmitted",
+  "successful_responses": 15,
+  "task_admitted": false,
+  "top_level_requests_attempted": 17,
+  "total_http_exchanges": null,
+  "total_network_bytes": null
+}

@@ -1,0 +1,44 @@
+{
+  "created_utc": "2026-10-30T14:43:42.271409+00:00",
+  "current_core_python_files": 206,
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "38621973417b05f8d9106a074f45b3799b915c87135351f63a9b43a95c5911b3",
+    "docs/reviews/part-5-progress.md": "e8a85a12e4d57f7b2ddf3466f0eb3d248c65381b3c520edb99719e8859f5a584",
+    "docs/reviews/part-5-readiness.md": "315ea549983c6dd76949aab704a7067e752c9b48da3f1b0311989c461131378e",
+    "docs/utility-handoff.md": "b472ed05545040ba6e450250afa86c1b630300ad0ffcee380574527c68bce153",
+    "docs/utility.md": "1d91c08d43397af8185a315961b3d75a8bc4083f917113717ad4e7bb4bebc824",
+    "examples/utility/README.md": "6c30161a3ff6dd3adda17abc0f06cd831116c6b7ea241839249ce07af045fe39",
+    "examples/utility/verification-training-terminal-v1/corrected-timeout.log": "00a85897cd79a659a50a2d19e24438c556822e3ee71ea520ed7df60807aabdec",
+    "examples/utility/verification-training-terminal-v1/documentation.log": "c1dec8025fe3985249dbc92bc918250ebfaf065c98097b87f511407a985620c2",
+    "examples/utility/verification-training-terminal-v1/early-timeout-and-source-guard-failures.log": "35cede2103cc5183de625dcf3be1d2261ac7be4e73aec2437ccb222a8d680211",
+    "examples/utility/verification-training-terminal-v1/final-terminal-origin.log": "d94f88a091a4053390083084e5708e1fd6ff5fc72feea4a513f299da25d427be",
+    "examples/utility/verification-training-terminal-v1/initial-terminal.log": "477eb246cd89781e7360667b960dcc40ab0f4ae01c17e0f3cade940ccd36da3a",
+    "examples/utility/verification-training-terminal-v1/stable-terminal-controller-costs.log": "d7e2285dfa895ef12b8bc419943d88e9f5fa5be5c8a3a92d9d9848aae305c240",
+    "examples/utility/verification-training-terminal-v1/training-runtime-regression.log": "d953217d0bfb954ca04cdd1ae1106ba92e9860643376c1dcbbcddd1193d5a20e",
+    "src/autoengineering/campaign/controller.py": "d22391caf1333acaa3de9a1d2e188275e7cc2fce2969ba1fc827be56a92adf00",
+    "src/autoengineering/utility/campaign_costs.py": "fcbfc4935009bce21ab5881aaa65fbbe43795b9cb8b6d30b1ac9f8fb9b2f27d6",
+    "src/autoengineering/utility/training_terminal.py": "dc712b3f1d21cc00af6f0d22195eb859c166a7f88f8e403dcd773bff796c6fe6",
+    "tests/test_utility_campaign_training_costs.py": "c44dad1f9092d5fa456142e8391653fe386f02e993b067812a7a7016da768081",
+    "tests/test_utility_training_terminal.py": "ac39645dda972b3233795740e793a67cd71c205c9c621389559cf9c66fb8fb58"
+  },
+  "limits": [
+    "supplied routing profile and stopped supervisor proof only",
+    "actual early timeout does not establish active-fit kill behavior",
+    "cancellation and other training adapters remain unqualified",
+    "trained route writers, private scoring, resource caps and independent task admission remain open",
+    "full default checkpoint predates this increment",
+    "no installed package, optional environment, other platform/host or independent data qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-routing-runtime.json",
+  "predecessor_sha256": "7756620e085aa3989ee0d8a03370b6ab76164c7cd791942d50eb45e0c6928f8e",
+  "schema": "utility-source-increment-v1",
+  "scope": "terminal evidence and offline costs for original stopped registered training attempts",
+  "verification": {
+    "diff_check": "passed",
+    "final_documentation": "19 passed in 0.58s",
+    "final_terminal_origin": "11 passed in 30.99s",
+    "lint": "passed",
+    "stable_terminal_controller_recovery_costs": "68 passed in 143.10s",
+    "training_runtime_regression": "32 passed in 80.54s"
+  }
+}

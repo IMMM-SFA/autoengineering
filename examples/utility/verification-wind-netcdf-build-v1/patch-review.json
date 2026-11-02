@@ -1,0 +1,21 @@
+{
+  "schema": "utility-netcdf-local-patch-review-v1",
+  "change": "Use the already imported NumPy ndarray declaration instead of a duplicate legacy declaration with no fields",
+  "original_pxi_sha256": "991fc28c5351af7ac4367a576b6286ea71265cbbea45b4b31dd54684e71dee37",
+  "patched_pxi_sha256": "3ad6e0728233b5443a2668b379d90352f91031ecd295df7bbab769f8611a0210",
+  "numpy_declaration": "numpy/__init__.cython-30.pxd:329",
+  "original_generated_C": "Separate Warn import for netCDF4-local ndarray and Ignore import for NumPy ndarray",
+  "warning_filters_changed": false,
+  "warning_criterion_relaxed": false,
+  "upstream_source_modified_only_in_isolated_copy": true,
+  "build_attempts_previous": 1,
+  "build_attempts_additional": 1,
+  "build_attempts_cumulative": 2,
+  "new_downloads": 0,
+  "sources": [
+    "https://docs.cython.org/src/userguide/extension_types.html",
+    "https://unidata.github.io/netcdf4-python/"
+  ],
+  "maintainer_review_or_release": false,
+  "private_runtime_qualified": false
+}

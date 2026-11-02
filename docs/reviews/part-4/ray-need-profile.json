@@ -1,0 +1,12 @@
+{
+  "profile": "bounded_serial_solar_campaign",
+  "physical_attempts": 15,
+  "supervised_wall_seconds": 35.681039332877845,
+  "sum_attempt_elapsed_seconds": 24.12901787739247,
+  "median_attempt_elapsed_seconds": 1.5989414579235017,
+  "max_attempt_elapsed_seconds": 2.0412900829687715,
+  "ray_need_gate": "unmet: current adaptive policy admits one outstanding action; no independent batch or throughput target",
+  "revisit_threshold": "at least 32 independent preauthorized attempts and a target of 2x measured throughput versus a bounded local process pool, with equal recovery/accounting",
+  "parallelism": 1,
+  "predeclared_independent_batch": false
+}

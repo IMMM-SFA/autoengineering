@@ -1,0 +1,15 @@
+{
+  "schema": "utility-camels-refusal-diagnostic-v1",
+  "original_refusal_reason": "forcing hour differs; no implicit date shift",
+  "forcing_row_count": 12784,
+  "flow_row_count": 12784,
+  "published_placeholder_hour_counts": {
+    "12": 12784
+  },
+  "declared_forcing_hour": 0,
+  "metadata_readme_claim": "hour zero for daily values",
+  "observational_values_exported": false,
+  "source_policy_changed": false,
+  "model_calls": 0,
+  "task_admitted": false
+}

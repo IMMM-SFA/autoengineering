@@ -1,0 +1,460 @@
+"""Bounded frozen guest transfer inputs; no installation or container operations."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import hashlib
+import io
+from pathlib import PurePosixPath
+import re
+import tarfile
+from typing import Literal
+
+from autoengineering.campaign.artifacts import confined_file, put_bytes, read_bytes
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.campaign.serialization import Record, canonical_json, digest, unique_json
+from autoengineering.campaign.store import StoreError, checked_directory, durable_write
+from .confirmation import TrainedSelectedState, read_selected_state
+from .contracts import sha256
+from .inference_execution import driver_limits, verify_code
+from .scoring import validate_grant
+
+MAX_FILES = 1024
+MAX_FILE_BYTES = 4 * 1024 * 1024
+MAX_INPUT_BYTES = 32 * 1024 * 1024
+MAX_TAR_BYTES = 40 * 1024 * 1024
+
+
+@dataclass(frozen=True)
+class GuestInputEntry(Record):
+    artifact: ArtifactRef
+    role: Literal[
+        "job",
+        "intent",
+        "claim",
+        "environment",
+        "lock",
+        "core_source",
+        "model_source",
+        "selected_state",
+        "runtime_profile",
+        "training_metadata",
+        "driver",
+    ]
+
+    def _validate(self):
+        path = self.artifact.path
+        if (
+            not re.fullmatch(r"[A-Za-z0-9_./-]+", path)
+            or str(PurePosixPath(path)) != path
+            or len(path.encode()) > 240
+            or any(p in (".", "..") for p in path.split("/"))
+        ):
+            raise ValueError("guest transfer path is not a supported relative path")
+        if self.artifact.size_bytes > MAX_FILE_BYTES:
+            raise ValueError("guest input member exceeds fixed bound")
+
+
+@dataclass(frozen=True)
+class GuestInputPackage(Record):
+    schema: Literal["utility-guest-input-package-v1"]
+    job_digest: str
+    launch_digest: str
+    claim_digest: str
+    intent_digest: str
+    entries: tuple[GuestInputEntry, ...]
+    archive: ArtifactRef
+    boundary: Literal["unqualified-candidate"]
+
+    def _validate(self):
+        for value in (self.job_digest, self.launch_digest, self.claim_digest, self.intent_digest):
+            sha256(value)
+        paths = [e.artifact.path for e in self.entries]
+        if paths != sorted(set(paths)) or not 1 <= len(paths) <= MAX_FILES:
+            raise ValueError("guest input members must be bounded, ordered and unique")
+        if sum(e.artifact.size_bytes for e in self.entries) > MAX_INPUT_BYTES:
+            raise ValueError("guest input bytes exceed fixed workspace allowance")
+        if (
+            self.archive.size_bytes > MAX_TAR_BYTES
+            or self.archive.media_type != "application/x-tar"
+        ):
+            raise ValueError("guest input archive exceeds fixed transfer allowance")
+
+
+def _reference(path, raw):
+    return ArtifactRef(
+        path,
+        hashlib.sha256(raw).hexdigest(),
+        len(raw),
+        "application/octet-stream",
+        "guest-input",
+        {},
+    )
+
+
+def _binding(job):
+    return {
+        "grant": job.grant.digest,
+        "executor": job.executor_digest,
+        "nonce": job.nonce,
+        "job": job.digest,
+    }
+
+
+def _inventory(job, claim, bound):
+    entries = {}
+
+    def add(ref, role):
+        if ref.path in {
+            "worker-result.json",
+            "bootstrap-capture.json",
+            "input-intent.json",
+            "input-package.json",
+            "scratch",
+        }:
+            raise StoreError("guest input aliases a reserved execution/transport path")
+        item = GuestInputEntry(ref, role)
+        previous = entries.get(ref.path)
+        if previous is not None:
+            if (previous.artifact.sha256, previous.artifact.size_bytes) != (
+                ref.sha256,
+                ref.size_bytes,
+            ):
+                raise StoreError("guest input path has conflicting frozen identities")
+            if previous.role == role or {previous.role, role} <= {"core_source", "model_source"}:
+                return
+            raise StoreError("guest input path aliases another input role")
+        entries[ref.path] = item
+
+    intent = canonical_json(_binding(job)).encode()
+    add(_reference("job.json", job.to_json().encode()), "job")
+    add(_reference("intent.json", intent), "intent")
+    add(
+        ArtifactRef(
+            "claim.json",
+            claim.sha256,
+            claim.size_bytes,
+            claim.media_type,
+            claim.producer,
+            claim.metadata,
+        ),
+        "claim",
+    )
+    add(job.environment, "environment")
+    add(job.lock, "lock")
+    add(job.grant.inference.selected_state, "selected_state")
+    add(job.grant.inference.runtime_profile, "runtime_profile")
+    for ref in bound.training.references():
+        add(ref, "training_metadata")
+    for ref in job.sources:
+        if ref.path.startswith("src/autoengineering/") and ref.path.endswith(".py"):
+            add(ref, "core_source")
+    declared = {r.path: r for r in job.sources}
+    for ref in bound.model.source_bundle:
+        if not ref.path.endswith(".py") or declared.get(ref.path) != ref:
+            raise StoreError("guest model requires supplied inventoried Python sources")
+        add(ref, "model_source")
+    canonical_driver = f"artifacts/{job.grant.inference.forcing.artifact.sha256}/drivers.npz"
+    if (
+        job.staged_driver.path != canonical_driver
+        or job.staged_driver.sha256 != job.grant.inference.forcing.artifact.sha256
+        or job.staged_driver.size_bytes != job.grant.inference.forcing.artifact.size_bytes
+        or job.staged_driver.media_type != "application/x-npz"
+    ):
+        raise StoreError("guest driver target differs from the frozen forcing")
+    add(job.staged_driver, "driver")
+    result = tuple(entries[path] for path in sorted(entries))
+    if len(result) > MAX_FILES or sum(e.artifact.size_bytes for e in result) > MAX_INPUT_BYTES:
+        raise StoreError("guest input closure exceeds fixed bound")
+    return result
+
+
+def _wheel_binding(job, document, entries):
+    sources = {r.path: r for r in job.guest.validate_environment(document)}
+    for entry in entries:
+        if entry.role not in ("core_source", "model_source"):
+            continue
+        ref = entry.artifact
+        installed = sources.get(ref.path.removeprefix("src/"))
+        if installed is None or (installed.sha256, installed.size_bytes) != (
+            ref.sha256,
+            ref.size_bytes,
+        ):
+            raise StoreError("guest wheel code differs from frozen transfer source")
+
+
+def _tar(entries, contents):
+    stream = io.BytesIO()
+    directories = sorted(
+        {str(p) for e in entries for p in PurePosixPath(e.artifact.path).parents if str(p) != "."}
+    )
+    with tarfile.open(fileobj=stream, mode="w:", format=tarfile.USTAR_FORMAT) as archive:
+        for name in directories:
+            item = tarfile.TarInfo(name)
+            item.type = tarfile.DIRTYPE
+            item.uid = item.gid = 1000
+            item.mode = 0o700
+            archive.addfile(item)
+        for entry in entries:
+            item = tarfile.TarInfo(entry.artifact.path)
+            item.uid = item.gid = 1000
+            item.mode = 0o600
+            item.size = entry.artifact.size_bytes
+            archive.addfile(item, io.BytesIO(contents[entry.artifact.path]))
+    raw = stream.getvalue()
+    if len(raw) > MAX_TAR_BYTES:
+        raise StoreError("guest input tar exceeds transfer bound")
+    return raw
+
+
+def _preflight(owner, store, source_root, driver_root):
+    if not owner._locked:
+        raise StoreError("guest input preparation requires the owner writer lock")
+    owner._binding()
+    if owner.suite_root != store.root or owner.replay().phase != "ready":
+        raise StoreError("guest input preparation requires the original ready owner")
+    if any(
+        a.is_relative_to(b) or b.is_relative_to(a)
+        for a, b in (
+            (driver_root, store.root),
+            (driver_root, source_root),
+            (driver_root, owner.root),
+            (owner.root, source_root),
+            (owner.root, store.root),
+        )
+    ):
+        raise StoreError("guest input scopes must be separate")
+    job, grant = owner.manifest.job, owner.manifest.job.grant
+    if (job.source_digest, job.lock.sha256) != (store.spec.source_digest, store.spec.lock_digest):
+        raise StoreError("guest input source/environment differs from frozen suite")
+    job.guest.validate_environment(
+        unique_json(read_bytes(store.root, job.environment, max_bytes=MAX_FILE_BYTES).decode())
+    )
+    state = store.replay()
+    if state["cancelled"]:
+        raise StoreError("cancelled suite cannot prepare guest inputs")
+    selected = validate_grant(store, grant, state["frozen"])
+    attempt = "confirmation-" + grant.cell_digest[:48]
+    allocation = state["attempts"].get(attempt)
+    if (
+        allocation is None
+        or allocation[1] != "started"
+        or attempt not in state["confirmation_accesses"]
+    ):
+        raise StoreError("guest input access lacks original composite reservation")
+    event = allocation[0]
+    if (event.phase, event.child_digest, event.resources) != (
+        "confirmation",
+        grant.digest,
+        grant.resources,
+    ):
+        raise StoreError("guest input access differs from charged composite grant")
+    bound = read_selected_state(store.root, selected.selected_state)
+    grant.inference.validate_selection(store.root, selected.selected_state, bound)
+    verify_code(source_root, job.sources, job.lock, job.source_digest, bound.model)
+    if (
+        grant.inference.forcing.artifact.size_bytes
+        > driver_limits(grant.inference).max_compressed_bytes
+    ):
+        raise StoreError("guest drivers exceed declared shape envelope")
+    return bound
+
+
+def prepare_guest_inputs(owner, store, source_root, driver_root):
+    """Read reserved drivers only after immutable stage intent; never retry access.
+
+    The original suite and owner writer locks must both remain held throughout.
+    No labels, fitting arrays, undeclared tree contents or installed image bytes
+    are included. The transfer archive contains regular files and private dirs.
+    """
+    if not store._locked:
+        raise StoreError("guest input preparation requires the suite writer lock")
+    if not owner._locked:
+        raise StoreError("guest input preparation requires the owner writer lock")
+    owner._binding()
+    intent_path = owner.root / "input-intent.json"
+    if intent_path.exists() or intent_path.is_symlink():
+        raise StoreError("guest input access already intended; saved-package recovery only")
+    source_root, driver_root = checked_directory(source_root), checked_directory(driver_root)
+    bound = _preflight(owner, store, source_root, driver_root)
+    job, launch, claim = owner.manifest.job, owner.manifest.launch, owner.manifest.claim
+    entries = _inventory(job, claim, bound)
+    if launch.policy.schema == "utility-guest-container-policy-v2" and not any(
+        e.artifact.path == "src/autoengineering/utility/guest_bootstrap.py" for e in entries
+    ):
+        raise StoreError("guest stdin bootstrap code is absent from frozen sources")
+    _wheel_binding(
+        job,
+        unique_json(read_bytes(store.root, job.environment, max_bytes=MAX_FILE_BYTES).decode()),
+        entries,
+    )
+    intent = {
+        "schema": "utility-guest-input-intent-v1",
+        "job": job.digest,
+        "launch": launch.digest,
+        "claim": claim.sha256,
+        "entries_digest": digest([e.to_dict() for e in entries]),
+        "driver_scope": digest(str(driver_root)),
+    }
+    durable_write(intent_path, canonical_json(intent).encode())
+    owner.fault("guest_inputs_intended")
+    contents = {}
+    for entry in entries:
+        ref, role = entry.artifact, entry.role
+        if role == "job":
+            raw = job.to_json().encode()
+        elif role == "intent":
+            raw = canonical_json(_binding(job)).encode()
+        elif role == "claim":
+            raw = read_bytes(store.root, claim, max_bytes=65536)
+        else:
+            origin = (
+                driver_root
+                if role == "driver"
+                else (
+                    source_root if role in ("lock", "core_source", "model_source") else store.root
+                )
+            )
+            original = job.grant.inference.forcing.artifact if role == "driver" else ref
+            raw = read_bytes(origin, original, max_bytes=MAX_FILE_BYTES)
+        if (len(raw), hashlib.sha256(raw).hexdigest()) != (ref.size_bytes, ref.sha256):
+            raise StoreError("guest input bytes differ from frozen closure; intent retained")
+        contents[ref.path] = raw
+    owner.fault("guest_inputs_read")
+    # Environment metadata is public but must match the immutable guest profile.
+    _wheel_binding(job, unique_json(contents[job.environment.path].decode()), entries)
+    archive = put_bytes(
+        owner.root,
+        _tar(entries, contents),
+        name="guest-inputs.tar",
+        media_type="application/x-tar",
+        producer="guest-input",
+    )
+    owner.fault("guest_inputs_archive")
+    package = GuestInputPackage(
+        "utility-guest-input-package-v1",
+        job.digest,
+        launch.digest,
+        claim.sha256,
+        digest(intent),
+        entries,
+        archive,
+        "unqualified-candidate",
+    )
+    durable_write(owner.root / "input-package.json", package.to_json().encode())
+    owner.fault("guest_inputs_committed")
+    return package
+
+
+def _contents(package, raw):
+    contents = {}
+    expected = {e.artifact.path: e for e in package.entries}
+    directories = {
+        str(p)
+        for e in package.entries
+        for p in PurePosixPath(e.artifact.path).parents
+        if str(p) != "."
+    }
+    seen = set()
+    try:
+        with tarfile.open(fileobj=io.BytesIO(raw), mode="r:") as archive:
+            for member in archive:
+                if member.name in seen or member.name not in expected.keys() | directories:
+                    raise StoreError("guest transfer contains duplicate or unexpected member")
+                seen.add(member.name)
+                is_dir = member.name in directories
+                if (
+                    member.type != (tarfile.DIRTYPE if is_dir else tarfile.REGTYPE)
+                    or member.mode != (0o700 if is_dir else 0o600)
+                    or member.uid != 1000
+                    or member.gid != 1000
+                    or member.mtime != 0
+                    or member.uname
+                    or member.gname
+                    or member.linkname
+                    or member.pax_headers
+                    or member.sparse is not None
+                ):
+                    raise StoreError("guest transfer member type/ownership/permissions differ")
+                if is_dir:
+                    if member.size != 0:
+                        raise StoreError("guest transfer directory has content")
+                    continue
+                ref = expected[member.name].artifact
+                if member.size != ref.size_bytes:
+                    raise StoreError("guest transfer member size differs")
+                content = archive.extractfile(member).read(ref.size_bytes + 1)
+                if hashlib.sha256(content).hexdigest() != ref.sha256:
+                    raise StoreError("guest transfer member digest differs")
+                contents[member.name] = content
+    except (tarfile.TarError, EOFError, UnicodeError):
+        raise StoreError("guest transfer is not a supported canonical tar archive") from None
+    if seen != expected.keys() | directories or _tar(package.entries, contents) != raw:
+        raise StoreError("guest transfer structure differs from canonical bounded archive")
+    return contents
+
+
+def verify_guest_inputs(root, job, launch, claim):
+    """Cold saved-package reconstruction, with no drivers/model/runtime or writes."""
+    from .guest_observations import _launch
+
+    root = checked_directory(root)
+    _launch(job, launch)
+    path = confined_file(root, "input-package.json")
+    if path.stat().st_size > 4 * 1024 * 1024:
+        raise StoreError("guest input package manifest exceeds bound")
+    package = GuestInputPackage.from_json(path.read_text())
+    intent_path = confined_file(root, "input-intent.json")
+    if intent_path.stat().st_size > 65536:
+        raise StoreError("guest input intent exceeds bound")
+    intent = unique_json(intent_path.read_text())
+    raw = read_bytes(root, package.archive, max_bytes=MAX_TAR_BYTES)
+    verify_guest_input_contents(package, job, launch, claim, intent, raw)
+    return package
+
+
+def verify_guest_input_contents(package, job, launch, claim, intent, raw):
+    """Validate bounded transfer bytes before writing any guest input file."""
+    from .guest_observations import _launch
+
+    _launch(job, launch)
+    if (package.job_digest, package.launch_digest, package.claim_digest) != (
+        job.digest,
+        launch.digest,
+        claim.sha256,
+    ) or launch.claim_digest != claim.sha256:
+        raise StoreError("guest input package belongs to another launch")
+    if (
+        not isinstance(intent, dict)
+        or set(intent) != {"schema", "job", "launch", "claim", "entries_digest", "driver_scope"}
+        or intent["schema"] != "utility-guest-input-intent-v1"
+        or (intent["job"], intent["launch"], intent["claim"])
+        != (job.digest, launch.digest, claim.sha256)
+        or digest(intent) != package.intent_digest
+        or intent["entries_digest"] != digest([e.to_dict() for e in package.entries])
+    ):
+        raise StoreError("guest input intent differs from saved package")
+    sha256(intent["driver_scope"])
+    if (len(raw), hashlib.sha256(raw).hexdigest()) != (
+        package.archive.size_bytes,
+        package.archive.sha256,
+    ):
+        raise StoreError("guest transfer archive digest/size differs")
+    contents = _contents(package, raw)
+    if contents.get("job.json") != job.to_json().encode():
+        raise StoreError("guest transferred job differs")
+    if unique_json(contents["intent.json"].decode()) != _binding(job):
+        raise StoreError("guest transferred worker intent differs")
+    if unique_json(contents["claim.json"].decode()) != (
+        _binding(job) | {"scope": job.claim_scope(None)}
+    ):
+        raise StoreError("guest transferred original claim differs")
+    bound = TrainedSelectedState.from_json(
+        contents[job.grant.inference.selected_state.path].decode()
+    )
+    if bound.model.digest != job.grant.model_digest:
+        raise StoreError("guest transferred model differs from frozen grant")
+    if package.entries != _inventory(job, claim, bound):
+        raise StoreError("guest transferred closure includes missing or unapproved inputs")
+    _wheel_binding(job, unique_json(contents[job.environment.path].decode()), package.entries)
+    return contents

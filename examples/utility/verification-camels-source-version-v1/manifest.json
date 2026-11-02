@@ -1,0 +1,57 @@
+{
+  "files": {
+    "LICENSE.loader.txt": {
+      "sha256": "96a1783b142451333adbaad4b87d83986e3f1ed982eaebe0bb48b2a2066bb0ab",
+      "size_bytes": 1523
+    },
+    "README.md": {
+      "sha256": "c25f03225a2d8388911d64a352ac9ccc2da76e925a5ec449d2c9308261860107",
+      "size_bytes": 972
+    },
+    "acquisition.json": {
+      "sha256": "6df8e332bd4a6e65fcf033f7942c78127d53a3828b83a81ae75a8c203dc72a5d",
+      "size_bytes": 2219
+    },
+    "camelsus-loader.py.txt": {
+      "sha256": "be186c9bc656f999716bbfc4dbe5e4f983f5678e10690ce6721af276cbd97eaf",
+      "size_bytes": 9564
+    },
+    "daymet-v4-guide.html": {
+      "sha256": "e9f69f3f123e4d89a9061c18b2a09373b4d7ad3e51351aaaa358516f06c33d12",
+      "size_bytes": 59337
+    },
+    "loader-branch.json": {
+      "sha256": "587a9193faa5661fa9f314a7191f511496a5820e9244499600b6d8edef1534ef",
+      "size_bytes": 5008
+    },
+    "ncar-hour-comments.json": {
+      "sha256": "a9594081a796401fee7893d556a231727d2ce5584b3fadbd6666c620a7636030",
+      "size_bytes": 1632
+    },
+    "ncar-hour-issue.json": {
+      "sha256": "d01c7d1b9fba3af01e7b09e07a558a47a8a3f6d3289ff463dd8c8b1b772bef76",
+      "size_bytes": 5446
+    },
+    "source-review.json": {
+      "sha256": "5e0bee8588849a891c5616fba0c8bfa7e32242939237380c531b4b5f3e36b08c",
+      "size_bytes": 1886
+    },
+    "source/examples/utility/hydrology_camels.py": {
+      "sha256": "ba2ec207fc2aba1aa9ce8ec9f22c5ae2fbd38fed070ac462ff83caf36f48e89e",
+      "size_bytes": 7950
+    },
+    "source/tests/test_utility_hydrology_camels.py": {
+      "sha256": "04dd19bd068a6f7e4842360bea780ff087f4e3d077ad42e2fa48ad58af20532b",
+      "size_bytes": 12383
+    },
+    "summary.json": {
+      "sha256": "756f862d612334c4a8ff376ca3edc83050800849b8fa05be5ae6eb3f2433894d",
+      "size_bytes": 1673
+    },
+    "tests.xml": {
+      "sha256": "07a991368750755a525b019f42f6c575333ddbfe1c61cdf39fd9ecb732061e03",
+      "size_bytes": 12403
+    }
+  },
+  "schema": "utility-camels-source-version-manifest-v1"
+}

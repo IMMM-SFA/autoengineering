@@ -1,0 +1,18 @@
+{
+  "scope": "four-task proposal preparation and blocked-dossier policy update; incremental metadata/source only, no scientific/platform/private qualification",
+  "predecessor": "examples/utility/source-inventory-guest-running-cancellation.json",
+  "predecessor_sha256": "46a923106cf3c142bdf31abe96da5e6ded876a7246eaac8cf3404bcbb2cf8dc3",
+  "source_sha256": {
+    "examples/utility/confirmation_choices.py": "d8f6de6edd79817a6b958d6291c097c029b3c0401b3b3ec0b4b70739908e6a6d",
+    "tests/test_utility_confirmation_choices.py": "6e004370e91d6d829e349f890030f6dc3eb1558e83c600a7da6373d0112c1e1f",
+    "examples/utility/tasks/hydrology.json": "6b7c9c7fe18ea1a91becb2f48a361d1633d206d4bb45456ce1c60578cfeebd2c",
+    "examples/utility/tasks/solar.json": "ebc29ca0c31b68bb0f92fe4e55695afe247e73ba08585b41f9e233f748d7e386",
+    "examples/utility/tasks/engineering.json": "991289146e4aa9f926034a3582fd146b10a549d4701d8243fc3ba4fc0df49a25",
+    "examples/utility/tasks/wind.json": "bd0892a77bf71748a9065a5e60449b9a2c38a21233df2de5b56526a09afe1958"
+  },
+  "verification": "examples/utility/proposals/confirmation-v2/summary.json",
+  "proposal": "examples/utility/proposals/confirmation-v2/proposal.json",
+  "proposal_digest": "59099fffedbc3aed4cc04b03cf1a5fb3d92678e48fdf231be74a47e5030e3c9e",
+  "core_sources_unchanged": 224,
+  "declared_wheel_sources_unchanged": 315
+}

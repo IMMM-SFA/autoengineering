@@ -1,0 +1,2 @@
+/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/pyDOE2/doe_factorial.py:201: SyntaxWarning: invalid escape sequence '\-'
+  A = [item for item in re.split('\-|\s|\+', gen) if item]  # remove empty strings

@@ -42,7 +42,14 @@ def test_canonical_roundtrip_and_whitespace(tmp_path):
     path.write_text("# changed formatting\n\n" + path.read_text())
     assert CampaignSpec.from_yaml(path).digest == spec.digest
     assert CampaignSpec.from_json(spec.to_json()) == spec
-    assert CampaignSpec.from_yaml(ROOT / "examples/campaign_contracts/fixture.yaml") == spec
+    # The checked Part 2 fixture retains its historical source hashes. A new
+    # package revision resolves a new identity instead of rewriting that record.
+    historical = CampaignSpec.from_yaml(ROOT / "examples/campaign_contracts/fixture.yaml")
+    assert CampaignSpec.from_json(historical.to_json()) == historical
+    assert historical.baseline.model.implementations == spec.baseline.model.implementations
+    assert historical.acceptance == spec.acceptance
+    assert historical.data == spec.data
+    assert historical.execution == spec.execution
 
 
 @pytest.mark.parametrize(
@@ -253,7 +260,9 @@ def test_resolved_hydrology_profile_and_private_split_artifacts():
 
     cached = audit_cache()
     spec = CampaignSpec.from_yaml(ROOT / "examples/campaign_contracts/profile/campaign.yaml")
-    verify_dependencies(spec, ROOT)
+    # Historical engine hashes must not become silently eligible under new code.
+    with pytest.raises(ValueError, match="mismatch"):
+        verify_dependencies(spec, ROOT)
     contracts = {item.id: item for item in spec.data}
     forcing = read_arrays(ROOT, contracts["forcing"].artifact)
     assert set(forcing) == {"precip_mm", "tmean_c", "tmax_c", "tmin_c", "day_of_year"}

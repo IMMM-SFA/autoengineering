@@ -1,0 +1,81 @@
+{
+  "schema": "utility-camels-inspection-result-v1",
+  "request_digest": "f3cab6701bc22c01298949fdec5493d54449ab8aa5245920b33b15cce7eed677",
+  "archive_verification": {
+    "schema": "utility-camels-archive-membership-v1",
+    "source_digest": "496f593162977da82adac7abfc10b7818900920a9ce21146681e78e2567ce751",
+    "archive_sha256": "bb90fca29a5bab8f0b300787a5ab5a669a366f40ba95b6877b631a81133f7e5d",
+    "archive_metadata_sha256": "5dc33eb71816153a1e1b071dd19434bcb59c4bc0b11222b7e9bccae59b829a72",
+    "archive_bytes_hashed": 3406626583,
+    "forcing_sha256": "d0bbf390e742defb9ed85a350cfd1091c9504be2a793d6c160a3bd44e9c20c90",
+    "streamflow_sha256": "45ebf2d12c64303b0e6b904ccc84e8caa6d0c9bc14febbb41eae38f3d649f362",
+    "member_bytes_decompressed": 1152695,
+    "archive_membership_verified": true,
+    "source_authenticity_admitted": false,
+    "physical_intervals_admitted": false,
+    "rights_and_exposure_admitted": false,
+    "protected_execution_qualified": false
+  },
+  "source_digest": "496f593162977da82adac7abfc10b7818900920a9ce21146681e78e2567ce751",
+  "plan_digest": "ea4552034d4f25a738ee6e37e9e8eea0a36f2d6826248881cdefa3795e401eb1",
+  "basin_area_km2": 292.543553,
+  "gauge_latitude_deg": 38.97,
+  "row_count": 12784,
+  "window_quality_counts": [
+    {
+      "role": "warmup",
+      "start": "1980-01-01",
+      "end": "1980-12-31",
+      "row_count": 366,
+      "flow_flag_counts": {
+        "A": 366
+      },
+      "missing_flow_count": 0,
+      "usable_flow_count": 366
+    },
+    {
+      "role": "fitting",
+      "start": "1981-01-01",
+      "end": "1999-12-31",
+      "row_count": 6939,
+      "flow_flag_counts": {
+        "A": 6898,
+        "A:e": 41
+      },
+      "missing_flow_count": 0,
+      "usable_flow_count": 6898
+    },
+    {
+      "role": "selection",
+      "start": "2000-01-01",
+      "end": "2004-12-31",
+      "row_count": 1827,
+      "flow_flag_counts": {
+        "A": 1736,
+        "A:e": 91
+      },
+      "missing_flow_count": 0,
+      "usable_flow_count": 1736
+    },
+    {
+      "role": "confirmation",
+      "start": "2005-01-01",
+      "end": "2014-12-31",
+      "row_count": 3652,
+      "flow_flag_counts": {
+        "A": 3467,
+        "A:e": 93,
+        "M": 92
+      },
+      "missing_flow_count": 92,
+      "usable_flow_count": 3467
+    }
+  ],
+  "complete_published_date_axis": true,
+  "physical_intervals_admitted": false,
+  "source_timing_or_leap_transformation_proven": false,
+  "observation_values_exported": false,
+  "model_calls": 0,
+  "private_partitions_published": false,
+  "task_admitted": false
+}

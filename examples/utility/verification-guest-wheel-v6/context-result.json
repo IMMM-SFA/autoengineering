@@ -1,0 +1,16 @@
+{
+  "plan_digest": "685d86e4bd0f3c8938405c4dd1e2d73ac077708e5c13a10ef80beb2ef83e1d80",
+  "context_digest": "4340a8d04bcb9e408dffb8057e5fd8bc3241e14b56036533b8c1cf4684b62797",
+  "environment_digest": "aec404431cb50f0bf3e34362183dc74294ce47b8bd96eb52241245da80b4d824",
+  "context_path": "outputs/guest-build-context-v6",
+  "copied_file_bytes": 275254359,
+  "payload_bytes": 273412716,
+  "context_files": 67,
+  "existing_archive_cache_used": true,
+  "new_network_requests": 0,
+  "new_dependency_installations": 0,
+  "image_built": false,
+  "new_container_starts": 0,
+  "runtime_qualified": false,
+  "known_next_step": "Image assembly and the explicit-environment derivative precede any new image qualification"
+}

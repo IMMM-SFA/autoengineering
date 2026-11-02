@@ -1,0 +1,10 @@
+{
+  "rows": 1336,
+  "scored_rows": 1109,
+  "power_rmse_kw": 148.15091534768507,
+  "parity": "passed",
+  "physical_starts": 2,
+  "seconds": 1.031397333368659,
+  "confirmation": "not_attempted",
+  "energy": "not_reported"
+}

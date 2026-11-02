@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/py_wake/__init__.py", line 6, in <module>
+    import netCDF4
+  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/netCDF4/__init__.py", line 11, in <module>
+    from ._netCDF4 import *
+  File "include/netCDF4.pxi", line 376, in init netCDF4._netCDF4
+RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject

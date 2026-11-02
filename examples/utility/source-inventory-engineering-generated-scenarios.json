@@ -1,0 +1,15 @@
+{
+  "scope": "Preselection operating-source preparation and post-barrier private reading, actual authored control only",
+  "predecessor": "examples/utility/source-inventory-solar-csv-installed.json",
+  "predecessor_sha256": "58b7a27ba15ac0bdaad035deb80d8d2700fd8bf3f3f118ad0be2e1a5580728d8",
+  "source_sha256": {
+    "examples/utility/engineering_scenarios.py": "8b9c0d109898e853a82c77a79d93034939d0d96a56028807df1d9b3a74da0e5a",
+    "tests/test_utility_engineering_scenarios.py": "b09ab70404f59914a6afada3a439c119292079033c5efb4d7d0508dbdce8027c",
+    "examples/utility/proposals/engineering-generated-v1.json": "3c10cb0bff6494f36c3797ea741326031e980c3b797aa2c9f889889dd9570129",
+    "examples/utility/exposure-register.json": "43bffbb96b37631f7cc0ea182e57c9c63da54929924e308eddfc8dbbfb825630"
+  },
+  "verification": "examples/utility/verification-engineering-generated-scenarios-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "new_preparer_in_guest_wheel": false
+}

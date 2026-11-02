@@ -1,0 +1,1 @@
+{"observed_utc": "2026-10-30T12:07:43.161844+00:00", "pytest_pid": 35048, "receipt_file_counts": {"action-finish.json": 114, "action-start.json": 114, "supervisor-result.json": 114}, "scope": "file counts only; not a committed outcome or final cost verdict", "test": "test_full_three_route_accounting_pause_replay_and_reports"}

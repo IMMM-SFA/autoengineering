@@ -1,0 +1,50 @@
+"""Publish split metadata receipts after an oversized summary; no scientific retry."""
+from pathlib import Path
+import hashlib
+import json
+import socket
+import subprocess
+
+from autoengineering.agents.batch import BatchStore
+from autoengineering.utility.engineering_campaign import EngineeringCampaign
+from autoengineering.utility.native_costs import join_native_costs
+from autoengineering.campaign.serialization import digest
+
+root=Path.cwd();out=root/'outputs/engineering-envelope-supervised-v1'
+assert not (out/'summary.json').exists()
+request=json.loads((out/'request.json').read_text())
+failure=json.loads((out/'failure.json').read_text())
+producer=root/'examples/utility/verification-engineering-envelope-supervised-v1/produce.py.txt'
+assert hashlib.sha256(producer.read_bytes()).hexdigest()==request['producer_sha256']
+for name,pin in request['source_pins'].items():
+    assert hashlib.sha256((out/'source'/name).read_bytes()).hexdigest()==pin
+    assert hashlib.sha256((root/name).read_bytes()).hexdigest()==pin
+batch=BatchStore(out/'batch',expected_digest=failure['batch_integrity']['batch_digest'])
+campaign=EngineeringCampaign(out/'campaign',batch,inspect_only=True)
+def denied(*args,**kwargs):raise AssertionError('metadata repair attempted external execution')
+socket.socket=subprocess.Popen=denied
+state=campaign.state();project=batch.replay()
+assert len(project.reservations)==len(project.observations)==49 and not project.pending and not project.finished
+report=state['native_reports'][0]
+assert report.status=='success' and len(report.result.solves)+len(report.result.support_solves)==35
+assert state['selected'].evaluation==state['evaluations'][1].evaluation
+costs=join_native_costs(batch,{'conventional':digest(request)})
+refs={
+    'native_report':batch.evidence(report.to_dict()).to_dict(),
+    'evaluations':[batch.evidence(value.to_dict()).to_dict() for value in state['evaluations']],
+    'costs':batch.evidence({'costs':[value.to_dict() for value in costs]}).to_dict(),
+    'decision':batch.evidence(state['decision'].to_dict()).to_dict(),
+    'selected_state':batch.evidence(state['selected'].to_dict()).to_dict(),
+}
+base,chosen=state['evaluations']
+assert all(c.values['source_power']<=1.01*b.values['source_power'] for b,c in zip(base.scenarios,chosen.scenarios,strict=True))
+evidence={'schema':'utility-engineering-envelope-supervision-completion-v2','request_digest':digest(request),
+    'records':refs,'outer_reservations':49,'native_inner_model_calls':35,'total_root_model_calls':83,
+    'baseline_power_W':base.evaluation.metrics['source_power'],'selected_power_W':chosen.evaluation.metrics['source_power'],
+    'public_per_case_power_degradation_limit':.01,'public_per_case_power_degradation_passed':True,
+    'cpu_seconds':None,'peak_rss_bytes':None,'independent_confirmation':False,
+    'protected_private_runtime_qualified':False,'oversized_summary_failure_preserved':True,
+    'new_scientific_calls_in_repair':0,'new_native_driver_calls_in_repair':0}
+proof=batch.evidence(evidence);batch.finish_case('conventional','passed',(proof,))
+(out/'summary.json').write_text(json.dumps({'receipt':proof.to_dict(),**evidence},sort_keys=True,indent=2)+'\n')
+print(json.dumps({'outer_reservations':49,'total_root_model_calls':83,'decision':state['decision'].outcome,'new_model_calls':0}))

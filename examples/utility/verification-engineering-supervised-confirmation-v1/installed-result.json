@@ -1,0 +1,11 @@
+{
+  "reader_exit_code_observed": 0,
+  "installed_core_only": true,
+  "json_markdown_cli_verify_reconstructed": true,
+  "model_and_example_imports_denied_from_startup": true,
+  "runtime_and_outside_file_reads_denied_after_initialization": true,
+  "new_model_calls": 0,
+  "private_source_reads": 0,
+  "observed_via": "direct tool invocation of relocated installed reader",
+  "reused_core_wheel_sha256": "72bb3bf16fcdb77997ce336cf04773b090eff5bc3ecb759881eaa16ee6641422"
+}

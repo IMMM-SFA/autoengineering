@@ -1,0 +1,41 @@
+"""Installed replay plus rejection of rehashed completion evidence dropping work."""
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+import zipfile
+source=Path(sys.argv[1]).resolve()
+archive=source/'examples/utility/verification-engineering-envelope-supervised-v1'
+stage=Path('/private/tmp/engineering-envelope-supervised-reader-v2');stage.mkdir(mode=0o700)
+installed=Path('/private/tmp/utility-engineering-envelope-installed-v1/installed')
+wheel=source/'examples/utility/verification-engineering-envelope-registration-v1/autoengineering-0.2.0-py3-none-any.whl'
+assert hashlib.sha256(wheel.read_bytes()).hexdigest()=='4e4dd052bc1ea57609aa61a6454560d5784baad7989597a9eeda6f4991dd6fb7'
+verified=0
+with zipfile.ZipFile(wheel) as z:
+    for name in z.namelist():
+        if name.startswith('autoengineering/') and not name.endswith('/'):
+            assert (installed/name).read_bytes()==z.read(name);verified+=1
+public=stage/'public';wrong=stage/'wrong'
+shutil.copytree(archive/'public',public);shutil.copytree(archive/'public',wrong)
+summary=json.loads((wrong/'summary.json').read_text());old=summary['receipt']
+record=json.loads((wrong/'batch'/old['path']).read_text());record['total_root_model_calls']=48
+raw=(json.dumps(record,sort_keys=True,separators=(',',':'))+'\n').encode();pin=hashlib.sha256(raw).hexdigest()
+relative='artifacts/'+pin+'/receipt.json';target=wrong/'batch'/relative;target.parent.mkdir();target.write_bytes(raw)
+summary['total_root_model_calls']=48
+summary['receipt']={**old,'path':relative,'sha256':pin,'size_bytes':len(raw)}
+(wrong/'summary.json').write_text(json.dumps(summary))
+assert not Path.cwd().resolve().is_relative_to(source)
+def run(root):
+    return subprocess.run([sys.executable,'-I','-B',str(archive/'read.py.txt'),str(root),str(installed)],capture_output=True,text=True)
+good=run(public);assert good.returncode==0,good.stderr
+bad=run(wrong);assert bad.returncode!=0 and 'AssertionError' in bad.stderr
+result={'schema':'utility-engineering-envelope-supervised-installed-reader-v1',
+    'outside_checkout':True,'relocated_replay':'passed','rehashed_dropped_native_work':'rejected',
+    'reader':json.loads(good.stdout),'installed_payloads_verified':verified,
+    'wheel_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),
+    'wheel_rebuilt':False,'dependencies_installed':False,'new_scientific_calls':0,
+    'reader_initialization':'core metadata readers may read installed libraries; guarded replay reads evidence only'}
+(archive/'reader-verification.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

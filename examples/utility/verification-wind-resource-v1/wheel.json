@@ -1,0 +1,7 @@
+{
+  "wheel_sha256": "60e65b345438a6c8908ab34094d8edb60aa80a1825276c80d85b752ab44a65cd",
+  "verified_python_files": 199,
+  "verified_fixture": "examples/utility/fixtures/wind-resource-demo.json",
+  "dependency_scope": "cached pinned wind environment path, no editable activation or new solve",
+  "guard_scope": "original checkout opens and all sockets denied in Python; subprocess helpers not denied"
+}

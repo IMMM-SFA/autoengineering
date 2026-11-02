@@ -1,0 +1,76 @@
+{
+  "buildx.build.provenance": {
+    "builder": {
+      "id": ""
+    },
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/localhost/ae-guest-source-b1293da8df334843a9c2f69a0389ac5d@frozen?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "args": {
+          "cpuperiod": "100000",
+          "cpuquota": "100000",
+          "force-network-mode": "none",
+          "memory": "2147483648",
+          "memswap": "2147483648",
+          "no-cache": ""
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ],
+        "root": {
+          "configSource": {
+            "path": "Dockerfile"
+          },
+          "request": {
+            "args": {
+              "cpuperiod": "100000",
+              "cpuquota": "100000",
+              "force-network-mode": "none",
+              "memory": "2147483648",
+              "memswap": "2147483648",
+              "no-cache": "",
+              "vcs:localdir:context": "outputs/guest-image-environment-v2/context",
+              "vcs:localdir:dockerfile": "outputs/guest-image-environment-v2/context",
+              "vcs:revision": "b393726a056d511a580262e6a85390c83bd185ef",
+              "vcs:source": "git@github.com:IMMM-SFA/autoengineering.git"
+            }
+          }
+        },
+        "compatibilityVersion": 30
+      },
+      "environment": {
+        "dockerfileVersion": "1.27.0",
+        "platform": "linux/arm64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/k4bvypesdde4ll6todawinvrc",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+    "digest": "sha256:516cb2702eb45d99264dc90622fea8de4de987f68b4266ba8c86da4c312390de",
+    "size": 670,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:516cb2702eb45d99264dc90622fea8de4de987f68b4266ba8c86da4c312390de",
+  "image.name": "moby-dangling@sha256:516cb2702eb45d99264dc90622fea8de4de987f68b4266ba8c86da4c312390de"
+}

@@ -1,0 +1,90 @@
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+import sys
+import time
+
+from autoengineering.utility import private_container_runtime as module
+
+repository=Path.cwd();evidence=repository/'examples/utility/verification-container-running-v1'
+evidence=evidence/'execution-timeout'
+evidence.mkdir(mode=0o700)
+source_names=['src/autoengineering/utility/private_container_runtime.py',
+              'src/autoengineering/utility/private_container_worker.py',
+              'src/autoengineering/utility/private_score_worker.py']
+hashes={name:hashlib.sha256((repository/name).read_bytes()).hexdigest() for name in source_names}
+(evidence/'executed-source-hashes.json').write_text(json.dumps(hashes,indent=2)+'\n')
+endpoint=Path('/Users/cam/.orbstack/run/docker.sock')
+version=module.API(str(endpoint)).json('GET','/version');server=module.sha(module.encode(version))
+registered=module.FixedScorerRuntime(endpoint,server_sha256=server);api_version=registered.preflight()
+controls=[]
+for fault,expected_exit in (('runtime-timeout',0),):
+    print('Running paused-workload control: '+fault,flush=True)
+    root=Path('/private/tmp')/('utility-running-'+fault+'-v1');root.mkdir(mode=0o700)
+    work=root/'workspace';work.mkdir(mode=0o700)
+    n=100000
+    (work/'job.json').write_text(json.dumps({'outcome':'rmse','units':'1','prediction':[256]*n},separators=(',',':')))
+    (work/'labels.json').write_text(json.dumps({'labels':[257]*n,'mask':[True]*n},separators=(',',':')))
+    assert all((work/name).stat().st_size<=1048576 for name in ('job.json','labels.json'))
+    settings={'endpoint':str(endpoint),'server_sha256':server,'runtime_identity':registered.identity,
+              'api_version':api_version,'job_sha256':module.sha((work/'job.json').read_bytes()),
+              'labels_sha256':module.sha((work/'labels.json').read_bytes()),'fault':fault}
+    module.write(root/'control.json',settings)
+    with (root/'creator.stdout').open('xb') as out,(root/'creator.stderr').open('xb') as err:
+        child=subprocess.Popen([sys.executable,'-I','/private/tmp/utility-running-fault-child-v2.py',
+                                str(repository/'src'),str(root)],stdout=out,stderr=err,
+                               env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8'})
+        code=child.wait(timeout=30)
+    directory=root/'container'
+    plan=json.loads((directory/'plan.json').read_bytes())
+    cid=plan['container_id'];api=module.API(str(endpoint),api_version)
+    deadline=time.monotonic()+15
+    while not (directory/'cleanup.json').exists() and time.monotonic()<deadline:
+        time.sleep(.05)
+    remaining=api.inspect(cid)
+    if remaining is not None:
+        module.verify_owned(remaining,plan)
+        module.write(root/'unexpected-remaining.json',remaining)
+        # Rescue this exact original only. This does not convert the control to
+        # a pass and never creates or starts replacement work.
+        if remaining['State']['Paused']:
+            status,_=api.request('POST','/containers/'+cid+'/unpause')
+            assert status==204
+        registered.reconcile_creation(root,stop=True)
+        raise AssertionError('automatic cleanup failed; original was explicitly rescued')
+    assert code==expected_exit,(fault,code)
+    paused=json.loads((root/'paused-running.json').read_bytes())
+    module.verify_owned(paused,plan)
+    assert paused['State']['Running'] is True and paused['State']['Paused'] is True
+    cleanup=json.loads((directory/'cleanup.json').read_bytes())
+    before_cleanup=json.loads((directory/'cleanup-before.json').read_bytes())
+    module.verify_owned(before_cleanup,plan)
+    assert before_cleanup['State']['Running'] is True and before_cleanup['State']['Paused'] is True
+    reason='deadline' if fault=='deadline' else 'owner_pipe_eof'
+    assert cleanup['container_id']==cid and cleanup['nonce']==plan['nonce']
+    assert cleanup['removed'] is True and cleanup['reason']==reason
+    assert not (directory/'result.json').exists()
+    operations=[json.loads(line) for line in (root/'creator-requests.jsonl').read_bytes().splitlines()]
+    assert sum(op['method']=='POST' and op['path'].startswith('/containers/create?') for op in operations)==1
+    assert sum(op['method']=='POST' and op['path'].endswith('/start') for op in operations)==1
+    assert sum(op['method']=='POST' and op['path'].endswith('/pause') for op in operations)==1
+    assert not any(op['method']=='DELETE' for op in operations)
+    stage=directory/'stage';stage.chmod(0o755)
+    for scope in (work,stage):
+        for name in ('job.json','labels.json'): (scope/name).unlink()
+    stage.chmod(0o555)
+    record={'fault':fault,'root':str(root),'owner_pid':child.pid,'owner_exit':code,
+            'container_id':cid,'nonce':plan['nonce'],'created_objects':1,'container_starts':1,
+            'scoring_child_starts':None,'running_and_paused_observed':True,'cleanup_reason':reason,
+            'automatic_original_removal':True,'live_absence_confirmed':True,'observer_delete_requests':0,
+            'accepted_scientific_result':False,'replacement_attempts':0,'all_authored_input_copies_deleted':True}
+    module.write(root/'control-result.json',record);controls.append(record)
+    for name,digest in hashes.items():assert hashlib.sha256((repository/name).read_bytes()).hexdigest()==digest
+    print(json.dumps(record,sort_keys=True),flush=True)
+(evidence/'actual-controls.json').write_text(json.dumps({
+    'schema':'synthetic-running-container-fault-controls-v1','controls':controls,
+    'created_objects':1,'container_starts':1,'scoring_child_starts':None,
+    'private_scoring_qualified':False,'real_confirmation_data_reads':0,
+    'provider_calls':0,'image_pulls':0,'remote_jobs':0,
+},indent=2)+'\n')

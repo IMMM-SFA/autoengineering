@@ -1,0 +1,68 @@
+"""Build a selected-source wheel and an isolated offline execution environment."""
+import hashlib,json,os,shutil,subprocess,sys,zipfile
+from pathlib import Path
+root=Path.cwd();os.umask(0o077)
+p=root/'examples/utility/verification-engineering-robust-installed-v1'
+base=Path('/private/tmp/utility-robust-installed-v1');base.mkdir(mode=0o700)
+stage=base/'source';stage.mkdir(mode=0o700)
+core=json.loads((root/'examples/utility/verification-load-cost-report-v1/wheel-input-pins.json').read_text())
+names=set(core)
+names.update(str(f.relative_to(root)) for f in (root/'src/autoengineering').rglob('*.py'))
+domain=['examples/utility/__init__.py','examples/utility/engineering.py','examples/utility/engineering_load.py','examples/utility/engineering_load_native.py','examples/utility/engineering_load_robust_native.py','examples/interoperability/circuit/model.py','examples/interoperability/circuit/fixture.py']
+names.update(domain)
+names.update(['examples/interoperability/circuit/protocol.json','examples/utility/fixtures/engineering_robust_cases.json'])
+pins={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in sorted(names)}
+for name in names:
+ target=stage/name;target.parent.mkdir(parents=True,exist_ok=True,mode=0o700);shutil.copyfile(root/name,target)
+(p/'wheel-input-pins.json').write_text(json.dumps(pins,indent=2)+'\n')
+env=os.environ.copy();env['SOURCE_DATE_EPOCH']='1793318400'
+cmd=[sys.executable,'-I','-B','-c',"from setuptools.build_meta import build_wheel; build_wheel('../wheel')"]
+r=subprocess.run(cmd,cwd=stage,env=env,text=True,capture_output=True)
+(p/'build.stdout.txt').write_text(r.stdout);(p/'build.stderr.txt').write_text(r.stderr)
+assert r.returncode==0,r.stderr
+wheel=next((base/'wheel').glob('*.whl'))
+with zipfile.ZipFile(wheel) as z:
+ code=[n for n in z.namelist() if n.endswith('.py')]
+ assert len(code)==232
+ for name in z.namelist():
+  if '.dist-info/' not in name:
+   key='src/'+name if name.startswith('autoengineering/') else name
+   assert hashlib.sha256(z.read(name)).hexdigest()==pins[key],name
+shutil.copyfile(wheel,p/wheel.name)
+# An isolated venv gives every -I supervised child the installed core runtime.
+venv=base/'venv'
+v=subprocess.run([sys.executable,'-I','-m','venv','--system-site-packages',str(venv)],cwd=base,text=True,capture_output=True)
+(p/'venv.stdout.txt').write_text(v.stdout);(p/'venv.stderr.txt').write_text(v.stderr)
+assert v.returncode==0,v.stderr
+python=venv/'bin/python'
+i=subprocess.run([str(python),'-I','-m','pip','install','--no-index','--no-deps','--no-compile',str(wheel)],cwd=base,text=True,capture_output=True)
+(p/'install.stdout.txt').write_text(i.stdout);(p/'install.stderr.txt').write_text(i.stderr)
+assert i.returncode==0,i.stderr
+site=venv/'lib/python3.12/site-packages'
+with zipfile.ZipFile(wheel) as z:
+ assert all((site/n).read_bytes()==z.read(n) for n in z.namelist() if '.dist-info/' not in n)
+# The audit hook is loaded by the installed interpreter and all -I children.
+blocked=str(root);dependencies=str(Path(sys.executable).resolve().parents[1])
+hook='''import os,sys
+from pathlib import Path
+_original=Path(BLOCKED)
+_dependencies=Path(DEPENDENCIES)
+def _source_guard(event,args):
+    if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):
+        p=Path(os.fsdecode(args[0])).absolute()
+        if p.is_relative_to(_original) and not p.is_relative_to(_dependencies):
+            raise RuntimeError('original checkout content read denied')
+sys.addaudithook(_source_guard)
+'''.replace('BLOCKED',repr(blocked)).replace('DEPENDENCIES',repr(dependencies))
+(site/'sitecustomize.py').write_text(hook)
+source=base/'captured';source.mkdir(mode=0o700)
+source_names=[]
+with zipfile.ZipFile(wheel) as z:
+ for name in code:
+  relative='src/'+name if name.startswith('autoengineering/') else name
+  target=source/relative;target.parent.mkdir(parents=True,exist_ok=True,mode=0o700);target.write_bytes(z.read(name));source_names.append(relative)
+shutil.copyfile(root/'pixi.lock',source/'pixi.lock')
+config={'base':str(base),'archive':str(p),'installed':str(site),'source':str(source),'source_names':source_names,'original_checkout':str(root),'dependency_root':dependencies,'python':str(python),'wheel_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest()}
+(base/'configuration.json').write_text(json.dumps(config,indent=2)+'\n')
+(p/'build-install.json').write_text(json.dumps(config|{'python_sources':232,'core_python_sources':225,'domain_python_sources':7,'network_or_dependency_installation':False,'dependencies_inherited':'interoperability','all_package_payloads_match_inputs':True,'all_installed_payloads_match_wheel':True},indent=2)+'\n')
+print(json.dumps({'python_sources':232,'wheel_sha256':config['wheel_sha256'],'isolated_interpreter':str(python)}))

@@ -1,0 +1,461 @@
+"""Authored Docker protocol and owned Unix IPC, never an actual daemon/model."""
+
+from contextlib import contextmanager
+import io
+import json
+import hashlib
+from pathlib import Path
+import socket
+import struct
+import tempfile
+import threading
+import time
+
+import pytest
+
+from autoengineering.utility import guest_attach as module
+from autoengineering.utility import guest_bootstrap
+import test_utility_guest_bootstrap as bootstrap_fixture
+
+metadata = bootstrap_fixture.metadata
+H = "1" * 64
+UPGRADE = (
+    b"HTTP/1.1 101 Switching Protocols\r\nConnection: Upgrade\r\nUpgrade: tcp\r\n"
+    b"Content-Type: application/vnd.docker.raw-stream\r\n\r\n"
+)
+
+
+def frame(channel, raw):
+    return struct.pack("!B3xI", channel, len(raw)) + raw
+
+
+class Clock:
+    def __init__(self, step=0):
+        self.value, self.step = 0, step
+
+    def __call__(self):
+        self.value += self.step
+        return self.value
+
+
+class Wire:
+    family = socket.AF_UNIX
+    type = socket.SOCK_STREAM
+
+    def __init__(self, incoming, *, chunk=4096, send_chunk=65536):
+        self.incoming = io.BytesIO(incoming)
+        self.sent = bytearray()
+        self.chunk, self.send_chunk = chunk, send_chunk
+        self.closed = False
+        self.shutdowns = []
+        self.timeouts = []
+        self.failure_after = None
+
+    def settimeout(self, value):
+        self.timeouts.append(value)
+
+    def recv(self, size):
+        return self.incoming.read(min(size, self.chunk))
+
+    def send(self, raw):
+        if self.failure_after is not None and len(self.sent) >= self.failure_after:
+            raise OSError("AUTHORED-PRIVATE-DIAGNOSTIC")
+        size = min(len(raw), self.send_chunk)
+        self.sent.extend(raw[:size])
+        return size
+
+    def shutdown(self, how):
+        self.shutdowns.append(how)
+
+    def connect(self, path):
+        self.path = path
+
+    def close(self):
+        self.closed = True
+
+
+def session(monkeypatch, incoming, *, chunk=4096, clock=None):
+    clock = clock or Clock()
+    monkeypatch.setattr(module, "_now", clock)
+    wire = Wire(incoming, chunk=chunk)
+    result = module.GuestAttachSession(wire, deadline=10)
+    result.upgrade("1.48", H)
+    return result, wire
+
+
+def test_upgrade_preserves_prefetched_frames_and_discards_bounded_diagnostics(monkeypatch):
+    stream, wire = session(
+        monkeypatch,
+        UPGRADE + frame(2, b"AUTHORED-PRIVATE-CANARY") + frame(1, b"first") + frame(1, b"second"),
+    )
+    assert stream.read(3) == b"fir"
+    assert stream.read(3) == b"st"
+    assert stream.read(6) == b"second"
+    assert stream.read(1) == b""
+    assert stream.stdout_bytes == 11 and stream.stderr_bytes == 23
+    assert wire.sent.startswith(f"POST /v1.48/containers/{H}/attach?logs=0&".encode())
+    assert wire.sent.endswith(b"Content-Length: 0\r\n\r\n")
+    assert b"AUTHORED-PRIVATE-CANARY" not in wire.sent
+
+
+@pytest.mark.parametrize("chunk", [1, 3, 7, 128])
+def test_fragmented_headers_and_frames_preserve_stdout(monkeypatch, chunk):
+    stream, _ = session(monkeypatch, UPGRADE + frame(1, b"abcdef"), chunk=chunk)
+    pieces = []
+    while value := stream.read(2):
+        pieces.append(value)
+    assert b"".join(pieces) == b"abcdef"
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        UPGRADE.replace(b"101 Switching Protocols", b"200 AUTHORED-PRIVATE-CANARY"),
+        UPGRADE.replace(b"Connection: Upgrade", b"Connection: close"),
+        UPGRADE.replace(b"Connection: Upgrade", b"Connection: upgrade, close"),
+        UPGRADE.replace(b"Upgrade: tcp", b"Upgrade: other"),
+        UPGRADE.replace(b"application/vnd.docker.raw-stream", b"text/plain"),
+        UPGRADE.replace(b"\r\n\r\n", b"\r\nContent-Length: 1\r\n\r\n"),
+        UPGRADE.replace(b"\r\n\r\n", b"\r\nTransfer-Encoding: chunked\r\n\r\n"),
+        UPGRADE.replace(b"\r\n\r\n", b"\r\nContent-Encoding: gzip\r\n\r\n"),
+        UPGRADE.replace(b"\r\n\r\n", b"\r\nUpgrade: tcp\r\n\r\n"),
+        UPGRADE.replace(b"Upgrade: tcp", b" Upgrade: tcp"),
+        UPGRADE.replace(b"Upgrade: tcp", b"Upgrade: t\x00cp"),
+        UPGRADE.replace(b"\r\n\r\n", b"\r\nX-Long: " + b"x" * 4097 + b"\r\n\r\n"),
+        UPGRADE[:-1],
+        b"HTTP/1.1 101\r\n" + b"X: " + b"x" * 65536,
+    ],
+)
+def test_bad_upgrade_closes_without_disclosing_server_bytes(monkeypatch, response):
+    wire = Wire(response)
+    monkeypatch.setattr(module, "_now", Clock())
+    stream = module.GuestAttachSession(wire, deadline=10)
+    with pytest.raises(module.GuestAttachError) as error:
+        stream.upgrade("1.48", H)
+    assert "AUTHORED-PRIVATE-CANARY" not in str(error.value)
+    assert wire.closed
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        frame(0, b"stdin-echo"),
+        frame(3, b"AUTHORED-DAEMON-ERROR"),
+        frame(4, b"unknown"),
+        b"\x01\x01\x00\x00" + struct.pack("!I", 0),
+        struct.pack("!B3xI", 1, module.MAX_STDOUT + 1),
+        struct.pack("!B3xI", 2, module.MAX_STDERR + 1),
+        frame(1, b"short")[:-1],
+        frame(1, b"value")[:3],
+    ],
+)
+def test_unknown_oversized_or_truncated_frame_refuses(monkeypatch, raw):
+    stream, wire = session(monkeypatch, UPGRADE + raw)
+    with pytest.raises(module.GuestAttachError):
+        while stream.read(65536):
+            pass
+    assert wire.closed
+
+
+def test_diagnostic_and_frame_limits_are_cumulative(monkeypatch):
+    monkeypatch.setattr(module, "MAX_STDERR", 3)
+    stream, _ = session(monkeypatch, UPGRADE + frame(2, b"ab") + frame(2, b"cd"))
+    with pytest.raises(module.GuestAttachError, match="diagnostics"):
+        stream.read(1)
+    monkeypatch.setattr(module, "MAX_FRAMES", 2)
+    stream, _ = session(monkeypatch, UPGRADE + frame(1, b"") * 3)
+    with pytest.raises(module.GuestAttachError, match="frame count"):
+        stream.read(1)
+
+
+def test_progress_does_not_extend_original_deadline(monkeypatch):
+    clock = Clock(step=0.01)
+    monkeypatch.setattr(module, "_now", clock)
+    wire = Wire(UPGRADE + frame(1, b"x") * 1000)
+    stream = module.GuestAttachSession(wire, deadline=1)
+    stream.upgrade("1.48", H)
+    with pytest.raises(module.GuestAttachTimeout):
+        while stream.read(1):
+            pass
+    assert stream.deadline == 1 and clock.value >= 1 and wire.closed
+
+
+def test_idle_io_polls_cancellation_without_inventing_owned_stop(monkeypatch):
+    cancelled = threading.Event()
+    stream, wire = session(monkeypatch, UPGRADE)
+
+    def receive(size):
+        cancelled.set()
+        raise socket.timeout()
+
+    wire.recv = receive
+    stream._cancelled = cancelled.is_set
+    with pytest.raises(module.GuestAttachCancelled, match="stop remains unverified"):
+        stream.read(1)
+    assert wire.closed
+
+
+@pytest.mark.parametrize("deadline", [True, float("nan"), float("inf"), 0, -1, 61])
+def test_unbounded_or_expired_deadline_refuses(monkeypatch, deadline):
+    monkeypatch.setattr(module, "_now", Clock())
+    with pytest.raises(module.GuestAttachError):
+        module.GuestAttachSession(Wire(b""), deadline=deadline)
+
+
+@pytest.mark.parametrize(
+    "path,version,cid",
+    [
+        ("relative.sock", "1.48", H),
+        ("tcp://localhost:2375", "1.48", H),
+        ("/a/../b.sock", "1.48", H),
+        ("/a\x00b", "1.48", H),
+        ("/valid.sock", "1.48\r\nInjected: true", H),
+        ("/valid.sock", "1.48", "short"),
+    ],
+)
+def test_bad_endpoint_or_header_identity_refuses_before_socket(monkeypatch, path, version, cid):
+    monkeypatch.setattr(module.socket, "socket", lambda *_: pytest.fail("socket opened"))
+    with pytest.raises(ValueError):
+        module.attach(path, version, cid, deadline=time.monotonic() + 1)
+
+
+def test_send_is_once_half_closes_and_checks_original_transfer(tmp_path, metadata, monkeypatch):
+    owner, package = bootstrap_fixture.prepared(tmp_path, metadata)
+    packet = guest_bootstrap.encode_request(owner)
+    stream, wire = session(monkeypatch, UPGRADE)
+    prefix = bytes(wire.sent)
+    wire.send_chunk = 997
+    m = owner.manifest
+    stream.send_once(
+        packet,
+        job_digest=m.job.digest,
+        launch_digest=m.launch.digest,
+        package_digest=package.digest,
+    )
+    assert wire.sent[len(prefix) :] == packet
+    assert wire.shutdowns == [socket.SHUT_WR] and stream.input_consumed
+    with pytest.raises(module.GuestAttachError, match="already consumed"):
+        stream.send_once(
+            packet,
+            job_digest=m.job.digest,
+            launch_digest=m.launch.digest,
+            package_digest=package.digest,
+        )
+    assert wire.closed and wire.shutdowns == [socket.SHUT_WR]
+
+
+def test_partial_write_consumes_attempt_without_retry(tmp_path, metadata, monkeypatch):
+    owner, package = bootstrap_fixture.prepared(tmp_path, metadata)
+    packet = guest_bootstrap.encode_request(owner)
+    stream, wire = session(monkeypatch, UPGRADE)
+    wire.send_chunk = 127
+    wire.failure_after = len(wire.sent) + 127
+    m = owner.manifest
+    with pytest.raises(module.GuestAttachError, match="send failed"):
+        stream.send_once(
+            packet,
+            job_digest=m.job.digest,
+            launch_digest=m.launch.digest,
+            package_digest=package.digest,
+        )
+    original = bytes(wire.sent)
+    assert stream.input_consumed and wire.closed and not wire.shutdowns
+    with pytest.raises(module.GuestAttachError):
+        stream.send_once(
+            packet,
+            job_digest=m.job.digest,
+            launch_digest=m.launch.digest,
+            package_digest=package.digest,
+        )
+    assert bytes(wire.sent) == original
+
+
+def test_foreign_packet_is_not_written(tmp_path, metadata, monkeypatch):
+    owner, package = bootstrap_fixture.prepared(tmp_path, metadata)
+    packet = guest_bootstrap.encode_request(owner)
+    stream, wire = session(monkeypatch, UPGRADE)
+    prefix = bytes(wire.sent)
+    with pytest.raises(module.GuestAttachError, match="another original transfer"):
+        stream.send_once(
+            packet,
+            job_digest="2" * 64,
+            launch_digest=owner.manifest.launch.digest,
+            package_digest=package.digest,
+        )
+    assert bytes(wire.sent) == prefix and not stream.input_consumed and wire.closed
+
+
+@contextmanager
+def unix_server(handler):
+    # Keep the Unix path below macOS's native sockaddr_un length limit.
+    with tempfile.TemporaryDirectory(prefix="ae-attach-", dir="/tmp") as directory:
+        path = Path(directory) / "socket"
+        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        server.bind(str(path))
+        server.listen(1)
+        server.settimeout(3)
+        errors = []
+
+        def run():
+            try:
+                connection, _ = server.accept()
+                with connection:
+                    connection.settimeout(3)
+                    handler(connection)
+            except BaseException as error:
+                errors.append(error)
+
+        thread = threading.Thread(target=run, daemon=True)
+        thread.start()
+        try:
+            yield path
+        finally:
+            server.close()
+            thread.join(5)
+            assert not thread.is_alive(), "authored Unix fixture did not finish"
+            assert not errors, repr(errors)
+
+
+def test_native_unix_attach_half_close_and_mux_reach_original_capture(tmp_path, metadata):
+    owner, package = bootstrap_fixture.prepared(tmp_path, metadata)
+    packet = guest_bootstrap.encode_request(owner)
+    output, _ = bootstrap_fixture.response(tmp_path, owner)
+    received = []
+
+    def serve(connection):
+        request = bytearray()
+        while not request.endswith(b"\r\n\r\n"):
+            chunk = connection.recv(1)
+            assert chunk
+            request.extend(chunk)
+        assert b"/attach?logs=0&stream=1&stdin=1&stdout=1&stderr=1" in request
+        connection.sendall(UPGRADE + frame(2, b"AUTHORED-PRIVATE-DIAGNOSTIC"))
+        body = bytearray()
+        while chunk := connection.recv(65536):
+            body.extend(chunk)
+        received.append(bytes(body))
+        for start in range(0, len(output), 733):
+            connection.sendall(frame(1, output[start : start + 733]))
+
+    with unix_server(serve) as path:
+        with module.attach(path, "1.48", H, deadline=time.monotonic() + 3) as stream:
+            m = owner.manifest
+            stream.send_once(
+                packet,
+                job_digest=m.job.digest,
+                launch_digest=m.launch.digest,
+                package_digest=package.digest,
+            )
+            root = bootstrap_fixture.receiver(tmp_path / "received")
+            captured = guest_bootstrap.capture_response(root, stream, m.job, m.launch, package)
+            assert stream.stdout_bytes == len(output) and stream.stderr_bytes > 0
+    assert received == [packet]
+    (tmp_path / "native-unix-proof.json").write_text(
+        json.dumps(
+            {
+                "scope": "authored owned Unix peer, not Docker or guest qualification",
+                "request_sha256": hashlib.sha256(packet).hexdigest(),
+                "response_digest": captured.response_digest,
+                "stdout_bytes": stream.stdout_bytes,
+                "stderr_bytes": stream.stderr_bytes,
+                "input_consumed": stream.input_consumed,
+                "peer_observed_stdin_eof": True,
+            },
+            indent=2,
+        )
+    )
+    assert guest_bootstrap.read_capture(root, m.job, m.launch, package) == captured
+
+
+def test_native_idle_socket_obeys_absolute_deadline():
+    left, right = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
+    try:
+        stream = module.GuestAttachSession(left, deadline=time.monotonic() + 0.2)
+        stream._upgraded = True  # Authored handshake state, no Docker process.
+        with pytest.raises(module.GuestAttachTimeout):
+            stream.read(1)
+        assert left.fileno() == -1
+    finally:
+        left.close()
+        right.close()
+
+
+def test_native_backpressure_consumes_write_before_deadline(tmp_path, metadata):
+    owner, package = bootstrap_fixture.prepared(tmp_path, metadata)
+    packet = guest_bootstrap.encode_request(owner)
+    left, right = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
+    left.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 4096)
+    try:
+        stream = module.GuestAttachSession(left, deadline=time.monotonic() + 0.5)
+        stream._upgraded = True  # Authored phase; peer intentionally never drains.
+        m = owner.manifest
+        with pytest.raises(module.GuestAttachTimeout):
+            stream.send_once(
+                packet,
+                job_digest=m.job.digest,
+                launch_digest=m.launch.digest,
+                package_digest=package.digest,
+            )
+        assert stream.input_consumed and left.fileno() == -1
+        right.settimeout(1)
+        assert right.recv(1), "deadline expired before any backpressured write"
+    finally:
+        left.close()
+        right.close()
+
+
+@pytest.mark.parametrize("kind", ["invalid", "exception"])
+def test_cancel_hook_fault_closes_without_disclosing_exception(monkeypatch, kind):
+    stream, wire = session(monkeypatch, UPGRADE)
+
+    def cancelled():
+        if kind == "exception":
+            raise RuntimeError("AUTHORED-PRIVATE-CANCEL-DETAIL")
+        return None
+
+    stream._cancelled = cancelled
+    with pytest.raises(module.GuestAttachError) as error:
+        stream.read(1)
+    assert "AUTHORED-PRIVATE-CANCEL-DETAIL" not in str(error.value) and wire.closed
+
+
+def test_short_connect_timeout_does_not_fabricate_absolute_deadline_expiry(monkeypatch):
+    monkeypatch.setattr(module, "_now", Clock())
+    wire = Wire(b"")
+    calls = []
+
+    def connect(path):
+        calls.append(path)
+        raise socket.timeout()
+
+    wire.connect = connect
+    monkeypatch.setattr(module.socket, "socket", lambda *_: wire)
+    with pytest.raises(module.GuestAttachError, match="outcome is unverified") as error:
+        module.attach("/authored-fixture.sock", "1.48", H, deadline=10)
+    assert not isinstance(error.value, module.GuestAttachTimeout)
+    assert calls == ["/authored-fixture.sock"] and wire.closed
+
+
+def test_multiplexed_media_type_uses_the_same_bounded_reader(monkeypatch):
+    header = UPGRADE.replace(
+        b"application/vnd.docker.raw-stream", b"application/vnd.docker.multiplexed-stream"
+    )
+    stream, _ = session(monkeypatch, header + frame(1, b"data"))
+    assert stream.read(4) == b"data" and stream.read(1) == b""
+
+
+def test_daemon_error_after_full_result_cannot_publish_completed_capture(
+    tmp_path, metadata, monkeypatch
+):
+    owner, package = bootstrap_fixture.prepared(tmp_path, metadata)
+    output, _ = bootstrap_fixture.response(tmp_path, owner)
+    stream, wire = session(
+        monkeypatch, UPGRADE + frame(1, output) + frame(3, b"AUTHORED-PRIVATE-DAEMON-DETAIL")
+    )
+    m = owner.manifest
+    root = bootstrap_fixture.receiver(tmp_path / "received")
+    with pytest.raises(module.GuestAttachError) as error:
+        guest_bootstrap.capture_response(root, stream, m.job, m.launch, package)
+    assert "AUTHORED-PRIVATE-DAEMON-DETAIL" not in str(error.value)
+    assert wire.closed and not (root / "bootstrap-capture.json").exists()
+    assert not list((root / "artifacts").iterdir())

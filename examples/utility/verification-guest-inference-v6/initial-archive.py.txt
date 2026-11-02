@@ -1,0 +1,38 @@
+import hashlib,json,shutil,subprocess,sys,tarfile
+from pathlib import Path
+from autoengineering.campaign.serialization import digest
+root=Path.cwd(); proof=root/'examples/utility/verification-guest-inference-v6'; run=root/'outputs/guest-inference-v6'
+for name in ('request.json','complete.json','result.json','execution-intent.json','preparation-intent.json','driver-copy-intent.json','runner.py.txt','template-owner.json'):
+ shutil.copyfile(run/name,proof/name)
+for name in ('guest_inference_smoke.py','guest_prediction_parity.py','guest_parity_reader.py'):
+ shutil.copyfile(root/'examples/utility'/name,proof/(name+'.txt'))
+shutil.copyfile(root/'tests/test_utility_guest_inference_smoke.py',proof/'test_utility_guest_inference_smoke.py.txt')
+shutil.copyfile('/private/tmp/utility-inference-v6-prep-unit.xml',proof/'preparation-unit.xml')
+c=json.loads((run/'complete.json').read_text()); q=json.loads((run/'request.json').read_text())
+expected=digest(c)
+files={str(p.relative_to(run/'suite')):{'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in (run/'suite').rglob('*') if p.is_file()}
+allowed_output=c['execution']['result']['outputs']['path']
+assert [n for n in files if n.endswith('.npz')]==[allowed_output]
+assert not any(Path(n).name in ('forcing.npz','fitting.npz','comparison.npz','drivers.npz','private-labels.json') for n in files)
+with tarfile.open(proof/'public-proof.tar.gz','w:gz') as a:
+ for name in sorted(files):a.add(run/'suite'/name,arcname='suite/'+name,recursive=False)
+relocated=Path('/private/tmp/utility-inference-v6-public')
+relocated.mkdir(mode=0o700)
+with tarfile.open(proof/'public-proof.tar.gz') as a:a.extractall(relocated,filter='data')
+for p in relocated.rglob('*'):
+ if p.is_dir():p.chmod(0o700)
+p=subprocess.run([sys.executable,'-I','-B',str(proof/'cold-recovery.py.txt'),str(relocated/'suite'),str(proof/'request.json'),str(proof/'complete.json'),expected],cwd='/private/tmp',capture_output=True,text=True)
+(proof/'cold.stdout.txt').write_text(p.stdout); (proof/'cold.stderr.txt').write_text(p.stderr)
+assert p.returncode==0,p.stderr
+(proof/'public-proof-manifest.json').write_text(json.dumps(files,indent=2,sort_keys=True)+'\n')
+parity=proof/'parity'; parity.mkdir(mode=0o700)
+original=root/'outputs/guest-prediction-parity-v6'
+for name in ('request.json','complete.json','preparation-intent.json','execution-intent.json','guest-outputs.npz','guest-predictions.json','native-outputs.npz','native-predictions.json','runner.py.txt'):
+ shutil.copyfile(original/name,parity/name)
+for src,name in [('work/job.json','job.json'),('work/worker-result.json','worker-result.json'),('work/attempts/native-reference/supervisor-result.json','supervisor-result.json')]:shutil.copyfile(original/src,parity/name)
+from examples.utility.guest_parity_reader import read_completion
+pd=json.loads((parity/'complete.json').read_text()); read_completion(parity,expected_digest=digest(pd))
+summary={'scope':'Current v6 installed frozen inference, same-fit native parity and relocated public recovery over authored exposed inputs','image_id':c['execution']['image_id'],'suite_digest':q['suite_digest'],'request_digest':digest(q),'completion_digest':expected,'parity_completion_digest':digest(pd),'container_creations':1,'container_starts':1,'charged_inference_starts':2,'model_inference_starts':2,'native_reference_starts':1,'fitting_starts_in_fixture_preparation':1,'fitting_routing_rollouts_completed':27,'fitting_routing_days_completed':2160,'fitting_rollouts_cap':120,'baseline_selection_evaluations':1,'baseline_science_starts_reported':None,'scoring_starts':0,'private_observation_reads':0,'guest_lifecycle_seconds':c['execution']['lifecycle_seconds'],'guest_model_seconds':c['execution']['result']['lifecycle_seconds'],'physical_checks':c['execution']['result']['checks'],'fit_sha256':json.loads((proof/'fixture-completion.json').read_text())['fit_sha256'],'original_container_absent':True,'cold_reader':{'exit_code':p.returncode,'archive_sha256':hashlib.sha256((proof/'public-proof.tar.gz').read_bytes()).hexdigest(),'files':len(files),'bytes':sum(x['bytes'] for x in files.values()),'relocated':True,'model_imports_blocked_from_startup':True,'array_loads_processes_network_clocks_writes_denied_during_recovery':True,'dependencies_inherited':True,'independent_os_attestation':False},'parity':{'all_seven_outputs_within_tolerance':pd['all_outputs_within_tolerance'],'max_abs_difference':max(x['max_abs_difference'] for x in pd['comparisons'].values()),'prediction_json_exact':pd['prediction_document_exact'],'atol':pd['atol'],'rtol':pd['rtol'],'fresh_saved_reader_verified':True},'source_controller':'checkout helpers with frozen snapshots; guest used installed v6 wheel','host_scope':'Local OrbStack Linux amd64 emulation on macOS ARM64 and one native macOS ARM64 reference','new_fitting_in_guest_or_native_reference':0,'runtime_qualified':False,'independent_confirmation':False,'full_part_5_complete':False}
+(proof/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+shutil.copyfile('/private/tmp/archive-inference-v6.py',proof/'archive.py.txt')
+print(json.dumps({'cold_files':len(files),'cold_exit':p.returncode,'parity_max_difference':summary['parity']['max_abs_difference'],'completion_digest':expected}))

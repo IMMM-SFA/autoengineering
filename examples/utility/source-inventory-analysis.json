@@ -1,0 +1,18 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "paired-analysis-partial",
+  "files": {
+    "src/autoengineering/utility/analysis.py": "d21dd33d32e42052ebc5729d9453b6bb90af66dfb4823085221c24a19f860a8d",
+    "tests/test_utility_analysis.py": "9f24a48d61aaee14ebc1d89dcef9ef89f1240093ff155da24f8bbf0f7c7e902a"
+  },
+  "checks": {
+    "final_analysis": "7 passed in 0.89s",
+    "prior_analysis_outcomes_barrier": "20 passed in 1.31s",
+    "ruff": "repository-wide pass"
+  },
+  "limits": [
+    "No trusted private scoring",
+    "No dependence estimator or shared baseline allocation",
+    "No complete efficiency evidence"
+  ]
+}

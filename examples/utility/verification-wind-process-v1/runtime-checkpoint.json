@@ -1,0 +1,18 @@
+{
+  "files": {
+    "src/autoengineering/utility/engineering_native.py": "6e1e1423844121b8f79f8878a12c6d49ed6ccff9f30ffdf8c1587ff40ab938d4",
+    "src/autoengineering/utility/wind_native_worker.py": "964961f523097925a98c995893e4f662ffbc01d6ff422cd877e27e69d783deb3",
+    "examples/utility/wind_process.py": "70c4274f5f0b76704c2408af98e79bffc21e71ac8cbf1d430c7a49f9ccf64087",
+    "examples/utility/wind_proposal.py": "59e7f2896e8515d62b74a7324761e4d9d9d310ebb61e290c82f32d6eefba582c",
+    "examples/utility/rehearse_wind_native.py": "f001ffa13a33e50514afabdc68ac765e99311220476b5fbeec61e847fa81eab5",
+    "tests/test_utility_wind_process.py": "52ac8f8a2d466b68fbfe24e5e4f45e2fec63d8233bb69a12099badd010db63a4",
+    "tests/test_utility_wind_proposal.py": "845b67c73fc3028650c6b8e069898b35dbf1fd1bae6eb9d6d839fd2fe5b47f24"
+  },
+  "wind_tests_exit_code": 0,
+  "real_probe_exit_code": 0,
+  "offline_reader_exit_code": 0,
+  "contract_session": 81335,
+  "contract_exit_code": 0,
+  "active_sessions": [],
+  "status": "completed"
+}

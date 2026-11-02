@@ -1,0 +1,3 @@
+{"method":"POST","path":"/containers/create?name=ae-private-rmse-50f48b1cf4454e74bb0d592e4f178cd8"}
+{"method":"GET","path":"/containers/e8150b19662a133ec522a4d0f647219bfe4494ac744918701a5041d17d5e18fa/json"}
+{"method":"POST","path":"/containers/e8150b19662a133ec522a4d0f647219bfe4494ac744918701a5041d17d5e18fa/start"}

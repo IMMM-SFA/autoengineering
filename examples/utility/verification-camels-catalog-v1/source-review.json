@@ -1,0 +1,51 @@
+{
+  "access_right": "open",
+  "aggregate_metadata_exposure": [
+    "dataset summary includes catchment-level aggregate simulation, delineation and discharge-quality counts; no individual flow rows read"
+  ],
+  "archive": {
+    "checksum": "md5:8e9a466710e8270b58f01d332a87184f",
+    "id": "c0e9d42c-1e36-40a5-b8c3-78c444f26526",
+    "key": "basin_timeseries_v1p2_metForcing_obsFlow.zip",
+    "links": {
+      "self": "https://zenodo.org/api/records/15529996/files/basin_timeseries_v1p2_metForcing_obsFlow.zip/content"
+    },
+    "size": 3406626583
+  },
+  "automatic_retries": 0,
+  "cross_response_object_identity_authenticated": false,
+  "declared_license": "cc-by-4.0",
+  "directory_members": 17728,
+  "documentation_findings": {
+    "expected_basin_members_listed": true,
+    "legacy_calendar": "not resolved by retrieved summary",
+    "missing_flow": -999.0,
+    "published_model_spinup": "separate calibration/validation spinups; not adopted for proposed causal evaluation",
+    "quality_flags": [
+      "A",
+      "A:e",
+      "M"
+    ],
+    "readme_hour": "zero described as daily placeholder; physical interval not established",
+    "units": "area m^2 and flow ft^3/s"
+  },
+  "full_archive_acquired": false,
+  "full_archive_md5_verified": false,
+  "full_archive_sha256": null,
+  "historical_datacite_registration_condition_preserved": true,
+  "http_etag_available": false,
+  "initial_directory_bound_refusal": "2 MiB local bound; no request attempted; resumed with 3 MiB bound within original 4 MiB acquisition cap",
+  "physical_intervals_resolved": false,
+  "prior_personal_exposure": "unknown",
+  "range_integrity": "exact Content-Range plus local central/header/CRC checks for documentation; not full archive cryptographic verification",
+  "record_doi": "10.5065/D6MW2F4D",
+  "record_id": 15529996,
+  "record_version": "1.2",
+  "saved_final_response_body_bytes": 2886194,
+  "schema": "utility-camels-current-catalog-review-v1",
+  "successful_top_level_requests": 10,
+  "task_admitted": false,
+  "time_series_members_opened": 0,
+  "total_http_exchanges": null,
+  "total_network_bytes": null
+}

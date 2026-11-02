@@ -1,0 +1,61 @@
+"""Reconstruct exact source and saved authored score identities without source opening."""
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(sys.argv[2]).resolve()))
+import importlib.abc
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self,fullname,*args):
+        if fullname.split('.')[0] in {'openmdao','py_wake','topfarm','torch','pvlib','h5py'}:
+            raise RuntimeError('optional model imports denied')
+sys.meta_path.insert(0,NoModels())
+import hashlib,json,os,socket,subprocess,time
+from autoengineering.campaign.serialization import digest,unique_json
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.utility.store import SuiteStore
+from autoengineering.utility.controller import UtilityController
+from autoengineering.agents.batch import BatchSpec,BatchStore
+from autoengineering.utility.baseline_selection import follower_group
+from autoengineering.utility.scoring import ConfirmationGrant,read_receipt
+from examples.utility import engineering_source_binding as b
+from examples.utility import engineering_scenarios as source
+root=Path(sys.argv[1]).resolve()
+expected=json.loads((root.parent/'expected-public.json').read_text())
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def denied(*args,**kwargs):raise RuntimeError('source entropy model network process or clock denied')
+source.read_private=source.derive=source.secrets.token_bytes=subprocess.Popen=socket.socket=time.time=time.monotonic=denied
+
+def audit(event,args):
+    if event=='open':
+        path,mode,flags=args
+        if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise RuntimeError('write denied')
+        if isinstance(path,int):
+            st=os.fstat(path)
+            if (st.st_dev,st.st_ino) not in inodes:raise RuntimeError('outside descriptor denied')
+        elif not Path(os.fsdecode(path)).absolute().is_relative_to(root):raise RuntimeError('outside read denied')
+    if event=='import' or event.startswith(('socket.','subprocess.','os.exec','os.fork','os.posix_spawn')):
+        raise RuntimeError('new import or execution denied')
+sys.addaudithook(audit)
+for name,sha in expected['files'].items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+store=SuiteStore(root/'suite');assert store.spec.digest==expected['suite_digest']
+state=store.replay()
+fixed=b.read_binding(store,ArtifactRef.from_dict(expected['binding_artifact']))
+grant=ConfirmationGrant.from_dict(expected['grant'])
+assert grant.scorer_digest==b.scorer_identity(fixed,expected['scorer_code_identifier'])
+assert fixed.suite_digest==store.spec.digest and fixed.partition_policy_digest==grant.partition_digest
+metadata=source.read_public(root/'metadata',expected_manifest_digest=fixed.public_manifest_digest)
+assert metadata['private_record_digest']==fixed.private_record_digest and metadata['seed_commitment']==fixed.seed_commitment
+attempt='confirmation-'+grant.cell_digest[:48]
+receipt=read_receipt(store.root,state['confirmation_scores'][attempt])
+assert receipt.digest==expected['receipt_digest'] and receipt.grant_digest==grant.digest
+assert receipt.measurement.scorer_digest==grant.scorer_digest
+assert state['phase_used'][('fixed_evaluations','confirmation','scientific_starts')]==1
+claims=list((store.root/b.ACCESS_DIRECTORY).glob('*.json'))
+assert len(claims)==1
+claim=unique_json(claims[0].read_text())
+assert claim['grant_digest']==grant.digest and claim['source_binding_digest']==fixed.digest
+assert claim['private_record_digest']==fixed.private_record_digest and claim['source_reads_reserved']==1
+assert not any(p.name=='scenarios.json' for p in root.rglob('*'))
+print(json.dumps({'sealed_binding_verified':True,'saved_receipt_verified':True,'bound_scorer_identity_verified':True,
+                  'source_read_intents':1,'confirmation_starts_charged':1,'new_source_reads':0,
+                  'new_entropy':0,'new_scoring':0,'new_models':0,'network':0,'processes':0,
+                  'authored_score_only':True,'task_admitted':False}))

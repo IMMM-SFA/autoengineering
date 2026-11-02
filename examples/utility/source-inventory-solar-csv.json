@@ -1,0 +1,17 @@
+{
+  "scope": "Authored raw CSV to existing solar interval/partition/readers; no site source observation or model admission",
+  "predecessor": "examples/utility/source-inventory-solar-metadata.json",
+  "predecessor_sha256": "25bf6fa9de4fe512a98648d5679a30fc6802e7c3982e2b7351fade603e962d1f",
+  "intervening_wind_inventory": "examples/utility/source-inventory-wind-hourly-study.json",
+  "intervening_wind_inventory_sha256": "51319fd0408b6aa856cd0013000f753a3853a231ec70b81bda97cb86950bda1a",
+  "source_sha256": {
+    "examples/utility/solar_csv.py": "42ee5e6c7a5eac924bef628b37adb2cdff9078658a29ccb5427eb4bc70954bb7",
+    "tests/test_utility_solar_csv.py": "096c1e6bb2ed5584632f206b1d5df426124b6f1ede62fe82212b36541d5f0389",
+    "examples/utility/exposure-register.json": "217f2927d51ae88f87d6175d4c81e3114ec90936a2133bef0143eeab2c63d36f",
+    "docs/reviews/part-5-wind-direction-source-review.md": "ea17537f99e13d6e1b8962b96fc149b8e266d96520de9059f1251f7f4202b20c"
+  },
+  "verification": "examples/utility/verification-solar-csv-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "new_parser_in_guest_wheel": false
+}

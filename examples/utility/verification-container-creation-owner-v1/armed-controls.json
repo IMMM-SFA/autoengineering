@@ -1,0 +1,47 @@
+{
+  "schema": "synthetic-container-armed-owner-controls-v1",
+  "controls": [
+    {
+      "name": "after-arm-cancel",
+      "root": "/private/tmp/utility-creation-owner-after-arm-cancel-v1",
+      "owner_pid": 88164,
+      "owner_exit": -15,
+      "phase": "after-arm",
+      "container_id": "f58f88ab74461a898500e6ebc180904483e5c561a780016c456029d478cf8374",
+      "nonce": "65c4f6a3fe7848ca91ac4c6f6466a31f",
+      "created_objects": 1,
+      "container_starts": 0,
+      "scoring_starts": 0,
+      "start_attempt_recorded_but_not_forwarded": true,
+      "watchdog_pid": 88165,
+      "cleanup_reason": "owner_pipe_eof",
+      "observer_delete_requests": 0,
+      "all_job_label_copies_deleted": true,
+      "original_id_removed": true,
+      "live_absence_confirmed": true
+    },
+    {
+      "name": "after-arm-owner-loss",
+      "root": "/private/tmp/utility-creation-owner-after-arm-owner-loss-v1",
+      "owner_pid": 88166,
+      "owner_exit": -9,
+      "phase": "after-arm",
+      "container_id": "27c23c7bce783ee5bd0762931ae2dd249271abb8a18251624803b1335fc9168d",
+      "nonce": "d4b5b6a818304c25b63b185541c1ea62",
+      "created_objects": 1,
+      "container_starts": 0,
+      "scoring_starts": 0,
+      "start_attempt_recorded_but_not_forwarded": true,
+      "watchdog_pid": 88167,
+      "cleanup_reason": "owner_pipe_eof",
+      "observer_delete_requests": 0,
+      "all_job_label_copies_deleted": true,
+      "original_id_removed": true,
+      "live_absence_confirmed": true
+    }
+  ],
+  "created_objects": 2,
+  "container_starts": 0,
+  "scoring_starts": 0,
+  "private_scoring_qualified": false
+}

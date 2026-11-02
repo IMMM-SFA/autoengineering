@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
 from typing import Protocol
+from typing import Literal
 
 import numpy as np
 
@@ -36,6 +37,26 @@ class TrainingResult(Record):
             raise ValueError("training must record its artifact and cost")
         if self.cost is not None and self.cost < 0:
             raise ValueError("training cost cannot be negative")
+
+
+@dataclass(frozen=True)
+class TrainingArtifactBundle(Record):
+    """Explicit portable training closure, never an executable registration."""
+
+    schema: Literal["training-artifact-bundle-v1"]
+    primary: ArtifactRef
+    companions: tuple[ArtifactRef, ...]
+
+    def _validate(self):
+        refs = (self.primary, *self.companions)
+        if len(self.companions) > 8 or len({r.path for r in refs}) != len(refs):
+            raise ValueError("training bundle needs a bounded unique artifact set")
+        for ref in refs:
+            parts = Path(ref.path).parts
+            if len(parts) != 3 or parts[:2] != ("artifacts", ref.sha256):
+                raise ValueError("training bundle members must be content addressed")
+            if "training_bundle" in ref.metadata:
+                raise ValueError("training bundles cannot be recursive")
 
 
 class ModelAdapter(Protocol):

@@ -1,0 +1,5 @@
+{
+  "wheel_sha256": "6a7a0128eefe9ce20171378ee4ddf5b6d1318d54cb1d16f86478599a319abf99",
+  "matched_core_python_files": 194,
+  "dependency_setup": "fresh venv, wheel extraction, cached base dependencies; no editable activation or fresh solve"
+}

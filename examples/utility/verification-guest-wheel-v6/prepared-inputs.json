@@ -1,0 +1,60 @@
+{
+  "inputs_digest": "aec404431cb50f0bf3e34362183dc74294ce47b8bd96eb52241245da80b4d824",
+  "wheel_sha256": "52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7",
+  "build_exit_code": 0,
+  "copied_inputs": 357,
+  "core_python_files": 225,
+  "declared_guest_python_files": 316,
+  "all_package_payloads_match_inputs": true,
+  "current_source_alignment_verified": true,
+  "v5_package_data_preserved": true,
+  "workspace_package_data_differences": [
+    {
+      "path": "examples/utility/README.md",
+      "previous_sha256": "1b9562f000767fe9facb0a2d28f1327f81acf97f648490ffeceaedb4448a4725",
+      "current_sha256": "2aa64cb6bd67c59e207feca557372d11cff0b6d688699968f495f5aaff74b172"
+    },
+    {
+      "path": "examples/utility/tasks/engineering.json",
+      "previous_sha256": "abd523b751ef618157e416377d40b393dec3d26ce06026e92e6fa329b8ea5cba",
+      "current_sha256": "991289146e4aa9f926034a3582fd146b10a549d4701d8243fc3ba4fc0df49a25"
+    },
+    {
+      "path": "examples/utility/tasks/hydrology.json",
+      "previous_sha256": "e6d348ffbf8506b0ae44314fa20916c5ae3b4d4c124edb6677cf2f41f73e1dbf",
+      "current_sha256": "6b7c9c7fe18ea1a91becb2f48a361d1633d206d4bb45456ce1c60578cfeebd2c"
+    },
+    {
+      "path": "examples/utility/tasks/solar.json",
+      "previous_sha256": "9966f009698b82baea93cbe2d5653943d4f651214c5d807b6f67b31561e3e8db",
+      "current_sha256": "ebc29ca0c31b68bb0f92fe4e55695afe247e73ba08585b41f9e233f748d7e386"
+    },
+    {
+      "path": "examples/utility/tasks/wind.json",
+      "previous_sha256": "263e24a969c4d617f6a940eafbcf6c2e1517c3ff3b15bdd6bff3f8bd897d290d",
+      "current_sha256": "bd0892a77bf71748a9065a5e60449b9a2c38a21233df2de5b56526a09afe1958"
+    }
+  ],
+  "historical_v5_inputs_preserved": true,
+  "runtime_archives_unchanged": true,
+  "lock_unchanged": true,
+  "dependency_roots": [
+    "click",
+    "networkx",
+    "numpy",
+    "pandas",
+    "python",
+    "pyyaml",
+    "rich",
+    "scipy"
+  ],
+  "runtime_archives": 49,
+  "compressed_archive_bytes": 265399717,
+  "new_network_requests": 0,
+  "new_dependency_installations": 0,
+  "new_model_calls": 0,
+  "installed": false,
+  "image_built": false,
+  "runtime_qualified": false,
+  "task_admitted": false
+}

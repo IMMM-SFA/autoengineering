@@ -1,0 +1,7 @@
+{
+  "error_type": "AssertionError",
+  "reason": "old native-only reader assumed physical receipt unknown list must be nonempty; the authored container fixture supplies those fields while global cost limits remain",
+  "earlier_cli_json_markdown_verify_checks_passed_before_assertion": true,
+  "model_starts": 0,
+  "container_starts": 0
+}

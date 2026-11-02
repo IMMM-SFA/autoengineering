@@ -1,0 +1,9 @@
+{
+  "schema": "utility-camels-refusal-diagnostic-intent-v1",
+  "original_failure_sha256": "5f2cfc208e620008fc7ce50fa063f5bf0c9196fd1caa60ea4b3763f8b0d01a47",
+  "outputs": "Fixed parser refusal category, date/schema metadata and placeholder-hour counts only",
+  "observational_values_exported": false,
+  "changes_to_source_policy": false,
+  "task_admitted": false,
+  "model_calls": 0
+}

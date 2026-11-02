@@ -1,0 +1,27 @@
+{
+  "request_digest": "c5fe7f7072d84cb436c5fa866cc39fe7b70506692ec4774c68f68424469ce0ec",
+  "schema": "utility-local-image-build-request-v4",
+  "commands": 7,
+  "manifest_proof": {
+    "sha256": "623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+    "size_bytes": 1752,
+    "config_digest": "sha256:37ccb536022bb36c4570856b55ebfa85bf07827e3c2fa3eba37f0dac62eebc05",
+    "media_type": "application/vnd.oci.image.manifest.v1+json"
+  },
+  "v3_outcome": "failed_consumed_before_build",
+  "v3_base_pull_completed": true,
+  "v3_client_commands": 5,
+  "v3_client_exit_codes": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "v3_context_log_omitted_from_public_copy": "Private socket path remains only in ignored original work",
+  "new_rule_checked_against_five_actual_saved_responses": true,
+  "v3_not_relabelled": true,
+  "v4_executed": false,
+  "v4_work_absent": true,
+  "runtime_qualified": false
+}

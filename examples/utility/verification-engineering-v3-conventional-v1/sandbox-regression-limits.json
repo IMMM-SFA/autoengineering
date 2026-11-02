@@ -1,0 +1,22 @@
+{
+  "domain_native_profiles_rerun": false,
+  "failed": 10,
+  "failed_nodeids": [
+    "tests/test_utility_engineering_native.py::test_native_process_and_inner_calls_are_separate_and_never_redispatched",
+    "tests/test_utility_engineering_native.py::test_native_saved_process_recovers_original_observation",
+    "tests/test_utility_engineering_native.py::test_timeout_failure_and_unsuccessful_driver_preserve_unknown_inner_work[1-1.0-timeout]",
+    "tests/test_utility_engineering_native.py::test_timeout_failure_and_unsuccessful_driver_preserve_unknown_inner_work[2-5.0-model_failure]",
+    "tests/test_utility_engineering_native.py::test_timeout_failure_and_unsuccessful_driver_preserve_unknown_inner_work[3-5.0-model_failure]",
+    "tests/test_utility_engineering_native.py::test_changed_native_limits_do_not_reuse_another_original_job",
+    "tests/test_utility_engineering_native.py::test_campaign_native_choice_gets_fresh_checks_and_exact_selection",
+    "tests/test_utility_engineering_native.py::test_failed_native_driver_commits_failure_without_eligible_candidate",
+    "tests/test_utility_engineering_native.py::test_legacy_native_result_preserves_identity_without_invented_final_counters",
+    "tests/test_utility_engineering_native.py::test_native_campaign_partial_followup_never_restarts_driver"
+  ],
+  "failure_reason": "all ten failed at PermissionError launching ps",
+  "next_check": "only the ten failed process-supervision tests with process inspection permitted",
+  "owned_test_workers_after_run": "none found by escalated process inventory; only inspection shell and rg matched",
+  "passed": 49,
+  "skipped_optional": 9,
+  "status": "initial_regression_failed_due_process_inspection_denial"
+}

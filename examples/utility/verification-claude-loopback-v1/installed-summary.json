@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "tests": 100,
+  "wheel_sha256": "838f2ee582c078e68ae6228bbab54d5507488418777cad54677ad175a26aa048",
+  "host_source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "scope": "authored transport/policy/archive fixtures; actual saved native and policy archive inspection",
+  "original_checkout_opens": "denied",
+  "network_sockets": "denied",
+  "processes_during_actual_archive_read": "denied",
+  "optional_scientific_models_and_anthropic_sdk": "absent",
+  "guard_scope": "Python startup policy only; not an OS boundary; fixed helper verifier uses isolated Python",
+  "full_dependency_solve": false,
+  "production_admission": false
+}

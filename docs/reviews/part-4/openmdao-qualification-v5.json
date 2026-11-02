@@ -1,0 +1,69 @@
+{
+  "identity": {
+    "schema_version": 1,
+    "framework": "openmdao",
+    "framework_version": "3.41.0",
+    "implementation_id": "openmdao-qualified-v5",
+    "mode": "model",
+    "configuration_digest": "fdada1b33dbb5262f49bff0bb3cf976faee4b4464b50f332ad5ce30072cc48fe",
+    "environment_digest": "b9486dfc6918ddf465302f71692c9f1dedcaa566add8828b1a6e6995fb25b226",
+    "source_digest": "1354384066c2765b17cfe0b214de7e966b3d3029340c66f5fbba31bc108d682d",
+    "capabilities": [
+      "whole_problem",
+      "scalar_units",
+      "convergence_checked"
+    ],
+    "seed": 17,
+    "checkpoint_format": "fresh-attempt-only"
+  },
+  "receipt": {
+    "schema_version": 1,
+    "integration_digest": "5f7d9ad661a6dd040cc84e82a9cf4383e377c9ccdb8a9a909da7c3bbda95174a",
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "direct_reference": [
+      {
+        "path": "examples/interoperability/evidence/circuit-installed-v5/parity.json",
+        "sha256": "c0d2abb148851bc2618fa36c490f33f3f13b0dfc62b07e279ca59df7c01d6c3e",
+        "size_bytes": 3306,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "examples/interoperability/evidence/circuit-installed-v5/derivatives.json",
+        "sha256": "1324ed1af7d4bc5e0ecd4a54e44064e7b66c5333820c52e05c65f8cb757c245f",
+        "size_bytes": 1708,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      },
+      {
+        "path": "examples/interoperability/evidence/circuit-installed-v5/report.json",
+        "sha256": "35fab1f1aebb6c6442e6db73f1235c138f74a232c412d3a5c32b98ecfe3f984a",
+        "size_bytes": 1798,
+        "media_type": "application/octet-stream",
+        "producer": "part-4-qualification",
+        "metadata": {}
+      }
+    ],
+    "tolerance_definition": {
+      "path": "examples/interoperability/circuit/protocol.json",
+      "sha256": "4568e51570ce220b3d50419abb267e2b27bc84fb5ff7b3bad59048b5b015fe94",
+      "size_bytes": 735,
+      "media_type": "application/octet-stream",
+      "producer": "part-4-qualification",
+      "metadata": {}
+    },
+    "capability_checks": [
+      "parity_or_translation",
+      "failure_recovery",
+      "installed_execution"
+    ],
+    "limitations": [
+      "trusted factory and source-specific inspector required",
+      "native and external budgets unmatched",
+      "macOS ARM64 only; Linux runtime unverified"
+    ],
+    "qualification": "verified"
+  }
+}

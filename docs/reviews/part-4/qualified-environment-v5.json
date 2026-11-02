@@ -1,0 +1,13 @@
+{
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "pandas": "3.1.0",
+  "optuna": "4.5.0",
+  "openmdao": "3.41.0",
+  "pvlib": "0.15.2",
+  "bmipy": "2.0.1",
+  "psutil": "7.2.2",
+  "python": "3.12.16 (main, Oct 26 2026, 11:31:43) [Clang 21.1.8 ]",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "lock_sha256": "16f3911bdc180b361f4bbcb02d2a848d68107635f9eb830781b53ba691a52ce5"
+}

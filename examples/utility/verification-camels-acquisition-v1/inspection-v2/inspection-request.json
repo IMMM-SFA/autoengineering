@@ -1,0 +1,17 @@
+{
+  "schema": "utility-camels-inspection-request-v1",
+  "acquisition_receipt_digest": "9df74b8738b4f92c759f87bbb5976eb01668f4bb1bb0f330a4e940c60d62d64c",
+  "policy_digest": "b0ef14f60bd627d838e254df92f31976e7775863d219b856b177187128535169",
+  "producer_sha256": "7f67c3de65b19bfc062fa883d32c7276157f9af636823fb0fc0ac2a9003912c1",
+  "source_pins": {
+    "examples/utility/hydrology_camels.py": "2303c2fa30436cef6214f52d4a78f4e8eb790b377ac0039bf0eea5ba33ca3df3",
+    "examples/utility/hydrology_camels_archive.py": "29a1f58801e969e3cae16637ad77707bf480ad159871d6fdc12896b817071213",
+    "examples/utility/hydrology_partitions.py": "2a2d687f0224f07e49774cfec931ebe4127b526f164a17417c2ad4951980ef91"
+  },
+  "archive_file": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/camels-acquisition-v1/archive.zip",
+  "archive_sha256": "bb90fca29a5bab8f0b300787a5ab5a669a366f40ba95b6877b631a81133f7e5d",
+  "member_decompressions_planned": 4,
+  "scientific_model_calls": 0,
+  "network_requests": 0,
+  "export_observation_values": false
+}

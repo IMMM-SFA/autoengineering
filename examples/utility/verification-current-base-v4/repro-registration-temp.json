@@ -1,0 +1,14 @@
+{
+  "basetemp": "/private/tmp/autoengineering-v4-repro-registration-rn7v9st9/pytest",
+  "argv": [
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_agent_preparation.py::test_registration_acknowledgment_recovers_without_rechecking_source",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/private/tmp/autoengineering-v4-repro-registration-rn7v9st9/pytest",
+    "--junitxml=/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-current-base-v4/repro-registration.xml"
+  ]
+}

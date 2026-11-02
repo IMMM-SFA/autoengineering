@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "rechecked_node_ids": [
+    "tests/test_research.py::TestRunComponent::test_command_kind_npz_contract"
+  ],
+  "changed_pins": [],
+  "original_full_run_preserved": true,
+  "test_and_production_source_unchanged": true
+}

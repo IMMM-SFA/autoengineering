@@ -206,8 +206,27 @@ class ProvenanceSpec(Record):
 
 
 @dataclass(frozen=True)
+class TrainingSpec(Record):
+    """Author permission for the supplied daily-prefix supervised payload."""
+
+    profile: Literal["daily-prefix-supervised-v1"]
+    adapter_ids: tuple[str, ...]
+    fitting_data_id: str
+
+    def _validate(self):
+        identifier(self.fitting_data_id)
+        if not self.adapter_ids:
+            raise ValueError("training needs explicit adapter IDs")
+        unique(self.adapter_ids, "training adapter")
+        for name in self.adapter_ids:
+            identifier(name)
+            if name.startswith("generated-"):
+                raise ValueError("this training profile requires a trusted adapter")
+
+
+@dataclass(frozen=True)
 class CampaignSpec(Record):
-    schema_version: Literal["1.0"]
+    schema_version: Literal["1.0", "1.1"]
     name: str
     scientific_scope: str
     seed: int
@@ -221,8 +240,11 @@ class CampaignSpec(Record):
     execution: ExecutionSpec
     confirmation: ConfirmationSpec
     provenance: ProvenanceSpec
+    training: TrainingSpec | None = None
 
     def _validate(self):
+        if (self.schema_version == "1.0") != (self.training is None):
+            raise ValueError("training requires campaign version 1.1 with an explicit policy")
         identifier(self.name)
         if self.seed < 0:
             raise ValueError("seed must be nonnegative")
@@ -236,6 +258,31 @@ class CampaignSpec(Record):
             if intervention.target not in self.baseline.model.implementations:
                 raise ValueError("intervention target is absent from baseline")
         data_by_id = {data.id: data for data in self.data}
+        if self.training is not None:
+            if not set(self.training.adapter_ids) <= set(self.execution.adapter_ids):
+                raise ValueError("training adapter is outside execution policy")
+            fitting = data_by_id.get(self.training.fitting_data_id)
+            if fitting is None or fitting.role != "fitting" or fitting.prior_exposure != "exposed":
+                raise ValueError("training requires declared exposed fitting data")
+            if fitting.artifact.media_type != "application/x-npz":
+                raise ValueError("this training profile requires an NPZ fitting artifact")
+            clock = fitting.ports[0].time
+            if len(fitting.ports) != 1 or clock is None or clock.timestep != "P1D":
+                raise ValueError("training profile requires one daily observation")
+            for port in self.baseline.model.inputs:
+                if port.time is None or port.time.dates[:len(clock.dates)] != clock.dates:
+                    raise ValueError("training observations must be an exact forcing prefix")
+                if port.name in ("labels", "mask"):
+                    raise ValueError("training forcing names conflict with supervised payload")
+                if any(getattr(port.time, f) != getattr(clock, f)
+                       for f in ("timestep", "calendar", "timestamp")):
+                    raise ValueError("training observation and forcing clocks differ")
+                if port.time.warmup_mask[:len(clock.dates)] != clock.warmup_mask:
+                    raise ValueError("training observation and forcing warmup differ")
+            if not any(clock.scoring_mask) or any(
+                a and b for a, b in zip(clock.scoring_mask, clock.warmup_mask)
+            ):
+                raise ValueError("training needs scored observations outside warmup")
         if not any(data.role == "forcing" for data in self.data):
             raise ValueError("campaign needs forcing data")
         if not any(data.role == "comparison" for data in self.data):
@@ -319,6 +366,22 @@ class CampaignSpec(Record):
                 raise ValueError("baseline sources are absent from declared source closure")
         if self.baseline.model.outputs != self.provenance.expected_outputs:
             raise ValueError("baseline outputs differ from expected artifact contract")
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        if self.schema_version == "1.0":
+            result.pop("training")
+        return result
+
+    @classmethod
+    def from_dict(cls, value):
+        if (
+            isinstance(value, Mapping)
+            and value.get("schema_version") == "1.0"
+            and "training" in value
+        ):
+            raise ValueError("version 1.0 does not accept a training field")
+        return super().from_dict(value)
 
     def to_yaml(self, path: str | Path) -> None:
         Path(path).write_text(yaml.safe_dump(self.to_dict(), sort_keys=False), encoding="utf-8")

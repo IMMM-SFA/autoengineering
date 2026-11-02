@@ -1,0 +1,58 @@
+{
+  "scope": "original complete Part 5 objective, not regression completion",
+  "checked_at_utc": "2026-10-29T17:28:15.121920+00:00",
+  "tasks": {
+    "hydrology": {
+      "path": "examples/utility/tasks/hydrology.json",
+      "sha256": "d3184d21d9544e9bdccdcac2e20b6a0b8b3b12077472bef6dcd1d675217bed3d",
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "confirmation_exposure": "unknown_exposure",
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null
+    },
+    "solar": {
+      "path": "examples/utility/tasks/solar.json",
+      "sha256": "9966f009698b82baea93cbe2d5653943d4f651214c5d807b6f67b31561e3e8db",
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "confirmation_exposure": "unknown_exposure",
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null
+    },
+    "engineering": {
+      "path": "examples/utility/tasks/engineering.json",
+      "sha256": "abd523b751ef618157e416377d40b393dec3d26ce06026e92e6fa329b8ea5cba",
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "confirmation_exposure": "unknown_exposure",
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null
+    },
+    "wind": {
+      "path": "examples/utility/tasks/wind.json",
+      "sha256": "263e24a969c4d617f6a940eafbcf6c2e1517c3ff3b15bdd6bff3f8bd897d290d",
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "confirmation_exposure": "unknown_exposure",
+      "minimum_useful_gain": null,
+      "secondary_tolerances": null
+    }
+  },
+  "frozen_protocol_present": false,
+  "private_scorer": "production macOS profile unqualified; actual data-memory-limit unavailable, two production tests skipped",
+  "independent_confirmation": "not_attempted",
+  "decision": "incomplete; independent task/runtime/protocol prerequisites unresolved",
+  "required_input": [
+    "untouched-data/scenario custodian and admitted partitions with rights/exposure closure",
+    "authorized protected scoring runtime and its execution limits",
+    "final task thresholds, host/model/cost choices and frozen run protocol/authority"
+  ],
+  "blocking_audit": {
+    "no_next_action_audit": 1,
+    "began_after": "both authorized full regression runs became terminal",
+    "condition": "independent experiment cannot advance without admitted untouched inputs/custody, qualified protected runtime and frozen authorized protocol",
+    "prior_turns": "verified waits while meaningful regression work was live; not counted as root impasse audits"
+  },
+  "remaining_software_scope": "task-specific training/scoring and complete-cost/result views still depend on admitted task and measurement contracts; no full implementation completion claim"
+}

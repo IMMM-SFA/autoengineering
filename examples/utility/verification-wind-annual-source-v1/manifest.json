@@ -1,0 +1,26 @@
+{
+  "source/examples/utility/wind_annual.py": {
+    "sha256": "685fba50d0f7f26f0362c486d5bb8bb48045db229d54aaf970edc2885d13b4aa",
+    "size_bytes": 7310
+  },
+  "source/examples/utility/wind_annual_scoring.py": {
+    "sha256": "80e03cbf827447fa45334de7c9b1a165b11c13df5e57e0481beb3c4264291bda",
+    "size_bytes": 10990
+  },
+  "source/examples/utility/wind_annual_source.py": {
+    "sha256": "2bab27e011865f9ec2ff1690530338d35d0046a4529c73328257167045bbf8ef",
+    "size_bytes": 14715
+  },
+  "source/tests/test_utility_wind_annual_source.py": {
+    "sha256": "f14aba733036710f0fdc22dc9a44ae13c61f9caac4bd18a1110139869a182c9f",
+    "size_bytes": 11797
+  },
+  "summary.json": {
+    "sha256": "9b932506d81ffa42c3493a4871e29df9db49b9c50139ae105189473570b43bfa",
+    "size_bytes": 2746
+  },
+  "tests.xml": {
+    "sha256": "f0e44edfea0f7df783de85ccef7b840182a6bd767682342f769b3489a5fd446e",
+    "size_bytes": 15168
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "root": "/private/tmp/anthropic-exchange-installed-endpoint-v1",
+  "wheel": "same SHA as installed-setup.json",
+  "guard_scope": "original opens, subprocesses and non-loopback network denied; only IPv4 TCP localhost fixtures allowed; not an OS boundary"
+}

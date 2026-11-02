@@ -1,0 +1,84 @@
+{
+  "schema": "utility-container-scorer-integration-development-v1",
+  "recorded_at_utc": "2026-10-30T04:35:30.787079+00:00",
+  "container_starts_total": 2,
+  "original_candidate": {
+    "schema": "synthetic-container-scorer-integration-v1",
+    "root": "/private/tmp/utility-container-profile-v1",
+    "container_id": "b564a8e666f259a860011da8a9c865d93aad2ca4467ca994dbf35ee9616b3a54",
+    "container_starts": 1,
+    "original_source_label_opens": 1,
+    "all_synthetic_label_files_removed": true,
+    "offline_recovery_without_api": true,
+    "receipt_replay_without_rescoring": true,
+    "score": {
+      "status": "success",
+      "outcome": "rmse",
+      "units": "W",
+      "value": 1.0,
+      "feasible": true
+    },
+    "grant_digest": "a7a50e29087bf6dd47a883cfce2ee2044555182cd03a2301bc0b0703abddb144",
+    "runtime_identity": "1eef20a874fda44557905afffb58a4a673bb89aa9348f85447440c7ea0df9bbb",
+    "scorer_identity": "6984ec4ee88d0c04133f312d4ba4b4d452662ff603cc0c9426165366b5bdb0c5",
+    "server_sha256": "c2a4ccf2e2612d656d3d12c0776cd4a42328567f29383d2a31c77cf699c43082",
+    "private_scoring_qualified": false,
+    "real_confirmation_data_reads": 0,
+    "provider_calls": 0,
+    "image_pulls": 0,
+    "remote_jobs": 0,
+    "harness_postcheck": "Original score and cleanup succeeded; stage label deletion initially failed on read-only directory. Resumed only offline checks against the same original result after temporarily changing that owned stage directory mode for synthetic label deletion."
+  },
+  "hardened_candidate": {
+    "schema": "synthetic-container-scorer-integration-v1",
+    "root": "/private/tmp/utility-container-profile-v2",
+    "container_id": "7039e227136e3e5272287805a4ae71a0e530dded7c5beb3b1139de88638b9e8f",
+    "nonce": "183678f5b9124ab182c78de79ee3f1b7",
+    "container_starts": 1,
+    "original_source_label_opens": 1,
+    "all_synthetic_label_files_removed": true,
+    "offline_recovery_without_api": true,
+    "receipt_replay_without_rescoring": true,
+    "score": {
+      "status": "success",
+      "outcome": "rmse",
+      "units": "W",
+      "value": 1.0,
+      "feasible": true
+    },
+    "grant_digest": "b26abdacc25db112fd5f000d13b3fde2b3176c91b885e5f068e78311906c28bc",
+    "runtime_identity": "f0a3eba0bae3dae7d170766b27d93afeed1fd76b84c5537c4979c26de4cbc325",
+    "scorer_identity": "50d3c1c24f934ad6d7c4cc6dc764b944ea60bf0a281614e23ca729a54902738c",
+    "server_sha256": "c2a4ccf2e2612d656d3d12c0776cd4a42328567f29383d2a31c77cf699c43082",
+    "private_scoring_qualified": false,
+    "real_confirmation_data_reads": 0,
+    "provider_calls": 0,
+    "image_pulls": 0,
+    "remote_jobs": 0
+  },
+  "source_scope": "original and hardened versions preserved separately; final current candidate has explicit staged-input/access binding",
+  "real_confirmation_data_reads": 0,
+  "provider_calls": 0,
+  "remote_jobs": 0,
+  "image_pulls": 0,
+  "private_scoring_qualified": false,
+  "minimum_reserved_active_seconds": 64,
+  "reservation_scope": "allowance for bounded lifecycle/API work; not a strict whole-host callback deadline",
+  "remaining": [
+    "full failure-matrix qualification of the new candidate runtime source",
+    "explicit suite-level publication of a recovered pending confirmation result",
+    "container-specific public cost receipt and cost join",
+    "independent task custody, thresholds and frozen authorized protocol"
+  ],
+  "tests": {
+    "passed": 161,
+    "seconds": 11.85
+  },
+  "wheel_core_python_files_byte_matched": 198,
+  "installed_relocated_recovery": {
+    "socket_calls": 0,
+    "process_starts": 0,
+    "label_source_opens": 0,
+    "original_root_opens": 0
+  }
+}

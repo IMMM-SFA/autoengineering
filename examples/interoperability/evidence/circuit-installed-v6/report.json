@@ -1,0 +1,58 @@
+{
+  "manifest_digest": "98dcf57330e51fe020114866d23bdfe7bec36216889a83339f2458b13c0c02f5",
+  "parity_cases": 3,
+  "derivative_audit_coupled_starts": 3,
+  "parity_coupled_starts": 6,
+  "optuna_physical_starts": 12,
+  "native": {
+    "source_current": 0.014706256386876256,
+    "objective": 3.7736339780440927e-13,
+    "work": {
+      "converged": true,
+      "residual_norm": 2.8175703957467046e-17,
+      "residual_tolerance": 1e-10,
+      "solver_iterations": 2,
+      "component_calls": 959,
+      "derivative_calls": 295
+    },
+    "coupled_solves": 10,
+    "solver_iterations_total": 52,
+    "solver_iterations_per_solve": [
+      17,
+      0,
+      6,
+      9,
+      5,
+      4,
+      3,
+      3,
+      3,
+      2
+    ],
+    "outputs": {
+      "node1_voltage": 1.4625006384461552,
+      "node2_voltage": 0.650000614299111,
+      "resistor1_current": 0.014625006384461552,
+      "resistor2_current": 8.125000241470442e-05,
+      "diode_current": 8.125000241470442e-05
+    },
+    "seconds": 0.021343041211366653,
+    "driver_result": "Problem: run22\nDriver:  ScipyOptimizeDriver\n  success     : True\n  iterations  : 10\n  runtime     : 2.1181E-02 s\n  model_evals : 10\n  model_time  : 1.8375E-02 s\n  deriv_evals : 7\n  deriv_time  : 2.1185E-03 s\n  exit_status : SUCCESS",
+    "budget_match": "unmatched_inner_solve_budget"
+  },
+  "optuna_recommendation": {
+    "action_id": "eval-000005",
+    "config": {
+      "source_current": 0.014297699581953646
+    },
+    "outcomes": {
+      "error": 1.6342235857846958e-06,
+      "node1": 1.422036806455339,
+      "node2": 0.6487216324527803
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration"
+  },
+  "total_seconds": 0.9378293752670288,
+  "claims": "development interoperability only; unmatched native inner budget"
+}

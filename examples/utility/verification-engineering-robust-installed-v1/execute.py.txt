@@ -1,0 +1,108 @@
+from pathlib import Path
+import json
+import hashlib
+import importlib.resources, math, platform
+import os
+import shutil
+import sys
+
+base = Path(sys.argv[1])
+c = json.loads((base / "configuration.json").read_text())
+sys.path.insert(0, c["installed"])
+os.environ["PYTHONPATH"] = c["installed"]
+
+from autoengineering.agents.batch import BatchCase, BatchSpec, BatchStore
+from autoengineering.agents.hosts.fake import FakeHost
+from autoengineering.agents.identity import host_environment_identity, host_source_identity
+from autoengineering.agents.records import HostSelection, ResourceLimits
+from autoengineering.campaign.artifacts import reference
+from autoengineering.campaign.serialization import digest
+from autoengineering.optimization import (
+    BudgetSpec, ContinuousParameter, NoiseSpec, ObjectiveSpec, OptimizationRunSpec, SearchSpace, StudySpec,
+)
+from autoengineering.optimization.records import EvaluationAction
+from autoengineering.utility.engineering_native import (
+    NativeDriverSpec, SupervisedNativeDriver, native_cost_records, verify_native_report,
+)
+from autoengineering.utility.engineering_process import (
+    EngineeringExecutionSpec, EngineeringScenario, SupervisedEngineeringExecutor, execution_identity,
+)
+from autoengineering.utility.studies import EngineeringStudySpec
+from examples.utility.engineering import rules
+import examples.utility.engineering_load as load
+import examples.utility.engineering_load_robust_native as native
+
+assert Path(load.__file__).is_relative_to(c["installed"])
+assert Path(native.__file__).is_relative_to(c["installed"])
+source = Path(c["source"])
+refs = tuple(reference(source, name, media_type="text/plain", producer="installed-load-control")
+             for name in c["source_names"])
+lock = reference(source, "pixi.lock", media_type="text/plain", producer="installed-load-control")
+fixture=json.loads(importlib.resources.files('examples.utility').joinpath('fixtures/engineering_robust_cases.json').read_text())
+assert len(fixture['cases'])==24
+cases=tuple(EngineeringScenario.from_dict(v) for v in fixture['cases'])
+entry = "examples.utility.engineering_load:execute"
+run = OptimizationRunSpec(StudySpec("installed-load-control", ObjectiveSpec("source_power", "minimize"),
+    (), BudgetSpec(2, "physical_executions", 1), NoiseSpec(), "system", 17),
+    SearchSpace((ContinuousParameter("source_current", .01, .1),)), "sobol", {},
+    "autoengineering.utility.studies:engineering_evaluator")
+study = EngineeringStudySpec(run, rules(.66, .001), tuple(s.scenario_id for s in cases),
+    execution_identity(entry, refs, lock, cases, 10., 32768))
+execution = EngineeringExecutionSpec("utility-engineering-execution-v1", study, entry,
+                                     refs, lock, cases, 10., 32768)
+spec = NativeDriverSpec("utility-native-driver-v1", execution,
+    "examples.utility.engineering_load_robust_native:execute", 20, 40, 10., 32768)
+batch_spec = BatchSpec("1.0", "installed-load-control", host_source_identity(), host_environment_identity(),
+    HostSelection("fake", "none", "not-used", "1.0"), FakeHost(()).capabilities(),
+    digest({"host": "not_invoked"}), ResourceLimits(1, 1, 0, 0, 600., 15., 1048576, 1048576),
+    25, (BatchCase("loads", "comparison", study.digest, 0, 25),))
+request={'scope':'one installed native robust design and 24 fresh scientific checks on exposed authored cases','specification':spec.to_dict(),'batch':batch_spec.to_dict(),'wheel_sha256':c['wheel_sha256'],'max_native_processes':1,'max_scenario_processes':24,'max_inner_native_solves':40,'new_fitting_starts':0,'automatic_retries':0,'reference_current_A':.022793262535515797,'reference_mean_power_W':.05198172873029417,'parity_atol':1e-12,'parity_rtol':1e-12,'site_guard_sha256':hashlib.sha256((Path(c['installed'])/'sitecustomize.py').read_bytes()).hexdigest(),'independent_confirmation':False}
+(base/'execution-request.json').write_text(json.dumps(request,indent=2)+'\n')
+try: (Path(c['original_checkout'])/'pyproject.toml').read_bytes()
+except RuntimeError: pass
+else: raise AssertionError('original checkout content read was allowed')
+batch = BatchStore.create(base / "batch", batch_spec)
+batch.start_case("loads", study.digest)
+runner = SupervisedEngineeringExecutor(execution, batch, "loads", source)
+driver = SupervisedNativeDriver(spec, runner)
+report = driver.run()
+assert report.status == "success"
+action = EvaluationAction("installed-native-candidate", report.result.configuration, "system", None, seed=17)
+value = runner(action)
+assert value.evaluation.eligible and len(value.scenarios) == 24
+assert math.isclose(report.result.configuration['source_current'],request['reference_current_A'],abs_tol=1e-12,rel_tol=1e-12)
+assert math.isclose(value.evaluation.metrics['source_power'],request['reference_mean_power_W'],abs_tol=1e-12,rel_tol=1e-12)
+verify_native_report(batch, "loads", spec, report)
+state = batch.replay()
+assert len(state.reservations) == 25 and not state.pending
+assert all(v.stop_verified for v in state.observations.values())
+
+def forbidden(*args, **kwargs):
+    raise AssertionError("completed recovery started a new process")
+
+import autoengineering.utility.engineering_process as process_module
+import autoengineering.utility.engineering_native as native_module
+process_module.supervise_process = forbidden
+native_module.supervise_process = forbidden
+assert runner.recover_completed(action) == value
+assert SupervisedNativeDriver(spec, runner).run(recover_only=True) == report
+assert len(batch.replay().reservations) == 25
+archive = base / "execution-proof"
+archive.mkdir(mode=0o700)
+(archive / "native-spec.json").write_text(spec.to_json())
+(archive / "native-report.json").write_text(report.to_json())
+(archive / "scientific-evaluation.json").write_text(value.to_json())
+shutil.copytree(batch.root, archive / "public-batch")
+costs = {row.resource: row.quantity for row in native_cost_records(report, "0" * 64)}
+summary = {"status": "passed", "load_module": load.__file__, "native_module": native.__file__,
+    "fresh_scenario_processes": 24, "native_processes": 1, "original_reservations": 25,
+    "recovery_added_starts": 0, "native_costs": costs,
+    "inherited_dependencies": "interoperability", "configuration": dict(report.result.configuration),
+    "mean_source_power_W": value.evaluation.metrics['source_power'], "native_inner_solves": len(report.result.solves),
+    "original_checkout_content_denied": True, "site_guard_in_parent_and_child_interpreter": True,
+    "domain_code_staged_from_verified_wheel": True, "host_system": platform.system(),
+    "host_architecture": platform.machine(), "python": platform.python_version(),
+    "host_invocations": 0, "independent_confirmation": False, "final_scenarios_evaluated": False,
+    "private_scoring_admitted": False}
+(archive / "installed-execution.json").write_text(json.dumps(summary, indent=2) + "\n")
+print(json.dumps(summary))

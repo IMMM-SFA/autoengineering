@@ -1,0 +1,110 @@
+{
+  "version": "claude-durable-exchange-probe-1.1",
+  "source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+  "missing_cache_case": true,
+  "policy_specification": {
+    "schema": "claude-helper-policy-1.4",
+    "workspace": "/private/tmp/claude-durable-exchange-missing-cache-v2/workspace",
+    "home": "/private/tmp/claude-durable-exchange-missing-cache-v2/home",
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "helper": "/private/tmp/claude-durable-exchange-missing-cache-v2/auth/helper",
+    "python": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
+    "python_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default",
+    "credential_files": [
+      "/private/tmp/claude-durable-exchange-missing-cache-v2/auth/synthetic-capability"
+    ],
+    "endpoints": [
+      {
+        "address": "localhost",
+        "port": 54310
+      }
+    ],
+    "forbidden_roots": [
+      "/private/tmp/claude-durable-exchange-missing-cache-v2/private",
+      "/private/tmp/claude-durable-exchange-missing-cache-v2/exchange",
+      "/private/tmp/claude-durable-exchange-missing-cache-v2/endpoint",
+      "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
+    ]
+  },
+  "inventory": {
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "sha256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+    "version": "2.1.310 (Claude Code)",
+    "supported_flags": [
+      "--print",
+      "--bare",
+      "--output-format",
+      "--input-format",
+      "--json-schema",
+      "--model",
+      "--tools",
+      "--disable-slash-commands",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "--setting-sources",
+      "--settings",
+      "--no-session-persistence",
+      "--permission-mode",
+      "--max-budget-usd"
+    ]
+  },
+  "native_status": "completed",
+  "native_stopped": true,
+  "native_error": null,
+  "native_structured_output": "{\"handoff_json\":\"{\\\"fixture\\\":true,\\\"role\\\":\\\"reviewer\\\"}\"}",
+  "native_diagnostic_usage": {
+    "uncached_input_tokens": 7,
+    "cached_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 10,
+    "input_tokens": 7,
+    "total_tokens": 17,
+    "reasoning_output_tokens": null
+  },
+  "broker_status": "completed",
+  "broker_usage": {
+    "uncached_input_tokens": 7,
+    "cached_input_tokens": null,
+    "cache_creation_input_tokens": null,
+    "input_tokens": null,
+    "output_tokens": 10,
+    "total_tokens": null,
+    "reasoning_output_tokens": null
+  },
+  "broker_usage_observation": {
+    "basis": "reported_message_fields_only",
+    "billed_cost_usd": null,
+    "invalid_count_fields": [],
+    "raw_sha256": "b53d4dbf7b74494ddc791285e22e406f3525d4ac5958c64b4691be4303afd3c0",
+    "reported_model": "claude-sonnet-4-6",
+    "schema_version": "1.0",
+    "usage": {
+      "cache_creation_input_tokens": null,
+      "cached_input_tokens": null,
+      "input_tokens": null,
+      "output_tokens": 10,
+      "reasoning_output_tokens": null,
+      "total_tokens": null,
+      "uncached_input_tokens": 7
+    },
+    "usage_categories_complete": false
+  },
+  "provider_requests_reserved": 1,
+  "authored_upstream_callbacks": 1,
+  "extra_callbacks_on_recovery": 0,
+  "same_native_process_on_recovery": true,
+  "same_native_result_on_recovery": true,
+  "endpoint_stop": {
+    "listener_closed": true,
+    "handler_stopped": true,
+    "upstream_callback_stopped": true,
+    "request_attempts": 2,
+    "exchange_requests": 1,
+    "upstream_callbacks": 1
+  },
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "production_admission": false,
+  "usage_cost_basis": "authored fixture, not measured provider work or billing",
+  "status": "passed_limited_scope"
+}

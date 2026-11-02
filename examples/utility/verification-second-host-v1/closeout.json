@@ -1,0 +1,42 @@
+{
+  "version": "claude-bare-transport-1.2",
+  "status": "offline_foundation_verified",
+  "checks": {
+    "closeout": {
+      "tests": 112,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "installed-final-tests": {
+      "tests": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "documentation": {
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "source": {
+    "path": "src/autoengineering/agents/hosts/claude.py",
+    "sha256": "c4cd83156fef423c1a71953bee76b54d5b9d78c0bbb8d6ba5510c0e48348bac4"
+  },
+  "current_tests_sha256": "288b0e51f1ba5de3f91c49c89f6b79e5f8942c74fff3efdbca18af3fe2eb5294",
+  "installed": {
+    "status": "passed",
+    "tests": 52,
+    "test_source_sha256": "288b0e51f1ba5de3f91c49c89f6b79e5f8942c74fff3efdbca18af3fe2eb5294",
+    "wheel_sha256": "efc99c556729b67495d375b52669ab55b252388d5f17a0eb8f1f8fa564487d2b",
+    "scope": "authored fixture set including saved-completion owner loss; no actual Claude inference",
+    "boundary_scope": "existing Python audit policy in parent and ordinary Python children, not an OS private boundary; fixed helper verifier uses isolated Python"
+  },
+  "cost_basis": "client estimate only; billed cost unknown",
+  "production_host": "not_admitted",
+  "actual_inference": "not_attempted",
+  "full_default_and_bayes": "not_rerun_after_new_module",
+  "goal": "active"
+}

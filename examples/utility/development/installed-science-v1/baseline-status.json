@@ -1,0 +1,13 @@
+{
+  "assigned_cells": 4,
+  "attempt_states": {
+    "child-0d27db683ef454eb558942f92091829912d53a4cf41cad33": "finished",
+    "child-7f3e885be7240552531d7c92d2113d16134784ee3931d418": "finished",
+    "child-e4c36679ffc5426b4b8b55d03d78958a1c4fb057cef76f59": "finished",
+    "child-efd8b28323b9a1614867064916da18b88fca11d30fe53ef1": "finished"
+  },
+  "cancelled": false,
+  "revision": 13,
+  "selection_manifest": "aa85547b79d169d1183f9ed55b09453cb1d76a1318901c4f98cc9839d2b33328",
+  "suite_digest": "1949ab9ceafcfc665be02f6efed59934e51050204f3ababeb5ea958b977508e2"
+}

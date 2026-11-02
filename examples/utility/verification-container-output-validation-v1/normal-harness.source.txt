@@ -1,0 +1,115 @@
+from pathlib import Path
+import hashlib
+import json
+import sys
+
+from autoengineering.utility import private_container_runtime as rm, container_scoring as sm
+from autoengineering.utility.scoring import ConfirmationGrant, ConfirmationService
+from autoengineering.utility.contracts import ResourceCap
+from autoengineering.utility.costs import join_confirmation_costs
+from autoengineering.campaign.artifacts import reference, put_bytes
+
+repository = Path.cwd()
+sys.path.insert(0, str(repository / "tests"))
+from test_utility_confirmation import selected_suite
+
+root = Path("/private/tmp/utility-output-validation-normal-v1")
+root.mkdir(mode=0o700)
+evidence = repository / "examples/utility/verification-container-output-validation-v1/normal"
+evidence.mkdir(mode=0o700)
+source_names = [
+    "src/autoengineering/utility/scoring.py", "src/autoengineering/utility/costs.py",
+    "src/autoengineering/utility/execution_receipts.py",
+    "src/autoengineering/utility/container_scoring.py",
+    "src/autoengineering/utility/private_container_runtime.py",
+    "src/autoengineering/utility/private_container_worker.py",
+    "src/autoengineering/utility/private_score_worker.py",
+]
+hashes = {name: hashlib.sha256((repository / name).read_bytes()).hexdigest()
+          for name in source_names}
+(evidence / "executed-source-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n")
+store, manifest, contract = selected_suite(root, outcome_name="rmse", confirmation_active_time=128)
+model = manifest.cells[0].model
+selected = store.replay()["frozen"]
+private = root / "private"
+private.mkdir(mode=0o700)
+(private / "labels.json").write_text('{"labels":[1,5],"mask":[true,true]}')
+labels = reference(private, "labels.json", media_type="application/json", producer="authored-custodian")
+partition = "1" * 64
+predictions = put_bytes(store.root, json.dumps({
+    "model_sha256": model.sha256, "partition_digest": partition,
+    "selection_digest": selected, "prediction": [2,4],
+}).encode(), name="predictions.json", media_type="application/json", producer="authored-fixture")
+endpoint = Path("/Users/cam/.orbstack/run/docker.sock")
+metadata = rm.API(str(endpoint)).json("GET", "/version")
+runtime = rm.FixedScorerRuntime(endpoint, server_sha256=rm.sha(rm.encode(metadata)))
+scorer = sm.ContainerRMSEScorer(store.root, private, labels=labels, predictions=predictions,
+                               partition_digest=partition, outcome_contract=contract, runtime=runtime)
+grant = ConfirmationGrant(store.spec.digest, store.spec.cells[0].digest, partition,
+                          scorer.identity, contract.digest, model.sha256, selected, (
+                              ResourceCap("scientific_starts", "count", 1, "reservation"),
+                              ResourceCap("active_time", "s", 64, "reservation"),
+                          ))
+reads = []
+original_read = sm.read_bytes
+def tracked(scope, ref, **kwargs):
+    if Path(scope) == private:
+        assert (private / grant.digest / "private-access.json").exists()
+        assert len(store.replay()["confirmation_accesses"]) == 1
+        reads.append(ref.sha256)
+    return original_read(scope, ref, **kwargs)
+sm.read_bytes = tracked
+def fault(point):
+    if point == "confirmation_score_created":
+        raise RuntimeError("authored interruption before suite publication")
+store.fault = fault
+service = ConfirmationService(store, scorer, scorer_digest=scorer.identity, outcome_contract=contract)
+try:
+    service.confirm(grant)
+except RuntimeError as exc:
+    assert str(exc) == "authored interruption before suite publication"
+else:
+    raise AssertionError("fault did not interrupt original publication")
+pending = store.replay()
+assert not pending["confirmation_scores"] and len(pending["confirmation_accesses"]) == 1
+assert len(reads) == 1
+attempt = private / grant.digest
+stage = attempt / "container/stage"
+stage.chmod(0o755)
+for path in (private / "labels.json", attempt / "workspace/labels.json", stage / "labels.json"):
+    path.unlink()
+stage.chmod(0o555)
+def denied(*args, **kwargs):
+    raise AssertionError("recovery attempted daemon access or new scoring")
+rm.API.request = denied
+runtime.run = denied
+store.fault = lambda _: None
+receipt = service.recover(grant)
+assert receipt.score.value == 1.0 and receipt.recovery is not None
+assert receipt.measurement is None and len(reads) == 1
+assert service.recover(grant) == service.confirm(grant) == receipt
+state = store.replay()
+assert state["used"] == pending["used"] and state["phase_used"] == pending["phase_used"]
+assert state["confirmation_accesses"] == pending["confirmation_accesses"]
+costs = {row.resource: row.quantity for row in join_confirmation_costs(store)}
+assert costs["confirmation_recoveries_committed"] == 1
+assert costs["confirmation_callback_duration"] is None
+assert costs["confirmation_scoring_starts"] == 1
+assert costs["confirmation_container_starts"] == 1
+assert costs["confirmation_container_lifecycle_duration"] >= 0
+assert receipt.execution is not None
+for name, digest in hashes.items():
+    assert hashlib.sha256((repository / name).read_bytes()).hexdigest() == digest
+plan = json.loads((attempt / "container/plan.json").read_bytes())
+summary = {
+    "schema": "synthetic-public-execution-recovery-v1", "root": str(root),
+    "container_id": plan["container_id"], "nonce": plan["nonce"], "container_starts": 1,
+    "original_label_source_reads": len(reads),
+    "public_execution":receipt.execution.to_dict(), "all_synthetic_labels_deleted": True,
+    "recovered_with_api_and_runtime_starts_denied": True,
+    "reservation_and_access_unchanged": True, "receipt": receipt.to_dict(), "costs": costs,
+    "private_scoring_qualified": False, "real_confirmation_data_reads": 0,
+    "provider_calls": 0, "remote_jobs": 0, "image_pulls": 0,
+}
+(evidence / "actual-recovery.json").write_text(json.dumps(summary, indent=2) + "\n")
+print(json.dumps(summary, sort_keys=True), flush=True)

@@ -1,0 +1,49 @@
+{
+  "netcdf4": {
+    "comment_text": null,
+    "core-metadata": false,
+    "digests": {
+      "blake2b_256": "34b60370bb3af66a12098da06dc5843f3b349b7c83ccbdf7306e7afa6248b533",
+      "md5": "814355d47aab847dfbb4d0c932bb7260",
+      "sha256": "cdbfdc92d6f4d7192ca8506c9b3d4c1d9892969ff28d8e8e1fc97ca08bf12164"
+    },
+    "downloads": -1,
+    "filename": "netcdf4-1.7.4.tar.gz",
+    "has_sig": false,
+    "md5_digest": "814355d47aab847dfbb4d0c932bb7260",
+    "packagetype": "sdist",
+    "python_version": "source",
+    "requires_python": ">=3.10",
+    "size": 838352,
+    "upload_time": "2026-01-05T02:27:38",
+    "upload_time_iso_8601": "2026-01-05T02:27:38.593147Z",
+    "url": "https://files.pythonhosted.org/packages/34/b6/0370bb3af66a12098da06dc5843f3b349b7c83ccbdf7306e7afa6248b533/netcdf4-1.7.4.tar.gz",
+    "yanked": false,
+    "yanked_reason": null
+  },
+  "Cython": {
+    "comment_text": null,
+    "core-metadata": {
+      "sha256": "35e7a6ef68b559c8c59f8c2c6630896be4200df08a762d4b1a1bf2d3f6f6a645"
+    },
+    "digests": {
+      "blake2b_256": "914d1eb0c7c196a136b1926f4d7f0492a96c6fabd604d77e6cd43b56a3a16d83",
+      "md5": "43d79caa07f067042cb904b44f35a922",
+      "sha256": "64d7f71be3dd6d6d4a4c575bb3a4674ea06d1e1e5e4cd1b9882a2bc40ed3c4c9"
+    },
+    "downloads": -1,
+    "filename": "cython-3.2.4-cp312-cp312-macosx_11_0_arm64.whl",
+    "has_sig": false,
+    "md5_digest": "43d79caa07f067042cb904b44f35a922",
+    "packagetype": "bdist_wheel",
+    "python_version": "cp312",
+    "requires_python": ">=3.8",
+    "size": 2970064,
+    "upload_time": "2026-01-04T14:15:08",
+    "upload_time_iso_8601": "2026-01-04T14:15:08.567982Z",
+    "url": "https://files.pythonhosted.org/packages/91/4d/1eb0c7c196a136b1926f4d7f0492a96c6fabd604d77e6cd43b56a3a16d83/cython-3.2.4-cp312-cp312-macosx_11_0_arm64.whl",
+    "yanked": false,
+    "yanked_reason": null
+  },
+  "Cython_version": "3.2.4"
+}

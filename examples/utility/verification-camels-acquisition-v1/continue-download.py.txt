@@ -1,0 +1,81 @@
+"""One explicit public Range continuation after a terminal partial acquisition.
+
+No scientific permission or data partition is retried. Existing committed prefix
+bytes and the first failure remain. This script refuses a consumed continuation.
+"""
+from pathlib import Path
+import hashlib,json,os,signal,time,urllib.request
+root=Path.cwd();out=root/'examples/utility/verification-camels-acquisition-v1';private=root/'outputs/camels-acquisition-v1'
+assert (out/'failure.json').exists() and not (out/'receipt.json').exists()
+assert not (out/'continuation-request.json').exists()
+first=json.loads((out/'request.json').read_text());failure=json.loads((out/'failure.json').read_text())
+partial=private/'archive.zip.part';assert not partial.is_symlink()
+prefix=partial.stat().st_size;expected=first['expected_size_bytes']
+assert 0<prefix<expected and prefix==failure['archive_bytes_written']==failure['archive_body_bytes_read']
+assert failure['observation_members_opened']==0 and failure['logical_requests_dispatched']==2
+metadata=json.loads((out/'metadata-response.json').read_text());selected=metadata['selected_file']
+assert selected['size']==expected and selected['checksum']=='md5:'+first['expected_md5']
+url=selected['links']['self']+'?download=1&continuation=1'
+request={'schema':'utility-camels-range-continuation-request-v1','previous_request_sha256':hashlib.sha256((out/'request.json').read_bytes()).hexdigest(),
+ 'previous_failure_sha256':hashlib.sha256((out/'failure.json').read_bytes()).hexdigest(),
+ 'prefix_bytes_retained':prefix,'additional_body_bytes_cap':expected-prefix,'logical_http_requests_additional_cap':1,
+ 'logical_http_requests_cumulative_cap':3,'socket_timeout_seconds':30,'elapsed_logical_limit_seconds':900,
+ 'active_http_deadline_mechanism':'SIGALRM real-time timer; metadata/cleanup after interruption is outside that bound','automatic_retries':0,'range_start':prefix,'range_end':expected-1,
+ 'archive_size_bytes':expected,'archive_md5':first['expected_md5'],'producer_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+ 'reason':'Continue a known terminal partial public download, preserving the previous resource charge and exact prefix',
+ 'observation_members_opened':0,'scientific_model_calls':0}
+(out/'continuation-request.json').write_text(json.dumps(request,indent=2)+'\n')
+sha=hashlib.sha256();md5=hashlib.md5(usedforsecurity=False);hashed=0
+def identity(path):
+ value=path.stat();return value.st_dev,value.st_ino,value.st_size,value.st_mtime_ns,value.st_ctime_ns
+before=identity(partial)
+with partial.open('rb') as reader:
+ while chunk:=reader.read(8*1024**2):sha.update(chunk);md5.update(chunk);hashed+=len(chunk)
+assert hashed==prefix and identity(partial)==before
+(out/'prefix-proof.json').write_text(json.dumps({'prefix_bytes':prefix,'sha256':sha.hexdigest(),'md5':md5.hexdigest()},indent=2)+'\n')
+started=time.monotonic();additional=0;dispatched=0;last_progress=prefix
+def deadline(signum,frame):raise TimeoutError('Public acquisition continuation deadline')
+previous_handler=signal.signal(signal.SIGALRM,deadline)
+signal.setitimer(signal.ITIMER_REAL,900)
+try:
+ dispatched=1
+ with urllib.request.urlopen(urllib.request.Request(url,headers={'Accept-Encoding':'identity','Range':f'bytes={prefix}-{expected-1}'}),timeout=30) as response:
+  assert response.status==206 and response.headers.get('Content-Encoding','identity')=='identity'
+  assert response.headers.get('Content-Range')==f'bytes {prefix}-{expected-1}/{expected}'
+  assert response.headers.get('Content-Length') is None or int(response.headers['Content-Length'])==expected-prefix
+  assert identity(partial)==before
+  with partial.open('ab') as writer:
+   while True:
+    assert time.monotonic()-started<=900
+    chunk=response.read(min(8*1024**2,expected-prefix-additional+1))
+    if not chunk:break
+    additional+=len(chunk);assert additional<=expected-prefix
+    writer.write(chunk);sha.update(chunk);md5.update(chunk)
+    if prefix+additional-last_progress>=64*1024**2:
+     last_progress=prefix+additional;print(json.dumps({'bytes_hashed':last_progress,'expected_bytes':expected,'continuation':True}),flush=True)
+   writer.flush();os.fsync(writer.fileno())
+  info={'url':url,'final_url':response.url,'status':response.status,'content_range':response.headers.get('Content-Range'),
+        'etag':response.headers.get('ETag'),'last_modified':response.headers.get('Last-Modified')}
+ assert prefix+additional==partial.stat().st_size==expected and md5.hexdigest()==first['expected_md5']
+ os.rename(partial,private/'archive.zip')
+ receipt={'schema':'utility-camels-full-acquisition-v2','request_sha256':hashlib.sha256((out/'request.json').read_bytes()).hexdigest(),
+  'continuation_request_sha256':hashlib.sha256((out/'continuation-request.json').read_bytes()).hexdigest(),
+  'metadata_response':metadata['response'],'archive_response':info,'archive_bytes':expected,
+  'archive_md5':md5.hexdigest(),'archive_sha256':sha.hexdigest(),'provider_md5_verified':True,
+  'logical_http_requests':3,'http_exchange_count':None,'total_transfer_bytes':None,
+  'previous_archive_bytes_retained':prefix,'additional_archive_body_bytes':additional,
+  'private_archive':str(private/'archive.zip'),'archive_mode':oct((private/'archive.zip').stat().st_mode&0o777),
+  'first_failure_preserved':True,'continuation_seconds':time.monotonic()-started,
+  'observation_members_opened':0,'scientific_model_calls':0,'confirmation_admitted':False,
+  'protected_private_runtime_qualified':False,'physical_intervals_admitted':False,'cpu_seconds':None,'peak_rss_bytes':None}
+ (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ print(json.dumps({'status':'complete','bytes':expected,'sha256':sha.hexdigest(),'md5_verified':True,'observation_members_opened':0}),flush=True)
+except BaseException as error:
+ (out/'continuation-failure.json').write_text(json.dumps({'error_type':type(error).__name__,'body_bytes_returned_by_reader':additional,
+  'file_size_bytes':partial.stat().st_size,'additional_http_requests_dispatched':dispatched,
+  'automatic_retry_allowed':False,'observation_members_opened':0,'scientific_model_calls':0},indent=2)+'\n')
+ raise
+
+finally:
+ signal.setitimer(signal.ITIMER_REAL,0)
+ signal.signal(signal.SIGALRM,previous_handler)

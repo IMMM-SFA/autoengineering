@@ -1,0 +1,8 @@
+{
+  "schema": "utility-authored-wheel-fixture-v1",
+  "suite_digest": "a7475c934eb8763113f867894509df07c57a7175192940ccc048c6d9dc1dedc8",
+  "grant_digest": "1cfc6f1429d3b36ff8401398afa73ba3c9ce60f653e59aa718f910f11dde5d2c",
+  "receipt_digest": "f9c2870718ff3b0d85466be5c7eeb03d2e1983d20273e3ea26dc2dc00f7ee322",
+  "scorer_starts": 1,
+  "scope": "authored public copy for extracted-wheel cold verification; no independent inputs or runtime qualification"
+}

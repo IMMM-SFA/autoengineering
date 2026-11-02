@@ -1,0 +1,38 @@
+[
+  {
+    "case": "examples.utility.guest_image help",
+    "exit_code": 0,
+    "isolated": true,
+    "code_from_extracted_wheel": true
+  },
+  {
+    "case": "examples.utility.guest_image_context help",
+    "exit_code": 0,
+    "isolated": true,
+    "code_from_extracted_wheel": true
+  },
+  {
+    "case": "examples.utility.guest_archive_download help",
+    "exit_code": 0,
+    "isolated": true,
+    "code_from_extracted_wheel": true
+  },
+  {
+    "case": "examples.utility.guest_image_build help",
+    "exit_code": 0,
+    "isolated": true,
+    "code_from_extracted_wheel": true
+  },
+  {
+    "case": "autoengineering.cli help",
+    "exit_code": 0,
+    "isolated": true,
+    "code_from_extracted_wheel": true
+  },
+  {
+    "case": "guarded cache/context/authored-build replay",
+    "exit_code": 0,
+    "isolated": true,
+    "code_from_extracted_wheel": true
+  }
+]

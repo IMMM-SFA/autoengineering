@@ -1,0 +1,109 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+.....................................................................s.. [ 47%]
+.......................s................................................ [ 51%]
+................................................................sss..s.. [ 55%]
+........................................................................ [ 59%]
+....................................sssssss...s.....ss.................. [ 63%]
+.........s.............................................................. [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+.................ss.s................................................... [ 79%]
+........................................................................ [ 83%]
+.....................................................sss....ss.......... [ 87%]
+........................................................................ [ 91%]
+...........................ssss...................ssss.s.............s.. [ 95%]
+.ss..........................................................ss......... [ 99%]
+......                                                                   [100%]
+=============================== warnings summary ===============================
+.pixi/envs/bayes/lib/python3.12/site-packages/torch/jit/_script.py:1488
+.pixi/envs/bayes/lib/python3.12/site-packages/torch/jit/_script.py:1488
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/torch/jit/_script.py:1488: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_full_network_backend.py: 6 warnings
+tests/test_partial_network_backend.py: 17 warnings
+tests/test_partial_network_benchmark.py: 8 warnings
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/gpytorch/likelihoods/noise_models.py:150: NumericalWarning: Very small noise values detected. This will likely lead to numerical instabilities. Rounding small noise values up to 1e-06.
+    warnings.warn(
+
+tests/test_full_network_backend.py::test_full_network_posterior_and_suggestion_replay_from_verified_tables
+tests/test_full_network_backend.py::test_full_network_posterior_and_suggestion_replay_from_verified_tables
+tests/test_full_network_backend.py::test_component_gp_uses_declared_feature_coordinates_without_second_transform
+tests/test_partial_network_backend.py::test_partial_fit_uses_component_rows_without_summing_system_costs
+tests/test_partial_network_backend.py::test_partial_system_fantasies_condition_all_system_outputs_with_common_draws
+tests/test_partial_network_backend.py::test_partial_exact_gaussian_conditioning_matches_closed_form
+tests/test_partial_network_backend.py::test_partial_fantasies_use_common_antithetic_draws
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/botorch/models/utils/assorted.py:276: InputDataWarning: Data (input features) is not contained to the unit cube. Please consider min-max scaling the input data.
+    check_min_max_scaling(
+
+tests/test_partial_network_backend.py::test_partial_exact_gaussian_conditioning_matches_closed_form
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/gpytorch/distributions/multivariate_normal.py:375: NumericalWarning: Negative variance values detected. This is likely due to numerical instabilities. Rounding negative variances up to 1e-10.
+    warnings.warn(
+
+tests/test_release_a_benchmark.py::test_modeled_methods_share_the_sobol_warm_start
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/smac/utils/configspace.py:209: DeprecationWarning: Please use `list(space.values())`
+    params = configspace.get_hyperparameters()
+
+tests/test_release_a_benchmark.py::test_modeled_methods_share_the_sobol_warm_start
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/smac/utils/configspace.py:212: DeprecationWarning: Please use `hp.to_value(vector)` instead.
+    design[:, idx] = param._inverse_transform(param._transform(design[:, idx]))
+
+tests/test_release_a_benchmark.py::test_modeled_methods_share_the_sobol_warm_start
+  /Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/bayes/lib/python3.12/site-packages/smac/utils/configspace.py:212: DeprecationWarning: Please use `hp.to_vector(value)` instead.
+    design[:, idx] = param._inverse_transform(param._transform(design[:, idx]))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] ../agentic-architecture-part1/tests/test_complex_model_cutoff.py:9: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_complex_models.py:10: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_local_bmi.py:11: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_local_convergence.py:11: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_local_models.py:14: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] tests/test_optuna_backend.py:6: could not import 'optuna': No module named 'optuna'
+SKIPPED [1] tests/test_ax_replay_prototype.py:12: could not import 'ax': No module named 'ax'
+SKIPPED [1] tests/test_bmi_adapter.py:192: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [3] tests/test_circuit_integration.py:13: could not import 'openmdao': No module named 'openmdao'
+SKIPPED [1] tests/test_circuit_integration.py:69: could not import 'openmdao': No module named 'openmdao'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:35: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:62: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:80: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:104: requires wind environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:119: requires wind environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:132: requires hybrid environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:149: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:179: requires solar environment
+SKIPPED [1] tests/test_openmdao_adapter.py:115: could not import 'openmdao.api': No module named 'openmdao'
+SKIPPED [1] tests/test_openmdao_adapter.py:146: could not import 'openmdao.api': No module named 'openmdao'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_cli.py:547: missing-dependency behavior is a base-environment contract
+SKIPPED [1] tests/test_optimizer_branches.py:36: could not import 'optuna': No module named 'optuna'
+SKIPPED [1] tests/test_optimizer_branches.py:36: could not import 'ax': No module named 'ax'
+SKIPPED [1] tests/test_optuna_replay_prototype.py:12: could not import 'optuna': No module named 'optuna'
+SKIPPED [1] tests/test_solar_integration.py:7: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:20: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:32: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:63: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:79: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_utility_engineering.py:11: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:32: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:56: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:69: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_figures.py:69: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:83: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:101: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:118: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:138: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_prediction_tasks.py:34: optional pvlib required
+SKIPPED [2] tests/test_utility_private_scoring.py:37: actual macOS data-memory limit unavailable; scorer correctly blocked
+SKIPPED [1] tests/test_utility_wind.py:32: optional wind environment required
+SKIPPED [1] tests/test_utility_wind.py:52: optional TOPFARM environment required
+1767 passed, 45 skipped, 44 warnings in 1567.98s (0:26:07)

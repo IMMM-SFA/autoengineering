@@ -1,0 +1,30 @@
+{
+  "scope": "synthetic-only standalone container probe preparation and unit validation",
+  "checked_at_utc": "2026-10-29T21:23:32.363374+00:00",
+  "tests": {
+    "passed": 45,
+    "skipped": 2,
+    "seconds": 1.18
+  },
+  "initial_test_run": {
+    "passed": 17,
+    "skipped": 2,
+    "failed": 1,
+    "failure": "sandbox denied ps for existing path-denial test; raw log/XML retained"
+  },
+  "pre_capability_run": {
+    "passed": 40,
+    "skipped": 2,
+    "seconds": 1.14
+  },
+  "lint": "passed src/tests/examples plus new standalone script",
+  "actual_container_starts": 0,
+  "image_pulls": 0,
+  "private_data_reads": 0,
+  "provider_calls": 0,
+  "remote_jobs": 0,
+  "qualification": "not_qualified",
+  "unit_contexts": "authored Linux proc/cgroup fixtures, not real enforcement evidence",
+  "broader_regressions": "existing base/Bayes snapshots predate this new script/test; not rerun or relabelled",
+  "remaining": "runtime choice and actual daemon/container lifecycle, resource and isolation qualification; data custody and independent protocol still unresolved"
+}

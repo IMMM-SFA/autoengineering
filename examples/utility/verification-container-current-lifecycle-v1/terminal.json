@@ -1,0 +1,35 @@
+{
+  "schema": "utility-current-lifecycle-terminal-v1",
+  "commands": [
+    {
+      "harness": "utility-current-creation-prearm-parent-v1.py",
+      "exit_code": 0,
+      "created_objects": 4,
+      "container_starts": 0
+    },
+    {
+      "harness": "utility-current-creation-armed-parent-v1.py",
+      "exit_code": 0,
+      "created_objects": 2,
+      "container_starts": 0
+    },
+    {
+      "harness": "utility-current-running-parent-v1.py",
+      "original_session": 8874,
+      "exit_code": 0,
+      "created_objects": 4,
+      "container_starts": 4
+    },
+    {
+      "harness": "utility-current-running-timeout-parent-v1.py",
+      "original_session": 57455,
+      "exit_code": 0,
+      "created_objects": 1,
+      "container_starts": 1
+    }
+  ],
+  "all_core_source_pins_unchanged": true,
+  "core_source_pin_sha256": "009d04fcdad41387d7ae0a52822cce048fd675b0fd9467bd52329642a8e8ccc9",
+  "runtime_source_sha256": "c7a4b87a3dd54a5eaa880244815f14d7dcfeeb4c27543400d90a8d79c306d3cd",
+  "private_scoring_qualified": false
+}

@@ -1,0 +1,201 @@
+{
+  "schema": "utility-coupled-image-resource-controls-v1",
+  "request_digest": "e1490096d83976a5f92677f3fbc84c64b7d371cefd20e9f6d2a666f2942619cf",
+  "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+  "cases": [
+    {
+      "mode": "memory_limit",
+      "container_id": "d15b14cd7f9e445c7b926fd47b93ab89c18958b16b31bf473d440577dcd1d49b",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": "memory_limit",
+        "nonce": "83ce617df44c49d3aa369fac524bb29a",
+        "container_id": "d15b14cd7f9e445c7b926fd47b93ab89c18958b16b31bf473d440577dcd1d49b",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "configuration_digest": "7e532ff0ed82338c32f60375f81c2919be1af76cf3a144d8d4c841ddee44fc2c",
+        "output_sha256": "4fdb8c175000e58b55e648791d7b693af710e05b4e8180851e78d4fdca78ae07",
+        "result": {
+          "oom_killed": true,
+          "exit_code": 137
+        },
+        "runtime_qualified": false,
+        "owner_loss_qualified": false
+      }
+    },
+    {
+      "mode": "pid_limit",
+      "container_id": "d582eec5a913628ad3e7b0aec57ed25dabf9d606b1a463aa8f4d4b1506b7c1bb",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": "pid_limit",
+        "nonce": "5ce8f6bf6d8f49a8b3fe7e5497a66482",
+        "container_id": "d582eec5a913628ad3e7b0aec57ed25dabf9d606b1a463aa8f4d4b1506b7c1bb",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "configuration_digest": "038df9f0e23f493ed40b5e32ae39d94b0f5892ba092cfd349ac17d25f7bb4c5d",
+        "output_sha256": "be99310db361d1b01083c918ff00633f6cd9b7650b2d766a5a3be2ef282fa6da",
+        "result": {
+          "children": 15,
+          "errno": "EAGAIN",
+          "pids_current": 16
+        },
+        "runtime_qualified": false,
+        "owner_loss_qualified": false
+      }
+    },
+    {
+      "mode": "workspace_limit",
+      "container_id": "84c5ff20f3505a56bcc00f98343fa4708be98c33ae129f0a4d077ca1199730d5",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": "workspace_limit",
+        "nonce": "52f1a6d36dd648ad8aae8051444b1b4f",
+        "container_id": "84c5ff20f3505a56bcc00f98343fa4708be98c33ae129f0a4d077ca1199730d5",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "configuration_digest": "f050d8413bfcfbff06f348f1fa06181623d025d9942af19e818a21349e423e3a",
+        "output_sha256": "c7a6d475877a7a965774cc13fce0455ea9b74018c8c307d4ac85c11c11201b87",
+        "result": {
+          "errno": "ENOSPC",
+          "written_bytes": 134217728
+        },
+        "runtime_qualified": false,
+        "owner_loss_qualified": false
+      }
+    },
+    {
+      "mode": "read_only_root",
+      "container_id": "9259857f66c3250ca1197aafef69a072493767c3a670baa9f0de013d0fa2d8c3",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": "read_only_root",
+        "nonce": "ec6f2e74be0741afb2caabb005c4a0e5",
+        "container_id": "9259857f66c3250ca1197aafef69a072493767c3a670baa9f0de013d0fa2d8c3",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "configuration_digest": "aa6464147337b8b9961a16926954d1acf5bcc4222a764cf9a157f6da06236016",
+        "output_sha256": "71e3a67bd4ff3eb57334be8c4c09bad7a302018cdc2a8c31d5630e3583380f3e",
+        "result": {
+          "errno": "EROFS"
+        },
+        "runtime_qualified": false,
+        "owner_loss_qualified": false
+      }
+    },
+    {
+      "mode": "network_denied",
+      "container_id": "b93088affc677a754f52226f909231d4f7d9b1479544526717b9ebde34bc94db",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": "network_denied",
+        "nonce": "6871e6c05ef74536b0da9c64e038d7d7",
+        "container_id": "b93088affc677a754f52226f909231d4f7d9b1479544526717b9ebde34bc94db",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "configuration_digest": "919cb2f4be34e01cb865a981e81417799a096dea3fe9bae21c14d5a62b6457e0",
+        "output_sha256": "19b6b0a98b5bb21aaa513f3492b58805bf2c4e2a4dadbf58d4bf03687715736f",
+        "result": {
+          "attempts": 1,
+          "errno": "ENETUNREACH"
+        },
+        "runtime_qualified": false,
+        "owner_loss_qualified": false
+      }
+    },
+    {
+      "mode": "host_canary_denied",
+      "container_id": "4558ae6d054b39f6ee575e62b5fec1466d660a2bfc9f1d74f4918cd27560c10e",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": "host_canary_denied",
+        "nonce": "72f423ae33394a10a267b6fcc7f55954",
+        "container_id": "4558ae6d054b39f6ee575e62b5fec1466d660a2bfc9f1d74f4918cd27560c10e",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "configuration_digest": "c5dc0ea53d5088dc7e343cc3587ba19cd0825bf41e96c30fb2250beb12790297",
+        "output_sha256": "8deef26945a8878513df49494c11730646e8cfe4040e90de704af4800cbb38c3",
+        "result": {
+          "errno": "ENOENT"
+        },
+        "runtime_qualified": false,
+        "owner_loss_qualified": false
+      }
+    },
+    {
+      "mode": "output_small",
+      "container_id": "86bbdfc6aba337c6d5c883ea423b073f916641622fb86e6b9294ca40c29aca1b",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-coupled-public-output-observation-v1",
+        "mode": "output_small",
+        "nonce": "d892104840384232a91ccd8ba8b0ae72",
+        "container_id": "86bbdfc6aba337c6d5c883ea423b073f916641622fb86e6b9294ca40c29aca1b",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "capture": {
+          "captured_bytes": 4096,
+          "child_exit_code": 0,
+          "child_signal": null,
+          "mode": "output-small",
+          "output_limit_bytes": 16384,
+          "output_limited": false,
+          "private_boundary_qualified": false,
+          "result": null,
+          "schema": "utility-coupled-load-output-v1"
+        },
+        "runtime_qualified": false
+      }
+    },
+    {
+      "mode": "output_overrun",
+      "container_id": "dee11b45fa78602496bd4f52ef7e761a8093fc62c6e880ea40b60e249c43c39d",
+      "container_creations": 1,
+      "container_starts": 1,
+      "original_container_absent": true,
+      "observation": {
+        "schema": "utility-coupled-public-output-observation-v1",
+        "mode": "output_overrun",
+        "nonce": "c7b99a15ad2741a4b8c4f538b00e186b",
+        "container_id": "dee11b45fa78602496bd4f52ef7e761a8093fc62c6e880ea40b60e249c43c39d",
+        "image_id": "sha256:62f6c7b58e34f4ec5d5517af49c8b9e1e7d1d7235f550384ac52c1281fb262ad",
+        "capture": {
+          "captured_bytes": 16384,
+          "child_exit_code": null,
+          "child_signal": 25,
+          "mode": "output-overrun",
+          "output_limit_bytes": 16384,
+          "output_limited": true,
+          "private_boundary_qualified": false,
+          "result": null,
+          "schema": "utility-coupled-load-output-v1"
+        },
+        "runtime_qualified": false
+      }
+    }
+  ],
+  "container_creations": 8,
+  "container_starts": 8,
+  "scientific_starts": 0,
+  "private_source_reads": 0,
+  "automatic_retries": 0,
+  "six_resource_controls_complete": true,
+  "two_public_output_controls_complete": true,
+  "scope": "fixed diagnostic commands on the exact image, not scientific-owner interruption qualification",
+  "runtime_qualified": false,
+  "private_boundary_qualified": false,
+  "independent_physical_host_qualified": false
+}

@@ -1,0 +1,28 @@
+"""Install the successor wheel locally and reuse the guarded common-report check."""
+from pathlib import Path
+import hashlib,json,subprocess,sys,zipfile
+root=Path.cwd();out=root/'examples/utility/verification-guest-wheel-v6'
+stage=Path('/private/tmp/utility-guest-wheel-v6-v2');target=stage/'installed'
+wheel=next(out.glob('*.whl')).resolve()
+command=[sys.executable,'-I','-m','pip','install','--no-index','--no-deps','--no-compile','--target',str(target),str(wheel)]
+p=subprocess.run(command,cwd=stage,capture_output=True,text=True)
+(out/'install.stdout.txt').write_text(p.stdout);(out/'install.stderr.txt').write_text(p.stderr)
+assert p.returncode==0
+with zipfile.ZipFile(wheel) as z:
+ for name in z.namelist():
+  if '.dist-info/' not in name:assert (target/name).read_bytes()==z.read(name)
+reader=Path('/private/tmp/utility-load-cost-report-v1/reader/installed-reader.py.txt')
+pins=reader.with_name('public-pins.json')
+public=Path('/private/tmp/utility-load-cost-report-v1/public')
+command=[sys.executable,'-I','-B',str(reader),str(target),str(public),str(pins),'current']
+checked=subprocess.run(command,cwd=stage,capture_output=True,text=True)
+(out/'installed-reader.stdout.txt').write_text(checked.stdout);(out/'installed-reader.stderr.txt').write_text(checked.stderr)
+assert checked.returncode==0
+result={'install_exit_code':p.returncode,'reader_exit_code':checked.returncode,
+ 'wheel_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),'installed_package_payloads_match':True,
+ 'declared_guest_python_sources':316,'core_python_sources':225,'local_macos_inherited_dependencies':True,
+ 'guarded_reader':json.loads(checked.stdout),'example_modules_in_package':True,
+ 'linux_image_or_full_workflow_qualified':False,'new_dependency_installations':0,
+ 'new_native_model_calls':0,'new_private_source_reads':0}
+(out/'installed-reader-result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

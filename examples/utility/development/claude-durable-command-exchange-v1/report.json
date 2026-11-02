@@ -1,0 +1,124 @@
+{
+  "version": "claude-durable-exchange-probe-1.1",
+  "source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+  "missing_cache_case": false,
+  "policy_specification": {
+    "schema": "claude-helper-policy-1.4",
+    "workspace": "/private/tmp/claude-durable-command-exchange-v1/workspace",
+    "home": "/private/tmp/claude-durable-command-exchange-v1/home",
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "helper": "/private/tmp/claude-durable-command-exchange-v1/auth/helper",
+    "python": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
+    "python_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default",
+    "credential_files": [
+      "/private/tmp/claude-durable-command-exchange-v1/auth/synthetic-capability"
+    ],
+    "endpoints": [
+      {
+        "address": "localhost",
+        "port": 55158
+      }
+    ],
+    "forbidden_roots": [
+      "/private/tmp/claude-durable-command-exchange-v1/private",
+      "/private/tmp/claude-durable-command-exchange-v1/exchange",
+      "/private/tmp/claude-durable-command-exchange-v1/endpoint",
+      "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
+    ]
+  },
+  "inventory": {
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "sha256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+    "version": "2.1.310 (Claude Code)",
+    "supported_flags": [
+      "--print",
+      "--bare",
+      "--output-format",
+      "--input-format",
+      "--json-schema",
+      "--model",
+      "--tools",
+      "--disable-slash-commands",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "--setting-sources",
+      "--settings",
+      "--no-session-persistence",
+      "--permission-mode",
+      "--max-budget-usd"
+    ]
+  },
+  "native_status": "completed",
+  "native_stopped": true,
+  "native_error": null,
+  "native_structured_output": "{\"handoff_json\":\"{\\\"fixture\\\":true,\\\"role\\\":\\\"reviewer\\\"}\"}",
+  "native_diagnostic_usage": {
+    "uncached_input_tokens": 7,
+    "cached_input_tokens": 2,
+    "cache_creation_input_tokens": 3,
+    "output_tokens": 10,
+    "input_tokens": 12,
+    "total_tokens": 22,
+    "reasoning_output_tokens": null
+  },
+  "broker_status": "completed",
+  "broker_usage": {
+    "uncached_input_tokens": 7,
+    "cached_input_tokens": 2,
+    "cache_creation_input_tokens": 3,
+    "input_tokens": 12,
+    "output_tokens": 10,
+    "total_tokens": 22,
+    "reasoning_output_tokens": null
+  },
+  "broker_usage_observation": {
+    "basis": "reported_message_fields_only",
+    "billed_cost_usd": null,
+    "invalid_count_fields": [],
+    "raw_sha256": "fa24a4e0f7e9cccfed78d8df9d75d6a012f67152143bb6a3d278765158282d92",
+    "reported_model": "claude-sonnet-4-6",
+    "schema_version": "1.0",
+    "usage": {
+      "cache_creation_input_tokens": 3,
+      "cached_input_tokens": 2,
+      "input_tokens": 12,
+      "output_tokens": 10,
+      "reasoning_output_tokens": null,
+      "total_tokens": 22,
+      "uncached_input_tokens": 7
+    },
+    "usage_categories_complete": true
+  },
+  "provider_requests_reserved": 1,
+  "authored_upstream_callbacks": 1,
+  "extra_callbacks_on_recovery": 0,
+  "same_native_process_on_recovery": true,
+  "same_native_result_on_recovery": true,
+  "endpoint_stop": {
+    "listener_closed": true,
+    "handler_stopped": true,
+    "upstream_callback_stopped": true,
+    "request_attempts": 2,
+    "exchange_requests": 1,
+    "upstream_callbacks": 1
+  },
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "production_admission": false,
+  "usage_cost_basis": "authored fixture, not measured provider work or billing",
+  "upstream_command_stop": {
+    "state": "verified_stopped",
+    "watchdog_reason": "group_stopped",
+    "bindings": {
+      "upstream.json": "a773c9ea4dc206852a2072ebac341407398dca6448bfdb20f33f70f2d7bce094",
+      "process/job.json": "f9f0e64f23a6c120f7b14c8162a1475319579285c89570fbe532e884699647d3",
+      "process/process.json": "9d8018ed61d294b0b9af31e96080aa4972f3f9c0a721f0cc5467d173fe14eff4",
+      "process/watchdog-job.json": "1f712bac4d1e9cbf9aba714cc38faad42e4e862a034aae6b5bdcfb728ad7822e",
+      "process/watchdog-result.json": "321fe11a27a6a9d235782c37b753aeabf63993ca45f0109f185293d502a35a73"
+    }
+  },
+  "upstream_response_recovered": true,
+  "upstream_scope": "authored owned process; no provider, key or network",
+  "probe_mode": "owned_command_callback",
+  "status": "failed"
+}

@@ -1,0 +1,9 @@
+{
+  "changed_existing_environment_entries": [],
+  "added_environments": [
+    "utility"
+  ],
+  "old_lock_sha256": "16f3911bdc180b361f4bbcb02d2a848d68107635f9eb830781b53ba691a52ce5",
+  "new_lock_sha256": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+  "scope": "environment entries only; workspace editable-package metadata adds extras"
+}

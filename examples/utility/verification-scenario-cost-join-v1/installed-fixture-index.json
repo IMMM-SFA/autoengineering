@@ -1,0 +1,22 @@
+{
+  ".operation.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  ".writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "artifacts/fdfc332d5e285185278090bab5a6c230a4214f32bb9a7ec72e6e0110c20a2e0d/receipt.json": "fdfc332d5e285185278090bab5a6c230a4214f32bb9a7ec72e6e0110c20a2e0d",
+  "batch.json": "11aff2993de7a6e848805278f2c4670c7fc1aeedc9b7b5f51654efd4ca5d7151",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/completion.json": "5be1819b2a4aed6cb32b4275fe05860f5230991ee019ea75b26cf69fef311517",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/intent.json": "ce05224cdd49894358138eeb2fe554a19ab65c071550af21ae19709a219d649b",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/job.json": "764d059f3317c8518dbca55e137ec5fd8ec3461230deb7cfb1f91c4a027963f4",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/launch-gate.json": "ce05224cdd49894358138eeb2fe554a19ab65c071550af21ae19709a219d649b",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/process.json": "17ce278afa2b3e2615888009500562c7113ab5331aca1d71166022f8136f6acf",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/stderr.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/stdin.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/stdout.bin": "021520747976623b9a5ca36e211a2f250e5cb9e8ba717f8033a6f93d885e1ed2",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/watchdog-job.json": "dbea7bf59dd63920d0f4e40418e4812848c8554308c6d80df7c3c906990ec03f",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/watchdog-ready.json": "c59b15a8d6c5bc12fb19bfce245246fe223f12ae5374125a825ec5323111dde5",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/process/watchdog-result.json": "d42c70aaabdb2cf1ded5bacd3d74401be4261be75f8ffa5df05224d1e2b22385",
+  "cases/first/engineering-processes/a73b7f49ed04f94e7f7cca330b7a4f0d00018801c4c7315e63f34b033ae16dca/scenario.json": "c3aa5b40f3ae768f6f85e3f57baa11781f2e41cba07761177db3c184ba607f58",
+  "cases/first/engineering-processes/execution.json": "52d31c306bb1e96434ec7a2e0527991480e0769f0b783e3e20dfc05e98772475",
+  "events/000000000001.json": "d5a13868d8cd823b5de0560bb9b2605e0dacac33392fd38471385c407984167b",
+  "events/000000000002.json": "75e950c3f2dffb58de3db8a66ca5bc924b04632787e50df6473a31326c697490",
+  "events/000000000003.json": "fa6c7b017c78009fb722646dae3b6782b340e866e642b861f278f55aa6fe8a1a"
+}

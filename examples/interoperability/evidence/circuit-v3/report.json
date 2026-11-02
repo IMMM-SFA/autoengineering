@@ -1,0 +1,38 @@
+{
+  "manifest_digest": "a8a0658342167adc064512d858c364ee85316ba3ff6aba0ab07ea51a7a21f88f",
+  "parity_cases": 3,
+  "derivative_audit_coupled_starts": 3,
+  "parity_coupled_starts": 6,
+  "optuna_physical_starts": 12,
+  "native": {
+    "source_current": 0.014706256386876256,
+    "objective": 3.7736339780440927e-13,
+    "work": {
+      "converged": true,
+      "residual_norm": 2.8175703957467046e-17,
+      "residual_tolerance": 1e-10,
+      "solver_iterations": 2,
+      "component_calls": 959,
+      "derivative_calls": 295
+    },
+    "coupled_solves": 10,
+    "seconds": 0.015903166960924864,
+    "driver_result": "Problem: run22\nDriver:  ScipyOptimizeDriver\n  success     : True\n  iterations  : 10\n  runtime     : 1.5735E-02 s\n  model_evals : 10\n  model_time  : 1.2079E-02 s\n  deriv_evals : 7\n  deriv_time  : 2.0201E-03 s\n  exit_status : SUCCESS",
+    "budget_match": "unmatched_inner_solve_budget"
+  },
+  "optuna_recommendation": {
+    "action_id": "eval-000005",
+    "config": {
+      "source_current": 0.014297699581953646
+    },
+    "outcomes": {
+      "error": 1.6342235857846958e-06,
+      "node1": 1.422036806455339,
+      "node2": 0.6487216324527803
+    },
+    "feasible": true,
+    "message": "best feasible observed configuration"
+  },
+  "total_seconds": 0.6699089580215514,
+  "claims": "development interoperability only; unmatched native inner budget"
+}

@@ -1,0 +1,56 @@
+{
+  "scope": "Provider interval dictionary and cached hardware metadata only",
+  "reviewed_at_utc": "2026-10-31T21:02:36.736821+00:00",
+  "provider_document_commit": "7affccd25972e92c4de855ee98a20c0e85577b59",
+  "provider_document_url": "https://github.com/openEDI/documentation/blob/7affccd25972e92c4de855ee98a20c0e85577b59/pvdaq.md",
+  "provider_document_sha256": "1315d61eb027ada2862bb9a204c9c96fbc724ed61e278d667a5e8bc5f1979bac",
+  "provider_document_bytes": 17619,
+  "provider_excerpt": "Is the data left(L), center(C), or right(R) aligned during the acquisition interval",
+  "documented_interval_codes": {
+    "L": "left",
+    "C": "center",
+    "R": "right"
+  },
+  "documentation_requests": [
+    {
+      "url": "https://api.github.com/repos/openEDI/documentation/commits?path=pvdaq.md&per_page=1",
+      "bytes": 4292,
+      "maximum_bytes": 65536,
+      "sha256": "45fb8d2d77f1edacba162aab9502718ad689cac9bed860708f38ff534fe9c261"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openEDI/documentation/7affccd25972e92c4de855ee98a20c0e85577b59/pvdaq.md",
+      "bytes": 17619,
+      "maximum_bytes": 65536,
+      "sha256": "1315d61eb027ada2862bb9a204c9c96fbc724ed61e278d667a5e8bc5f1979bac"
+    }
+  ],
+  "saved_site_metadata_sha256": "17e4f7f448fcb2bec43f7610b40c1f7f4fc794ccc185e41dcde0514afba73ae5",
+  "saved_site_metadata_path": "examples/utility/proposals/confirmation-v2/metadata-refresh/2107_system_metadata.json",
+  "observed_interval_code_counts": {
+    "Inverters": 24,
+    "Meters": 1,
+    "Other Instruments": 1
+  },
+  "observed_interval_codes_unique": [
+    "L"
+  ],
+  "selected_ac_metric_id": 149583,
+  "selected_ac_source_type": "INVERTER",
+  "selected_ac_source_id": null,
+  "selected_ac_aggregation": "avg",
+  "system_reported_resolution": "5-15 min",
+  "system_timezone_code": "PST8PDT",
+  "resolved": "Generic L/C/R dictionary meaning",
+  "unresolved": [
+    "Explicit selected-AC-to-inverter join",
+    "Sample support duration and timestamp/DST treatment",
+    "Availability delays, quality masks, equipment topology, rights and exposure"
+  ],
+  "inference_limit": "Equal device interval codes do not establish the missing channel join or its clock/support contract",
+  "observation_files_requested": false,
+  "new_private_labels_read": false,
+  "model_calls": 0,
+  "task_admitted": false,
+  "proposal_or_frozen_metadata_rewritten": false
+}

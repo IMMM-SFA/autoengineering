@@ -1,0 +1,20 @@
+{
+  "schema": "utility-baseline-selection-installed-reader-v1",
+  "installed_core_files": 202,
+  "logical_selections": 4,
+  "original_scientific_process_starts": 1,
+  "metadata_followers": 3,
+  "shared_state_artifacts": 1,
+  "scientific_cost_allocation": [
+    0.25,
+    0.25,
+    0.25,
+    0.25
+  ],
+  "unmeasured_reference_copy_durations": 3,
+  "all_lineage_verified": true,
+  "journal_unchanged": true,
+  "original_roots_network_and_process_denied": true,
+  "private_scoring_qualified": false,
+  "independent_confirmation": false
+}

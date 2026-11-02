@@ -1,0 +1,16 @@
+{
+  "scope": "Fixed-design coupled scoring kernel on previously exposed control inputs; no independent confirmation",
+  "predecessor": "examples/utility/source-inventory-engineering-source-binding.json",
+  "predecessor_sha256": "251cd6e3288823f843e925fbaf2cbc00087f79115a37f327d73d6f5f2b363bea",
+  "current_source_sha256": {
+    "examples/utility/engineering_load_scoring.py": "4d626d11aaeac0727f8820cc59968615fcaafe7789f979bf2def237531abf6a1",
+    "tests/test_utility_engineering_load_scoring.py": "e1fde6238f88e3320b8d7749e3d3dce4dcb3e314baf563c7cce6616490044489",
+    "examples/utility/exposure-register.json": "ea12d14ec7698454e44ffa7694bbd5e3023b399ffbc358c08dff4e4a2696ae5e"
+  },
+  "executed_source": "examples/utility/verification-engineering-load-scoring-v1/executed-source/engineering_load_scoring.py.txt",
+  "executed_source_sha256": "5e11f7d951cb73435e45a418935c74fa295a1e2fbba7986d6e066486237649bf",
+  "source_scope_difference": "Current kernel corrects only the counter-scope description; no numeric implementation change or rerun",
+  "verification": "examples/utility/verification-engineering-load-scoring-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315
+}

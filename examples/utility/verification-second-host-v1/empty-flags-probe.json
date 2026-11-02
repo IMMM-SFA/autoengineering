@@ -1,0 +1,11 @@
+{
+  "arguments": [
+    "--bare",
+    "--tools=",
+    "--setting-sources=",
+    "--help"
+  ],
+  "exit_code": 0,
+  "help_returned": true,
+  "prompt": "none"
+}

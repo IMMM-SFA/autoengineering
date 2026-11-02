@@ -1,0 +1,51 @@
+"""Read a relocated saved build after initialization, without live operations."""
+
+import hashlib
+import json
+import os
+from pathlib import Path
+import socket
+import subprocess
+import sys
+import time
+
+data, expected, source_root, source_sha = sys.argv[1:]
+data = Path(data).resolve()
+sys.path.insert(0, source_root)
+from examples.utility import guest_image_build as reader
+
+assert hashlib.sha256(Path(reader.__file__).read_bytes()).hexdigest() == source_sha
+reader.digest({})
+json.loads("{}")
+
+
+def forbidden(*args, **kwargs):
+    raise AssertionError("saved build reader attempted a live operation")
+
+
+def guard(event, args):
+    if event == "open":
+        path, mode, flags = args
+        if not isinstance(path, (str, bytes, os.PathLike)):
+            raise AssertionError("saved reader opened an unscoped descriptor")
+        if not Path(os.fsdecode(path)).absolute().is_relative_to(data):
+            raise AssertionError("saved reader opened outside relocated data")
+        if any(c in (mode or "") for c in "wax+") or flags & (
+            os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND
+        ):
+            raise AssertionError("saved reader attempted a write")
+    elif event in ("os.listdir", "os.scandir"):
+        if not Path(args[0]).absolute().is_relative_to(data):
+            raise AssertionError("saved reader listed outside relocated data")
+    elif event == "import" or event.startswith(("socket.", "subprocess.", "os.exec")):
+        raise AssertionError("saved reader attempted import, network or execution")
+    elif event in ("os.system", "os.fork", "os.posix_spawn"):
+        raise AssertionError("saved reader attempted execution")
+
+
+reader._binary = reader._endpoint = reader._run = forbidden
+socket.socket = subprocess.Popen = forbidden
+time.time = time.monotonic = time.perf_counter = forbidden
+sys.addaudithook(guard)
+result = reader.read_completion(data, expected_digest=expected)
+print(json.dumps({"verified_digest": reader.digest(result), "result": result}, sort_keys=True))

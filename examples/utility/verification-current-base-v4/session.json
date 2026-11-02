@@ -1,0 +1,5 @@
+{
+  "exec_session_id": 22797,
+  "recorded_utc": "2026-10-31T00:43:28.143995+00:00",
+  "note": "Handle identifies the launched process. Poll it to establish current state; this file alone does not prove liveness."
+}

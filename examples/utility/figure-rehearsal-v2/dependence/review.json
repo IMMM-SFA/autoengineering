@@ -1,0 +1,21 @@
+{
+  "profile": "authored illustration; no executed utility suite",
+  "rendering_profiles": [
+    {
+      "schema": "utility-matplotlib-v1",
+      "width_inches": 8.0,
+      "dpi": 160,
+      "matplotlib": "3.11.1",
+      "freetype": "2.14.3",
+      "renderer_sha256": "8935376847b7bb04b616cb684a0302347733794eca33cd48289e48f6d6277692"
+    },
+    {
+      "schema": "utility-matplotlib-v1",
+      "width_inches": 5.0,
+      "dpi": 160,
+      "matplotlib": "3.11.1",
+      "freetype": "2.14.3",
+      "renderer_sha256": "8935376847b7bb04b616cb684a0302347733794eca33cd48289e48f6d6277692"
+    }
+  ]
+}

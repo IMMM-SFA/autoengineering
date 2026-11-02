@@ -1,0 +1,120 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+.....................................................................s.. [ 47%]
+.......................s................................................ [ 51%]
+................................................................sss..s.. [ 55%]
+.................sssssssss.............................................. [ 59%]
+...............................sssssss...s.....ss....................... [ 63%]
+...s.................................................................... [ 67%]
+........................................................................ [ 71%]
+..............................................................ssssssssss [ 75%]
+sssssssssss.ss.sssssssssssssssss.ssss...........s....................... [ 79%]
+........................................................................ [ 83%]
+................................................sss....ss............... [ 87%]
+........................................................................ [ 91%]
+......................ssss...................ssss.s.............s...ss.. [ 95%]
+........................................................ss.............. [ 99%]
+.                                                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] ../agentic-architecture-part1/tests/test_complex_model_cutoff.py:9: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_complex_models.py:10: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] tests/test_integration_supervision.py:7: could not import 'psutil': No module named 'psutil'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_local_bmi.py:11: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_local_convergence.py:11: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_local_models.py:14: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [1] tests/test_optuna_backend.py:6: could not import 'optuna': No module named 'optuna'
+SKIPPED [1] tests/test_ax_replay_prototype.py:12: could not import 'ax': No module named 'ax'
+SKIPPED [1] tests/test_bmi_adapter.py:192: could not import 'bmipy': No module named 'bmipy'
+SKIPPED [3] tests/test_circuit_integration.py:13: could not import 'openmdao': No module named 'openmdao'
+SKIPPED [1] tests/test_circuit_integration.py:69: could not import 'openmdao': No module named 'openmdao'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:127: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:173: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:204: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:221: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:268: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:285: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:357: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:379: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_full_network_backend.py:394: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:35: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:62: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:80: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:104: requires wind environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:119: requires wind environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:132: requires hybrid environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:149: requires solar environment
+SKIPPED [1] ../agentic-architecture-part1/tests/test_open_chains.py:179: requires solar environment
+SKIPPED [1] tests/test_openmdao_adapter.py:115: could not import 'openmdao.api': No module named 'openmdao'
+SKIPPED [1] tests/test_openmdao_adapter.py:146: could not import 'openmdao.api': No module named 'openmdao'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_cli.py:532: Bayesian dependencies are not installed
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:820: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:831: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:862: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:900: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:926: whole-system backend is unavailable
+SKIPPED [3] ../agentic-architecture-part1/tests/test_optimization_system.py:963: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:988: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1007: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1024: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1088: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1103: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1118: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1143: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1193: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1207: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1266: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1298: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1341: whole-system backend is unavailable
+SKIPPED [1] ../agentic-architecture-part1/tests/test_optimization_system.py:1370: whole-system backend is unavailable
+SKIPPED [1] tests/test_optimizer_branches.py:36: could not import 'optuna': No module named 'optuna'
+SKIPPED [1] tests/test_optimizer_branches.py:36: could not import 'ax': No module named 'ax'
+SKIPPED [1] tests/test_optuna_replay_prototype.py:12: could not import 'optuna': No module named 'optuna'
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:129: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:169: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:196: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:218: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:249: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:282: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:337: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:384: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:419: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:469: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:510: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:533: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:579: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:623: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:652: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_backend.py:685: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_benchmark.py:36: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_benchmark.py:61: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_benchmark.py:106: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_partial_network_benchmark.py:136: optional Bayesian dependencies
+SKIPPED [1] ../agentic-architecture-part1/tests/test_release_a_benchmark.py:179: Bayesian benchmark dependencies are unavailable
+SKIPPED [1] tests/test_solar_integration.py:7: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:20: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:32: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:63: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_solar_integration.py:79: could not import 'pvlib': No module named 'pvlib'
+SKIPPED [1] tests/test_utility_engineering.py:11: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:32: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:56: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_engineering.py:69: optional OpenMDAO environment required
+SKIPPED [1] tests/test_utility_figures.py:69: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:83: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:101: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:118: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_figures.py:138: optional Matplotlib rendering environment required
+SKIPPED [1] tests/test_utility_prediction_tasks.py:34: optional pvlib required
+SKIPPED [2] tests/test_utility_private_scoring.py:37: actual macOS data-memory limit unavailable; scorer correctly blocked
+SKIPPED [1] tests/test_utility_wind.py:32: optional wind environment required
+SKIPPED [1] tests/test_utility_wind.py:52: optional TOPFARM environment required
+1711 passed, 97 skipped in 1397.03s (0:23:17)

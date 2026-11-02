@@ -1,0 +1,40 @@
+{
+  "created_utc": "2026-10-30T15:45:08.365284+00:00",
+  "current_core_python_files": 207,
+  "files": {
+    "docs/implementation-plans/part-5-frozen-prediction-increment.md": "8098e82b303275fd7d640e4bc17524b30fc9f5a35193c53a4c2533c22c30e19d",
+    "docs/reviews/part-5-completion-audit.md": "815f1ec587409157e2525b49f9cc653043e9ffd3bd5b68a040d59b97a9051da6",
+    "docs/reviews/part-5-progress.md": "56c04ad1f7f1b67c2195502c8236a95f23289b1056b8f909a0238ef774189834",
+    "docs/reviews/part-5-readiness.md": "b657c8f7735c76a09d1ea8f01809eb8b104a661150dba38b65939b84e909aefd",
+    "docs/utility-handoff.md": "da65eeaf74206d36084a5178195783dbb275c7f6e60bc79664695debc202b3e3",
+    "docs/utility.md": "e7bed46344e11d78313c62b0b1274ad6bc87d8cb2dc09152d6cf3054b7467196",
+    "examples/utility/verification-composite-grants-v1/documentation.log": "368442f9d96808211014938c6662c1aac70f4bf59cf47f3a2fe53f05e60d8b55",
+    "examples/utility/verification-composite-grants-v1/final-cli-vector-compatibility.log": "b0ac81868e26bb9b62fd51b2eaca2bfa37586ba08c38e6eb0c391ed32aa29d7e",
+    "examples/utility/verification-composite-grants-v1/grant-scoring-regression.log": "56d3c39a138049c3e5a37658cc7879a7b77676ef4a098be4c40b89c6b98b1727",
+    "examples/utility/verification-composite-grants-v1/initial-reference-fixture-failures.log": "c2f6285edaa7eff48dc987265de186f494b3dcca0865a8145befca0d1992066b",
+    "examples/utility/verification-composite-grants-v1/new-contract-tests.log": "0aa5e2cc92fad0263d6ab14850f62d50d6994972453f697e34690c2106dbf5c0",
+    "src/autoengineering/utility/inference_contracts.py": "f96c2d2cbaf0d4ec8b6d55e9b193dcd0fcdf2507c353173da385ac863dde8531",
+    "src/autoengineering/utility/scoring.py": "7617bd8e9039ecdf387e75c8b0606b384109160e08ef6c9dc9980f2e3608bc12",
+    "tests/test_utility_composite_grants.py": "e446442a70ef2f6190dd7dc6de9472c447949f5c7870b279eea11602804afbeb"
+  },
+  "limits": [
+    "metadata/preflight contract only; vector services refuse composite execution and recovery",
+    "no supervised composite executor, physical checks or nested receipt chain yet",
+    "no private scorer registration or independent data admission",
+    "full default checkpoint predates this increment",
+    "no installed package, optional environment, new image/host/platform or independent execution qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-training-cancellation.json",
+  "predecessor_sha256": "f99fe97c4ae46d6ce9232dd4cf7e697043ac389bd6bcb583820bb427d34d0ce7",
+  "schema": "utility-source-increment-v1",
+  "scope": "versioned two-start confirmation grant and metadata-only frozen routing replay validation",
+  "verification": {
+    "diff_check": "passed",
+    "final_composite_cli_vector_compatibility": "35 passed in 19.57s",
+    "final_documentation": "19 passed in 0.60s",
+    "formatting": "grant AST equality verified",
+    "grant_scoring_recovery_cost_regression": "59 passed in 26.77s",
+    "lint": "passed",
+    "new_contracts": "6 passed in 15.62s"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "supplied-wind-adapter-partial",
+  "files": {
+    "examples/utility/wind.py": "6fdc15a62f95f2cd13cd6175480ac9b5ec381126097b9ab7e72cd7ebf8d94b37",
+    "tests/test_utility_wind.py": "8a7a07c314b869752f5f1e4ac133a95e5878b95314775f5ca04c32fad57212b5"
+  },
+  "checks": {
+    "wind": "3 passed, 1 NumPy binary-size warning in 22.45s after locked install",
+    "ruff": "repository-wide pass"
+  },
+  "pending": [
+    "default test session 17705"
+  ],
+  "limits": [
+    "NumPy binary-size warning retained; runtime not fully qualified",
+    "No native wind comparator or independent weather confirmation"
+  ]
+}

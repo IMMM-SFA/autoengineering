@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="29" time="6.903" timestamp="2026-10-29T04:32:32.967795-07:00" hostname="m5-mbp"><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[None]" time="0.041" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[pin]" time="0.025" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[candidate]" time="0.025" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[codex]" time="0.024" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[source]" time="0.031" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[runtime]" time="0.030" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[boundary]" time="0.031" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[auth]" time="0.030" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[api-version]" time="0.032" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[limitations]" time="0.031" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[tokens]" time="0.031" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[usd]" time="0.029" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[counter]" time="0.030" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[checks]" time="0.033" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[artifact]" time="0.049" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[executable]" time="0.035" /><testcase classname="tests.test_agent_claude_profile" name="test_every_profile_binding_and_artifact_is_required[extra]" time="0.025" /><testcase classname="tests.test_agent_claude_profile" name="test_boolean_observation_cannot_replace_integer_native_tool_counter" time="0.036" /><testcase classname="tests.test_agent_claude_host" name="test_scheduler_commits_claude_handoff_and_broker_usage_without_native_fill[False]" time="0.762" /><testcase classname="tests.test_agent_claude_host" name="test_scheduler_commits_claude_handoff_and_broker_usage_without_native_fill[True]" time="0.758" /><testcase classname="tests.test_agent_claude_host" name="test_lost_return_reconciles_original_claude_evidence_without_relaunch" time="0.750" /><testcase classname="tests.test_agent_claude_host" name="test_typed_role_validation_still_rejects_a_valid_transport_envelope" time="0.679" /><testcase classname="tests.test_agent_claude_host" name="test_missing_real_qualification_refuses_before_any_credential_read" time="0.001" /><testcase classname="tests.test_agent_claude_host" name="test_selection_and_capabilities_keep_legacy_shapes_and_separate_new_versions" time="0.001" /><testcase classname="tests.test_agent_claude_host" name="test_configuration_versions_bind_host_and_keep_old_digest" time="0.020" /><testcase classname="tests.test_agent_claude_host" name="test_exact_api_worker_missing_lease_fails_before_send_and_preserves_stop" time="0.883" /><testcase classname="tests.test_agent_claude_host" name="test_claude_batch_charges_once_and_recovers_original_observation[False]" time="0.831" /><testcase classname="tests.test_agent_claude_host" name="test_claude_batch_charges_once_and_recovers_original_observation[True]" time="0.790" /><testcase classname="tests.test_agent_claude_host" name="test_cli_run_resume_binds_claude_configuration_and_all_roles" time="0.159"><failure message="ValueError: artifact must be a regular file">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4407/test_cli_run_resume_binds_clau0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x120c419a0&gt;
+
+    def test_cli_run_resume_binds_claude_configuration_and_all_roles(tmp_path, monkeypatch):
+        from click.testing import CliRunner
+        from autoengineering.agents.hosts.scripted import supplied_reply
+        from autoengineering.agents.records import TaskAssignment
+        from autoengineering.agents.store import WorkerStore
+        from autoengineering.cli import cli
+        from examples.agent_campaign.run import prepare
+        from test_agent_host_configuration import command
+    
+        scheduler, _, _, _ = worker(tmp_path, monkeypatch)
+        host = scheduler.host
+        root = tmp_path / "example"
+&gt;       _, spec = prepare(root)
+                  ^^^^^^^^^^^^^
+
+tests/test_agent_claude_host.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.12/site-packages/examples/agent_campaign/run.py:36: in prepare
+    agent_fixture().to_yaml(specification)
+    ^^^^^^^^^^^^^^^
+venv/lib/python3.12/site-packages/examples/agent_campaign/fixture.py:15: in agent_fixture
+    sources = tuple(
+venv/lib/python3.12/site-packages/examples/agent_campaign/fixture.py:16: in &lt;genexpr&gt;
+    reference(ROOT, path, media_type="application/octet-stream", producer="author")
+venv/lib/python3.12/site-packages/autoengineering/campaign/artifacts.py:49: in reference
+    path = confined_file(root, relative)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/private/tmp/claude-host-installed-v1/venv/lib/python3.12/site-packages')
+relative = 'src/autoengineering/campaign/scientific-closure-v1.json'
+
+    def confined_file(root: Path, relative: str) -&gt; Path:
+        relative_path(relative)
+        root = Path(root).absolute()
+        # Check every existing ancestor, including the supplied root's ancestors.
+        target = root / relative
+        for path in (*reversed(target.parents), target):
+            if path.is_symlink():
+                raise ValueError("artifact path contains a symlink")
+        if not target.is_file() or not stat.S_ISREG(target.stat().st_mode):
+&gt;           raise ValueError("artifact must be a regular file")
+E           ValueError: artifact must be a regular file
+
+venv/lib/python3.12/site-packages/autoengineering/campaign/artifacts.py:26: ValueError</failure></testcase></testsuite></testsuites>

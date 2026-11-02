@@ -1,0 +1,5 @@
+{
+  "command": "python -m pytest tests/test_utility_guest_prediction_parity.py tests/test_utility_guest_parity_reader.py tests/test_utility_guest_preflight_controls.py tests/test_utility_guest_inference_smoke.py tests/test_utility_guest_executor.py tests/test_utility_guest_inputs.py tests/test_utility_frozen_inference.py tests/test_utility_guest_receipts.py tests/test_documentation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-parity-preflight-final-v1 --junitxml=examples/utility/verification-guest-preflight-controls-v1/final.xml",
+  "exit_code": 0,
+  "scope": "authored local tests; no final real-data or provider protocol"
+}

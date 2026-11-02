@@ -1,0 +1,18 @@
+{
+  "related_tests_passed": 62,
+  "related_regression_seconds": 203.36,
+  "documentation_tests_passed": 19,
+  "ruff_src_tests_examples": "passed",
+  "git_diff_check": "passed",
+  "installed_core_only_reader_sources": 225,
+  "installed_core_payloads_match_current_source": true,
+  "guest_declared_code_sources_aligned": 316,
+  "relocated_score_and_two_stage_cost_replay": "passed",
+  "missing_committed_receipt_refused": true,
+  "private_label_blob_and_root_path_absent": true,
+  "runtime_source_changed": false,
+  "full_default_suite_rerun": false,
+  "runtime_qualified": false,
+  "private_boundary_qualified": false,
+  "full_part_5_complete": false
+}

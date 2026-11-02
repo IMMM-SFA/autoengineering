@@ -1,0 +1,34 @@
+"""Verify a relocated successor context with source/cache/execution denied."""
+from pathlib import Path
+import sys
+sys.path.insert(0,sys.argv[2])
+import hashlib,json,os,socket,subprocess,time
+from examples.utility import guest_image,guest_image_context
+from examples.utility.inference_environment import verify_inputs
+b''.decode('cp437')
+root=Path(sys.argv[1]).resolve();expected=sys.argv[3]
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def denied(*a,**kw):raise RuntimeError('source probe process network or clock denied')
+subprocess.Popen=socket.socket=time.time=time.monotonic=guest_image._source_alignment=denied
+
+def audit(event,args):
+ if event=='open':
+  path,mode,flags=args
+  if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise RuntimeError('write denied')
+  if isinstance(path,int):
+   st=os.fstat(path)
+   if (st.st_dev,st.st_ino) not in inodes:raise RuntimeError('outside descriptor denied')
+  elif not Path(os.fsdecode(path)).absolute().is_relative_to(root):raise RuntimeError('original source or cache read denied')
+ if event=='import' or event.startswith(('socket.','subprocess.','os.exec','os.fork','os.posix_spawn')):
+  raise RuntimeError('new import or execution denied')
+sys.addaudithook(audit)
+manifest=guest_image_context.verify(root,expected_digest=expected)
+plan=json.loads((root/'proof/plan.json').read_text())
+inputs=verify_inputs(root/'proof/environment',expected_digest=plan['environment_inputs_digest'])
+assert len(inputs.wheel_python_sources)==316
+assert sum(r.path.startswith('autoengineering/') for r in inputs.wheel_python_sources)==225
+assert not manifest['build_authorized'] and not manifest['runtime_qualified']
+print(json.dumps({'relocated_context_verified':True,'declared_guest_python_sources':316,
+ 'core_python_sources':225,'context_files':len(manifest['files']),
+ 'copied_file_bytes':manifest['copied_file_bytes'],'original_source_or_cache_reads':0,
+ 'network':0,'processes':0,'model_calls':0,'image_built':False,'runtime_qualified':False}))

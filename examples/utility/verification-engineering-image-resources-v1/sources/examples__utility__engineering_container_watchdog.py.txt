@@ -1,0 +1,402 @@
+"""Independent owner-pipe cleanup for the prospective original container.
+
+No create, start, packet or model action is available here. Readiness is required
+before CREATE, and CID binding is required before START. An unresolved creation
+remains unverified. The full interruption matrix is separate qualification work.
+"""
+
+from __future__ import annotations
+
+from contextlib import contextmanager
+import fcntl
+import hashlib
+import os
+from pathlib import Path
+import re
+import select
+import stat
+import subprocess
+import sys
+import time
+
+from autoengineering.campaign.serialization import canonical_json, digest, unique_json
+from autoengineering.campaign.store import checked_directory, durable_write
+from autoengineering.utility.guest_daemon import GuestDaemonAPI
+
+
+def source_identity():
+    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+
+@contextmanager
+def cleanup_lock(root, deadline):
+    fd = os.open(Path(root) / "cleanup.lock", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("cleanup lock is not regular")
+        while True:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError("cleanup lock deadline expired")
+                time.sleep(0.01)
+        yield
+    finally:
+        os.close(fd)
+
+
+def run_watchdog(root, read_fd):
+    from examples.utility import engineering_container_runtime as owner
+
+    root = checked_directory(root)
+    path = root / "watchdog-plan.json"
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > 65536:
+        raise ValueError("watchdog plan differs")
+    plan = unique_json(path.read_text())
+    if set(plan) != {
+        "schema",
+        "container_id",
+        "nonce",
+        "grant_digest",
+        "packet_sha256",
+        "name",
+        "configuration",
+        "endpoint",
+        "api_version",
+        "server_digest",
+        "api_profile_digest",
+        "owner_source_digest",
+        "watchdog_source_digest",
+        "active_deadline",
+        "deadline",
+    }:
+        raise ValueError("watchdog plan fields differ")
+    if (
+        plan["schema"]
+        not in ("utility-coupled-watchdog-plan-v1", "utility-coupled-watchdog-plan-v2")
+        or (plan["schema"] == "utility-coupled-watchdog-plan-v1" and plan["container_id"] is None)
+        or plan["owner_source_digest"] != owner.source_identity()
+        or plan["watchdog_source_digest"] != source_identity()
+        or plan["name"] != "ae-coupled-load-" + plan["nonce"]
+        or canonical_json(plan["configuration"])
+        != canonical_json(
+            owner.configuration(plan["nonce"], plan["packet_sha256"], plan["grant_digest"])
+        )
+        or not 0 < plan["deadline"] - time.monotonic() <= 60
+        or not 0 < plan["deadline"] - plan["active_deadline"] <= 10
+    ):
+        raise ValueError("watchdog source, ownership or deadline differs")
+    api = GuestDaemonAPI(
+        plan["endpoint"], api_version=plan["api_version"], server_digest=plan["server_digest"]
+    )
+    if api.identity != plan["api_profile_digest"]:
+        raise ValueError("watchdog daemon profile differs")
+    cid = plan["container_id"]
+
+    def inspect_named():
+        status, raw = api._request(
+            "GET", "/containers/" + plan["name"] + "/json", deadline=plan["deadline"]
+        )
+        if status == 404:
+            return None
+        if status != 200:
+            raise ValueError("watchdog original name inspection unverified")
+        return unique_json(raw.decode())
+
+    def bind_if_published():
+        path = root / "watchdog-bind.json"
+        if not path.exists():
+            return None
+        if path.is_symlink() or not path.is_file() or path.stat().st_size > 4096:
+            raise ValueError("watchdog binding type or size differs")
+        binding = unique_json(path.read_text())
+        if set(binding) != {"plan_digest", "container_id"} or binding["plan_digest"] != digest(
+            plan
+        ):
+            raise ValueError("watchdog binding plan differs")
+        bound = binding["container_id"]
+        if not isinstance(bound, str) or re.fullmatch("[0-9a-f]{64}", bound) is None:
+            raise ValueError("watchdog binding CID differs")
+        current = api.inspect(bound, deadline=plan["deadline"])
+        owner.verify_owned(current, plan["configuration"], cid=bound, name=plan["name"])
+        durable_write(
+            root / "watchdog-bound.json",
+            canonical_json(
+                {
+                    "plan_digest": digest(plan),
+                    "container_id": bound,
+                    "watchdog_pid": os.getpid(),
+                }
+            ).encode(),
+        )
+        return bound
+
+    if cid is None:
+        if inspect_named() is not None:
+            raise ValueError("watchdog prospective name already exists")
+    else:
+        value = api.inspect(cid, deadline=min(plan["deadline"], time.monotonic() + 5))
+        owner.verify_owned(value, plan["configuration"], cid=cid, name=plan["name"])
+    ready = {
+        "schema": "utility-coupled-watchdog-ready-v1",
+        "plan_digest": digest(plan),
+        "container_id": cid,
+        "watchdog_pid": os.getpid(),
+    }
+    durable_write(root / "watchdog-ready.json", canonical_json(ready).encode())
+    reason = "deadline"
+    while time.monotonic() < plan["active_deadline"]:
+        if cid is None:
+            cid = bind_if_published()
+        readable, _, _ = select.select(
+            [read_fd], [], [], min(0.1, max(0, plan["active_deadline"] - time.monotonic()))
+        )
+        if readable:
+            message = os.read(read_fd, 2)
+            reason = (
+                "owner_done"
+                if message == b"D"
+                else ("owner_lost" if message == b"" else "invalid_disarm")
+            )
+            break
+    with cleanup_lock(root, plan["deadline"]):
+        current = (
+            api.inspect(cid, deadline=plan["deadline"]) if cid is not None else inspect_named()
+        )
+        create_uncertain = cid is None and (root / "create-intent.json").exists()
+        # A missing object after an unacknowledged CREATE is not proof that the
+        # daemon cannot finish it later. Observe until the active window ends,
+        # leaving the cleanup window available if the original object appears.
+        while (
+            current is None
+            and create_uncertain
+            and reason != "owner_done"
+            and time.monotonic() < plan["active_deadline"]
+        ):
+            time.sleep(0.05)
+            current = inspect_named()
+        deleted = False
+        if current is not None:
+            if cid is None:
+                cid = current["Id"]
+            owner.verify_owned(current, plan["configuration"], cid=cid, name=plan["name"])
+            durable_write(
+                root / "watchdog-delete-intent.json",
+                canonical_json(
+                    {
+                        "plan_digest": digest(plan),
+                        "container_id": cid,
+                        "reason": reason,
+                    }
+                ).encode(),
+            )
+            status, body = api._request(
+                "DELETE", "/containers/" + cid + "?force=1", deadline=plan["deadline"]
+            )
+            if status != 204 or body != b"":
+                raise ValueError("watchdog delete outcome unverified")
+            deleted = True
+        if cid is None and reason == "owner_done":
+            parent_path = root / "cleanup.json"
+            if (
+                parent_path.is_file()
+                and not parent_path.is_symlink()
+                and parent_path.stat().st_size <= 4096
+            ):
+                parent = unique_json(parent_path.read_text())
+                candidate = parent.get("container_id")
+                if (
+                    isinstance(candidate, str)
+                    and re.fullmatch("[0-9a-f]{64}", candidate)
+                    and parent.get("absent") is True
+                ):
+                    cid = candidate
+        absent = (
+            api.inspect(cid, deadline=plan["deadline"]) is None
+            if cid is not None
+            else (not create_uncertain and inspect_named() is None)
+        )
+        result = {
+            "schema": "utility-coupled-watchdog-outcome-v1",
+            "plan_digest": digest(plan),
+            "container_id": cid,
+            "watchdog_pid": os.getpid(),
+            "reason": reason,
+            "delete_intended": deleted,
+            "absent": absent,
+            "private_boundary_qualified": False,
+            "unacknowledged_creation_unverified": cid is None and create_uncertain,
+        }
+        durable_write(root / "watchdog-outcome.json", canonical_json(result).encode())
+        if not absent:
+            raise ValueError("watchdog original container remains")
+
+
+class CoupledWatchdog:
+    def __init__(self, root, api, *, config, cid, name, active_deadline, deadline):
+        from examples.utility import engineering_container_runtime as owner
+
+        self.root = checked_directory(root)
+        self.deadline = deadline
+        self.write_fd = None
+        self.process = None
+        nonce = config["Labels"]["org.autoengineering.nonce"]
+        plan = {
+            "schema": "utility-coupled-watchdog-plan-v2"
+            if cid is None
+            else "utility-coupled-watchdog-plan-v1",
+            "container_id": cid,
+            "nonce": nonce,
+            "grant_digest": config["Labels"]["org.autoengineering.grant"],
+            "packet_sha256": config["Cmd"][0],
+            "name": name,
+            "configuration": config,
+            "endpoint": api._socket_path,
+            "api_version": api.profile.api_version,
+            "server_digest": api.profile.server_digest,
+            "api_profile_digest": api.identity,
+            "owner_source_digest": owner.source_identity(),
+            "watchdog_source_digest": source_identity(),
+            "active_deadline": active_deadline,
+            "deadline": deadline,
+        }
+        self.plan_digest = digest(plan)
+        durable_write(self.root / "watchdog-plan.json", canonical_json(plan).encode())
+        read_fd, write_fd = os.pipe()
+        try:
+            source_root = str(Path(__file__).resolve().parents[2])
+            bootstrap = "import sys;sys.path.insert(0,sys.argv[1]);from examples.utility.engineering_container_watchdog import main;raise SystemExit(main(sys.argv[2:]))"
+            self.process = subprocess.Popen(
+                [
+                    sys.executable,
+                    "-I",
+                    "-B",
+                    "-c",
+                    bootstrap,
+                    source_root,
+                    str(self.root),
+                    str(read_fd),
+                ],
+                pass_fds=(read_fd,),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+            self.write_fd = write_fd
+        except BaseException:
+            os.close(write_fd)
+            raise
+        finally:
+            os.close(read_fd)
+
+    def ready(self):
+        limit = min(self.deadline - 10, time.monotonic() + 5)
+        path = self.root / "watchdog-ready.json"
+        while time.monotonic() < limit:
+            if self.process.poll() is not None:
+                raise ValueError("watchdog exited before readiness")
+            if path.exists():
+                if path.is_symlink() or path.stat().st_size > 4096:
+                    raise ValueError("watchdog readiness type or size differs")
+                ready = unique_json(path.read_text())
+                if (
+                    ready.get("plan_digest") != self.plan_digest
+                    or ready.get("watchdog_pid") != self.process.pid
+                ):
+                    raise ValueError("watchdog readiness identity differs")
+                return ready
+            time.sleep(0.01)
+        raise TimeoutError("watchdog readiness deadline expired")
+
+    def check_alive(self):
+        """Revoke result authority immediately when the owned supervisor exits."""
+        code = self.process.poll()
+        if code is not None:
+            path = self.root / "watchdog-loss.json"
+            if not path.exists():
+                durable_write(
+                    path,
+                    canonical_json(
+                        {
+                            "plan_digest": self.plan_digest,
+                            "watchdog_pid": self.process.pid,
+                            "exit_code": code,
+                            "score_authority_revoked": True,
+                            "automatic_retry_allowed": False,
+                        }
+                    ).encode(),
+                )
+            raise ValueError("coupled watchdog exited; result authority revoked")
+
+    def bind(self, cid):
+        if not isinstance(cid, str) or re.fullmatch("[0-9a-f]{64}", cid) is None:
+            raise ValueError("watchdog CID binding differs")
+        durable_write(
+            self.root / "watchdog-bind.json",
+            canonical_json(
+                {
+                    "plan_digest": self.plan_digest,
+                    "container_id": cid,
+                }
+            ).encode(),
+        )
+        limit = min(self.deadline - 10, time.monotonic() + 5)
+        path = self.root / "watchdog-bound.json"
+        while time.monotonic() < limit:
+            self.check_alive()
+            if path.exists():
+                if path.is_symlink() or not path.is_file() or path.stat().st_size > 4096:
+                    raise ValueError("watchdog binding acknowledgement differs")
+                value = unique_json(path.read_text())
+                if value != {
+                    "plan_digest": self.plan_digest,
+                    "container_id": cid,
+                    "watchdog_pid": self.process.pid,
+                }:
+                    raise ValueError("watchdog acknowledged another container")
+                return value
+            time.sleep(0.01)
+        raise TimeoutError("watchdog binding acknowledgement timed out")
+
+    def finish(self):
+        if self.write_fd is not None:
+            try:
+                os.write(self.write_fd, b"D")
+            except BrokenPipeError:
+                pass
+            finally:
+                os.close(self.write_fd)
+                self.write_fd = None
+        code = self.process.wait(timeout=max(0.01, self.deadline - time.monotonic()))
+        path = self.root / "watchdog-outcome.json"
+        if code != 0 or path.is_symlink() or not path.is_file() or path.stat().st_size > 4096:
+            raise ValueError("watchdog cleanup completion unverified")
+        result = unique_json(path.read_text())
+        if result.get("plan_digest") != self.plan_digest or result.get("absent") is not True:
+            raise ValueError("watchdog absence differs")
+        return result
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    root = Path(argv[0])
+    try:
+        run_watchdog(root, int(argv[1]))
+        return 0
+    except BaseException as error:
+        try:
+            durable_write(
+                root / "watchdog-failure.json",
+                canonical_json(
+                    {
+                        "error_type": type(error).__name__,
+                        "cleanup_unverified": True,
+                    }
+                ).encode(),
+            )
+        except Exception:
+            pass
+        return 70

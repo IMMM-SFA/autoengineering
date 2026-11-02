@@ -1,0 +1,1 @@
+{"body":{"Id":"9385f85c8f339d40e9b18e21a26e66e83d72ad5a59b1393bdd8aa30a5e4f2e20","Warnings":[]},"body_sha256":"a5f65a51f6da51e4f57961e3676ecc47f5c6d40567542164bae65168ae4487ab","body_size":88,"call":4,"case":"lost_create_response","method":"POST","path":"/containers/create?name=ae-frozen-routing-768151856c0144049590be17a7265351&platform=linux%2Famd64","status":201}

@@ -1,0 +1,35 @@
+from pathlib import Path
+root=Path.cwd()
+text='''
+
+A separate supplied-scenario native recipe now supports up to 24 circuit cases
+without requiring a combined worst corner. It chooses the case requiring the
+largest source current at the common voltage threshold, retains native coupled
+SLSQP/derivatives and checks every supplied case freshly. The passive-circuit
+monotonicity reduction and actual diode-option check are documented. The older
+combined-corner recipe is unchanged. Exact scientific acceptance stays separate.
+
+An authored 24-case supervised job used 35 inner solves within a 40-call cap.
+Twenty-four separately reserved scientific processes then passed all original
+checks. The batch retained 25 physical reservations. Saved native/scenario recovery
+launched nothing and added no reservations. An isolated installed core-only
+base reader verified relocated native and parent receipts, reconstructed costs
+and the saved scenario mean, with models/runtime/original roots denied. The
+optional environment passed 22 tests. Base/documentation checks passed 33 tests
+with eight expected optional skips. No core source changed.
+
+These cases were exposed synthetic development inputs. No proposed final grid
+or private generated source was opened. The new recipe is not installed/platform
+qualified and is outside the frozen v6 inference image. Task admission, protected
+engineering scoring and the actual comparative study remain open.
+
+[Robust native engineering evidence](PREFIXexamples/utility/verification-engineering-robust-native-v1/README.md).
+'''
+for name in ['docs/utility.md','docs/utility-handoff.md','docs/reviews/part-5-progress.md','docs/reviews/part-5-completion-audit.md']:
+ with (root/name).open('a') as f:f.write(text.replace('PREFIX','../../' if '/reviews/' in name else '../'))
+p=root/'docs/reviews/part-5-completion-audit.md'
+s=p.read_text()
+needle='| Selection acceptance versus confirmation outcome |'
+row='| Native design without a combined load corner | `examples/utility/engineering_load_robust_native.py`; `tests/test_utility_engineering_load_robust_native.py` | New application-supplied recipe uses an exact threshold-current reduction for the fixed passive circuit. An authored supervised 24-case design, 24 separately reserved scientific checks and installed base-only receipt reconstruction pass. Original corner recipe unchanged. Final data/admission and installed model execution remain open. |\n'
+assert needle in s
+p.write_text(s.replace(needle,row+needle,1))

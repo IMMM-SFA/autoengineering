@@ -1,0 +1,13 @@
+{
+  "scope": "administrative base identity correction and small public metadata fixtures",
+  "predecessor": "examples/utility/source-inventory-guest-build-context.json",
+  "predecessor_sha256": "04e3b0b512c1247b2647a64b181c746d7e2e6f708af63209ad518e5edb1e5578",
+  "source_sha256": {
+    "examples/utility/guest_image_build.py": "2c98439f3716846d072d8187f828e6ba104dfc6ca1c66c84fe141d2fbe3ba93c",
+    "tests/test_utility_guest_image_build.py": "db0cda4c8006daa04d4a008492e0fbfc61753959e8d49941d406957acca8654f",
+    "tests/fixtures/guest-base-manifest.raw": "623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+    "tests/fixtures/guest-base-inspect.json": "a10438fc316400a9b318701e79d9f3d8298b234bf856f7867b4d30c765c7d85f"
+  },
+  "verification": "examples/utility/verification-guest-build-base-v1/summary.json",
+  "prepared_request": "examples/utility/prepared-guest-build-v4/request.json"
+}

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="6.261" timestamp="2026-10-28T14:41:55.161061-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_mixed_preparation" name="test_three_family_preparation_is_source_closed_and_starts_nothing" time="6.074"><failure message="AssertionError: Preparation attempted process or network dispatch">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4296/test_three_family_preparation_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x105a759a0&gt;
+
+    def test_three_family_preparation_is_source_closed_and_starts_nothing(tmp_path, monkeypatch):
+        from examples.utility.rehearse_mixed import prepare
+        from autoengineering.utility.mixed_execution import ScriptedMixedPlan
+        from autoengineering.utility.engineering_execution import TaskEngineeringCampaign
+        from autoengineering.campaign.artifacts import read_bytes
+    
+        pytest.importorskip("pvlib")  # Dependency import may inspect the CPU through uname.
+    
+        def denied(*args, **kwargs):
+            raise AssertionError("Preparation attempted process or network dispatch")
+    
+        monkeypatch.setattr("subprocess.Popen", denied)
+        monkeypatch.setattr("socket.socket", denied)
+        output, source, plan, store = prepare(tmp_path / "prepared", Path(CACHE))
+        assert ScriptedMixedPlan.from_json(plan.to_json()) == plan
+        assert {t.family for t in store.spec.tasks} == {"hydrology", "solar", "engineering"}
+        assert len(store.spec.cells) == 21 and len(store.spec.child_batches()) == 1
+        assert len(store.spec.routes) == 7
+        assert not store.replay()["attempts"] and store.replay()["frozen"] is None
+        permitted = {ref.path for ref in (*plan.source_inventory, plan.lock)}
+        actual = {str(p.relative_to(source)) for p in source.rglob("*") if p.is_file()}
+        assert actual == permitted
+        for ref in (*plan.source_inventory, plan.lock):
+            read_bytes(source, ref)
+        for task in plan.campaigns:
+            if isinstance(task, TaskEngineeringCampaign):
+                assert task.campaign.execution.schema.endswith("v2")
+                assert task.campaign.execution.sources == plan.source_inventory
+            else:
+                assert task.campaign.confirmation.mode == "disabled"
+                assert all(d.prior_exposure == "exposed" for d in task.campaign.data)
+                assert task.campaign.provenance.environment_lock == plan.lock
+                # Qualify the exact JSON boundary used by the mixed coordinator.
+                from autoengineering.campaign.controller import CampaignController
+    
+                path = output / (task.task_id + "-input.json")
+                path.write_text(task.campaign.to_json())
+&gt;               controller = CampaignController.create(
+                    path, source, output / (task.task_id + "-controller")
+                )
+
+tests/test_utility_mixed_preparation.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/autoengineering/campaign/controller.py:84: in create
+    validate_policy(spec)
+src/autoengineering/campaign/runtime.py:160: in validate_policy
+    build_backend(spec.calibration.run)
+src/autoengineering/optimization/command.py:47: in build_backend
+    return OptunaBackend(run.study, run.search_space, **dict(run.policy_options))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/autoengineering/optimization/optuna_backend.py:42: in __init__
+    self.environment.update(python=sys.version, platform=platform.platform())
+                                                         ^^^^^^^^^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:1292: in platform
+    bits, linkage = architecture(sys.executable)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:727: in architecture
+    fileout = _syscmd_file(executable, '')
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:676: in _syscmd_file
+    output = subprocess.check_output(['file', '-b', target],
+.pixi/envs/interoperability/lib/python3.12/subprocess.py:466: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+.pixi/envs/interoperability/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (['file', '-b', '/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/interoperability/bin/python3.12'],)
+kwargs = {'stdout': -1, 'stderr': -3, 'env': {'CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS': '1', 'CODEX_CI': '1', 'CODEX_PERMISSION_PROFILE': ':workspace', 'CODEX_SANDBOX': 'seatbelt', ...}}
+
+    def denied(*args, **kwargs):
+&gt;       raise AssertionError("Preparation attempted process or network dispatch")
+E       AssertionError: Preparation attempted process or network dispatch
+
+tests/test_utility_mixed_preparation.py:25: AssertionError</failure></testcase></testsuite></testsuites>

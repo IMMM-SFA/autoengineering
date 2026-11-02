@@ -1,0 +1,41 @@
+{
+  "resumed_audit": 1,
+  "checked_at_utc": "2026-10-29T21:25:35.831014+00:00",
+  "previous_turn": "progress: synthetic probe implementation and 45-pass/2-skip verification",
+  "this_turn": "no implementation progress: runtime selection and custody decisions still absent",
+  "condition": "actual runtime qualification and admitted independent experiment require runtime selection, data custody/admission and frozen authorized protocol",
+  "candidate_status": "candidate_not_qualified",
+  "candidate_sha256": "bdd535133460c566cedead804155af0d7297c00bfa1ae8acfb788df614c58ec4",
+  "runtime_selection_received": false,
+  "custodian_selection_received": false,
+  "tasks": {
+    "hydrology": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "sha256": "d3184d21d9544e9bdccdcac2e20b6a0b8b3b12077472bef6dcd1d675217bed3d"
+    },
+    "solar": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "sha256": "9966f009698b82baea93cbe2d5653943d4f651214c5d807b6f67b31561e3e8db"
+    },
+    "engineering": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "sha256": "abd523b751ef618157e416377d40b393dec3d26ce06026e92e6fa329b8ea5cba"
+    },
+    "wind": {
+      "status": "blocked_draft",
+      "confirmation_partition": null,
+      "minimum_useful_gain": null,
+      "sha256": "263e24a969c4d617f6a940eafbcf6c2e1517c3ff3b15bdd6bff3f8bd897d290d"
+    }
+  },
+  "protocol_present": false,
+  "live_validation_jobs": "none; completed results retained and not rerun",
+  "continuation_policy": "fresh resumed audit; old blocked counts are not reused",
+  "goal_completion": "not achieved"
+}

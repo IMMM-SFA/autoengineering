@@ -1,0 +1,5 @@
+{
+  "src/autoengineering/utility/guest_owner.py": "2d031f8eb0827a8e3d3c4f17a3e136ddea4c19630c05b4c28660f851d92fa576",
+  "src/autoengineering/utility/guest_observations.py": "14e43124a10aea5e655042e012ee7a801ec6e1934ccb61ce58445d7c495270d0",
+  "tests/test_utility_guest_owner.py": "49bfe05fe222041a3146617564adfdbef8dfae96b28923b95d91b892ec5926af"
+}

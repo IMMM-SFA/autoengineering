@@ -1,0 +1,43 @@
+{
+  "schema": "utility-guest-image-context-verification-v1",
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "61",
+    "time": "2.680",
+    "timestamp": "2026-10-30T17:00:16.814727-07:00",
+    "hostname": "m5-mbp"
+  },
+  "modules": {
+    "tests.test_utility_guest_image_context": 22,
+    "tests.test_utility_guest_image": 12,
+    "tests.test_utility_inference_environment": 27
+  },
+  "documentation_tests": 19,
+  "ruff_passed": true,
+  "touched_E501_passed": true,
+  "whitespace_passed": true,
+  "core_python_files": 224,
+  "host_helper_in_prior_wheel": false,
+  "authored_payloads_and_installer_profile": true,
+  "guarded_relocated_fixture_reader": true,
+  "production_empty_cache_refused_before_output": true,
+  "actual_production_context_materialized": false,
+  "archive_acquisition": false,
+  "installation": false,
+  "image_build": false,
+  "container_execution": false,
+  "runtime_privacy_qualified": false,
+  "independent_confirmation": false,
+  "full_default_rerun": false,
+  "remaining": [
+    "production archive acquisition and materialization",
+    "bounded build runner",
+    "actual daemon handlers and diagnostic profiles",
+    "installed/platform/host qualification",
+    "runtime/privacy qualification",
+    "independent task admission, approved thresholds and frozen matrix"
+  ]
+}

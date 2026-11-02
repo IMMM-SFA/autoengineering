@@ -1,0 +1,1 @@
+{"case":"watchdog_child_loss_before_start","container_creations":1,"container_starts":0,"reason":"original guest watchdog is not live within its deadline","watchdog_killed":true}

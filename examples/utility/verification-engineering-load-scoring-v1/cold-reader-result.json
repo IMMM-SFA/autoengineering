@@ -1,0 +1,13 @@
+{
+  "saved_development_work_verified": true,
+  "completed_model_starts": 24,
+  "solver_iterations": 390,
+  "component_calls": 6360,
+  "component_linearize_calls": 1950,
+  "counter_scope_correction_verified": true,
+  "new_models": 0,
+  "private_source_or_model_output_reads": 0,
+  "processes": 0,
+  "network": 0,
+  "task_admitted": false
+}

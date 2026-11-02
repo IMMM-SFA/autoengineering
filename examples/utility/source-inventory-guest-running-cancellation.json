@@ -1,0 +1,16 @@
+{
+  "scope": "incremental actual running guest cancellation before input transfer and saved nonnumeric failure; not model-compute interruption, full source/platform/private or independent utility qualification",
+  "predecessor": "examples/utility/source-inventory-guest-owner-loss.json",
+  "predecessor_sha256": "58c5d8bd30ec9e6d6c1d50bac85f16f2c14c471401e81cf033b0f3dcf114eaea",
+  "source_sha256": {
+    "examples/utility/guest_running_cancellation.py": "ee1f7144a56166813ad054af2d642406dbdb5b7ae0510d96a8bc537231973126",
+    "examples/utility/guest_running_cancellation_reader.py": "cd77638a4427e1c03a32af9f091d012681a49e7e3ea7064d61155f60d7ea3e1e",
+    "tests/test_utility_guest_running_cancellation.py": "dc0d2e735ecf849aa1c2abab1aceaec7258eda3e03e6c0e3c8f19137664d77b1",
+    "tests/test_utility_guest_running_cancellation_reader.py": "d51d427b7bd9b2d2987f7da14888db020dce56477802cff23de2b22806247a63"
+  },
+  "verification": "examples/utility/verification-guest-running-cancellation-v1/summary.json",
+  "qualification_evidence_map": "examples/utility/qualification-state-guest-v5.json",
+  "accounting_register": "examples/utility/guest-qualification-accounting-v4.json",
+  "core_sources_unchanged": 224,
+  "declared_wheel_sources_unchanged": 315
+}

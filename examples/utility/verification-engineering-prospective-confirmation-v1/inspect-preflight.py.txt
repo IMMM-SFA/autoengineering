@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,time
+from autoengineering.campaign.serialization import digest
+from examples.utility import engineering_container_runtime as owner
+root=Path.cwd();archive=root/'examples/utility/verification-engineering-prospective-confirmation-v1'
+old=json.loads((root/'examples/utility/verification-engineering-linux-worker-v1/request.json').read_bytes())
+request=json.loads((archive/'request.json').read_bytes())
+result={'scope':'read-only current-state diagnosis after consumed scoring attempt; not callback or private-source replay','container_create_or_start_calls':0,'private_source_reads':0,'model_calls':0,'original_attempt_remains_charged':True,'checks':[]}
+try:
+    runtime=owner.CoupledContainerRuntime(cli='/usr/local/bin/docker',endpoint='/Users/cam/.orbstack/run/docker.sock',api_version=old['api_version'],server_digest=old['server_digest'])
+    runtime._verify_identity()
+    result['checks'].append({'check':'runtime_identity','status':'passed'})
+    version=runtime.api._json('GET','/version',deadline=time.monotonic()+10)
+    result['checks'].append({'check':'daemon_version','current_digest':digest(version),'expected_digest':old['server_digest'],'matches':digest(version)==old['server_digest']})
+    image=runtime.api._json('GET','/images/'+owner.IMAGE+'/json',deadline=time.monotonic()+10)
+    owner.verify_image(image)
+    result['checks'].append({'check':'image_identity','status':'passed'})
+except Exception as error:
+    result.update(error_type=type(error).__name__)
+(archive/'preflight-inspection.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result),flush=True)

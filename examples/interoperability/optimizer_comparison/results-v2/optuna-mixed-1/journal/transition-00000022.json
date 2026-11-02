@@ -1,0 +1,1 @@
+{"action_id":"eval-000005","ledger_prefix_digest":"b95c451c0142910c4cc95b955bb480f3cc335b4082380eb760b0a19cd6df4188","observation":null,"phase":"proposal","previous_digest":"4085ed0d99be120a3ac2abd91f0a109c797775681f1264309fc7b15928735ce1","proposal":{"configuration":{"family":"quadratic","n":2,"x":0.0923385947687978,"y":0.1862602113776709},"external_id":"5"},"revision":22}

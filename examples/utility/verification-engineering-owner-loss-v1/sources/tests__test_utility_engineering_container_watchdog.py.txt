@@ -1,0 +1,94 @@
+"""Owner-pipe EOF/deadline cleanup uses exact acknowledged ownership only."""
+
+from copy import deepcopy
+import json
+import os
+import time
+
+import pytest
+
+from autoengineering.campaign.serialization import canonical_json
+from examples.utility import engineering_container_runtime as owner
+from examples.utility import engineering_container_watchdog as watchdog
+from test_utility_engineering_container_runtime import setup, H
+
+
+def prepared(tmp_path, monkeypatch, mode):
+    runtime, grant, _, pin = setup(monkeypatch)
+    api = runtime.api
+    nonce = "a" * 32
+    name = "ae-coupled-load-" + nonce
+    config = owner.configuration(nonce, pin, grant.digest)
+    api.created = True
+    api.config = deepcopy(config)
+    api.name = name
+    if mode == "done":
+        api.deleted = True
+    now = time.monotonic()
+    plan = {
+        "schema": "utility-coupled-watchdog-plan-v1",
+        "container_id": H,
+        "nonce": nonce,
+        "grant_digest": grant.digest,
+        "packet_sha256": pin,
+        "name": name,
+        "configuration": config,
+        "endpoint": "/explicit/socket",
+        "api_version": "1.56",
+        "server_digest": api.profile.server_digest,
+        "api_profile_digest": api.identity,
+        "owner_source_digest": owner.source_identity(),
+        "watchdog_source_digest": watchdog.source_identity(),
+        "active_deadline": now - 0.01 if mode == "deadline" else now + 2,
+        "deadline": now + 3,
+    }
+    (tmp_path / "watchdog-plan.json").write_text(canonical_json(plan))
+    monkeypatch.setattr(watchdog, "GuestDaemonAPI", lambda *a, **kw: api)
+    return api
+
+
+@pytest.mark.parametrize("mode", ["lost", "deadline", "done"])
+def test_original_container_cleaned_on_eof_or_deadline(tmp_path, monkeypatch, mode):
+    api = prepared(tmp_path, monkeypatch, mode)
+    # Ready requires the original container. For normal finish, make the first
+    # readiness inspection visible and the later cleanup inspection absent.
+    if mode == "done":
+        api.deleted = False
+        original = api.inspect
+        calls = []
+
+        def inspect(*a, **kw):
+            if calls:
+                api.deleted = True
+            calls.append(1)
+            return original(*a, **kw)
+
+        monkeypatch.setattr(api, "inspect", inspect)
+    read_fd, write_fd = os.pipe()
+    if mode == "done":
+        os.write(write_fd, b"D")
+    os.close(write_fd)
+    try:
+        watchdog.run_watchdog(tmp_path, read_fd)
+    finally:
+        os.close(read_fd)
+    outcome = json.loads((tmp_path / "watchdog-outcome.json").read_bytes())
+    assert outcome["absent"] is True and api.deleted
+    assert (
+        outcome["reason"]
+        == {"lost": "owner_lost", "deadline": "deadline", "done": "owner_done"}[mode]
+    )
+    assert outcome["delete_intended"] is (mode != "done")
+
+
+def test_foreign_original_labels_refuse_cleanup(tmp_path, monkeypatch):
+    api = prepared(tmp_path, monkeypatch, "lost")
+    api.config["Labels"]["org.autoengineering.grant"] = "2" * 64
+    read_fd, write_fd = os.pipe()
+    os.close(write_fd)
+    try:
+        with pytest.raises(ValueError):
+            watchdog.run_watchdog(tmp_path, read_fd)
+    finally:
+        os.close(read_fd)
+    assert not api.deleted and not (tmp_path / "watchdog-ready.json").exists()

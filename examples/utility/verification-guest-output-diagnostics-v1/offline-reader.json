@@ -1,0 +1,42 @@
+{
+  "schema": "utility-guest-output-diagnostics-completion-v1",
+  "request_digest": "01b09fc5ffec9667f45625efa3151adba2817c70176785ff70bd85e553de336a",
+  "cases": [
+    {
+      "mode": "malformed_stdio",
+      "container_id": "c5cb59614028d87b58a271e7080cb2bc20742d501e1b0f4c1e59dd0375dfcb64",
+      "container_creations": 1,
+      "container_starts": 1,
+      "refusal": {
+        "exception": "StoreError",
+        "message": "guest transport frame version differs",
+        "stderr_bytes_discarded": 0,
+        "stdout_bytes_accepted": 16,
+        "stdout_bytes_declared": 16
+      },
+      "cleanup_absent": true,
+      "scientific_starts": 0
+    },
+    {
+      "mode": "oversized_stdout",
+      "container_id": "2c5df1d1acf1770aeaaf55ebcdc6513583a3f80380228994dcca911aa29fbadd",
+      "container_creations": 1,
+      "container_starts": 1,
+      "refusal": {
+        "exception": "GuestAttachError",
+        "message": "guest attach stdout exceeds bound",
+        "stderr_bytes_discarded": 0,
+        "stdout_bytes_accepted": 68222976,
+        "stdout_bytes_declared": 68255744
+      },
+      "cleanup_absent": true,
+      "scientific_starts": 0
+    }
+  ],
+  "container_creations": 2,
+  "container_starts": 2,
+  "scientific_starts": 0,
+  "runtime_qualified": false,
+  "owner_loss_cleanup_qualified": false,
+  "automatic_retries": 0
+}

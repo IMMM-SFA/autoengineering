@@ -1,0 +1,83 @@
+{
+  "status": "blocked_draft",
+  "transfer_claim": "new-period or new-scenario only after custody review",
+  "routes": [
+    "unchanged_baseline",
+    "conventional",
+    "single_agent",
+    "multi_agent"
+  ],
+  "regimes": [
+    "fixed_evaluations",
+    "fixed_total_cost"
+  ],
+  "repetitions": {
+    "planning_default": 10,
+    "frozen": false,
+    "freeze_rule": "Use development variability and minimum useful effect before confirmation access"
+  },
+  "budget_status": "No execution authorized. Profile exposed development inputs then freeze numeric caps including confirmation reserve.",
+  "analysis_status": "Freeze effect margin, secondary tolerances, paired interval method, seed and multiplicity policy before access.",
+  "confirmation": {
+    "partition": null,
+    "status": "unknown_exposure",
+    "access": "No worker access; trusted custodian only after suite selection barrier"
+  },
+  "human_expert": "not_attempted",
+  "task_id": "engineering",
+  "family": "Coupled engineering",
+  "question": "Can source-current design minimize source power while maintaining specified node voltage across independently frozen ground/load scenarios?",
+  "baseline": "Whole OpenMDAO resistor/diode/node Problem",
+  "candidate_pool": "Source current only initially; ground/load scenario bindings require separate qualification",
+  "conventional": "Native SLSQP retaining derivatives plus Sobol reference",
+  "primary_outcome": {
+    "name": "Source power",
+    "units": "W",
+    "direction": "minimize"
+  },
+  "physical_checks": [
+    "Converged coupled solve",
+    "Constitutive and node residuals <= 1e-10 A",
+    "Scenario voltage requirements",
+    "Separate derivative and inner-solve counters"
+  ],
+  "blockers": [
+    "Freeze final voltage requirement, useful-gain margin and genuinely unseen operating/load scenarios before evaluation",
+    "Freeze final source-current domain and native-driver/solver budgets",
+    "Independent scenario and confirmation runtime admission; current scientific integration is development evidence only"
+  ],
+  "parameter_domains": "Not frozen; executable admission blocked",
+  "minimum_useful_gain": null,
+  "secondary_tolerances": null,
+  "source_closure": "See source inventory; data hashes and license closure pending",
+  "environment": "interoperability",
+  "development_partition": "Previously exposed fixtures only; never confirmation",
+  "time_policy": "Freeze initialization, causal carryover, warmup, masks, gaps and embargo before execution",
+  "claim_limit": "Modeled objective only; no measured predictive claim",
+  "development_evidence": "examples/utility/development/engineering-v1",
+  "development_matrix_evidence": {
+    "examples/utility/development/four-family-v1/summary.json": "8250213ec8103c5a10bf747d0b60742b719be5bcc507e7d6e548a49289ade0a1",
+    "examples/utility/development/four-family-v1/execution-plan.json": "ef1ad174e3b7742552820dba46de8624b480839b5e6b2161656e212f4a561571"
+  },
+  "development_contract": {
+    "status": "implemented_exposed_only",
+    "implemented": [
+      "Coupled OpenMDAO solve and constitutive residual checks",
+      "Source-current calibration and fixed-design evaluation through the scientific controller",
+      "Native SLSQP with derivatives and inner-work counters",
+      "Source-bound supervised scenario execution and retained selection",
+      "Seven scripted routes in the common exposed four-family rehearsal"
+    ],
+    "supported_source_current_A": [
+      0.01,
+      0.1
+    ],
+    "final_study_domain_frozen": false,
+    "evidence": {
+      "examples/utility/engineering.py": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+      "src/autoengineering/utility/engineering_campaign.py": "11e56913b74dce9232326306d97c9482bdeb7a35161a6491f4de718d52d8098d",
+      "examples/utility/engineering_study.py": "7cc563a8c5938cb10b7e5349f20c32ce0ec3c95a80bd7e9650a82a80be82370b",
+      "examples/utility/development/engineering-campaign-v2/summary.json": "1d66b2e69cdf54a100903e39a9b7c8db73020b03759512a7c7a2d7862fc0c327"
+    }
+  }
+}

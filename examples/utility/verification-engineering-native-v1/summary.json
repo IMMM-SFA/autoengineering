@@ -1,0 +1,78 @@
+{
+  "schema": "utility-engineering-native-verification-v1",
+  "purpose": "Trusted native circuit scientific tool on already exposed scenarios",
+  "commands": {
+    "default": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility*.py tests/test_optimization_recovery.py tests/test_optimization_run_spec.py -q -rs -p no:cacheprovider --junitxml=examples/utility/verification-engineering-native-v1/default.xml",
+    "interoperability": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PATH=\"$PWD/.pixi/envs/interoperability/bin:$PATH\" .pixi/envs/interoperability/bin/python -m pytest tests/test_utility_engineering_native.py tests/test_utility_engineering_campaign.py tests/test_utility_engineering_process.py tests/test_utility_engineering.py tests/test_utility_studies.py -q -rs -p no:cacheprovider --junitxml=examples/utility/verification-engineering-native-v1/interoperability.xml",
+    "native-recovery-final": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility_engineering_native.py -q -rs -p no:cacheprovider --junitxml=examples/utility/verification-engineering-native-v1/native-recovery-final.xml",
+    "documentation-final": ".pixi/envs/default/bin/python -m pytest tests/test_documentation.py -q -p no:cacheprovider --junitxml=examples/utility/verification-engineering-native-v1/documentation-final.xml",
+    "lint": ".pixi/envs/default/bin/ruff check src tests examples scripts/utility_installed_model_check.py",
+    "rehearsal-final": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PATH=\"$PWD/.pixi/envs/interoperability/bin:$PATH\" .pixi/envs/interoperability/bin/python -m examples.utility.rehearse_engineering_native --output examples/utility/development/engineering-native-v2",
+    "offline-reader": ".pixi/envs/default/bin/python examples/utility/verification-engineering-native-v1/check-reader.py"
+  },
+  "results": {
+    "focused-default": {
+      "tests": "44",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "2",
+      "time": "77.785"
+    },
+    "native-final": {
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1",
+      "time": "19.386"
+    },
+    "default": {
+      "tests": "345",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "16",
+      "time": "191.417"
+    },
+    "interoperability": {
+      "tests": "49",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "82.960"
+    },
+    "native-recovery-final": {
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1",
+      "time": "23.863"
+    },
+    "documentation-final": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.951"
+    }
+  },
+  "lint": "passed",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "verification_scope": {
+    "broad_checks": "Final runtime/example bytes; native test file had fourteen collected cases",
+    "later_change": "One test-only composed recovery case was added; runtime/example sources stayed unchanged",
+    "final_native_file": "Fifteen collected cases, fourteen passed and one optional skip in default environment",
+    "intermediate_focused": "Before final derivative snapshot was added; not final runtime coverage",
+    "outer_unit": "One native batch reservation is one driver job, not one inner model solve",
+    "inner_bound": "Enforced by the qualified supplied circuit implementation; generic result validation does not sandbox a new callback"
+  },
+  "limits": [
+    "No filesystem/network/memory sandbox",
+    "Exposed modeled circuit only",
+    "No suite route broker/coordinator/public CLI integration",
+    "No full suite cost join or efficiency claim",
+    "No independent confirmation, provider, Linux, second host or remote execution",
+    "Full repository default/Bayes suites and installed wheel were not rerun",
+    "Native optimizer success does not override fresh scientific checks",
+    "Engineering reader archive relocation remains unqualified; original absolute locations are bound"
+  ]
+}

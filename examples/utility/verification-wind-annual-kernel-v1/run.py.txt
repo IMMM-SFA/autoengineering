@@ -1,0 +1,90 @@
+"""One authored annual kernel call and one existing-profile parity call, no retries."""
+
+import hashlib
+import json
+import math
+from pathlib import Path
+import time
+
+import numpy as np
+
+from autoengineering.campaign.serialization import digest
+from autoengineering.campaign.store import durable_write
+from examples.utility import wind_annual_scoring as kernel
+from examples.utility import wind_hourly
+from examples.utility.wind_annual import AnnualWindPlan, AnnualWindSource
+from examples.utility.wind_parameters import WindGeometry
+
+
+ROOT = Path.cwd()
+ARCHIVE = ROOT / "examples/utility/verification-wind-annual-kernel-v1"
+WORK = ROOT / "outputs/wind-annual-kernel-authored-v1"
+if WORK.exists() or WORK.is_symlink():
+    raise ValueError("authored control scope already consumed; no automatic retry")
+geometry = WindGeometry((0.0, 600.0, 0.0, 600.0), (0.0, 0.0, 600.0, 600.0))
+axis = kernel._axis(2007)
+data = kernel.AnnualWindDrivers(
+    2007, hashlib.sha256(b"authored constant drivers, not an acquired WIND object").hexdigest(),
+    axis, np.full(len(axis), 10.0), np.full(len(axis), 360.0),
+)
+source = AnnualWindSource(
+    2007, "v1.0.0", "conus/v1.0.0/wtk_conus_2007.h5",
+    data.object_identity_digest, data.manifest_digest,
+)
+plan = AnnualWindPlan(
+    "utility-wind-annual-plan-v1", (source,), kernel.model_identity(), geometry.digest,
+    digest(kernel.INTERPRETATION),
+)
+policy = kernel.AnnualWindScorePolicy(
+    "utility-wind-annual-score-v1", kernel.source_identity(), plan.model_digest, plan.digest,
+)
+request = {
+    "scope": "authored constant-driver parity; no acquired or reserved weather",
+    "source_object_identity": "authored fixture, not an acquired HDF5 object identity",
+    "plan": plan.to_dict(), "policy": policy.to_dict(),
+    "driver_manifest": data.manifest,
+    "reserved_model_starts": 2, "kernel_starts": 1, "direct_reference_starts": 1,
+    "automatic_retries": 0, "absolute_tolerance_gwh": 1e-12,
+    "relative_tolerance": 1e-10, "os_limits_qualified": False,
+}
+WORK.mkdir(mode=0o700)
+durable_write(WORK / "request.json", json.dumps(request, indent=2).encode())
+durable_write(ARCHIVE / "request.json", json.dumps(request, indent=2).encode())
+scope = WORK / "kernel"
+scope.mkdir(mode=0o700)
+began = time.perf_counter()
+result = kernel.score_annual(
+    geometry.baseline, geometry, plan, (data,), scope,
+    policy=policy, execution_digest=digest(request),
+)
+if result.score.status != "success":
+    raise ValueError("authored kernel stopped; preserve charged work without retry")
+durable_write(WORK / "direct-intent.json", json.dumps({
+    "status": "started", "reserved_model_starts": 1, "automatic_retries": 0,
+}).encode())
+reference = wind_hourly.WindHourly(
+    geometry, 2007, axis, data.speed_m_s, data.direction_deg,
+    data.manifest_digest, digest(kernel.INTERPRETATION),
+)
+direct = reference.physical({}, geometry.baseline)
+value = float(direct["annual_energy"])
+durable_write(WORK / "direct-result.json", json.dumps({
+    "status": "success", "annual_energy_gwh": value, "model_starts": 1,
+}).encode())
+assert math.isclose(result.score.value, value, rel_tol=1e-10, abs_tol=1e-12)
+summary = {
+    "status": "passed", "scope": request["scope"],
+    "request_digest": digest(request), "kernel_energy_gwh": result.score.value,
+    "direct_energy_gwh": value, "absolute_difference_gwh": abs(result.score.value-value),
+    "elapsed_seconds": time.perf_counter()-began,
+    "attempted_model_starts": result.attempted_model_starts+1,
+    "completed_model_starts": result.completed_model_starts+1,
+    "known_inner_solver_work": None, "total_cpu_seconds": None,
+    "rss_bytes": None, "full_cost_evidence": False,
+    "private_weather_reads": 0, "fitting_starts": 0,
+    "task_admitted": False, "private_boundary_qualified": False,
+    "os_limits_qualified": False, "automatic_retries": 0,
+}
+durable_write(WORK / "summary.json", json.dumps(summary, indent=2).encode())
+durable_write(ARCHIVE / "actual-result.json", json.dumps(summary, indent=2).encode())
+print(json.dumps(summary, sort_keys=True))

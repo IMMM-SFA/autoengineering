@@ -1,0 +1,104 @@
+{
+  "schema": "utility-figure-data-v1",
+  "suite_digest": "c805c01a3f0800e9db10e6b5a66b1989e888bf33e6b686225d88d7e61942bfbe",
+  "source_head": "1111111111111111111111111111111111111111111111111111111111111111",
+  "report_spec_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+  "contrasts": [
+    {
+      "task_id": "Authored illustration",
+      "regime": "fixed_evaluations",
+      "route_id": "multi",
+      "comparator_id": "conventional",
+      "outcome": "power",
+      "units": "W",
+      "assigned_pairs": 6,
+      "valid_pairs": 6,
+      "pairs": [
+        {
+          "repetition": 0,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "route_value": 10.2,
+          "comparator_value": 10.0,
+          "gain": -0.1999999999999993
+        },
+        {
+          "repetition": 1,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "route_value": 9.7,
+          "comparator_value": 10.0,
+          "gain": 0.3000000000000007
+        },
+        {
+          "repetition": 2,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "route_value": 9.3,
+          "comparator_value": 10.0,
+          "gain": 0.6999999999999993
+        },
+        {
+          "repetition": 3,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "route_value": 9.0,
+          "comparator_value": 10.0,
+          "gain": 1.0
+        },
+        {
+          "repetition": 4,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "route_value": 8.9,
+          "comparator_value": 10.0,
+          "gain": 1.0999999999999996
+        },
+        {
+          "repetition": 5,
+          "scenario_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "route_value": 8.1,
+          "comparator_value": 10.0,
+          "gain": 1.9000000000000004
+        }
+      ],
+      "mean_gain": 0.8000000000000002,
+      "interval": [
+        0.043241198011133464,
+        1.5567588019888667
+      ],
+      "verdict": "inconclusive",
+      "dependence_complete": false,
+      "dependence_evidence": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "scientific_claim_scope": "unresolved dependence scope",
+      "minimum_gain": 0.1,
+      "interval_method": "paired_student_t",
+      "repetition_confidence": 0.95
+    }
+  ],
+  "reliability": [
+    {
+      "task_id": "Authored illustration",
+      "regime": "fixed_evaluations",
+      "routes": {
+        "conventional": {
+          "successful_feasible": 5,
+          "timeout": 1
+        },
+        "multi": {
+          "successful_feasible": 5,
+          "timeout": 1
+        }
+      }
+    }
+  ],
+  "total_cost_comparison": {
+    "status": "blocked",
+    "reason": "complete total cost evidence unavailable"
+  },
+  "claim_limits": [
+    "Authored illustration; no scientific utility evidence"
+  ]
+}

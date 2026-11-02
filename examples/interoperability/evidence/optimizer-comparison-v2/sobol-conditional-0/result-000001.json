@@ -1,0 +1,1 @@
+{"action_id": "eval-000001", "configuration": {"family": "quadratic", "quadratic_slope": 0.09241819009184837, "x": 0.11512198951095343, "y": 0.45364713855087757}, "result": {"feasible": false, "objective": null, "reason": "frozen_failure_control", "status": "model_failure"}}

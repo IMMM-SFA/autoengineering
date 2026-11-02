@@ -1,0 +1,162 @@
+[
+  {
+    "name": "basin_dataset_public_v1p2/usgs_streamflow/02/01491000_streamflow_qc.txt",
+    "compressed_bytes": 59110,
+    "uncompressed_bytes": 396754,
+    "compression": 8,
+    "crc32": 1731573096,
+    "local_header_offset": 24769065
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_basin_mean_forcing.txt",
+    "compressed_bytes": 882,
+    "uncompressed_bytes": 1905,
+    "compression": 8,
+    "crc32": 1209032891,
+    "local_header_offset": 38340471
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_elev_bands_forcing.txt",
+    "compressed_bytes": 1039,
+    "uncompressed_bytes": 2351,
+    "compression": 8,
+    "crc32": 3421047866,
+    "local_header_offset": 38341466
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_FIRST.txt",
+    "compressed_bytes": 1794,
+    "uncompressed_bytes": 4101,
+    "compression": 8,
+    "crc32": 1966024919,
+    "local_header_offset": 38342618
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_hru_forcing.txt",
+    "compressed_bytes": 933,
+    "uncompressed_bytes": 2046,
+    "compression": 8,
+    "crc32": 3199818916,
+    "local_header_offset": 38344512
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_model_output.txt",
+    "compressed_bytes": 1863,
+    "uncompressed_bytes": 4555,
+    "compression": 8,
+    "crc32": 514790156,
+    "local_header_offset": 38345551
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_shapefiles.txt",
+    "compressed_bytes": 537,
+    "uncompressed_bytes": 1101,
+    "compression": 8,
+    "crc32": 3476265496,
+    "local_header_offset": 38347521
+  },
+  {
+    "name": "basin_dataset_public_v1p2/readme_streamflow.txt",
+    "compressed_bytes": 773,
+    "uncompressed_bytes": 1660,
+    "compression": 8,
+    "crc32": 1248490064,
+    "local_header_offset": 38348163
+  },
+  {
+    "name": "basin_dataset_public_v1p2/elev_bands_forcing/daymet/02/01491000.list",
+    "compressed_bytes": 58,
+    "uncompressed_bytes": 59,
+    "compression": 8,
+    "crc32": 1404191887,
+    "local_header_offset": 664959363
+  },
+  {
+    "name": "basin_dataset_public_v1p2/elev_bands_forcing/daymet/02/01491000_elev_band_000_cida_forcing_leap.txt",
+    "compressed_bytes": 209122,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 323180768,
+    "local_header_offset": 728809387
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000_hru_02530_cida_forcing_leap.txt",
+    "compressed_bytes": 191545,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 1246543075,
+    "local_header_offset": 2393838133
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000_hru_01208_cida_forcing_leap.txt",
+    "compressed_bytes": 168081,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 4131657492,
+    "local_header_offset": 2397594130
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000_hru_01210_cida_forcing_leap.txt",
+    "compressed_bytes": 183618,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 4034774884,
+    "local_header_offset": 2400655119
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000_hru_02528_cida_forcing_leap.txt",
+    "compressed_bytes": 198730,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 1142906375,
+    "local_header_offset": 2420125877
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000.list",
+    "compressed_bytes": 105,
+    "uncompressed_bytes": 285,
+    "compression": 8,
+    "crc32": 2039129446,
+    "local_header_offset": 2420679246
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000_hru_01205_cida_forcing_leap.txt",
+    "compressed_bytes": 171322,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 3213976599,
+    "local_header_offset": 2453351938
+  },
+  {
+    "name": "basin_dataset_public_v1p2/hru_forcing/daymet/02/01491000_hru_01184_cida_forcing_leap.txt",
+    "compressed_bytes": 167950,
+    "uncompressed_bytes": 981210,
+    "compression": 8,
+    "crc32": 3849006616,
+    "local_header_offset": 2474762051
+  },
+  {
+    "name": "basin_dataset_public_v1p2/basin_mean_forcing/nldas/02/01491000_lump_nldas_forcing_leap.txt",
+    "compressed_bytes": 210123,
+    "uncompressed_bytes": 754802,
+    "compression": 8,
+    "crc32": 4045126749,
+    "local_header_offset": 3101616276
+  },
+  {
+    "name": "basin_dataset_public_v1p2/basin_mean_forcing/daymet/02/01491000_lump_cida_forcing_leap.txt",
+    "compressed_bytes": 207282,
+    "uncompressed_bytes": 755941,
+    "compression": 8,
+    "crc32": 2869580220,
+    "local_header_offset": 3243831800
+  },
+  {
+    "name": "basin_dataset_public_v1p2/basin_mean_forcing/maurer/02/01491000_lump_maurer_forcing_leap.txt",
+    "compressed_bytes": 176434,
+    "uncompressed_bytes": 625240,
+    "compression": 8,
+    "crc32": 132882700,
+    "local_header_offset": 3369288842
+  }
+]

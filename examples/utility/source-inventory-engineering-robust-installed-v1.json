@@ -1,0 +1,33 @@
+{
+  "scope": "Selected-source installed native robust recipe and base-only saved-receipt replay outside checkout",
+  "predecessor": "examples/utility/source-inventory-engineering-robust-native-v1.json",
+  "predecessor_sha256": "b358eaab2e6bf138c1b4836a20a1c005a300c7f0431ad961ad487f896c2cd1b2",
+  "current_source_sha256": {
+    "examples/utility/fixtures/engineering_robust_cases.json": "4a643abe206820411ce49c44ec546d9f22f6815efe7d525048fedfb3b2189b06",
+    "examples/utility/exposure-register.json": "751ce31f109b1a4dc25be5aee0e8a524b6ca550d005fead63b2fa90b1a6f5596",
+    "examples/utility/README.md": "c843ec1f3891b6105cd8cacc4552b08fa548eb30f96bcf4e34030b5583b82613",
+    "examples/utility/engineering_load_robust_native.py": "9d5ebae764943742217aa0ba5c7f11ce6c975dfe13eb008d3835959f8f2200f2",
+    "docs/utility.md": "1120ba379c4242ce8ec6fbeee278522eff16bacb6fbdbea781b30a45d62914fc",
+    "docs/utility-handoff.md": "c33a8ffa26648d7c2b7990eeb64d09c41fbe0938672bc96e23cc0f4171ae1e89",
+    "docs/reviews/part-5-progress.md": "6d5717cf101200d2837455ba9fb5a40fd1fc384d3ab0f7639310888ae98b5c2b",
+    "docs/reviews/part-5-completion-audit.md": "aa8c5a1ee35104e993ac6322b8252cf46223ce9632c4211f8a759c564e87f703"
+  },
+  "verification": "examples/utility/verification-engineering-robust-installed-v1/summary.json",
+  "verification_sha256": "22af86c721cb1a0f968be0d799a86ef936e63265b6c190834bfae21cbe998f49",
+  "wheel_sha256": "ae08af9d2a53af382ae1a22ca5921d974d1984ec0ab18f5705f108d6a1e2fc26",
+  "package_python_sources": 232,
+  "core_python_sources": 225,
+  "domain_python_sources": 7,
+  "core_source_changed": false,
+  "recipe_source_changed_since_preceding_check": false,
+  "new_fixture_status": "known_exposed authored synthetic development data",
+  "installed_scientific_processes": 25,
+  "installed_core_only_cold_replay_passed": true,
+  "platform": "macOS ARM64 Python 3.12.16 with inherited OpenMDAO 3.41.0",
+  "linux_execution_qualified": false,
+  "whole_release_qualified": false,
+  "guest_register_changed": false,
+  "existing_v6_declared_code_alignment": 316,
+  "full_default_suite_rerun": false,
+  "full_part_5_complete": false
+}

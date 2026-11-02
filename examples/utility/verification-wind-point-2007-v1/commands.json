@@ -1,0 +1,8 @@
+{
+  "prepare": "python -m examples.utility.wind_point_extract prepare examples/utility/verification-wind-source-metadata-v1 outputs/wind-point-2007-v1",
+  "execute": "utility environment python -m examples.utility.wind_point_extract execute outputs/wind-point-2007-v1 --expected-digest e21926fbc8d31876424626b379bf0430daa3af3d9a9fa2cfb4a2a8c2c1dc26ba",
+  "hdf_tests": "utility environment python -m pytest tests/test_utility_wind_point.py tests/test_utility_wind_point_range.py tests/test_utility_wind_point_extract.py tests/test_utility_wind_range.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-wind-point-final-hdf-v2 --junitxml=examples/utility/verification-wind-point-2007-v1/hdf-regression.xml",
+  "public_reader": "default environment python -B public-reader.py PUBLIC_ROOT SOURCE_ROOT",
+  "full_replay": "utility environment python full-replay.py SOURCE_ROOT ORIGINAL_ACQUISITION_ROOT REPLAY_RESULT",
+  "environment": "existing utility environment for native HDF5 and default environment for compact public verification; no environment/lock changes"
+}

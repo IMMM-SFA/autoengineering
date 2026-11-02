@@ -1,0 +1,222 @@
+"""Service integration uses authored selected states and lifecycle outputs."""
+
+from dataclasses import replace
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
+import numpy as np
+import pytest
+
+from autoengineering.campaign.artifacts import read_bytes
+from autoengineering.campaign.serialization import digest
+from autoengineering.campaign.store import StoreError
+from autoengineering.utility.contracts import ResourceCap
+from autoengineering.utility.scoring import ConfirmationGrant, ConfirmationService
+from examples.utility import engineering
+from examples.utility import engineering_load as load
+from examples.utility import engineering_load_callback as callback
+from examples.utility import engineering_load_scoring as kernel
+from examples.utility import engineering_scenarios as source
+from examples.utility import engineering_source_binding as binding
+from test_utility_confirmation import selected_suite
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def setup(tmp_path, monkeypatch, *, native=False, change=None, entropy=None):
+    if not native:
+        monkeypatch.setattr(engineering, "version", lambda name: "3.41.0")
+    model = load.context(0.05, tmp_path, source_root=ROOT).model
+    policy = kernel.LoadScorePolicy(
+        "utility-coupled-load-score-v1", model.digest, kernel.source_identity(), 0.62
+    )
+    source_policy = source.ScenarioPolicy(
+        "utility-engineering-generated-scenarios-v1",
+        "task",
+        {
+            "ground_voltage": (-0.05, 0.05),
+            "resistor1_ohm": (95.0, 105.0),
+            "resistor2_ohm": (9500.0, 10500.0),
+        },
+        source.source_identity(),
+    )
+    public, private, work = (tmp_path / n for n in ("public", "private", "work"))
+    for p in (public, private, work):
+        p.mkdir(mode=0o700)
+    monkeypatch.setattr(source.secrets, "token_bytes", entropy or (lambda n: b"a" * n))
+    captured = {}
+    resources = (
+        ResourceCap("scientific_starts", "count", 1, "reservation"),
+        ResourceCap("load_model_starts", "count", 24, "reservation"),
+        ResourceCap("load_solver_iterations", "count", 2400, "reservation"),
+        ResourceCap("active_time", "s", 60, "reservation"),
+    )
+
+    def before(store):
+        # Selected-state validation checks the actual declared model source bytes.
+        for ref in model.source_bundle:
+            target = store.root / ref.path
+            target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            target.write_bytes(read_bytes(ROOT, ref))
+        metadata = source.prepare(
+            store, source_policy, public, private, expected_suite_digest=store.spec.digest
+        )
+        ref = binding.seal(store, public, expected_manifest_digest=digest(metadata))
+        scorer = callback.TrustedLoadScorer(
+            store, ref, public, private, ROOT, work, expected_model=model, policy=policy
+        )
+        captured.update(scorer=scorer, source_ref=ref, source_metadata=metadata)
+
+    def transform(spec):
+        budget = spec.budgets[0]
+        additions = resources[1:3]
+        regime = "fixed_total_cost" if change == "regime" else "fixed_evaluations"
+        return replace(
+            spec,
+            tasks=(replace(spec.tasks[0], partition_digest=source_policy.digest),),
+            cells=tuple(
+                replace(c, scenario_digest=source_policy.digest, regime=regime) for c in spec.cells
+            ),
+            budgets=(
+                replace(
+                    budget,
+                    regime=regime,
+                    caps=(*budget.caps, *additions),
+                    confirmation_reserve=(*budget.confirmation_reserve, *resources[1:]),
+                ),
+            ),
+        )
+
+    configuration = {"source_current": 0.05} if change != "configuration" else {}
+    store, manifest, contract = selected_suite(
+        tmp_path,
+        suite_transform=transform,
+        before_selection=before,
+        model_override=model,
+        selected_configuration=configuration,
+        outcome_contract_override=callback.outcome_contract(policy),
+    )
+    scorer = captured["scorer"]
+    if change == "allowance":
+        resources = tuple(r for r in resources if r.name != "load_model_starts")
+    grant = ConfirmationGrant(
+        store.spec.digest,
+        manifest.cells[0].cell_digest,
+        source_policy.digest,
+        scorer.identity,
+        contract.digest,
+        manifest.cells[0].model.sha256,
+        store.replay()["frozen"],
+        resources,
+    )
+    service = ConfirmationService(
+        store, scorer, scorer_digest=scorer.identity, outcome_contract=contract
+    )
+    return store, grant, service, captured, work
+
+
+def authored_solver(monkeypatch, *, change=None):
+    calls = []
+
+    def run(adapter, ctx, forcing, *args):
+        index = len(calls)
+        calls.append(1)
+        if change == "failure" and index == 2:
+            raise RuntimeError("PRIVATE-MODEL-DETAIL-743")
+        diagnostics = {
+            "converged": 1.0,
+            "residual_norm": 1e-12,
+            "residual_tolerance": 1e-10,
+            "solver_iterations": 4.0,
+            "component_calls": 20.0,
+            "derivative_calls": 1.0,
+        }
+        return SimpleNamespace(
+            training=SimpleNamespace(status="not_applicable"),
+            outputs={
+                "node1_voltage": forcing["ground_voltage"] + 5.0,
+                "node2_voltage": np.asarray(0.6 if change == "veto" and index == 4 else 0.7),
+            },
+            diagnostics=diagnostics,
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(load, "adapter", lambda: None)
+    monkeypatch.setattr(kernel, "run_lifecycle", run)
+    return calls
+
+
+def test_service_scores_once_and_saved_replay_opens_no_source_or_model(tmp_path, monkeypatch):
+    store, grant, service, _, _ = setup(tmp_path, monkeypatch)
+    calls = authored_solver(monkeypatch)
+    receipt = service.confirm(grant)
+    assert receipt.score.value == pytest.approx(0.25) and receipt.score.feasible
+    assert len(calls) == 24
+    work = json.loads((store.root / callback.WORK_DIRECTORY / f"{grant.digest}.json").read_text())
+    assert work["attempted_model_starts"] == work["completed_model_starts"] == 24
+    assert work["total_inner_work"] == {
+        "solver_iterations": 96,
+        "component_calls": 480,
+        "derivative_calls": 24,
+    }
+    assert not work["task_admitted"] and not work["private_boundary_qualified"]
+    assert (
+        store.replay()["phase_used"][("fixed_evaluations", "confirmation", "load_model_starts")]
+        == 24
+    )
+    monkeypatch.setattr(source, "read_private", lambda *a, **k: pytest.fail("source reopened"))
+    monkeypatch.setattr(kernel, "run_lifecycle", lambda *a, **k: pytest.fail("model rerun"))
+    before = len(store.replay()["events"])
+    assert service.confirm(grant) == receipt
+    assert len(store.replay()["events"]) == before
+
+
+@pytest.mark.parametrize("change", ["allowance", "configuration", "code", "model", "regime"])
+def test_invalid_registration_refuses_private_access_and_retains_attempt(
+    tmp_path, monkeypatch, change
+):
+    store, grant, service, captured, _ = setup(tmp_path, monkeypatch, change=change)
+    monkeypatch.setattr(source, "read_private", lambda *a, **k: pytest.fail("invalid source read"))
+    monkeypatch.setattr(kernel, "run_lifecycle", lambda *a, **k: pytest.fail("invalid model start"))
+    if change == "code":
+        monkeypatch.setattr(callback, "source_identity", lambda: "0" * 64)
+    elif change == "model":
+        captured["scorer"].expected_model = replace(
+            captured["scorer"].expected_model, graph_digest="0" * 64
+        )
+    with pytest.raises(StoreError, match="uncertain"):
+        service.confirm(grant)
+    assert not (store.root / binding.ACCESS_DIRECTORY).exists()
+    assert len(store.replay()["confirmation_accesses"]) == 1
+    with pytest.raises(StoreError, match="uncertain"):
+        service.confirm(grant)
+
+
+@pytest.mark.parametrize("change", ["veto", "failure"])
+def test_physical_veto_and_failed_model_preserve_work(tmp_path, monkeypatch, change):
+    store, grant, service, _, _ = setup(tmp_path, monkeypatch)
+    calls = authored_solver(monkeypatch, change=change)
+    receipt = service.confirm(grant)
+    expected = "scientific_infeasible" if change == "veto" else "model_failure"
+    assert receipt.score.status == expected and receipt.score.value is None
+    work = json.loads((store.root / callback.WORK_DIRECTORY / f"{grant.digest}.json").read_text())
+    assert work["attempted_model_starts"] == len(calls) == (24 if change == "veto" else 3)
+    assert work["completed_model_starts"] == (24 if change == "veto" else 2)
+    assert (work["total_inner_work"] is None) == (change == "failure")
+    assert work["last_attempt_inner_work_unknown"] == (change == "failure")
+    assert "PRIVATE-MODEL" not in json.dumps(work)
+    assert service.confirm(grant) == receipt
+    assert len(calls) == work["attempted_model_starts"]
+
+
+def test_preselection_registration_reads_no_private_source_and_starts_no_model(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(source, "read_private", lambda *a, **k: pytest.fail("early private read"))
+    monkeypatch.setattr(
+        kernel, "run_lifecycle", lambda *a, **k: pytest.fail("registration ran model")
+    )
+    store, _, _, _, work = setup(tmp_path, monkeypatch)
+    assert not list(work.iterdir())
+    assert not (store.root / binding.ACCESS_DIRECTORY).exists()

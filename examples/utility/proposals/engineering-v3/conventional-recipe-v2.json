@@ -1,0 +1,55 @@
+{
+  "CPU_RSS_limits_qualified": false,
+  "OS_deadline_qualified": false,
+  "acceptance_rule": "driver success plus original physical 0.62 V, residual and finite-power checks on the fresh corner and all original 24 public cases; retain exact stricter optimizer-target feasibility separately",
+  "automatic_retries": 0,
+  "batch_logical_seconds": 640,
+  "confirmation_rows_generated": false,
+  "container_starts": 0,
+  "corner_rule": "minimum ground, minimum R1, maximum R2; passive current-voltage monotonicity under fixed diode constants",
+  "correction": "Native root passes describe work, not final candidate eligibility; preserve retained circuit diagnostics",
+  "current_domain_A": [
+    0.01,
+    0.1
+  ],
+  "development_input_digest": "95698ee20beafd091747c003be214f4ba9665e32916f0571841e39d844c56d8f",
+  "driver_implementation": "examples.utility.engineering_load_native.native_design",
+  "driver_maximum_iterations": 20,
+  "host_calls": 0,
+  "maximum_coupled_evaluations": 63,
+  "maximum_cumulative_native_driver_invocations_including_failed_profile": 2,
+  "maximum_cumulative_native_model_invocations_including_failed_profile": 64,
+  "native_driver": "OpenMDAO ScipyOptimizeDriver SLSQP, original total derivatives",
+  "native_driver_invocations": 1,
+  "native_helper_maximum_solves_including_corner_check": 39,
+  "numerical_buffer_V": 1e-05,
+  "optimizer_target_voltage_V": 0.62001,
+  "pass_accounting_source_sha256": "3afa93516d25e151e87d4393e3cb12d169d4dd509b566feb6758db74c1b9176d",
+  "per_solve_reservation_seconds": 10,
+  "physical_minimum_node2_voltage_V": 0.62,
+  "previous_fully_observed_profile_charges": 1,
+  "private_source_reads": 0,
+  "public_development_checks": 24,
+  "question": "fixed current robust to the declared load envelope; public development checks only",
+  "schema": "utility-engineering-v3-conventional-recipe-v2",
+  "selection_support": [
+    {
+      "forcing": {
+        "ground_voltage": -0.02,
+        "resistor1_ohm": 90.0,
+        "resistor2_ohm": 11000.0
+      },
+      "scenario_id": "declared-envelope-corner"
+    }
+  ],
+  "selection_support_and_recipe_available_to_all_future_routes": true,
+  "source_pins": {
+    "examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+    "examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "examples/utility/engineering_load_native.py": "3a01b9d8d43673d9af48ea0a14274344d0ceff439a3125c4b038d98787ee04d7",
+    "examples/utility/engineering_native_accounting.py": "3afa93516d25e151e87d4393e3cb12d169d4dd509b566feb6758db74c1b9176d",
+    "pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c"
+  },
+  "supersedes_profiling_recipe_digest": "3bc07635e58023d9e3a1c8f430ba85008c11651f5edfd84b5325474a9f7a1358",
+  "target_proposal_digest": "7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5"
+}

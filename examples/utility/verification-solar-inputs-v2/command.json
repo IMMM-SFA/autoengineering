@@ -1,0 +1,5 @@
+{
+  "command": "python -m pytest tests/test_utility_solar_intervals.py tests/test_utility_solar_partitions.py tests/test_utility_hydrology_partitions.py tests/test_utility_confirmation_choices.py tests/test_documentation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-solar-inputs-final-v3 --junitxml=examples/utility/verification-solar-inputs-v2/final-current.xml",
+  "exit_code": 0,
+  "scope": "authored normalized data only"
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "receipt_id": "campaign-cost-89db6236c367d68f329cb1ac51d11165d0c147c62022c623",
+    "source_digest": "86c20bae43bf39ee0d350200bf996098491854c5b560bae61009c8eeab5eb4d1",
+    "category": "selection",
+    "resource": "campaign_process_starts",
+    "units": "count",
+    "quantity": 1.0,
+    "cell_digests": [
+      "1111111111111111111111111111111111111111111111111111111111111111"
+    ],
+    "allocation": [
+      1.0
+    ]
+  },
+  {
+    "receipt_id": "campaign-cost-8e429379c48a383f3b78f9178849342009da1346e36cfab6",
+    "source_digest": "86c20bae43bf39ee0d350200bf996098491854c5b560bae61009c8eeab5eb4d1",
+    "category": "selection",
+    "resource": "campaign_model_lifecycle_duration",
+    "units": "s",
+    "quantity": 0.00010179216042160988,
+    "cell_digests": [
+      "1111111111111111111111111111111111111111111111111111111111111111"
+    ],
+    "allocation": [
+      1.0
+    ]
+  },
+  {
+    "receipt_id": "campaign-cost-ab5325b3869dda06990da44cb0cc1575c3882ff0ca9c9fe9",
+    "source_digest": "8fa8724a72772d0bc9286a6cfda6faf3d2fb754194c230083bca1562c099b104",
+    "category": "selection",
+    "resource": "campaign_process_starts",
+    "units": "count",
+    "quantity": 1.0,
+    "cell_digests": [
+      "1111111111111111111111111111111111111111111111111111111111111111"
+    ],
+    "allocation": [
+      1.0
+    ]
+  },
+  {
+    "receipt_id": "campaign-cost-fc54eb1403c1e3c2e34844eef28065148dc1172ff33f63de",
+    "source_digest": "8fa8724a72772d0bc9286a6cfda6faf3d2fb754194c230083bca1562c099b104",
+    "category": "selection",
+    "resource": "campaign_model_lifecycle_duration",
+    "units": "s",
+    "quantity": 0.00010300008580088615,
+    "cell_digests": [
+      "1111111111111111111111111111111111111111111111111111111111111111"
+    ],
+    "allocation": [
+      1.0
+    ]
+  }
+]

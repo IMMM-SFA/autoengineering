@@ -1,0 +1,20 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "offline-cli-and-wheel",
+  "files": {
+    "src/autoengineering/utility/command.py": "9ead0693beda9f73505474a32c849ea2a4de78971322f38220cdcbb42578dbaf",
+    "src/autoengineering/utility/report.py": "0bad0017bfbb822cc5b7568be90696147f59833706fd3060c8ee15153b4d718c",
+    "src/autoengineering/cli.py": "593e40a783ec6d01fe8b3fb0760f52c14f63f8e01af3e1ee370b211047620e6c",
+    "pyproject.toml": "fb40ddc548ab40b2fe8f8c2307d804c5664ce54b853a53db47cb2e1f6d7d43d2",
+    "tests/test_utility_cli.py": "36e3e6706a02bc74ab54c8ffcc8c97256768b0a8427ebcaede5e10bb65e3b10e",
+    "tests/test_documentation.py": "dede3062fb8348f5a2632a98c6ae90d031cdc9d69764776257a91da64577d59b",
+    "docs/utility.md": "77ffe6d0546dafca8e2d8a3378a30fa752a967c30da9a465e7f1f8c487c5f4c1",
+    ".claude/agents/auto-engineer.md": "a707b9c9fe186984eb542dd6f406eefed4d5afbd5f6dab6f4730e74081f9e2f7"
+  },
+  "wheel_sha256": "6e932092457e9599ea5a9baedccac06fed812be7e754b506984712d65019e871",
+  "installed_offline_invocations": 7,
+  "limits": [
+    "No executable suite routes or private scoring",
+    "macOS base-dependency reader check only"
+  ]
+}

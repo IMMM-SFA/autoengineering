@@ -1,0 +1,47 @@
+{
+  "status": "passed",
+  "visual_inspection": "both final PNG figures at 11 and 8 inches",
+  "units_and_scenario_labels": "checked against frozen selected scenario data and implementation source",
+  "source_and_table_hashes": "verified",
+  "overlapping_route_membership": {
+    "leaf": [
+      [
+        "baseline"
+      ],
+      [
+        "conventional",
+        "single_agent",
+        "multi_agent",
+        "no_investigator",
+        "no_implementer",
+        "no_reviewer"
+      ]
+    ],
+    "solar": [
+      [
+        "baseline"
+      ],
+      [
+        "conventional",
+        "single_agent",
+        "multi_agent",
+        "no_investigator",
+        "no_implementer",
+        "no_reviewer"
+      ]
+    ],
+    "wind_layout": [
+      [
+        "baseline",
+        "conventional",
+        "single_agent",
+        "multi_agent",
+        "no_investigator",
+        "no_implementer",
+        "no_reviewer"
+      ]
+    ]
+  },
+  "initial_failures_and_images": "preserved",
+  "confirmation": "not_attempted"
+}

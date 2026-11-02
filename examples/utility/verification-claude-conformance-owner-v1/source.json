@@ -1,0 +1,10 @@
+{
+  "src/autoengineering/agents/conformance_owner.py": "c70df99115ce39657662844a1c73075047984a6be8f02e4ca63a1d7e4cba922e",
+  "src/autoengineering/agents/conformance_protocol.py": "21d7adeca82af7ac0a1919cfdce205bbf49504f2d47967404e227fe670a3a14c",
+  "src/autoengineering/agents/hosts/claude_host.py": "32c575ada958253a68ea06ab143880a37437792db9a589c05c5e7113c91d3f98",
+  "src/autoengineering/agents/hosts/claude_abandoned.py": "707148ab66d0d6b9f2a065250bca27d9a752d3da6154fe2076abc5cbd87b0ea3",
+  "tests/test_agent_claude_conformance.py": "1aa5c34276643f6366ed937afd3d55b5becf865d398e3c29b58ef2eeeb2bb890",
+  "tests/test_agent_claude_conformance_runtime.py": "5de43ea12084274c537b84af1619e1509665d8ff6f7b9dc6f96b48465eee7f41",
+  "tests/test_agent_claude_conformance_owner.py": "815bcd91ba8023088048fd0ee1213d31bd9cf4759f1c54dfa87cd3c9091eeef8",
+  "tests/test_agent_claude_abandoned.py": "6e55b4f4760e4425b34a69801991d4723919e9f5564cc065b9d7c6530cb1be79"
+}

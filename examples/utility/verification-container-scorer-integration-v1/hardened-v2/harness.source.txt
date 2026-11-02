@@ -1,0 +1,110 @@
+from pathlib import Path
+import hashlib
+import json
+import sys
+
+from autoengineering.utility import private_container_runtime as runtime_module
+from autoengineering.utility import container_scoring as scorer_module
+from autoengineering.utility.scoring import ConfirmationGrant, ConfirmationService
+from autoengineering.utility.contracts import ResourceCap
+from autoengineering.campaign.artifacts import reference, put_bytes
+
+repository = Path.cwd()
+sys.path.insert(0, str(repository / "tests"))
+from test_utility_confirmation import selected_suite
+
+root = Path("/private/tmp/utility-container-profile-v2")
+root.mkdir(mode=0o700)
+evidence = repository / "examples/utility/verification-container-scorer-integration-v1"
+evidence = evidence / "hardened-v2"
+evidence.mkdir(mode=0o700)
+source_names = [
+    "src/autoengineering/utility/private_container_runtime.py",
+    "src/autoengineering/utility/private_container_worker.py",
+    "src/autoengineering/utility/private_score_worker.py",
+    "src/autoengineering/utility/container_scoring.py",
+]
+source_hashes = {name: hashlib.sha256((repository / name).read_bytes()).hexdigest()
+                 for name in source_names}
+(evidence / "executed-source-hashes.json").write_text(json.dumps(source_hashes, indent=2) + "\n")
+store, manifest, contract = selected_suite(root, outcome_name="rmse", confirmation_active_time=128)
+model = manifest.cells[0].model
+selected = store.replay()["frozen"]
+private = root / "private"
+private.mkdir(mode=0o700)
+(private / "labels.json").write_text('{"labels":[1,5],"mask":[true,true]}')
+labels = reference(private, "labels.json", media_type="application/json",
+                   producer="authored-synthetic-custodian")
+partition = "1" * 64
+predictions = put_bytes(store.root, json.dumps({
+    "model_sha256": model.sha256, "partition_digest": partition,
+    "selection_digest": selected, "prediction": [2,4],
+}).encode(), name="predictions.json", media_type="application/json",
+    producer="authored-synthetic-fixture")
+socket_path = Path("/Users/cam/.orbstack/run/docker.sock")
+metadata = runtime_module.API(str(socket_path)).json("GET", "/version")
+server_digest = runtime_module.sha(runtime_module.encode(metadata))
+runtime = runtime_module.FixedScorerRuntime(socket_path, server_sha256=server_digest)
+scorer = scorer_module.ContainerRMSEScorer(
+    store.root, private, labels=labels, predictions=predictions,
+    partition_digest=partition, outcome_contract=contract, runtime=runtime,
+)
+grant = ConfirmationGrant(
+    store.spec.digest, store.spec.cells[0].digest, partition, scorer.identity,
+    contract.digest, model.sha256, selected, (
+        ResourceCap("scientific_starts", "count", 1, "reservation"),
+        ResourceCap("active_time", "s", 64, "reservation"),
+    ),
+)
+reads = []
+original_read = scorer_module.read_bytes
+
+def tracked(scope, ref, **kwargs):
+    if Path(scope) == private:
+        intent = private / grant.digest / "private-access.json"
+        assert intent.is_file()
+        state = store.replay()
+        assert len(state["confirmation_accesses"]) == 1
+        assert state["phase_used"][("fixed_evaluations", "confirmation", "scientific_starts")] == 1
+        reads.append(ref.sha256)
+    return original_read(scope, ref, **kwargs)
+
+scorer_module.read_bytes = tracked
+service = ConfirmationService(store, scorer, scorer_digest=scorer.identity, outcome_contract=contract)
+receipt = service.confirm(grant)
+assert receipt.score.value == 1.0 and len(reads) == 1
+attempt = private / grant.digest
+(attempt / "container/stage").chmod(0o755)
+for path in [private / "labels.json", attempt / "workspace/labels.json",
+             attempt / "container/stage/labels.json"]:
+    path.unlink()
+(attempt / "container/stage").chmod(0o555)
+
+def denied(*args, **kwargs):
+    raise AssertionError("offline replay attempted a daemon request or new score")
+
+runtime_module.API.request = denied
+reopened_runtime = runtime_module.FixedScorerRuntime(socket_path, server_sha256=server_digest)
+reopened = scorer_module.ContainerRMSEScorer(
+    store.root, private, labels=labels, predictions=predictions,
+    partition_digest=partition, outcome_contract=contract, runtime=reopened_runtime,
+)
+assert reopened.recover(grant, model) == receipt.score
+assert service.confirm(grant) == receipt
+assert len(reads) == 1
+for name, expected in source_hashes.items():
+    assert hashlib.sha256((repository / name).read_bytes()).hexdigest() == expected
+plan = json.loads((attempt / "container/plan.json").read_bytes())
+summary = {
+    "schema": "synthetic-container-scorer-integration-v1",
+    "root": str(root), "container_id": plan["container_id"], "nonce": plan["nonce"],
+    "container_starts": 1, "original_source_label_opens": len(reads),
+    "all_synthetic_label_files_removed": True, "offline_recovery_without_api": True,
+    "receipt_replay_without_rescoring": True, "score": receipt.score.to_dict(),
+    "grant_digest": grant.digest, "runtime_identity": runtime.identity,
+    "scorer_identity": scorer.identity, "server_sha256": server_digest,
+    "private_scoring_qualified": False, "real_confirmation_data_reads": 0,
+    "provider_calls": 0, "image_pulls": 0, "remote_jobs": 0,
+}
+(evidence / "actual-integration.json").write_text(json.dumps(summary, indent=2) + "\n")
+print(json.dumps(summary, sort_keys=True), flush=True)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import asdict, replace
 import json
 import hashlib
 import io
@@ -16,7 +16,14 @@ import yaml
 from autoengineering.adapters.contracts import PrepareContext, validate_arrays
 
 from .acceptance import CheckContext, DEFAULT_CHECKS, decide, metrics
-from .artifacts import confined_file, put_bytes, read_arrays, read_bytes, reference
+from .artifacts import (
+    confined_file,
+    put_bytes,
+    read_arrays,
+    read_bytes,
+    reference,
+    commit_worker_lifecycle,
+)
 from .budget import BudgetAccount, BudgetExhausted
 from .execution import cancellation_intent, pending_cancellations, supervise
 from .identity import scientific_identity, verify_dependencies, verify_runtime_sources
@@ -75,11 +82,16 @@ class CampaignController:
 
     @classmethod
     def create(cls, specification: Path, source_root: Path, workdir: Path, **kwargs):
-        spec = CampaignSpec.from_yaml(specification)
+        specification = Path(specification)
+        spec = (
+            CampaignSpec.from_json(specification.read_text(encoding="utf-8"))
+            if specification.suffix.lower() == ".json"
+            else CampaignSpec.from_yaml(specification)
+        )
         validate_policy(spec)
         identity = scientific_identity(spec, source_root)
         verify_runtime_sources(spec)
-        adapters = registry()
+        adapters = registry(spec=spec, root=source_root)
         for adapter_id in spec.execution.adapter_ids:
             adapters.validate(adapter_id, spec.baseline.model, source_root)
         # Validation and dependency checks finish before creating any work directory.
@@ -125,7 +137,9 @@ class CampaignController:
             try:
                 verify_runtime_sources(spec)
                 for adapter_id in spec.execution.adapter_ids:
-                    registry().validate(adapter_id, spec.baseline.model, store.root / "bundle")
+                    registry(spec=spec, root=store.root / "bundle").validate(
+                        adapter_id, spec.baseline.model, store.root / "bundle"
+                    )
                 current = scientific_identity(spec, Path(identity["source_root"]))
                 bundled = scientific_identity(spec, store.root / "bundle")
             except (ValueError, OSError) as error:
@@ -266,7 +280,16 @@ class CampaignController:
         declared = {ref.path: ref for ref in self.spec.provenance.sources}
         if any(declared.get(ref.path) != ref for ref in snapshot.model.source_bundle):
             raise ValueError("candidate has undeclared source dependencies")
-        registry().validate(snapshot.adapter_id, snapshot.model, self.bundle)
+        registry(spec=self.spec, root=self.bundle).validate(
+            snapshot.adapter_id, snapshot.model, self.bundle
+        )
+        if snapshot.adapter_id.startswith("generated-"):
+            from autoengineering.adapters.registration import load_registration, validate_model
+
+            registration, refs = load_registration(
+                self.bundle, expected_identity=snapshot.adapter_id.removeprefix("generated-")
+            )
+            validate_model(registration, refs, snapshot.model, snapshot.fixed_parameters)
         for name, value in snapshot.fixed_parameters.items():
             if name in allowed.parameter_bounds:
                 low, high = allowed.parameter_bounds[name]
@@ -278,6 +301,11 @@ class CampaignController:
             elif name == "family" and snapshot.adapter_id == "routing":
                 if f"{value}-v1" != snapshot.proposal.implementation_id:
                     raise ValueError("routing configuration and implementation identity differ")
+            elif name == "method" and snapshot.adapter_id == "solar-pvlib":
+                if {"faiman": "faiman-v1", "sapm_module": "sapm-v1"}.get(value) != (
+                    snapshot.proposal.implementation_id
+                ):
+                    raise ValueError("solar thermal method and implementation identity differ")
             elif self.spec.baseline.parameters.get(name) != value:
                 raise ValueError("candidate changes an undeclared parameter")
         if set(snapshot.fixed_parameters) != set(self.spec.baseline.parameters):
@@ -331,8 +359,14 @@ class CampaignController:
             validate_arrays(self._arrays(forcing), self.spec.baseline.model.inputs, forcing.ports)
         except (ValueError, TypeError, KeyError):
             return "invalid_task"
-        for role in ("comparison", "fitting") if self.spec.calibration else ("comparison",):
-            data = self._data(role)
+        observations = [self._data("comparison")]
+        if self.spec.calibration:
+            observations.append(self._data("fitting"))
+        if self.spec.training:
+            fitting = next(d for d in self.spec.data if d.id == self.spec.training.fitting_data_id)
+            if fitting not in observations:
+                observations.append(fitting)
+        for data in observations:
             try:
                 validate_arrays(self._arrays(data), data.ports, data.ports)
                 if any(
@@ -455,16 +489,29 @@ class CampaignController:
         identity = json.loads(confined_file(self.store.root, "identity.json").read_text())
         verify_dependencies(self.spec, Path(identity["source_root"]))
         verify_runtime_sources(self.spec)
-        registry().validate(adapter_id, model, self.bundle)
+        registry(spec=self.spec, root=self.bundle).validate(adapter_id, model, self.bundle)
         attempt_id = f"attempt-{len(state.budget.attempts) + 1:06d}"
         nonce = uuid.uuid4().hex
+        from .training import fitting_grant
+
+        grant = fitting_grant(
+            self.spec, model, adapter_id, attempt_id, nonce,
+            self.spec.seed if seed is None else seed, role,
+            forcing_override or self._data("forcing").artifact,
+            parameters,
+        )
+        grant_ref = None if grant is None else put_bytes(
+            self.store.root, grant.to_json().encode(), name="fitting-grant.json",
+            media_type="application/json", producer=attempt_id,
+        )
         attempt = AttemptRecord(
             attempt_id, reservation_id, "launched", action_id, nonce, None, None, True, None
         )
         budget = state.budget.start(attempt)
         state = replace(state, budget=budget)
         self._checkpoint(
-            "evaluating", state, "action_reserved", (forcing_override,) if forcing_override else ()
+            "evaluating", state, "action_reserved",
+            tuple(r for r in (forcing_override, grant_ref) if r is not None),
         )
         if self.remaining is not None:
             self.remaining -= 1
@@ -472,8 +519,16 @@ class CampaignController:
         jobs.mkdir(mode=0o700, exist_ok=True)
         checked_directory(jobs)
         output_path = jobs / f"{attempt_id}.npz"
+        scratch = jobs / f"{attempt_id}-{nonce}"
+        if adapter_id.startswith("generated-"):
+            from .container_execution import scratch_path
+
+            scratch = scratch_path(self.store.root, attempt_id, nonce)
+        scratch.mkdir(mode=0o700)
+        checked_directory(scratch)
         context = PrepareContext(
-            model, parameters, self.spec.seed if seed is None else seed, str(jobs), ()
+            model, parameters, self.spec.seed if seed is None else seed, str(scratch),
+            () if grant is None else (grant.data.id,),
         )
         job = {
             "context": context.to_dict(),
@@ -488,6 +543,11 @@ class CampaignController:
             "nonce": nonce,
             "causal_reference": causal_reference.to_dict() if causal_reference else None,
         }
+        if grant_ref is not None:
+            job["fitting_grant"] = grant_ref.to_dict()
+            job["attempt_id"] = attempt_id
+        if adapter_id.startswith("generated-"):
+            job["attempt_id"] = attempt_id
         job_path = jobs / f"{attempt_id}.json"
         durable_write(job_path, canonical_json(job).encode())
         result = supervise(
@@ -504,6 +564,7 @@ class CampaignController:
         )
         output_refs, outputs = (), {}
         lifecycle_ref = None
+        lifecycle_refs = ()
         status = result.status
         if status == "success":
             try:
@@ -512,13 +573,14 @@ class CampaignController:
                 content = output_path.read_bytes()
                 if hashlib.sha256(content).hexdigest() != metadata["output_sha256"]:
                     raise ValueError("worker output digest mismatch")
-                lifecycle_ref = put_bytes(
+                lifecycle_refs = commit_worker_lifecycle(
                     self.store.root,
+                    Path(context.scratch_path),
                     metadata_path.read_bytes(),
-                    name="lifecycle.json",
-                    media_type="application/json",
+                    output_sha256=metadata["output_sha256"],
                     producer=attempt_id,
                 )
+                lifecycle_ref = lifecycle_refs[0]
                 ref = put_bytes(
                     self.store.root,
                     content,
@@ -537,6 +599,31 @@ class CampaignController:
             producer="supervisor",
         )
         certain = result.stopped and (result.receipt_valid or result.stop_reason is not None)
+        terminal_refs = ()
+        training_capture_error = False
+        if certain and lifecycle_ref is None and grant_ref is not None:
+            from autoengineering.utility.training_terminal import capture_terminal_training
+
+            try:
+                terminal_refs = capture_terminal_training(
+                    self.store.root, self.spec, job_path, job, context
+                )
+            except (ValueError, OSError, KeyError, TypeError):
+                training_capture_error = True
+                status = "infrastructure_failure"
+        inner_receipt = None
+        if adapter_id.startswith("generated-"):
+            try:
+                if not certain:
+                    raise ValueError("native owner stop remains unresolved")
+                proof, inner_receipt = self._isolated_proof(
+                    attempt, job=job, stop=True, outputs=outputs if status == "success" else None
+                )
+                certain = proof.stopped
+                if not certain:
+                    status = "infrastructure_failure"
+            except (ValueError, OSError, TypeError, KeyError):
+                certain, status = False, "infrastructure_failure"
         attempt = replace(
             attempt,
             state="finished" if certain else "uncertain",
@@ -565,6 +652,12 @@ class CampaignController:
         )
         if lifecycle_ref:
             provenance["lifecycle_record"] = lifecycle_ref.sha256
+        if inner_receipt:
+            provenance["isolated_execution_record"] = inner_receipt.sha256
+        if terminal_refs:
+            provenance["training_terminal_record"] = terminal_refs[0].sha256
+        if training_capture_error:
+            provenance["training_capture_error"] = "unverifiable"
         if not certain:
             provenance["cost_uncertain"] = "true"
         evaluation = replace(evaluation, provenance=provenance)
@@ -578,12 +671,63 @@ class CampaignController:
             target,
             state,
             "action_finished",
-            (*output_refs, receipt, *((lifecycle_ref,) if lifecycle_ref else ())),
+            (
+                *output_refs,
+                receipt,
+                *lifecycle_refs,
+                *terminal_refs,
+                *((inner_receipt,) if inner_receipt else ()),
+            ),
         )
         return evaluation
 
+    def _isolated_proof(self, attempt, *, job=None, stop=False, outputs=None):
+        """Verify the native owner is gone before inspecting or stopping inner work."""
+        from .container_execution import reconcile_attempt
+        from .execution import ProcessIdentity, live_members
+
+        folder = self.store.root / "attempts" / attempt.id
+        identity = ProcessIdentity(**json.loads(confined_file(folder, "process.json").read_text()))
+        if identity.nonce != attempt.launch_nonce or live_members(identity.pgid):
+            raise ValueError("native owner stop remains unresolved")
+        if job is None:
+            job = json.loads(confined_file(self.store.root, f"jobs/{attempt.id}.json").read_text())
+        if job.get("adapter_id") not in self.spec.execution.adapter_ids:
+            raise ValueError("isolated adapter is outside the frozen catalogue")
+        proof = reconcile_attempt(
+            self.store.root, job, attempt_id=attempt.id, nonce=attempt.launch_nonce, stop=stop
+        )
+        if outputs is not None:
+            if not proof.stopped:
+                raise ValueError("isolated container stop remains unresolved")
+            recovered = proof.outputs(PrepareContext.from_dict(job["context"]).model.outputs)
+            if set(outputs) != set(recovered) or any(
+                not np.array_equal(outputs[name], value) for name, value in recovered.items()
+            ):
+                raise ValueError("native outputs differ from the isolated execution result")
+        record = asdict(proof)
+        if record["physical"] is not None:
+            raw = record["physical"].pop("stdout")
+            record["physical"]["stdout_sha256"] = (
+                hashlib.sha256(raw).hexdigest() if raw is not None else None
+            )
+        receipt = put_bytes(
+            self.store.root,
+            canonical_json(
+                {"attempt_id": attempt.id, "nonce": attempt.launch_nonce, **record}
+            ).encode(),
+            name="isolated-recovery.json",
+            media_type="application/json",
+            producer="controller",
+        )
+        return proof, receipt
+
     def _evaluate(self, request, projection):
         state = self.state(projection)
+        if pending_cancellations(self.store.root, self.spec.name):
+            if state.budget.unresolved_attempts:
+                return self._transition("reconciliation_required", state)
+            return self._transition("completed", replace(state, outcome="cancelled"))
         candidate_id, mode = request.payload["candidate_id"], request.payload["mode"]
         if projection.state == "created":
             issue = self._data_availability()
@@ -735,6 +879,10 @@ class CampaignController:
             projection.state != "selection_frozen" and state.phase != "confirmation"
         ):
             raise CampaignError("invalid_transition")
+        if pending_cancellations(self.store.root, self.spec.name):
+            if state.budget.unresolved_attempts:
+                return self._transition("reconciliation_required", state)
+            return self._transition("completed", replace(state, outcome="cancelled"))
         if self.spec.confirmation.mode == "disabled":
             return self._transition(
                 "report_ready",
@@ -816,6 +964,8 @@ class CampaignController:
         path = self.store.root / "attempts" / attempt.id / "process.json"
         if path.exists():
             identity = ProcessIdentity(**json.loads(path.read_text()))
+            if identity.nonce != attempt.launch_nonce:
+                raise CampaignError("reconciliation_required")
             if live_members(identity.pgid):
                 if not identity_matches(identity) or not stop_recovered(
                     identity, self.spec.execution
@@ -824,6 +974,21 @@ class CampaignController:
         elif (self.store.root / "attempts" / attempt.id / "launch-intent.json").exists():
             # No PID receipt means that this process cannot prove which group to stop.
             raise CampaignError("reconciliation_required")
+        inner_receipt = None
+        try:
+            job_path = self.store.root / "jobs" / f"{attempt.id}.json"
+            if not job_path.exists() and any(
+                name.startswith("generated-") for name in self.spec.execution.adapter_ids
+            ):
+                raise ValueError("isolated attempt job is missing")
+            if job_path.exists():
+                job = json.loads(confined_file(job_path.parent, job_path.name).read_text())
+                if job["adapter_id"].startswith("generated-"):
+                    proof, inner_receipt = self._isolated_proof(attempt, job=job, stop=True)
+                    if not proof.stopped:
+                        raise ValueError("isolated container stop remains unresolved")
+        except (ValueError, KeyError, TypeError, OSError) as error:
+            raise CampaignError("reconciliation_required") from error
         resolved = replace(attempt, state="reconciled", uncertain_cost=True)
         state = replace(state, budget=state.budget.resolve(resolved))
         target = state.resume_state or "evaluating"
@@ -850,6 +1015,7 @@ class CampaignController:
                 "reconciled_attempt_id": attempt.id,
                 "cost_note": "Physical allowance retained; unknown cost is not zero",
             },
+            artifacts=(inner_receipt,) if inner_receipt else (),
         )
 
     def request(self, operation, payload=None, *, request_id=None):
@@ -938,6 +1104,10 @@ class CampaignController:
                 parameters = dict(self.spec.baseline.parameters)
                 if self.spec.baseline.adapter_id == "hydrology":
                     parameters["pet"] = implementation.removesuffix("-v1")
+                elif self.spec.baseline.adapter_id == "solar-pvlib":
+                    parameters["method"] = {"faiman-v1": "faiman", "sapm-v1": "sapm_module"}[
+                        implementation
+                    ]
                 elif self.spec.baseline.adapter_id == "routing":
                     from examples.campaign_contracts.routing import PARAMETERS
 
@@ -961,7 +1131,13 @@ class CampaignController:
                     else []
                 )
                 yield CandidateSnapshot(
-                    proposal, model, self.spec.baseline.adapter_id, digest(space), parameters
+                    proposal,
+                    model,
+                    implementation
+                    if implementation.startswith("generated-")
+                    else self.spec.baseline.adapter_id,
+                    digest(space),
+                    parameters,
                 )
 
     def advance(self):
@@ -1060,7 +1236,14 @@ class CampaignController:
             identity = ProcessIdentity(
                 **json.loads(confined_file(folder, "process.json").read_text())
             )
-            if identity.nonce != attempt.launch_nonce or live_members(identity.pgid):
+            if (
+                identity.nonce != attempt.launch_nonce
+                or type(identity.pid) is not int
+                or identity.pid <= 0
+                or type(identity.pgid) is not int
+                or identity.pgid != identity.pid
+                or live_members(identity.pgid)
+            ):
                 return None
             start = json.loads(confined_file(folder, "action-start.json").read_text())
             finish = json.loads(confined_file(folder, "action-finish.json").read_text())
@@ -1083,6 +1266,18 @@ class CampaignController:
             content = output_path.read_bytes()
             if hashlib.sha256(content).hexdigest() != metadata["output_sha256"]:
                 return None
+            context = PrepareContext.from_dict(job["context"])
+            from .training import verify_fitting_grant
+
+            verify_fitting_grant(self.store.root / f"jobs/{attempt.id}.json", job, context)
+            lifecycle_refs = commit_worker_lifecycle(
+                self.store.root,
+                Path(context.scratch_path),
+                confined_file(self.store.root, f"jobs/{attempt.id}.metadata.json").read_bytes(),
+                output_sha256=metadata["output_sha256"],
+                producer=attempt.id,
+            )
+            lifecycle_ref = lifecycle_refs[0]
             ref = put_bytes(
                 self.store.root,
                 content,
@@ -1091,7 +1286,11 @@ class CampaignController:
                 producer=attempt.id,
             )
             outputs = read_arrays(self.store.root, ref)
-            context = PrepareContext.from_dict(job["context"])
+            inner_receipt = None
+            if job["adapter_id"].startswith("generated-"):
+                proof, inner_receipt = self._isolated_proof(attempt, job=job, outputs=outputs)
+                if not proof.stopped:
+                    return None
             elapsed = finish["monotonic"] - start["monotonic"]
             accounted_seconds = None
             supervisor_path = folder / "supervisor-result.json"
@@ -1121,16 +1320,34 @@ class CampaignController:
                     evaluation, outputs, ArtifactRef.from_dict(job["causal_reference"])
                 )
             evaluation = replace(
-                evaluation, provenance=dict(evaluation.provenance, purpose=job["purpose"])
+                evaluation,
+                provenance=dict(
+                    evaluation.provenance,
+                    purpose=job["purpose"],
+                    execution_seed=str(context.seed),
+                    lifecycle_record=lifecycle_ref.sha256,
+                    **(
+                        {"isolated_execution_record": inner_receipt.sha256} if inner_receipt else {}
+                    ),
+                ),
             )
             receipt = put_bytes(
                 self.store.root,
                 canonical_json(
                     {
+                        "schema": "campaign-recovery-receipt-v2",
                         "attempt_id": attempt.id,
                         "nonce": attempt.launch_nonce,
+                        "identity": identity.to_dict(),
+                        "stopped": True,
+                        "status": "success",
                         "output_sha256": ref.sha256,
                         "recovered": True,
+                        **(
+                            {"isolated_execution_record": inner_receipt.to_dict()}
+                            if inner_receipt
+                            else {}
+                        ),
                     }
                 ).encode(),
                 name="recovery-receipt.json",
@@ -1147,7 +1364,124 @@ class CampaignController:
                     receipt=receipt,
                 ),
                 evaluation,
-                (ref, receipt),
+                (ref, receipt, *lifecycle_refs, *((inner_receipt,) if inner_receipt else ())),
+            )
+        except (ValueError, KeyError, TypeError, OSError):
+            return None
+
+    def _recover_failed_training(self, attempt, *, allow_cancelled=False):
+        """Reconcile a stopped supplied training worker from its original supervisor proof."""
+        import math
+        from .execution import ProcessIdentity, SupervisedResult, live_members
+        from .serialization import unique_json
+        from autoengineering.utility.training_terminal import capture_terminal_training
+
+        try:
+            folder = self.store.root / "attempts" / attempt.id
+            receipt = reference(
+                self.store.root,
+                f"attempts/{attempt.id}/supervisor-result.json",
+                media_type="application/json",
+                producer="supervisor",
+            )
+            raw = unique_json(read_bytes(self.store.root, receipt, max_bytes=65536).decode())
+            proof = SupervisedResult(**dict(raw, identity=ProcessIdentity(**raw["identity"])))
+            identity = ProcessIdentity(
+                **json.loads(confined_file(folder, "process.json").read_text())
+            )
+            if (
+                proof.identity != identity
+                or identity.nonce != attempt.launch_nonce
+                or type(identity.pid) is not int
+                or identity.pid <= 0
+                or type(identity.pgid) is not int
+                or identity.pgid != identity.pid
+                or proof.stopped is not True
+                or type(proof.returncode) is not int
+                or type(proof.receipt_valid) is not bool
+                or type(proof.elapsed_seconds) not in (int, float)
+                or not math.isfinite(proof.elapsed_seconds)
+                or proof.elapsed_seconds < 0
+                or live_members(identity.pgid)
+            ):
+                return None
+            ordinary = (
+                proof.status == "model_failure"
+                and proof.receipt_valid is True
+                and proof.stop_reason is None
+                and type(proof.returncode) is int
+                and proof.returncode != 0
+            )
+            timeout = proof.status == "timeout" and proof.stop_reason == "timeout"
+            cancelled = (
+                allow_cancelled
+                and proof.status == "infrastructure_failure"
+                and proof.stop_reason == "cancelled"
+            )
+            if not (ordinary or timeout or cancelled):
+                return None
+            start = None
+            if ordinary or (folder / "action-start.json").exists():
+                start = json.loads(confined_file(folder, "action-start.json").read_text())
+                if (
+                    start["nonce"] != attempt.launch_nonce
+                    or type(start["monotonic"]) not in (int, float)
+                    or not math.isfinite(start["monotonic"])
+                ):
+                    return None
+            if ordinary:
+                finish = json.loads(confined_file(folder, "action-finish.json").read_text())
+                if (
+                    finish["nonce"] != attempt.launch_nonce
+                    or finish["returncode"] != proof.returncode
+                    or type(finish["monotonic"]) not in (int, float)
+                    or not math.isfinite(finish["monotonic"])
+                    or finish["monotonic"] < start["monotonic"]
+                    or proof.elapsed_seconds < finish["monotonic"] - start["monotonic"]
+                ):
+                    return None
+            job_path = self.store.root / f"jobs/{attempt.id}.json"
+            job = json.loads(confined_file(self.store.root, f"jobs/{attempt.id}.json").read_text())
+            if (
+                job["adapter_id"] != "hydrology-learned-routing-v1"
+                or job.get("attempt_id") != attempt.id
+                or job["nonce"] != attempt.launch_nonce
+            ):
+                return None
+            context = PrepareContext.from_dict(job["context"])
+            refs = capture_terminal_training(self.store.root, self.spec, job_path, job, context)
+            if not refs:
+                return None
+            evaluation = self._score(
+                job["model_id"],
+                context.parameters,
+                proof.status,
+                {},
+                attempt.id,
+                proof.elapsed_seconds,
+                (),
+                job["role"],
+            )
+            evaluation = replace(
+                evaluation,
+                provenance=dict(
+                    evaluation.provenance,
+                    purpose=job["purpose"],
+                    execution_seed=str(context.seed),
+                    training_terminal_record=refs[0].sha256,
+                ),
+            )
+            return (
+                replace(
+                    attempt,
+                    state="finished",
+                    measured_cost=1.0,
+                    elapsed_seconds=proof.elapsed_seconds,
+                    uncertain_cost=False,
+                    receipt=receipt,
+                ),
+                evaluation,
+                (receipt, *refs),
             )
         except (ValueError, KeyError, TypeError, OSError):
             return None
@@ -1166,15 +1500,44 @@ class CampaignController:
                 if item.state not in ("finished", "reconciled")
             ]
             if unresolved and pending_cancellations(self.store.root, self.spec.name):
-                if self._stop_unresolved(unresolved):
+                training_refs = []
+                for attempt in unresolved:
+                    recovered = self._recover_failed_training(attempt, allow_cancelled=True)
+                    if recovered:
+                        resolved, evaluation, refs = recovered
+                        state = replace(
+                            state,
+                            budget=state.budget.resolve(resolved),
+                            evaluations=(*state.evaluations, evaluation),
+                        )
+                        training_refs.extend(refs)
+                remaining = [
+                    a for a in state.budget.attempts if a.state not in ("finished", "reconciled")
+                ]
+                stopped, stop_receipts = self._stop_unresolved(remaining)
+                if stopped:
                     # Stopping work does not turn uncertain cost into a measured zero.
                     self._checkpoint(
-                        "completed", replace(state, outcome="cancelled"), "cancelled_after_recovery"
+                        "completed",
+                        replace(state, outcome="cancelled"),
+                        "cancelled_after_recovery",
+                        (*training_refs, *stop_receipts),
                     )
+                    return
+                if training_refs:
+                    self._checkpoint(
+                        "reconciliation_required",
+                        replace(state, resume_state=state.resume_state or projection.state),
+                        "recovery",
+                        (*training_refs, *stop_receipts),
+                    )
+                    self.store.refresh_projection()
                     return
             artifacts = []
             for attempt in unresolved:
-                recovered = self._recover_finished(attempt)
+                recovered = self._recover_finished(attempt) or self._recover_failed_training(
+                    attempt
+                )
                 if recovered:
                     resolved, evaluation, refs = recovered
                     state = replace(
@@ -1327,24 +1690,38 @@ class CampaignController:
     def _stop_unresolved(self, attempts):
         from .execution import ProcessIdentity, identity_matches, live_members, stop_recovered
 
+        receipts = []
         for attempt in attempts:
             folder = self.store.root / "attempts" / attempt.id
             path = folder / "process.json"
             if not path.exists():
                 if (folder / "launch-intent.json").exists():
-                    return False
+                    return False, tuple(receipts)
                 continue
             try:
                 identity = ProcessIdentity(
                     **json.loads(confined_file(folder, "process.json").read_text())
                 )
                 if identity.nonce != attempt.launch_nonce:
-                    return False
+                    return False, tuple(receipts)
                 if live_members(identity.pgid) and (
                     not identity_matches(identity)
                     or not stop_recovered(identity, self.spec.execution)
                 ):
-                    return False
-            except (OSError, ValueError, TypeError):
-                return False
-        return True
+                    return False, tuple(receipts)
+                job_path = self.store.root / "jobs" / f"{attempt.id}.json"
+                if not job_path.exists():
+                    if any(
+                        name.startswith("generated-") for name in self.spec.execution.adapter_ids
+                    ):
+                        return False, tuple(receipts)
+                    continue
+                job = json.loads(confined_file(job_path.parent, job_path.name).read_text())
+                if job["adapter_id"].startswith("generated-"):
+                    proof, receipt = self._isolated_proof(attempt, job=job, stop=True)
+                    receipts.append(receipt)
+                    if not proof.stopped:
+                        return False, tuple(receipts)
+            except (OSError, ValueError, TypeError, KeyError):
+                return False, tuple(receipts)
+        return True, tuple(receipts)

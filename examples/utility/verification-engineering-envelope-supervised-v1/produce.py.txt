@@ -1,0 +1,118 @@
+"""One source-closed public development controller qualification; never rerun."""
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import time
+
+from autoengineering.agents.batch import BatchCase, BatchSpec, BatchStore
+from autoengineering.agents.hosts.fake import FakeHost
+from autoengineering.agents.identity import host_environment_identity, host_source_identity
+from autoengineering.agents.records import HostSelection, ResourceLimits
+from autoengineering.campaign.artifacts import reference
+from autoengineering.campaign.records import Request
+from autoengineering.campaign.serialization import digest
+from autoengineering.optimization import (
+    BudgetSpec, ContinuousParameter, NoiseSpec, ObjectiveSpec, OptimizationRunSpec,
+    SearchSpace, StudySpec,
+)
+from autoengineering.utility.engineering_campaign import EngineeringCampaign, EngineeringNativeCampaignSpec
+from autoengineering.utility.engineering_native import NativeDriverSpec
+from autoengineering.utility.engineering_process import EngineeringExecutionSpec, EngineeringScenario, SupervisedEngineeringExecutor, execution_identity
+from autoengineering.utility.native_costs import join_native_costs
+from autoengineering.utility.studies import EngineeringStudySpec
+from examples.utility.engineering import rules
+from examples.utility.engineering_load import context
+
+root=Path.cwd()
+archive=root/'examples/utility/verification-engineering-envelope-supervised-v1'
+out=root/'outputs/engineering-envelope-supervised-v1'
+assert not out.exists();out.mkdir(mode=0o700)
+source=out/'source';source.mkdir(mode=0o700)
+names={str(p.relative_to(root)) for p in (root/'src/autoengineering').rglob('*.py')}
+names.update(['examples/utility/__init__.py','examples/utility/engineering.py',
+    'examples/utility/engineering_load.py','examples/utility/engineering_load_native.py',
+    'examples/utility/engineering_load_envelope_native.py',
+    'examples/interoperability/circuit/model.py','examples/interoperability/circuit/fixture.py','pixi.lock'])
+for name in sorted(names):
+    target=source/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/name,target)
+inputs=json.loads((root/'examples/utility/proposals/engineering-v3/development-inputs.json').read_text())
+proposal=json.loads((root/'examples/utility/proposals/engineering-v3/proposal.json').read_text())
+gain=json.loads((root/'examples/utility/proposals/engineering-v3/gain-reference.json').read_text())
+assert digest(proposal)=='7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5'
+cases=tuple(EngineeringScenario.from_dict(case) for case in inputs['cases'])
+assert len(cases)==24
+ctx=context(.05,out,source_root=source)
+known={r.path:r for r in ctx.model.source_bundle}
+refs=tuple(known.get(name) or reference(source,name,media_type='text/plain',producer='envelope-supervision') for name in sorted(names) if name!='pixi.lock')
+lock=known['pixi.lock'];entry='examples.utility.engineering_load:execute'
+assert gain['target_proposal_digest']==digest(proposal) and gain['development_input_digest']==digest(inputs)
+minimum_gain=gain['binding']['absolute_gain']
+assert minimum_gain==0.012487250213233526
+run=OptimizationRunSpec(StudySpec('engineering-envelope-supervision',ObjectiveSpec('source_power','minimize'),(),
+    BudgetSpec(1,'physical_executions',1),NoiseSpec(),'system',17),
+    SearchSpace((ContinuousParameter('source_current',.01,.1),)),'sobol',{},
+    'autoengineering.utility.studies:engineering_evaluator')
+study=EngineeringStudySpec(run,rules(.62,minimum_gain),tuple(s.scenario_id for s in cases),
+    execution_identity(entry,refs,lock,cases,10.,32768))
+execution=EngineeringExecutionSpec('utility-engineering-execution-v1',study,entry,refs,lock,cases,10.,32768)
+native=NativeDriverSpec('utility-native-driver-v1',execution,
+    'examples.utility.engineering_load_envelope_native:execute',20,53,20.,32768)
+spec=EngineeringNativeCampaignSpec('utility-engineering-campaign-v2','engineering-envelope-supervision',
+    execution,ctx.model,{'source_current':.05},(),12,native=native)
+request={'schema':'utility-engineering-envelope-supervision-request-v1','proposal_digest':digest(proposal),
+    'input_digest':digest(inputs),'gain_reference_digest':digest(gain),'campaign_digest':spec.digest,
+    'source_pins':{name:hashlib.sha256((source/name).read_bytes()).hexdigest() for name in sorted(names)},
+    'producer_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    'planned_operations':['baseline','native','review','freeze'],
+    'planned_outer_processes':49,'reserved_outer_processes':spec.scientific_starts,
+    'unused_calibration_process_reserve':24,'native_inner_call_cap':53,
+    'planned_sequence_total_root_model_call_cap':101,'native_driver_seconds':20.,'scenario_seconds':10.,
+    'total_elapsed_logical_limit_seconds':1200.,'cpu_rss_qualification':False,
+    'host_invocations':0,'private_source_access':False,'automatic_retries':0,'independent_confirmation':False}
+(out/'request.json').write_text(json.dumps(request,sort_keys=True,indent=2)+'\n')
+(out/'campaign-spec.json').write_text(spec.to_json())
+batch_spec=BatchSpec('1.0','engineering-envelope-supervision',host_source_identity(),host_environment_identity(),
+    HostSelection('fake','none','not-invoked','1.0'),FakeHost(()).capabilities(),digest(request),
+    ResourceLimits(1,1,0,0,1200.,20.,32768,1048576),spec.scientific_starts,
+    (BatchCase('conventional','comparison',digest(request),0,spec.scientific_starts),))
+batch=BatchStore.create(out/'batch',batch_spec);batch.start_case('conventional',digest(request))
+executor=SupervisedEngineeringExecutor(execution,batch,'conventional',source)
+campaign=EngineeringCampaign.create(out/'campaign',spec,executor)
+responses=[];started=time.monotonic()
+try:
+    for identifier,operation,payload in [('baseline','evaluate',{'candidate_id':'baseline','mode':'fixed'}),
+        ('native','evaluate',{'candidate_id':'native','mode':'native'}),('review','review',{}),('freeze','freeze',{})]:
+        assert time.monotonic()-started<1200.
+        command=Request('1.0',spec.name,identifier,campaign.state()['projection'].revision,operation,payload)
+        response=campaign.handle(command);responses.append(response.to_dict())
+        if identifier=='native' and response.status=='ok':
+            evaluated=campaign.state()['evaluations'];base,chosen=evaluated
+            assert all(c.values['source_power']<=1.01*b.values['source_power'] for b,c in zip(base.scenarios,chosen.scenarios,strict=True))
+        (out/(identifier+'-response.json')).write_text(response.to_json())
+        print(json.dumps({'operation':identifier,'status':response.status,'reservations':len(batch.replay().reservations)}),flush=True)
+        assert response.status=='ok',response.to_dict()
+    state=campaign.state();report=state['native_reports'][0]
+    assert report.status=='success' and report.result.schema=='utility-native-result-v3'
+    assert len(batch.replay().reservations)==49 and not batch.replay().pending
+    assert len(report.result.solves)+len(report.result.support_solves)<=53
+    assert state['decision'].selected_id==state['evaluations'][1].evaluation.id
+    costs=join_native_costs(batch,{'conventional':digest(request)})
+    (out/'native-report.json').write_text(report.to_json())
+    (out/'selected-state.json').write_text(state['selected'].to_json())
+    evidence={'schema':'utility-engineering-envelope-supervision-completion-v1','request_digest':digest(request),
+        'decision':state['decision'].to_dict(),'native_report':report.to_dict(),
+        'evaluations':[value.to_dict() for value in state['evaluations']],
+        'public_per_case_power_degradation_limit':.01,'public_per_case_power_degradation_passed':True,
+        'costs':[value.to_dict() for value in costs],'batch_integrity':batch.report(),
+        'outer_reservations':49,'native_inner_model_calls':len(report.result.solves)+len(report.result.support_solves),
+        'total_root_model_calls':48+len(report.result.solves)+len(report.result.support_solves),
+        'seconds':time.monotonic()-started,'cpu_seconds':None,'peak_rss_bytes':None,
+        'independent_confirmation':False,'protected_private_runtime_qualified':False}
+    proof=batch.evidence(evidence);batch.finish_case('conventional','passed',(proof,))
+    (out/'summary.json').write_text(json.dumps({'receipt':proof.to_dict(),**evidence},sort_keys=True,indent=2)+'\n')
+    print(json.dumps({'total_root_model_calls':evidence['total_root_model_calls'],'decision':state['decision'].outcome}),flush=True)
+except BaseException as error:
+    (out/'failure.json').write_text(json.dumps({'error_type':type(error).__name__,'automatic_retry_allowed':False,
+        'batch_integrity':batch.report(),'outer_reservations':len(batch.replay().reservations)},sort_keys=True,indent=2)+'\n')
+    raise

@@ -1,0 +1,14 @@
+{
+  "schema": "utility-task-scoring-binding-terminal-v1",
+  "focused_passed": 79,
+  "focused_duration_seconds": 14.46,
+  "documentation_passed": 19,
+  "ruff_exit_code": 0,
+  "installed_core_files_matching_source": 201,
+  "installed_cli_processes": 4,
+  "actual_authored_engineering_selection_exercised": true,
+  "independent_confirmation": false,
+  "private_scoring_qualified": false,
+  "full_default_bayes_or_utility_rerun": false,
+  "goal_complete": false
+}

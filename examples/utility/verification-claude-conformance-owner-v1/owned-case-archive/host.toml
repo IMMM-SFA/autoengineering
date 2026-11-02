@@ -1,0 +1,7 @@
+schema_version = "1.1"
+qualification_root = "/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4436/test_all_six_claude_cases_repl0/qualification"
+qualification_digest = "0000000000000000000000000000000000000000000000000000000000000000"
+credential_path = "/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4436/test_all_six_claude_cases_repl0/never-open-lease.json"
+lease_id = "unit-lease"
+host_kind = "claude"
+auth_mode = "api"

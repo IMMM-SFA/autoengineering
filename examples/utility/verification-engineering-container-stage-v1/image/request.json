@@ -1,0 +1,89 @@
+{
+  "scope": "one offline local engineering dependency image overlay",
+  "environment": {
+    "base_image": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
+    "base_environment_digest": "aec404431cb50f0bf3e34362183dc74294ce47b8bd96eb52241245da80b4d824",
+    "dependency_plan_digest": "a27daa3516697990d6585fab31010fb0c8590cbda0896e8c114e6b70b1c1a41d",
+    "payloads": {
+      "wheels/openmdao-3.41.0-py3-none-any.whl": "7b0ced8500c6d713d9b92352316bd6ec85d311cc2383fbc05a6637ac2bd590cf",
+      "wheels/packaging-26.3-py3-none-any.whl": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "wheels/requests-2.34.2-py3-none-any.whl": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "wheels/urllib3-2.8.0-py3-none-any.whl": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "wheels/certifi-2026.10.23-py3-none-any.whl": "e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1",
+      "wheels/charset_normalizer-3.5.1-py3-none-any.whl": "6df0ec430f9a831772c23ca5a224cba36517a58a84bb32c32bb59a9fa67c47f6",
+      "wheels/idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "model-source/examples/utility/engineering.py": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+      "model-source/examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+      "model-source/examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+      "model-source/examples/interoperability/circuit/fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+      "model-source/pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c"
+    },
+    "model_library": "openmdao-3.41.0",
+    "purpose": "coupled-load dependency candidate, no private worker admission"
+  },
+  "environment_digest": "24be3793c90641a2de10966c8cd3af0be3e1f04f0f2d1e52d6751d45ccabf0ce",
+  "source_image": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
+  "source_alias": "localhost/ae-engineering-source-1fed24dc839d4e39a50fc9d820198706:frozen",
+  "labels": {
+    "org.autoengineering.purpose": "utility-coupled-load-environment-candidate-v1",
+    "org.autoengineering.environment": "24be3793c90641a2de10966c8cd3af0be3e1f04f0f2d1e52d6751d45ccabf0ce",
+    "org.autoengineering.wheel": "52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7",
+    "org.autoengineering.source-image": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
+    "org.autoengineering.environment-recipe": "pinned-engineering-dependency-overlay-v1"
+  },
+  "command": [
+    "/opt/inference/bin/python",
+    "-I",
+    "-c",
+    "import importlib.metadata as m; print(m.version('openmdao'))"
+  ],
+  "files": {
+    "Dockerfile": "e0d05724b76f1f2798480a3b07b163de813f8f2b93c56b66504df8b38f29f3d9",
+    ".dockerignore": "e473a88a7da50226f9089435fe2ddc9daafbb774a02c0a8a4b0b389163bf97ed",
+    "checksums.sha256": "2addef534abc5699751be818020d2ac59c5b464020ee2b23fc8aa0fba0e2b99f",
+    "wheels/charset_normalizer-3.5.1-py3-none-any.whl": "6df0ec430f9a831772c23ca5a224cba36517a58a84bb32c32bb59a9fa67c47f6",
+    "wheels/certifi-2026.10.23-py3-none-any.whl": "e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1",
+    "wheels/packaging-26.3-py3-none-any.whl": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+    "wheels/idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+    "wheels/requests-2.34.2-py3-none-any.whl": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+    "wheels/urllib3-2.8.0-py3-none-any.whl": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+    "wheels/openmdao-3.41.0-py3-none-any.whl": "7b0ced8500c6d713d9b92352316bd6ec85d311cc2383fbc05a6637ac2bd590cf",
+    "model-source/pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c",
+    "model-source/examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "model-source/examples/utility/engineering.py": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+    "model-source/examples/interoperability/circuit/fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+    "model-source/examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a"
+  },
+  "binary": {
+    "path_digest": "e0bfec6b0e18664386d0cbda6f25311fd57d7b74285f0c684e06a54b8a2e5256",
+    "resolved_digest": "cb26684320496524df0cb02c26d92443a40e4e367e37cf674b1cda20986537aa",
+    "sha256": "4a728ee98f89005a90198a9be791e8fdaebbcb5e6af9721251efe0113df37759",
+    "size_bytes": 74041344
+  },
+  "buildx": {
+    "path_digest": "130e8afc7557216509554b0e2045f2f520ed6cfe13925965c73d7dd84223679a",
+    "resolved_digest": "cb26684320496524df0cb02c26d92443a40e4e367e37cf674b1cda20986537aa",
+    "sha256": "4a728ee98f89005a90198a9be791e8fdaebbcb5e6af9721251efe0113df37759",
+    "size_bytes": 74041344
+  },
+  "endpoint": {
+    "path_digest": "5561046d8997211b75a105111a982c221aace73c728a9b9f70a766d5a2cfdc22",
+    "device": 16777232,
+    "inode": 234643971,
+    "owner_uid": 501
+  },
+  "helper_sha256": "2c98439f3716846d072d8187f828e6ba104dfc6ca1c66c84fe141d2fbe3ba93c",
+  "script_sha256": "5d1a73b09fb80ac580c332ecda9f0b392861b55cf8139a3a388ffd87b61983ae",
+  "max_source_tags": 1,
+  "max_builds": 1,
+  "pull_commands": 0,
+  "build_network": "none",
+  "active_seconds": 600,
+  "requested_build_cpu_count": 1,
+  "requested_build_memory_bytes": 2147483648,
+  "automatic_retries": 0,
+  "scientific_starts": 0,
+  "disk_quota_enforced": false,
+  "daemon_cancellation_qualified": false,
+  "runtime_qualified": false
+}

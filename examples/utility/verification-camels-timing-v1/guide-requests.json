@@ -1,0 +1,30 @@
+[
+  {
+    "path": "daymet-v2-guide.html",
+    "url": "https://daacweb-prod.ornl.gov/DAYMET/guides/Daymet_mosaics.html",
+    "status": "complete",
+    "max_body_bytes": 524288,
+    "automatic_retries": false,
+    "http_status": 200,
+    "final_url": "https://daacweb-prod.ornl.gov/DAYMET/guides/Daymet_mosaics.html",
+    "body_bytes": 68375,
+    "sha256": "cfaf5a4d9b294a44937ccb758f0e7d82eb2124417a923930be69ecc06e220d2e",
+    "elapsed_seconds": 0.8939524171873927,
+    "total_http_exchanges": null,
+    "total_network_bytes": null
+  },
+  {
+    "path": "ncar-repository-root.json",
+    "url": "https://api.github.com/repos/NCAR/CAMELS/contents",
+    "status": "complete",
+    "max_body_bytes": 524288,
+    "automatic_retries": false,
+    "http_status": 200,
+    "final_url": "https://api.github.com/repos/NCAR/CAMELS/contents",
+    "body_bytes": 697,
+    "sha256": "4621620a4fe8e21eb5cf7de325827c2a45b8bf78902f337ee148ac34237d93c3",
+    "elapsed_seconds": 0.2491706246510148,
+    "total_http_exchanges": null,
+    "total_network_bytes": null
+  }
+]

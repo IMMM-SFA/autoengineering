@@ -1,0 +1,37 @@
+{
+  "status": "verified_increment_only",
+  "part_5_complete": false,
+  "production_admission": false,
+  "host_source_identity": "8402762a4b9dbbb4292a08e502997a8d54e5ffd6418153825a8a41fbe5eaf07f",
+  "agent_tests": 939,
+  "installed_tests": 100,
+  "documentation_and_reader_tests": 39,
+  "native_probe_scope": [
+    "14 syscall controls",
+    "native synthetic-helper/StructuredOutput roundtrip",
+    "timeout",
+    "cancellation",
+    "output limit",
+    "original completed replay",
+    "active owner loss with missing completion",
+    "saved completion caller loss"
+  ],
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "independent_confirmation_accesses": 0,
+  "original_study_pinned_files_unchanged": 15634,
+  "main_checkout_status": "clean",
+  "commit": "not_requested",
+  "push": "not_requested",
+  "remaining": [
+    "production upstream broker",
+    "host records/admission and scheduler/factory/cost integration",
+    "complete privacy/resource/workspace/permission qualification",
+    "actual authorized LLM role conformance",
+    "Linux x86-64",
+    "independent data and custody",
+    "qualified private scoring runtime",
+    "final protocol costs effort and paired analysis"
+  ],
+  "checked_at_utc": "2026-10-29T08:52:33.418685+00:00"
+}

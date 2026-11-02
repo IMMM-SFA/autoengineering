@@ -1,0 +1,77 @@
+-L/opt/homebrew/Cellar/netcdf/4.10.1/lib -lnetcdf
+-L/opt/homebrew/Cellar/hdf5/2.2.0/lib -lhdf5
+reading from setup.cfg...
+using /opt/homebrew/opt/netcdf/bin/nc-config...
+checking /opt/homebrew/Cellar/netcdf/4.10.1/include...
+hdf5 headers not found in /opt/homebrew/Cellar/netcdf/4.10.1/include
+nc-config did provide path to HDF5 headers, search standard locations...
+checking /opt/homebrew/opt/hdf5/include...
+HDF5 library version:  headers found in /opt/homebrew/opt/hdf5/include
+HDF5 library version:  found in /opt/homebrew/opt/hdf5
+using netcdf library version b'4.10.1'
+using Cython to compile netCDF4.pyx...
+netcdf lib does not have parallel functions
+NETCDF_PLUGIN_DIR not set, no netcdf compression plugins installed
+running bdist_wheel
+running build
+running build_py
+creating build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+copying src/netCDF4/__init__.py -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+copying src/netCDF4/utils.py -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+running egg_info
+writing src/netCDF4.egg-info/PKG-INFO
+writing dependency_links to src/netCDF4.egg-info/dependency_links.txt
+writing entry points to src/netCDF4.egg-info/entry_points.txt
+writing requirements to src/netCDF4.egg-info/requires.txt
+writing top-level names to src/netCDF4.egg-info/top_level.txt
+reading manifest file 'src/netCDF4.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/netCDF4.egg-info/SOURCES.txt'
+copying src/netCDF4/__init__.pyi -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+copying src/netCDF4/_netCDF4.pyi -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+copying src/netCDF4/_netCDF4.pyx -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+copying src/netCDF4/py.typed -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4
+creating build/lib.macosx-11.0-arm64-cpython-312/netCDF4/plugins
+copying src/netCDF4/plugins/empty.txt -> build/lib.macosx-11.0-arm64-cpython-312/netCDF4/plugins
+running build_ext
+Compiling src/netCDF4/_netCDF4.pyx because it changed.
+[1/1] Cythonizing src/netCDF4/_netCDF4.pyx
+building 'netCDF4._netCDF4' extension
+clang -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -O2 -Wall -fPIC -O2 -isystem /Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/include -fdebug-prefix-map=/Users/runner/miniforge3/conda-bld/python-split_1788406855827/work=/usr/local/src/conda/python-split-3.12.14 -arch arm64 -fPIC -O2 -isystem /Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/include -fdebug-prefix-map=/Users/runner/miniforge3/conda-bld/python-split_1788406855827/work=/usr/local/src/conda/python-split-3.12.14 -arch arm64 -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DNC_COMPLEX_NO_EXPORT=1 -I/opt/homebrew/Cellar/netcdf/4.10.1/include -I/opt/homebrew/opt/hdf5/include -I/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/numpy/_core/include -Iinclude -Iexternal/nc_complex/include -Iexternal/nc_complex/include/generated_fallbacks -I/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/include/python3.12 -c external/nc_complex/src/nc_complex.c -o build/temp.macosx-11.0-arm64-cpython-312/external/nc_complex/src/nc_complex.o
+clang -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -O2 -Wall -fPIC -O2 -isystem /Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/include -fdebug-prefix-map=/Users/runner/miniforge3/conda-bld/python-split_1788406855827/work=/usr/local/src/conda/python-split-3.12.14 -arch arm64 -fPIC -O2 -isystem /Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/include -fdebug-prefix-map=/Users/runner/miniforge3/conda-bld/python-split_1788406855827/work=/usr/local/src/conda/python-split-3.12.14 -arch arm64 -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION -DNC_COMPLEX_NO_EXPORT=1 -I/opt/homebrew/Cellar/netcdf/4.10.1/include -I/opt/homebrew/opt/hdf5/include -I/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/wind/lib/python3.12/site-packages/numpy/_core/include -Iinclude -Iexternal/nc_complex/include -Iexternal/nc_complex/include/generated_fallbacks -I/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/include/python3.12 -c src/netCDF4/_netCDF4.c -o build/temp.macosx-11.0-arm64-cpython-312/src/netCDF4/_netCDF4.o
+clang -bundle -undefined dynamic_lookup -Wl,-rpath,/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/lib -L/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/lib -Wl,-rpath,/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/lib -L/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/wind/lib build/temp.macosx-11.0-arm64-cpython-312/external/nc_complex/src/nc_complex.o build/temp.macosx-11.0-arm64-cpython-312/src/netCDF4/_netCDF4.o -L/opt/homebrew/Cellar/netcdf/4.10.1/lib -L/opt/homebrew/opt/hdf5/lib -Wl,-rpath,/opt/homebrew/Cellar/netcdf/4.10.1/lib -Wl,-rpath,/opt/homebrew/opt/hdf5/lib -lnetcdf -lhdf5_hl -lhdf5 -o build/lib.macosx-11.0-arm64-cpython-312/netCDF4/_netCDF4.cpython-312-darwin.so
+installing to build/bdist.macosx-11.0-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-11.0-arm64/wheel
+creating build/bdist.macosx-11.0-arm64/wheel/netCDF4
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/_netCDF4.pyi -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/__init__.pyi -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+creating build/bdist.macosx-11.0-arm64/wheel/netCDF4/plugins
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/plugins/empty.txt -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4/plugins
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/_netCDF4.cpython-312-darwin.so -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/utils.py -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/_netCDF4.pyx -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+copying build/lib.macosx-11.0-arm64-cpython-312/netCDF4/py.typed -> build/bdist.macosx-11.0-arm64/wheel/./netCDF4
+running install_egg_info
+Copying src/netCDF4.egg-info to build/bdist.macosx-11.0-arm64/wheel/./netCDF4-1.7.4-py3.12.egg-info
+running install_scripts
+creating build/bdist.macosx-11.0-arm64/wheel/netcdf4-1.7.4.dist-info/WHEEL
+creating '/private/tmp/utility-wind-netcdf-build-v3/wheel/.tmp-b8vd_6aq/netcdf4-1.7.4-cp312-cp312-macosx_26_0_arm64.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
+adding 'netCDF4/__init__.py'
+adding 'netCDF4/__init__.pyi'
+adding 'netCDF4/_netCDF4.cpython-312-darwin.so'
+adding 'netCDF4/_netCDF4.pyi'
+adding 'netCDF4/_netCDF4.pyx'
+adding 'netCDF4/py.typed'
+adding 'netCDF4/utils.py'
+adding 'netCDF4/plugins/empty.txt'
+adding 'netcdf4-1.7.4.dist-info/licenses/LICENSE'
+adding 'netcdf4-1.7.4.dist-info/METADATA'
+adding 'netcdf4-1.7.4.dist-info/WHEEL'
+adding 'netcdf4-1.7.4.dist-info/entry_points.txt'
+adding 'netcdf4-1.7.4.dist-info/top_level.txt'
+adding 'netcdf4-1.7.4.dist-info/RECORD'
+removing build/bdist.macosx-11.0-arm64/wheel

@@ -1,0 +1,40 @@
+"""Existing confirmation service with a source-bound authored callback, no circuit solve."""
+import sys,json,secrets,hashlib
+from pathlib import Path
+root=Path(__file__).resolve().parents[3]
+sys.path[:0]=[str(root),str(root/'tests')]
+import pytest
+from test_utility_engineering_source_binding import setup,H
+from autoengineering.campaign.serialization import digest
+from autoengineering.utility.scoring import ConfirmationService,PublicScore
+from examples.utility import engineering_source_binding as b
+from examples.utility import engineering_scenarios as source
+output=Path(sys.argv[1]).absolute();output.mkdir(mode=0o700)
+patch=pytest.MonkeyPatch()
+try:
+    original_entropy=secrets.token_bytes
+    store,grant,contract,artifact,public,private,metadata=setup(output,patch,entropy=original_entropy)
+    reads=[]
+    def scorer(active,model):
+        rows=b.open_for_confirmation(store,active,artifact,public,private,scorer_code_digest=H)
+        assert len(rows)==24
+        reads.append(1)
+        return PublicScore('success','power','W',3.,True) # Declared authored fixture score.
+    service=ConfirmationService(store,scorer,scorer_digest=grant.scorer_digest,outcome_contract=contract)
+    receipt=service.confirm(grant)
+    patch.setattr(source,'read_private',lambda *a,**kw:(_ for _ in ()).throw(AssertionError('saved score reopened private source')))
+    patch.setattr(source.secrets,'token_bytes',lambda n:(_ for _ in ()).throw(AssertionError('saved score redrew')))
+    resumed=ConfirmationService(store,lambda *a:(_ for _ in ()).throw(AssertionError('saved score rescored')),
+                                scorer_digest=grant.scorer_digest,outcome_contract=contract)
+    assert resumed.confirm(grant)==receipt and reads==[1]
+    fixed=b.read_binding(store,artifact)
+    result={'scope':'Authored selected-model fixture plus source-bound callback through unchanged confirmation service; not a circuit result',
+            'suite_digest':store.spec.digest,'binding_artifact':artifact.to_dict(),'binding_digest':fixed.digest,
+            'grant':grant.to_dict(),'outcome_contract':contract.to_dict(),'receipt':receipt.to_dict(),
+            'callback_invocations':1,'source_reads':1,'new_entropy_on_replay':0,'source_reads_on_replay':0,
+            'scientific_confirmation_starts_charged':1,'model_or_solver_calls':0,'provider_calls':0,
+            'score_kind':'authored constant fixture','source_values_exported':False,'task_admitted':False,
+            'private_boundary_qualified':False}
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+    print(json.dumps({k:v for k,v in result.items() if k not in ('grant','receipt','outcome_contract')}))
+finally:patch.undo()

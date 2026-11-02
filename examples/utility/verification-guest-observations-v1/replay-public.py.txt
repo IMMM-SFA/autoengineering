@@ -1,0 +1,45 @@
+"""Replay authored public captures only; no runtime attestation or model execution."""
+import json
+from pathlib import Path
+import socket
+import subprocess
+import tarfile
+import tempfile
+import time
+
+from autoengineering.campaign.artifacts import read_bytes
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.utility.guest_observations import project_observations
+from autoengineering.utility.guest_receipts import (
+    GuestInferenceArchive, GuestLaunchIntent, verify_guest_archive,
+)
+from autoengineering.utility.inference_execution import FrozenGuestInferenceJob
+from autoengineering.utility.scoring import ConfirmationGrant
+
+bundle = Path(__file__).parent
+inputs = json.loads((bundle / 'reader-inputs.json').read_text())
+with tempfile.TemporaryDirectory() as directory:
+    destination = Path(directory).resolve()
+    with tarfile.open(bundle / 'authored-public-observations.tar.gz') as archive:
+        archive.extractall(destination, filter='data')
+    root = destination / 'public'
+    for p in [root, *root.rglob('*')]:
+        p.chmod(0o700 if p.is_dir() else 0o600)
+    ref = ArtifactRef.from_dict(inputs['archive'])
+    archived = GuestInferenceArchive.from_json(read_bytes(root, ref).decode())
+    job = FrozenGuestInferenceJob.from_json(read_bytes(root, archived.job).decode())
+    launch = GuestLaunchIntent.from_json(read_bytes(root, archived.launch).decode())
+    observations = json.loads((root / 'authored-raw-observations.json').read_text())
+    def forbidden(*args, **kwargs):
+        raise AssertionError('replay cannot execute, connect or resample elapsed time')
+    subprocess.Popen = socket.socket = time.monotonic = forbidden
+    projected = project_observations(job, launch, **observations)
+    for value, name in zip(projected, ('start', 'stop', 'cleanup'), strict=True):
+        assert value.to_json().encode() == read_bytes(root, getattr(archived, name))
+    result = verify_guest_archive(
+        root, ref, ConfirmationGrant.from_dict(inputs['grant']), **inputs['pins']
+    )
+    assert result.job_digest == inputs['expected_job_digest']
+    assert result.status == 'success' and result.boundary == 'unqualified-candidate'
+    assert result.lifecycle_seconds is None
+    print('Relocated authored captures and public archive agree; no runtime admission.')

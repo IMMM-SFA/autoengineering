@@ -1,0 +1,981 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-US">
+<head>
+<meta name="docSource" content="guide document">
+<meta name="project" content="Daymet">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="/css/guide.css">
+<title>Daymet: Daily Surface Weather Data on a 1-km Grid for North America, Version 2</title>
+<link rel="stylesheet" type="text/css" href="/css/content.css">
+</head>
+<body>
+  <div id="guidebox">
+    <link rel="stylesheet" href="/css/new.css"><script>  var dataLayer = window.dataLayer = window.dataLayer || [];
+  dataLayer.push({
+      'event': 'ipAddress',
+      'ipAddress': '97.120.112.25'
+  });
+</script><a id="skip-nav" href="#main-content">Skip to main content</a><header class="headerbox"> <!-- begin headerbox container div --><div class="headerpicbox"><a id="daac-link" href="/" title="ORNL DAAC">ORNL DAAC Home</a><a id="nasa-link" href="https://www.nasa.gov" title="NASA" target="_blank">NASA Home</a><nav class="menubox"><ul class="nav">
+	<li class="top first home"><a class="top_link" href="/" title="ORNL DAAC home"><span class="fa fa-home fa-fw"></span><span class="home_text down">Home</span></a>
+	</li>
+	<li class="top"><a href="/about/" class="top_link"><span class="down">About Us</span></a>
+		<ul class="sub">
+			<!-- <li><a href="/about_us.shtml"><span>About ORNL DAAC</span></a></li> -->
+			<!-- <li><a href="/who.shtml"><span>Who We Are</span></a></li> -->
+			<!-- <li><a href="/partners.html"><span>Partners</span></a></li> -->
+			<!-- <li><a href="/about/biogeochem/"><span>Biogeochemical Dynamics</span></a></li> -->
+			<li><a href="/about#mission"><span>Mission</span></a></li>
+			<li><a href="/about#citation_guidelines"><span>Data Use and Citation Guidelines</span></a></li>
+			<li><a href="/about#uwg"><span>User Working Group</span></a></li>
+			<li><a href="/about#partners"><span>Partners</span></a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/about/about_us.html"><span>About Us</span></a></li> -->
+	<li class="top"><a href="/get_data/" class="top_link"><span class="down">Get Data</span></a>
+		<ul class="sub">
+			<!--<li><a href="/get_data#datasearch" class="fly"><span>Search for Data</span></a>
+				<ul>
+					<li><a href="/daacdata"><span>Browse Data</span></a></li>
+				</ul>
+			</li>-->
+			<li><a href="/get_data#themes" class="fly"><span>Science Themes</span></a>
+				<ul>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=1"><span>Vegetation and Forests</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=2"><span>Arctic Ecosystems</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=3"><span>Soils</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=4"><span>Carbon Cycle</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=5"><span>Biomass</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=6"><span>Land Use and Human Dimensions</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=7"><span>Hydrology and Cryosphere</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=8"><span>Fire</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=9"><span>Climate</span></a></li>
+				</ul>
+			</li>
+			<li><a href="/get_data#projects" class="fly"><span>NASA Projects</span></a>
+				<ul>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=1"><span>BigFoot</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=10"><span>Hydroclimatology Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=11"><span>Large Scale Biosphere-Atmosphere Experiment (LBA-ECO)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=12"><span>Terrestrial Ecology Subsetting & Visualization Services (TESViS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=13"><span>Net Primary Productivity (NPP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=14"><span>Oregon Transect Ecosystem Research Project (OTTER)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=15"><span>Prototype Validation Exercise (PROVE)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=16"><span>River Discharge (RIVDIS)</span></a></li> -->
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=17"><span>Vegetation Collection</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=18"><span>Southern African Regional Science Initiative Project (SAFARI 2000)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=19"><span>Soil Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=2"><span>Boreal Ecosystem-Atmosphere Study (BOREAS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=20"><span>Superior National Forest</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=21"><span>Vegetation Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=22"><span>Vegetation-Ecosystem Modeling and Analysis Project (VEMAP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=27"><span>Model Archive</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=28"><span>North American Carbon Program (NACP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=29"><span>International Satellite Land Surface Climatology Project (ISLSCP II)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=3"><span>Boreal Ecosystem-Atmosphere Study (BOREAS)</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=30"><span>Atmospheric Tracer Transport Model Intercomparison Project (TransCom)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=31"><span>Services</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=32"><span>Daymet</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=33"><span>Carbon Monitoring System (CMS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=34"><span>Arctic-Boreal Vulnerability Experiment (ABoVE)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=35"><span>Carbon in Arctic Reservoirs Vulnerability Experiment (CARVE)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=36"><span>Airborne Microwave Observatory of Subcanopy and Subsurface (AirMOSS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=37"><span>Atmospheric Carbon and Transport - America (ACT-America)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=38"><span>AfriSAR</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=39"><span>Atmospheric Tomography Mission (ATom)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=4"><span>Accelerated Canopy Chemistry Program (ACCP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=40"><span>Global Ecosystem Dynamics Investigation (GEDI)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=41"><span>Delta-X</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=42"><span>SIF-ESDR</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=43"><span>MODIS/ASTER Airborne Simulator (MASTER)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=44"><span>CARbon Atmosphere Flux Experiment (CARAFE)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=45"><span>Active Sensing of CO2 Emissions over Nights, Days, and Seasons (ASCENDS) Airborne Campaign</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=46"><span>CO2 and MEthane eXperiment (COMEX)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=47"><span>Airborne Visible InfraRed Imaging Spectrometer (AVIRIS)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=48"><span>Hyperspectral Infrared Imager (HyspIRI) Airborne</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=49"><span>SBG High Frequency Time Series (SHIFT)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=5"><span>Climate Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=50"><span>Space-based Imaging Spectroscopy and Thermal pathfindER (SISTER)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=51"><span>Biodiversity Survey of the Cape (BioSCape)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=52"><span>Biological Diversity</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=53"><span>Western Diversity Time Series</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=55"><span> FireSense</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=56"><span>Hyperspectral Thermal Emission Spectrometer (HyTES)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=57"><span>Geological Earth Mapping Experiment (GEMx)</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=58"><span>Portable Remote Imaging Spectrometer (PRISM)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=59"><span>Airborne Validation Unified Experiment: Land to Ocean (AVUELO)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=6"><span>EOS Land Validation</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=60"><span>Surface Biology and Geology (SBG)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=7"><span>First ISLSCP Field Experiment (FIFE)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=8"><span>First ISLSCP Field Experiment (FIFE)</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=9"><span>FLUXNET</span></a></li>
+				</ul>
+			</li>
+			<li><a href="/get_data#datasets" class="fly">All Datasets</a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/get_data/get_data.html"><span>Get Data</span></a></li> -->
+	<li class="top"><a href="/submit/" class="top_link"><span class="down">Submit Data</span></a>
+		<ul class="sub">
+			<li><a href="/submit/form/form.html"><span>Submit Data Form</span></a></li>
+			<li><a href="/submit/#scope_and_acceptance_practices"><span>Data Scope and Acceptance Practices</span></a></li>
+			<li><a href="/submit/#authorship"><span>Data Authorship Guidance</span></a></li>
+			<li><a href="/submit/#timeline"><span>Data Publication Timeline</span></a></li>
+			<li><a href="/submit/#guidelines"><span>Detailed Submission Guidelines</span></a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/submit/submit.html"><span>Submit Data</span></a>
+		<ul class="sub">
+			<li><a href="/submit/form/form.html"><span>Submit Data Form</span></a></li>
+			<li><a href="/submit/#scope_and_acceptance_practices"><span>Data Scope and Acceptance Practices</span></a></li>
+			<li><a href="/submit/#authorship"><span>Data Authorship Guidance</span></a></li>
+			<li><a href="/submit/#timeline"><span>Data Publication Timeline</span></a></li>
+			<li><a href="/submit/#guidelines"><span>Detailed Submission Guidelines</span></a></li>
+			<li><a href="/submit/questions/questions.html"><span>Data Provider Questions</span></a></li>
+			<li><a href="/submit/qachecklist/qachecklist.html"><span>Data Quality Review Checklist</span></a></li>
+			<li><a href="/submit/csvstandards/csvstandards.html"><span>CSV Standards</span></a></li>
+			<li><a href="/submit/netcdfrequirements/netcdfrequirements.html"><span>NetCDF Data Requirements</span></a></li>
+			<li><a href="/submit/help/helpsub.html"><span>Submission Help</span></a></li>
+		</ul>
+	</li> -->
+	<li class="top"><a href="/tools/" class="top_link"><span class="down">Tools</span></a>
+		<ul class="sub">
+			<!-- <li><a href="/tools/"><span>Data Tools</span></a></li> -->
+			<li><a href="https://modis.ornl.gov/data.html" class="fly"><span>TESViS</span></a>
+				<ul>
+					<li><a href="/modisfixedsite/"><span>TESViS Fixed Site Subsets</span></a></li>
+					<li><a href="/modisglobal/"><span>TESViS Global Subsets</span></a></li>
+					<li><a href="/modiswebservice/"><span>TESViS Web service</span></a></li>
+				</ul></li>
+			<li><a href="https://thredds.daac.ornl.gov/thredds/catalogs/ornldaac/ornldaac.html"><span>THREDDS</span></a></li>
+			<li><a href="https://webmap.ornl.gov/ogc"><span>SDAT</span></a></li>
+			<li><a href="https://daymet.ornl.gov"><span>Daymet</span></a></li>
+			<!-- <li><a href="https://carve.ornl.gov/visualize/"><span>CARVE Data Viewer</span></a></li> -->
+			<!-- <li><a href="/tools/airborne-data-visualizer/adv.html"><span>Airborne Data Visualizer</span></a></li> -->
+			<!-- <li><a href="/tools/airborne-data-visualizer-project-list/adv_viewer.html"><span>Airborne Data Visualizer</span></a></li> -->
+			<li><a href="/tools/airborne-data-visualizer-project-list/"><span>Airborne Data Visualizer</span></a></li>
+			<li><a href="https://airmoss.ornl.gov/visualize/"><span>Soil Moisture Visualizer</span></a></li>
+			<!-- <li><a href="/cgi-bin/service_dataset_lister.pl?svc_id=1"><span>Spatial Data Access</span></a></li> -->
+			<!-- <li><a href="/cgi-bin/service_dataset_lister.pl?svc_id=2"><span>Spatial Data Access</span></a></li> -->
+			<!-- <li><a href="/spatial_data_access.shtml"><span>Spatial Data Access</span></a></li> -->
+			<!-- <li><a href="/webgis.shtml"><span>WebGIS</span></a></li> -->
+			<!-- <li><a href="/thredds.shtml"><span>THREDDS</span></a></li> -->
+			<!-- <li><a href="/cgi-bin/service_dataset_lister.pl?svc_id=4"><span>THREDDS</span></a></li> -->
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/tools/tools.html"><span>Tools</span></a></li> -->
+	<li class="top"><a href="/resources/" class="top_link"><span class="down">Resources</span></a>
+		<ul class="sub">
+			<li><a href="/resources/learning/"><span>Learning</span></a></li>
+			<li><a href="/datamanagement/"><span>Data Management</span></a></li>
+			<li><a href="https://daac-news.ornl.gov/"><span>News</span></a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/resources/resources.html"><span>Resources</span></a>
+		<ul class="sub">
+			<li><a href="/resources/learning/learning.html"><span>Learning</span></a></li>
+			<li><a href="/datamanagement/datamanagement.html"><span>Data Management</span></a></li>
+		</ul>
+	</li> -->
+	<li class="top"><a href="/help/" class="top_link"><span class="down">Help</span></a>
+		<ul class="sub">
+	<li><a href="https://forum.earthdata.nasa.gov/" title"Earthdata Forum" id="Forum"><span>Earthdata Forum</span><span class="icon-external-link line-icon pad-left" title="external link"></span></a></li>
+	<li><a href="mailto:uso@daac.ornl.gov">Email Us<span class="icon-envelope-alt line-icon pad-left" title="external link"></span></a></li>
+		</ul>
+	</li>
+</ul>
+</nav> <!-- end of menubox --><div id="signin" class="signin"><a class="top_link" title="sign in" href="/cgi-bin/urs/urs_logon_initiate.pl"><span><span class="icon-signin"></span>Sign in</span></a></div></div> <!-- end of headerpicbox --><div class="menuBar"></div></header> <!-- end of headerbox container --><div id="crumbs" class="crumbs"><a href="/">DAAC Home</a> > <a href="/get_data/">Get Data</a> > <a href="/get_data#projects">NASA Projects</a> > <a href="/cgi-bin/dataset_lister.pl?p=32">Daymet</a> > User guide</div><span id="main-content"></span><script>var tabToHighlight = "Get Data";</script>
+
+
+    <div class="pagetitle">
+      Daymet: Daily Surface Weather Data on a 1-km Grid for North America, Version 2<br> <a class="button"
+        href="/cgi-bin/dsviewer.pl?ds_id=1219" target="_blank">Get Data</a>
+    </div>
+    <div id="contentbox">
+      <p class="I1">Revision Date: July, 15, 2016</p>
+<table class="nogrid versionNotice" align="center" cellpadding="5">
+  <tbody>
+    <tr>
+      <td class="nogrid" style="width: 801px">
+        <strong>Please note that this version was superseded by Version 3 on 2016/07/15.</strong> 
+        <br><br>
+        Follow this link to the latest version:<br><br>
+        Thornton, P.E., M.M. Thornton, B.W. Mayer, Y. Wei, R. Devarakonda, R.S. Vose, and R.B. Cook. 2016. 
+        Daymet: Daily Surface Weather Data on a 1-km Grid for North America, Version 3. ORNL DAAC, Oak 
+        Ridge, Tennessee, USA. 
+	<a href="http://dx.doi.org/10.3334/ORNLDAAC/1328">http://dx.doi.org/10.3334/ORNLDAAC/1328</a>
+        <br><br>
+        Contact ORNL DAAC User Services (support-ornl@earthdata.nasa.gov) if you need additional assistance.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br><br>
+
+<h2>Summary:</h2>
+      <p class="I1">This data set provides Daymet output data as mosaicked gridded estimates of daily weather
+        parameters for North America, including continuous surfaces of day length, precipitation, shortwave radiation,
+        snow water equivalent, maximum air temperature, minimum air temperature, and water vapor pressure. The Daymet
+        data product was derived from selected meteorological station data by interpolation and extrapolation
+        algorithms.</p>
+      <p class="I1">The data product covers the period January 1, 1980 to December 31 of the most recently processed
+        calendar year for Canada and the United States, currently 2015. Data for additional calendar years will become available by June
+        of the following year. For Mexico, data are available for the period January 1, 1980 to December 31, 2009.</p>
+      <p class="I1">Data are available on a daily time step at a 1-km x 1-km spatial resolution in Lambert Conformal
+        Conic projection with a spatial extent that covers the conterminous United States, Mexico, and Southern Canada
+        as meteorological station density allows. Data are assembled by parameter and year with each yearly file
+        containing a time dimension of 365 days.</p>
+      <p class="I1">Data are provided in Climate and Forecast (CF) metadata convention compliant (version 1.4)
+        netCDF file formats.</p>
+
+      <p class="u">Daymet data are available from the ORNL DAAC via two download mechanisms.</p>
+      <p class="I1">1. Search and Order or Data Browse: Data files may be obtained through DAAC search and order
+        tools or directly by browsing the Daymet data directories. Files are in netCDF version 4.0 format. 
+	There are 252 *.nc4 files each
+        containing 7 parameters (dayl, prcp, srad, swe, tmax, tmin, and vp) for 36 years (1980 -2015).</p>
+      <p class="I1">2. THREDDS (Thematic Real-time Environmental Data Services) Data Server: Data can be subset
+        spatially and temporally prior to downloading. THREDDS downloads are available in various formats: netCDF-3
+        format (*.nc) or netCDF-4 format (*.nc4) if through NetCDF Subset Service and in ASCII or Binary if through
+        OPeNDAP. Subsetting and downloading of files available through THREDDS has a 2-GB file size limitation.</p>
+      <p class="I1">The ORNL DAAC is publishing Version 2.0 of the North American mosaics and will update the Daymet
+        products annually. Version and change history documentation are provided.</p>
+      <p class="I1">&nbsp;</p>
+      <p class="I1">
+        <strong>ORNL DAAC Version Record:</strong>
+      </p>
+      <table class="grid">
+        <tbody>
+          <tr>
+            <th class="grid" style="width: 147px">Daymet Product Version</th>
+            <th class="grid" style="width: 112px">ORNL DAAC Release Date</th>
+            <th class="grid" style="width: 267px">Description</th>
+          </tr>
+          <tr>
+            <td class="gridL" style="width: 147px">Version 3, North American mosaics</td>
+            <td class="grid" style="width: 112px">July 12, 2016</td>
+            <td class="gridL" style="width: 267px">ORNL DAAC archived and released new daily gridded mosaics for
+              meteorological parameters and updated Daymet Website. All existing Daymet products and tools continue to
+              be available.</td>
+          </tr>
+	  <tr>
+	    <td class="gridL" style="width: 147px">2015 mosaics</td>
+	    <td class="grid" style="width: 112px">March 7, 2016</td>
+	    <td class="gridL" style="width:267px">ORNL DAAC released daily gridded mosaics for 2015 for each
+	      Daymet variable.</td>
+          <tr>
+            <td class="gridL" style="width: 147px">2014 mosaics</td>
+            <td class="grid" style="width: 112px">May 18, 2015</td>
+            <td class="gridL" style="width: 267px">ORNL DAAC released daily gridded mosaics for 2014 for each
+              Daymet variable.</td>
+          <tr>
+            <td class="gridL" style="width: 147px">2013 mosaics</td>
+            <td class="grid" style="width: 112px">June 13, 2014</td>
+            <td class="gridL" style="width: 267px">ORNL DAAC released daily gridded mosaics for 2013 for each
+              Daymet variable.</td>
+
+          </tr>
+          <tr>
+            <td class="gridL" style="width: 147px">Version 2, North American mosaics</td>
+            <td class="grid" style="width: 112px">May 15, 2014</td>
+            <td class="gridL" style="width: 267px">ORNL DAAC archived and released new daily gridded mosaics for
+              meteorological parameters and updated Daymet Website. All existing Daymet products and tools continue to
+              be available.</td>
+
+          </tr>
+          <tr>
+            <td class="gridL" style="width: 147px">&nbsp;</td>
+            <td class="grid" style="width: 112px">May 10, 2012</td>
+            <td class="gridL" style="width: 267px">NACP Modeling and Synthesis Thematic Data Center (MAST-DC) at
+              ORNL released new daily gridded meteorological parameter data for 2-degree Daymet tiles through the Daymet
+              Website.</td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Data and Documentation Access:</h2>
+      <p class="I1">
+        <strong>Get Data: </strong> <a href="/cgi-bin/dsviewer.pl?ds_id=1219">http://daac.ornl.gov/cgi-bin/dsviewer.pl?ds_id=1219</a>
+      </p>
+      <p class="I1">
+        <strong>Daymet THREDDS Data Server: </strong> <br>
+        <a href="http://thredds.daac.ornl.gov/thredds/catalogs/ornldaac/Regional_and_Global_Data/DAYMET_COLLECTIONS/DAYMET_COLLECTIONS.html">http://thredds.daac.ornl.gov/thredds/catalogs/ornldaac/Regional_and_Global_Data/DAYMET_COLLECTIONS/DAYMET_COLLECTIONS.html</a>
+
+      </p>
+      <p class="I1">The THREDDS Data Server allows users to find and access data sets of interest from within a
+        simple, hierarchical catalog within a Web browser or compatible client software. Data can be subset spatially
+        and temporally prior to downloading. THREDDS supports data downloads in various data formats. Subsetting and
+        downloading of files available through THREDDS has a 2-GB file size limitation.</p>
+      <p class="I1">
+        <strong>Companion Documentation for this Data Set:</strong>
+      </p>
+      <p class="I2">&nbsp;&nbsp;Daymet_mosaics.pdf (this user’s guide)</p>
+      <p class="I2">&nbsp;&nbsp;Daymet_mosaics_version_readme.txt</p>
+
+
+
+      <p class="I1">
+        <strong>Supplemental Information: </strong>
+      </p>
+      <p class="I2">
+        For additional information, please see the following web sites : <br> <br> • <a
+          href="http://daymet.ornl.gov/">Daymet Project Web Page</a> <br> • <a
+          href="http://daymet.ornl.gov/tools.html">Daymet Community Tools Site</a> <br> • <a
+          href="http://daymet.ornl.gov/biblio.html">Daymet User Literature Citations </a>
+      </p>
+
+      <p class="I1">
+        <strong>Additional Data Services at the Daymet Project Web Site:</strong>
+      </p>
+      <p class="I1">In addition to the Search and Order/Data Browse and THREDDS data download capabilities, two services are
+        available to provide Daymet data in other forms.</p>
+      <p class="u">Single 1-km by 1-km Pixel Data Extraction Tool</p>
+      <p class="I2">
+        This tool allows a user to obtain daily data for all or a selection of the parameters for selected year(s) for a
+        single geographic point (1-km x 1-km pixel) in a tabular format output file. Direct link: <a
+          href="http://daymet.ornl.gov/singlepixel.html">http://daymet.ornl.gov/singlepixel.html</a>
+      </p>
+
+      <p class="u">Daymet Tile (2-degree x 2-degree ) of Daily Gridded Surface Data Selection Tool</p>
+      <p class="I2">
+        This tool allows a user to obtain gridded data for the 2-degree by 2-degree tiles that are produced during the
+        Daymet processing routine. Users can download the daily gridded surface data for all Daymet parameters for the
+        selected tile. Daily data for each parameter are distributed as individual files in a netCDF-3 format (*.nc)
+        file format. Direct link: <a href="http://daymet.ornl.gov/gridded.html">http://daymet.ornl.gov/gridded.html</a>
+      </p>
+
+      <p class="I1">&nbsp;</p>
+      <a href="#Daymet_m_citation"></a> <a name="Daymet_m_citation"></a>
+      <h2>Data Citation:</h2>
+      <p class="I1">
+        <strong> Cite this data set as follows:</strong>
+      </p>
+      <p class="I1">
+        Thornton, P.E., M.M. Thornton, B.W. Mayer, N. Wilhelmi, Y. Wei, R. Devarakonda, and R.B. Cook. 2014. Daymet:
+        Daily Surface Weather Data on a 1-km Grid for North America, Version 2. ORNL DAAC, Oak Ridge, Tennessee, USA.
+        Accessed Month DD, YYYY. Time period: YYYY-MM-DD to YYYY-MM-DD. Spatial range: N=DD.DD, S=DD.DD, E=DDD.DD, W=DDD.DD.
+        <a href="http://dx.doi.org/10.3334/ORNLDAAC/1219">http://dx.doi.org/10.3334/ORNLDAAC/1219</a>
+      </p>
+      <p class="I1">
+        <strong>For citing specific Daymet downloaded data and subsets used in your analyses and publications
+          document as appropriate:</strong>
+      </p>
+      <p class="I2">
+        <strong>Date accessed:</strong> Date that you downloaded data to account for possible updates within Version 2.
+      </p>
+      <p class="I2">
+        <strong>Temporal range:</strong> Range of data in year/month/day (YYYY/MM/DD).
+      </p>
+      <p class="I2">
+        <strong>Spatial range:</strong> Define the bounding box for the data as the Northern- and Southern-most
+        latitudes and Eastern- and Western-most longitudes in decimal degrees. South latitude and West longitude are (-)
+        negative values. Add decimal places as needed for precision.
+      </p>
+      <p class="I1">
+        <strong>In addition to the data set citation, the following should be used as the general reference for
+          the methods used to generate Daymet data products:</strong>
+      </p>
+      <p class="I2">
+        Thornton, P.E., Running, S.W., White, M.A. 1997. Generating surfaces of daily meteorological variables over
+        large regions of complex terrain. Journal of Hydrology 190: 214 - 251. <a
+          href="http://dx.doi.org/10.1016/S0022-1694(96)03128-9">http://dx.doi.org/10.1016/S0022-1694(96)03128-9</a>
+      </p>
+      <p class="I1">
+        <strong>For applications of the radiation and humidity data please include the following citations in
+          addition to the general citation:</strong>
+      </p>
+      <p class="I2">
+        Thornton, P.E., H. Hasenauer, and M.A. White. 2000. Simultaneous estimation of daily solar radiation and
+        humidity from observed temperature and precipitation: An application over complex terrain in Austria.
+        Agricultural and Forest Meteorology 104:255-271.<a href="http://dx.doi.org/10.1016/S0168-1923(00)00170-2">
+          http://dx.doi.org/10.1016/S0168-1923(00)00170-2</a>
+      </p>
+      <p class="I2">
+        Thornton, P.E. and S.W. Running. 1999. An improved algorithm for estimating incident daily solar radiation from
+        measurements of temperature, humidity, and precipitation. Agriculture and Forest Meteorology. 93:211-228. <a
+          href="http://dx.doi.org/10.1016/S0168-1923(98)00126-9">http://dx.doi.org/10.1016/S0168-1923(98)00126-9</a>
+      </p>
+
+      <h2>Table of Contents:</h2>
+      <ul>
+        <li><a href="#HDataSetOverview">1 Data Set Overview</a></li>
+        <li><a href="#datacharact">2 Data Characteristics</a></li>
+        <li><a href="#appderivation">3 Applications and Derivation</a></li>
+        <li><a href="#qualityassess">4 Quality Assessment</a></li>
+        <li><a href="#HAcqMatMethods">5 Acquisition Materials and Methods</a></li>
+        <li><a href="#HDataDescrAccess">6 Data Access</a></li>
+        <li><a href="#references">7 References </a></li>
+      </ul>
+      <a name="HDataSetOverview"></a>
+      <h2>1. Data Set Overview:</h2>
+      <p class="I1">
+        <strong>Project:</strong> Daymet
+      </p>
+      <p class="I1">Daymet is model-produced gridded estimates of daily weather parameters based on daily
+        meteorological observations. The algorithms and software that generate Daymet data products were developed to
+        fulfill the need for continuous surfaces of daily weather data necessary for plant growth model inputs. These
+        Daymet data also have broad applications over a wide variety of scientific and research fields including
+        hydrology, terrestrial vegetation growth models, carbon cycle science, and regional to large scale climate
+        change analysis. Weather parameters generated include daily surfaces of minimum and maximum temperature,
+        precipitation, humidity, and radiation produced on a 1-km x 1-km gridded surface in Lambert Conformal Conic
+        projection over the conterminous United States, Mexico, and Southern Canada. The required model inputs include a
+        digital elevation model and observations of maximum temperature, minimum temperature, and precipitation from
+        ground-based meteorological stations.</p>
+      <p class="I1">Mosaicked daily gridded data are available for the seven output parameters and distributed as
+        individual files per year each in a CF compliant (version 1.4) netCDF file format. The netCDF file format is
+        self-describing and compliant to the CF metadata conventions. Each parameter, as well as the spatial and
+        temporal properties of the data, is defined within the header file.</p>
+      <p class="I1">&nbsp;</p>
+      <a name="datacharact"></a>
+      <h2>2. Data Characteristics:</h2>
+      <p class="I1">Data are available for each of the seven parameters on a daily time step at a 1-km x 1-km
+        spatial resolution for the conterminous United States, Mexico, and Southern Canada. The spatial extent is the
+        same for all of the files. See the data spatial properties description below.</p>
+      <p class="I1">The data set begins in January 1, 1980 and ends in December of the most recently processed
+        calendar year -- currently 2015. For Mexico, data are available for the period January 1, 1980 to December 31,
+        2009.</p>
+      <p class="u">
+        <strong>DAAC HTTP Site:</strong>
+      </p>
+      <p class="I1">Data are assembled by parameter and year with each yearly *.nc4 file containing a time dimension
+        of 365 days. Files are in CF-compliant netCDF-4 format.</p>
+      <p class="I1">Files are assembled by parameter and year in a flat structure. Filenames follow this syntax:</p>
+      <p class="I3">pppp_YYYY.nc4</p>
+      <p class="I1">Where pppp is the respective parameter abbreviation (dayl, prcp, srad, swe, tmax, tmin, and vp)
+        and YYYY is year. For example, precipitation data are provided in 36 files starting with prcp_1980.nc4 through
+        prcp_2015.nc4.</p>
+      <P class="Iu">
+        <strong>THREDDS Data Server:</strong>
+      </p>
+      <p class="I1">Data are presented by year (1980-2015) and then parameter.</p>
+      <p class="I1">Data can be subset spatially and temporally prior to downloading. THREDDS downloads are
+        available in various formats: netCDF-3 format (*.nc) or netCDF-4 format (*.nc4) if through NetCDF Subset Service
+        and in ASCII or Binary if through OPeNDAP. Subsetting and downloading of files available through THREDDS has a
+        2-GB file size limitation.</p>
+      <p class="I1">Data User Note: The data files on the THREDDS Data Server are the same as on the HTTP site and
+        are individually named the same (e.g., prcp_2012.nc4). The current THREEDS Data Server NetCDF Subset Service
+        provides output files in both netCDF-3 (*.nc) and netCDF-4 (*.nc4) formats.</p>
+      <p class="I1">
+        <strong>Parameters, Parameter abbreviations, Units, and Descriptions:</strong>
+      </p>
+      <TABLE class="grid">
+        <TBODY>
+          <TR>
+            <TH class="grid">Parameter</TH>
+            <TH class="grid">Abbr</TH>
+            <TH class="grid">Units</TH>
+            <TH class="grid">Description</TH>
+          </TR>
+          <TR>
+            <TD class="gridL">Day length</TD>
+            <TD class="grid">dayl</TD>
+            <TD class="grid">s/day</TD>
+            <TD class="gridL">Duration of the daylight period in seconds per day. This calculation is based on the
+              period of the day during which the sun is above a hypothetical flat horizon</TD>
+          </TR>
+          <TR>
+            <TD class="gridL">Precipitation</TD>
+            <TD class="grid">prcp</TD>
+            <TD class="grid">mm/day</TD>
+            <TD class="gridL">Daily total precipitation in millimeters per day, sum of all forms converted to
+              water-equivalent. Precipitation occurrence on any given day may be ascertained.</TD>
+          </TR>
+          <TR>
+            <TD class="gridL">Shortwave radiation</TD>
+            <TD class="grid">srad</TD>
+            <TD class="grid">W/m2</TD>
+            <TD class="gridL">Incident shortwave radiation flux density in watts per square meter, taken as an
+              average over the daylight period of the day. NOTE: Daily total radiation (MJ/m2/day) can be calculated as
+              follows: ((srad (W/m2) * dayl (s/day)) / l,000,000)</TD>
+          </TR>
+          <TR>
+            <TD class="gridL">Snow water equivalent</TD>
+            <TD class="grid">swe</TD>
+            <TD class="grid">kg/m2</TD>
+            <TD class="gridL">Snow water equivalent in kilograms per square meter. The amount of water contained
+              within the snowpack.</TD>
+          </TR>
+          <TR>
+            <TD class="gridL">Maximum air temperature</TD>
+            <TD class="grid">tmax</TD>
+            <TD class="grid">degrees C</TD>
+            <TD class="gridL">Daily maximum 2-meter air temperature in degrees Celsius.</TD>
+          </TR>
+          <TR>
+            <TD class="gridL">Minimum air temperature</TD>
+            <TD class="grid">tmin</TD>
+            <TD class="grid">degrees C</TD>
+            <TD class="gridL">Daily minimum 2-meter air temperature in degrees Celsius.</TD>
+          </TR>
+          <TR>
+            <TD class="gridL">Water vapor pressure</TD>
+            <TD class="grid">vp</TD>
+            <TD class="grid">Pa</TD>
+            <TD class="gridL">Water vapor pressure in pascals. Daily average partial pressure of water vapor.</TD>
+          </TR>
+        </TBODY>
+      </TABLE>
+      <br>
+      <p class="I1">
+        <strong>Version Information:</strong>
+      </p>
+      <p class="I1">The data are stored and distributed as individual CF-Compliant netCDF file for each parameter.
+        The most current Daymet data are being delivered to the user in terms of both Daymet software and Daymet data
+        versions. Version information is recorded in the header file of each of the CF-netCDF files within the Global
+        Attribute fields; Version_software and Version_data. All Daymet data are provisional and subject to revision.</p>
+      <p class="I1">
+        <strong>The Daymet Calendar:</strong>
+      </p>
+      <p class="I1">The Daymet calendar is based on a standard calendar year. All Daymet years, including leap
+        years, have 1 - 365 days. For leap years, the Daymet database includes leap day. Values for December 31 are
+        discarded from leap years to maintain a 365-day year.</p>
+      <p class="I1">
+        <strong>Spatial Data Properties:</strong><br> <br>Spatial Representation Type: Raster<br>Pixel
+        Depth: 32 bit<br>Pixel Type: float<br> Number of Bands: 365<br>Band Information: time<br>Raster
+        Format: netCDF<br> Source Type: continuous<br>No Data Value: -9999<br>Scale Factor: none<br>Offset:
+        none<br>Endian Type: NA<br> <br>Number Columns: 5,268<br>Column Resolution: 1,000 meter <br>Number
+        Rows: 4,823<br>Row Resolution: 1,000 meter <br> <br>Extent in the items coordinate system<br>North:
+        1786000 <br>South: -3037000 <br>West: -2015000 <br>East: 3253000<br> <br>xll corner:
+        -2015000<br>yll corner: -3037000<br>Cell Geometry: area<br>Point in Pixel: corner
+      </p>
+      <p class="I1">
+        <strong>Spatial Reference Properties:</strong><br> <br>Type: Projected<br>Geographic Coordinate
+        Reference: WGS_1984<br>Projection: Lambert Conformal Conic
+      </p>
+      <p class="I1">
+        T<strong>he North American Daymet projection system and parameters:</strong><br> <br>Projection
+        System: Lambert Conformal Conic<br> Parameters:<br>projection units: meters<br>datum (spheroid):
+        WGS_84<br>1st standard parallel: 25 deg N<br>2nd standard parallel: 60 deg N<br>Central meridian:
+        -100 deg (W)<br>Latitude of origin: 42.5 deg N<br>false easting: 0<br> false northing: 0
+      </p>
+      <p class="I1">
+        <strong>Site boundaries:</strong>(All latitude and longitude given in degrees and fractions)
+      </p>
+      <TABLE class="grid" summary="This table gives the lat/lon bounds and geodetic datum for each site.">
+        <TBODY>
+          <TR>
+            <TH style="width: 148px;" class="grid">Site (Region)</TH>
+            <TH style="width: 103px;" class="grid">Westernmost Longitude</TH>
+            <TH style="width: 106px;" class="grid">Easternmost Longitude</TH>
+            <TH style="width: 117px;" class="grid">Northernmost Latitude</TH>
+            <TH style="width: 108px;" class="grid">Southernmost Latitude</TH>
+            <TH style="width: 108px;" class="grid">Geodetic Datum</TH>
+          </TR>
+          <TR>
+            <TD style="width: 148px;" class="grid">North America</TD>
+            <TD style="width: 103px;" class="grid">-131.104</TD>
+            <TD style="width: 106px;" class="grid">-52.95</TD>
+            <TD style="width: 117px;" class="grid">52.000</TD>
+            <TD style="width: 108px;" class="grid">14.53</TD>
+            <TD style="width: 108px;" class="grid">WGS_1984</TD>
+          </TR>
+        </TBODY>
+      </TABLE>
+      <p class="I1">
+        <strong>Time period</strong>
+      </p>
+      <p class="I1">•&nbsp; The data set covers the period January 1, 1980 to December 31 of the most recent
+        processed calendar year. Data for additional calendar years will become available by June of the following year.
+        For Mexico, data are available only for the period January 1, 1980 to December 31, 2009.</p>
+      <br> <br> <a name="appderivation"></a>
+      <h2>3. Data Application and Derivation:</h2>
+      <p class="I1">The Daymet data have broad applications over a wide variety of research fields including
+        hydrology, terrestrial vegetation growth models, carbon cycle science, and regional to large scale climate
+        change analysis. Measurements of near-surface meteorological conditions are made at many locations, but
+        researchers are often faced with having to perform ecosystem process simulations in areas where no
+        meteorological measurements have been taken. The continuous gridded surfaces of the Daymet data set were
+        developed to overcome these limitations.</p>
+      <p class="I1">The Daymet method is based on the spatial convolution of a truncated Gaussian weighting filter
+        with the set of station locations. Sensitivity to the typical heterogeneous distribution of stations in complex
+        terrain is accomplished with an iterative station density algorithm. In it, a system is established in which the
+        search radius of stations is reduced in data-rich regions and increased in data-poor regions. This is
+        accomplished by specifying an average number of observations to be included at each point. The average number of
+        stations (n) for temperature extrema is 25; for precipitation, n = 15. The search distance of stations is then
+        varied as a smooth function of the local station density. The result is a seamless match of gridded daily data.</p>
+      <p class="I1">In the Daymet algorithm, spatially and temporally explicit empirical analyses of the
+        relationships of temperature and precipitation to elevation are performed. In addition, a daily precipitation
+        occurrence algorithm is introduced, as a precursor to the prediction of daily precipitation amount. Surfaces of
+        humidity (water vapor pressure) are generated as a function of the predicted daily minimum temperature and the
+        predicted daily average daylight temperature. Daily surfaces of incident solar radiation are generated as a
+        function of sun-slope geometry and interpolated diurnal temperature range. Snowpack, quantified as snow water
+        equivalent, is estimated as part of the Daymet processing in order to reduce biases in shortwave radiation
+        estimates related to multiple reflections between the surface and atmosphere that are especially important when
+        the surface is covered by snow. The Daymet data set includes estimated SWE as an output parameter since this
+        quantity may be of interest for research applications in addition to its primary intended use as a component of
+        the Daymet shortwave radiation algorithm.</p>
+      <a name="qualityassess"></a>
+      <h2>4. Quality Assessment:</h2>
+      <p class="I1">
+        <strong>Tile Quality</strong>
+      </p>
+      <p class="I1">In the Daymet data processing, binary output files from the Daymet model are passed through a
+        number of QA/QC checks that include annual and monthly climate summary evaluations and minimum/maximum value
+        checks. The&nbsp; Daymet algorithm manages the large number of input data and large spatial extent of the study
+        area by creating a system of 2-degree x 2-degree “tiles” that are processed individually through the Daymet
+        software. These tiles are identified by a TileID, which is derived within the Daymet algorithm and is consistent
+        throughout the temporal period of the Daymet record. There are a small number of Daymet tiles that do not run
+        properly through the Daymet algorithm or that do run but have been removed from the Daymet data collection due
+        to poor quality results for all or some of the associated Daymet parameters. The cause of the failure of these
+        tiles is almost exclusively due to low surface observation station density in areas that are sparsely populated.</p>
+      <p class="I1">
+        <strong>No Data Tiles</strong>
+      </p>
+      <p class="I1">In order to maintain the integrity of the Daymet product, any tile that was not produced because
+        of quality reasons (i.e., low station density) has been replaced with NoData netCDF files for each of the
+        parameters associated with that tile. For these tiles that were not produced, there are NoData netCDF files for
+        each of the parameters: dayl.nc, prcp.nc, srad.nc, swe.nc, tmax.nc, tmin.nc, and vp.nc. These NoData netCDF
+        files will have the appropriate spatial and temporal extents for its specific tile location, but contain only
+        the NoData Value of -9999.</p>
+      <p class="I1">
+        A list of Daymet NoData Tiles by year can be found at: <a href="http://daymet.ornl.gov/datasupport.html">http://daymet.ornl.gov/datasupport.html</a>.
+      </p>
+      <p class="I1">Note that meteorological station data for Mexico is available only for the period January 1980
+        through December 2009.</p>
+      <p class="I1">
+        <strong>Snow Water Equivalent Clarification</strong>
+      </p>
+      <p class="I1">Snowpack, quantified as snow water equivalent (SWE), is estimated as part of the Daymet
+        processing in order to reduce biases in shortwave radiation estimates related to multiple reflections between
+        the surface and atmosphere that are especially important when the surface is covered by snow (Thornton et al.
+        2000). The Daymet (v2.0) data set includes estimated SWE as an output parameter since this quantity may be of
+        interest for research applications in addition to its primary intended use as a component of the Daymet
+        shortwave radiation algorithm. An important caveat in the use of SWE from the Daymet (v2.0) data set is that the
+        algorithm used to estimate SWE is executed with only a single calendar year of primary surface weather inputs
+        (daily maximum and minimum temperature and daily total precipitation) available for the estimation of a
+        corresponding calendar year of snowpack. Since northern hemisphere snowpack accumulation is commonly underway
+        already at the beginning of the calendar year, the SWE algorithm uses data from a single calendar year to make a
+        two-year sequence of temperature and precipitation, then predicts the evolution of snowpack over this two-year
+        period to provide an estimate of year day 365 (December 31 for non-leap years) snowpack as an initial condition
+        for the January 1 time step of the actual calendar year. The problem with this approach is that it ignores the
+        dependence of January 1 snowpack on preceding calendar year temperature and precipitation conditions, and so
+        generates potential biases in mid-season snowpack which can propagate to biases in late-season timing of snow
+        melt. A better approach would be to calculate snowpack from the continuous stream of calendar years. We intend
+        to apply this improvement in subsequent Daymet releases.</p>
+      <a name="HAcqMatMethods"></a>
+      <h2>5. Data Acquisition Materials and Methods:</h2>
+      <p class="I1">The Daymet model requires spatially referenced ground observations of daily maximum and minimum
+        temperature and precipitation. These observations have been obtained from a number of sources throughout this
+        current Daymet campaign. The ground observations for the United States came from two main sources. The first is
+        the Cooperative Summary of the Day network of weather stations archived and distributed by the National Climate
+        Data Center (NCDC). These data have recently come under the umbrella and are distributed as part of the Global
+        Historical Climatology Network (GHCN)-Daily data set. The second source of surface observation data for the
+        United States is the SNOwpack and TELemetry (SNOTEL) data set managed and distributed by the Natural Resources
+        Conservation Service (NRCS). These stations are primarily in high elevation regions in the Western US and Alaska
+        and are principle in maintaining critical snow pack information. Canadian surface observations were provided by
+        the Government of Canada (Environment Canada) and through the GHCN-Daily data set. The Servicio Meteorológico
+        Nacional provided surface weather observations within Mexico.</p>
+      <p class="I1">Additional inputs for the Daymet algorithm are a digital elevation model (DEM) and Land Mask.
+        The DEM used in this version of Daymet is a North American subset of the NASA SRTM near-global 30 arc second
+        DEM. This DEM was reprojected and resampled from a geographic coordinate system (GCS_WGS_84) to the Daymet
+        Lambert Conformal Conic projection as outlined below. The resampling method used a cubic convolution
+        interpolation with an output cell size set to 1,000 m and a file extent as recorded below. Though no Daymet data
+        is currently available for regions north of 60 degrees North, the SRTM DEM was augmented with GTOPO 30 data
+        above this latitude. Slope, aspect, and horizon grids are derived from the DEM within the Daymet algorithm. A
+        Daymet North American land “mask” file was derived in order to allow Daymet processing to occur for “land”
+        pixels including shallow inland water ways, coastlines, and lake shorelines while excluding only very large
+        bodies of water such as the Great Lakes. The SRTM DEM included the Great Lakes and tended to over-estimate large
+        river and coastal water and was therefore not a good candidate for deriving the Daymet land mask. A
+        reclassification was performed on the MODIS Nadir BRDF-Adjusted Reflectances (NBAR) MODIS land-water mask
+        (Salomon, 2004) as outlined below.</p>
+      <table class="grid">
+        <tbody>
+          <tr>
+            <th class="grid" style="width: 169px">Old Classification</th>
+            <th class="grid" style="width: 89px">New Classification</th>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">0 – Shallow Ocean</td>
+            <td class="grid" style="width: 89px">Water</td>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">1 - Land</td>
+            <td class="grid" style="width: 89px">Land</td>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">2 – Shallow Inland Water</td>
+            <td class="grid" style="width: 89px">Land</td>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">3 – Ocean Coastline and Lake Shorelines</td>
+            <td class="grid" style="width: 89px">Land</td>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">5 – Deep Inland Water</td>
+            <td class="grid" style="width: 89px">Land</td>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">6 – Shallow Ocean</td>
+            <td class="grid" style="width: 89px">Water</td>
+          </tr>
+          <tr>
+            <td class="grid" style="width: 169px">7 – Deep Ocean</td>
+            <td class="grid" style="width: 89px">Water</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <p class="I1">&nbsp;</p>
+      <a name="HDataDescrAccess"></a>
+      <h2>6. Data Access:</h2>
+      <p class="I1">This data is available through the Oak Ridge National Laboratory (ORNL) Distributed Active
+        Archive Center (DAAC).</p>
+      <h3>Data Archive Center:</h3>
+      <h4>Contact for Data Center Access Information:</h4>
+      <p class="I3">
+        E-mail: <a href="mailto:uso@daac.ornl.gov">uso@daac.ornl.gov</a><br> Telephone: +1 (865) 241-3952<br>
+        <br>
+      </p>
+      <a name="references"></a>
+      <h2>7. References:</h2>
+      <p class="I1">
+        Thornton, P.E., S.W. Running, and M.A. White. 1997. Generating surfaces of daily meteorological variables over
+        large regions of complex terrain. Journal of Hydrology 190: 214 - 251. <a
+          href="http://dx.doi.org/10.1016/S0022-1694(96)03128-9">http://dx.doi.org/10.1016/S0022-1694(96)03128-9</a>
+      </p>
+      <p class="I1">
+        Thornton, P.E., H. Hasenauer, and M.A. White. 2000. Simultaneous estimation of daily solar radiation and
+        humidity from observed temperature and precipitation: An application over complex terrain in Austria.
+        Agriculturaland Forest Meteorology 104:255 - 271. <a href="http://dx.doi.org/10.1016/S0168-1923(00)00170-2">http://dx.doi.org/10.1016/S0168-1923(00)00170-2</a>
+      </p>
+      <p class="I1">
+        Thornton, P.E. and S.W. Running. 1999. An improved algorithm for estimating incident daily solar radiation from
+        measurements of temperature, humidity, and precipitation. Agriculture and Forest Meteorology. 93:211 - 228. <a
+          href="http://dx.doi.org/10.1016/S0168-1923(98)00126-9">http://dx.doi.org/10.1016/S0168-1923(98)00126-9</a>
+      </p>
+    </div>
+
+    <br>
+    <footer>
+  <div class="headWrapper" id="footerWrapper">
+    <div id="main-footer">
+      <!-- left section -->
+      <div class="mainFooterLeft">
+        <a href="https://www.ornl.gov" title="www.ornl.gov">
+          <!-- <object type="image/svg+xml" alt="ORNL home page" data="/graphics/logos/ORNL_33_opt.svg"> -->
+          <img alt="ORNL home page" src="/graphics/logos/ORNL_twoline.png"> <!-- </object> -->
+        </a>
+      </div>
+
+      <!-- middle section -->
+      <div class="mainFooterMiddle">
+        <a href="https://www.nasa.gov/about/highlights/HP_Privacy.html" class="foot-link">NASA Privacy Policy</a><span class="foot-link">
+          | </span> <a href="/help/" class="foot-link">Help</a>
+      </div>
+
+      <!-- right section -->
+      <div class="mainFooterRight">
+        <a class="usa-link-twitter" href="https://twitter.com/NASAEarthData" title="Follow us @NASAEarthData"> <span class="fa fa-twitter-square" aria-hidden="true"></span><span class="sr-only">Follow us @NASAEarthData</span></a>
+        <a class="usa-link-youtube" href="https://www.youtube.com/channel/UCrZ-Cgk3DfiLPfHEReLzCfg/feed" title="NASAEarthData on YouTube">
+          <span class="fa fa-youtube-square" aria-hidden="true"></span><span class="sr-only">NASAEarthData on
+            YouTube</span></a>
+        <a class="usa-link-facebook" href="https://www.facebook.com/NASAEarthData" title="Like us on Facebook"> <span class="fa fa-facebook-square" aria-hidden="true"></span><span class="sr-only">Like us on Facebook</span></a>
+        <a class="usa-social_link" href="https://github.com/ornldaac" title="ORNL DAAC on GitHub"> <span class="fa fa-github-square" aria-hidden="true"></span><span class="sr-only">ORNL DAAC on GitHub</span></a>
+        <a class="usa-link-rss" href="https://daac-news.ornl.gov/rss.xml" title="ORNL DAAC News RSS Feed"> <span class="fa fa-rss-square" aria-hidden="true"></span><span class="sr-only">ORNL DAAC News RSS Feed</span></a>
+      </div>
+    </div>
+    <!--main-footer-->
+
+    <div class="big-foot">
+      <ul class="nav">
+	<li class="top first home"><a class="top_link" href="/" title="ORNL DAAC home"><span class="fa fa-home fa-fw"></span><span class="home_text down">Home</span></a>
+	</li>
+	<li class="top"><a href="/about/" class="top_link"><span class="down">About Us</span></a>
+		<ul class="sub">
+			<!-- <li><a href="/about_us.shtml"><span>About ORNL DAAC</span></a></li> -->
+			<!-- <li><a href="/who.shtml"><span>Who We Are</span></a></li> -->
+			<!-- <li><a href="/partners.html"><span>Partners</span></a></li> -->
+			<!-- <li><a href="/about/biogeochem/"><span>Biogeochemical Dynamics</span></a></li> -->
+			<li><a href="/about#mission"><span>Mission</span></a></li>
+			<li><a href="/about#citation_guidelines"><span>Data Use and Citation Guidelines</span></a></li>
+			<li><a href="/about#uwg"><span>User Working Group</span></a></li>
+			<li><a href="/about#partners"><span>Partners</span></a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/about/about_us.html"><span>About Us</span></a></li> -->
+	<li class="top"><a href="/get_data/" class="top_link"><span class="down">Get Data</span></a>
+		<ul class="sub">
+			<!--<li><a href="/get_data#datasearch" class="fly"><span>Search for Data</span></a>
+				<ul>
+					<li><a href="/daacdata"><span>Browse Data</span></a></li>
+				</ul>
+			</li>-->
+			<li><a href="/get_data#themes" class="fly"><span>Science Themes</span></a>
+				<ul>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=1"><span>Vegetation and Forests</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=2"><span>Arctic Ecosystems</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=3"><span>Soils</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=4"><span>Carbon Cycle</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=5"><span>Biomass</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=6"><span>Land Use and Human Dimensions</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=7"><span>Hydrology and Cryosphere</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=8"><span>Fire</span></a></li>
+					<li><a href="/cgi-bin/theme_dataset_lister.pl?theme_id=9"><span>Climate</span></a></li>
+				</ul>
+			</li>
+			<li><a href="/get_data#projects" class="fly"><span>NASA Projects</span></a>
+				<ul>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=1"><span>BigFoot</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=10"><span>Hydroclimatology Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=11"><span>Large Scale Biosphere-Atmosphere Experiment (LBA-ECO)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=12"><span>Terrestrial Ecology Subsetting & Visualization Services (TESViS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=13"><span>Net Primary Productivity (NPP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=14"><span>Oregon Transect Ecosystem Research Project (OTTER)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=15"><span>Prototype Validation Exercise (PROVE)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=16"><span>River Discharge (RIVDIS)</span></a></li> -->
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=17"><span>Vegetation Collection</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=18"><span>Southern African Regional Science Initiative Project (SAFARI 2000)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=19"><span>Soil Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=2"><span>Boreal Ecosystem-Atmosphere Study (BOREAS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=20"><span>Superior National Forest</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=21"><span>Vegetation Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=22"><span>Vegetation-Ecosystem Modeling and Analysis Project (VEMAP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=27"><span>Model Archive</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=28"><span>North American Carbon Program (NACP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=29"><span>International Satellite Land Surface Climatology Project (ISLSCP II)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=3"><span>Boreal Ecosystem-Atmosphere Study (BOREAS)</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=30"><span>Atmospheric Tracer Transport Model Intercomparison Project (TransCom)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=31"><span>Services</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=32"><span>Daymet</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=33"><span>Carbon Monitoring System (CMS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=34"><span>Arctic-Boreal Vulnerability Experiment (ABoVE)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=35"><span>Carbon in Arctic Reservoirs Vulnerability Experiment (CARVE)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=36"><span>Airborne Microwave Observatory of Subcanopy and Subsurface (AirMOSS)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=37"><span>Atmospheric Carbon and Transport - America (ACT-America)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=38"><span>AfriSAR</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=39"><span>Atmospheric Tomography Mission (ATom)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=4"><span>Accelerated Canopy Chemistry Program (ACCP)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=40"><span>Global Ecosystem Dynamics Investigation (GEDI)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=41"><span>Delta-X</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=42"><span>SIF-ESDR</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=43"><span>MODIS/ASTER Airborne Simulator (MASTER)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=44"><span>CARbon Atmosphere Flux Experiment (CARAFE)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=45"><span>Active Sensing of CO2 Emissions over Nights, Days, and Seasons (ASCENDS) Airborne Campaign</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=46"><span>CO2 and MEthane eXperiment (COMEX)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=47"><span>Airborne Visible InfraRed Imaging Spectrometer (AVIRIS)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=48"><span>Hyperspectral Infrared Imager (HyspIRI) Airborne</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=49"><span>SBG High Frequency Time Series (SHIFT)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=5"><span>Climate Collection</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=50"><span>Space-based Imaging Spectroscopy and Thermal pathfindER (SISTER)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=51"><span>Biodiversity Survey of the Cape (BioSCape)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=52"><span>Biological Diversity</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=53"><span>Western Diversity Time Series</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=55"><span> FireSense</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=56"><span>Hyperspectral Thermal Emission Spectrometer (HyTES)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=57"><span>Geological Earth Mapping Experiment (GEMx)</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=58"><span>Portable Remote Imaging Spectrometer (PRISM)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=59"><span>Airborne Validation Unified Experiment: Land to Ocean (AVUELO)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=6"><span>EOS Land Validation</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=60"><span>Surface Biology and Geology (SBG)</span></a></li>
+					<li><a href="/cgi-bin/dataset_lister.pl?p=7"><span>First ISLSCP Field Experiment (FIFE)</span></a></li>
+					<!-- <li><a href="/cgi-bin/dataset_lister.pl?p=8"><span>First ISLSCP Field Experiment (FIFE)</span></a></li> -->
+					<li><a href="/cgi-bin/dataset_lister.pl?p=9"><span>FLUXNET</span></a></li>
+				</ul>
+			</li>
+			<li><a href="/get_data#datasets" class="fly">All Datasets</a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/get_data/get_data.html"><span>Get Data</span></a></li> -->
+	<li class="top"><a href="/submit/" class="top_link"><span class="down">Submit Data</span></a>
+		<ul class="sub">
+			<li><a href="/submit/form/form.html"><span>Submit Data Form</span></a></li>
+			<li><a href="/submit/#scope_and_acceptance_practices"><span>Data Scope and Acceptance Practices</span></a></li>
+			<li><a href="/submit/#authorship"><span>Data Authorship Guidance</span></a></li>
+			<li><a href="/submit/#timeline"><span>Data Publication Timeline</span></a></li>
+			<li><a href="/submit/#guidelines"><span>Detailed Submission Guidelines</span></a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/submit/submit.html"><span>Submit Data</span></a>
+		<ul class="sub">
+			<li><a href="/submit/form/form.html"><span>Submit Data Form</span></a></li>
+			<li><a href="/submit/#scope_and_acceptance_practices"><span>Data Scope and Acceptance Practices</span></a></li>
+			<li><a href="/submit/#authorship"><span>Data Authorship Guidance</span></a></li>
+			<li><a href="/submit/#timeline"><span>Data Publication Timeline</span></a></li>
+			<li><a href="/submit/#guidelines"><span>Detailed Submission Guidelines</span></a></li>
+			<li><a href="/submit/questions/questions.html"><span>Data Provider Questions</span></a></li>
+			<li><a href="/submit/qachecklist/qachecklist.html"><span>Data Quality Review Checklist</span></a></li>
+			<li><a href="/submit/csvstandards/csvstandards.html"><span>CSV Standards</span></a></li>
+			<li><a href="/submit/netcdfrequirements/netcdfrequirements.html"><span>NetCDF Data Requirements</span></a></li>
+			<li><a href="/submit/help/helpsub.html"><span>Submission Help</span></a></li>
+		</ul>
+	</li> -->
+	<li class="top"><a href="/tools/" class="top_link"><span class="down">Tools</span></a>
+		<ul class="sub">
+			<!-- <li><a href="/tools/"><span>Data Tools</span></a></li> -->
+			<li><a href="https://modis.ornl.gov/data.html" class="fly"><span>TESViS</span></a>
+				<ul>
+					<li><a href="/modisfixedsite/"><span>TESViS Fixed Site Subsets</span></a></li>
+					<li><a href="/modisglobal/"><span>TESViS Global Subsets</span></a></li>
+					<li><a href="/modiswebservice/"><span>TESViS Web service</span></a></li>
+				</ul></li>
+			<li><a href="https://thredds.daac.ornl.gov/thredds/catalogs/ornldaac/ornldaac.html"><span>THREDDS</span></a></li>
+			<li><a href="https://webmap.ornl.gov/ogc"><span>SDAT</span></a></li>
+			<li><a href="https://daymet.ornl.gov"><span>Daymet</span></a></li>
+			<!-- <li><a href="https://carve.ornl.gov/visualize/"><span>CARVE Data Viewer</span></a></li> -->
+			<!-- <li><a href="/tools/airborne-data-visualizer/adv.html"><span>Airborne Data Visualizer</span></a></li> -->
+			<!-- <li><a href="/tools/airborne-data-visualizer-project-list/adv_viewer.html"><span>Airborne Data Visualizer</span></a></li> -->
+			<li><a href="/tools/airborne-data-visualizer-project-list/"><span>Airborne Data Visualizer</span></a></li>
+			<li><a href="https://airmoss.ornl.gov/visualize/"><span>Soil Moisture Visualizer</span></a></li>
+			<!-- <li><a href="/cgi-bin/service_dataset_lister.pl?svc_id=1"><span>Spatial Data Access</span></a></li> -->
+			<!-- <li><a href="/cgi-bin/service_dataset_lister.pl?svc_id=2"><span>Spatial Data Access</span></a></li> -->
+			<!-- <li><a href="/spatial_data_access.shtml"><span>Spatial Data Access</span></a></li> -->
+			<!-- <li><a href="/webgis.shtml"><span>WebGIS</span></a></li> -->
+			<!-- <li><a href="/thredds.shtml"><span>THREDDS</span></a></li> -->
+			<!-- <li><a href="/cgi-bin/service_dataset_lister.pl?svc_id=4"><span>THREDDS</span></a></li> -->
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/tools/tools.html"><span>Tools</span></a></li> -->
+	<li class="top"><a href="/resources/" class="top_link"><span class="down">Resources</span></a>
+		<ul class="sub">
+			<li><a href="/resources/learning/"><span>Learning</span></a></li>
+			<li><a href="/datamanagement/"><span>Data Management</span></a></li>
+			<li><a href="https://daac-news.ornl.gov/"><span>News</span></a></li>
+		</ul>
+	</li>
+	<!-- <li class="top"><a href="/resources/resources.html"><span>Resources</span></a>
+		<ul class="sub">
+			<li><a href="/resources/learning/learning.html"><span>Learning</span></a></li>
+			<li><a href="/datamanagement/datamanagement.html"><span>Data Management</span></a></li>
+		</ul>
+	</li> -->
+	<li class="top"><a href="/help/" class="top_link"><span class="down">Help</span></a>
+		<ul class="sub">
+	<li><a href="https://forum.earthdata.nasa.gov/" title"Earthdata Forum" id="Forum"><span>Earthdata Forum</span><span class="icon-external-link line-icon pad-left" title="external link"></span></a></li>
+	<li><a href="mailto:uso@daac.ornl.gov">Email Us<span class="icon-envelope-alt line-icon pad-left" title="external link"></span></a></li>
+		</ul>
+	</li>
+</ul>
+
+    </div>
+    <!--big-foot-->
+    <hr>
+  </div>
+  <!-- headWrapper -->
+</footer>
+
+<!-- Add utils.js -->
+<script src="/js/jquery.js"></script>
+<script src="/js/utils.js?1.2"></script>
+<script>highlight(tabToHighlight);</script>
+
+<!-- integrated search bar js -->
+<script src="/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/js/succinct-master/jQuery.succinct.min.js"></script>
+
+<!-- Add Tophat -->
+<script src="https://cdn.earthdata.nasa.gov/tophat2/tophat2.js" id="earthdata-tophat-script" data-current-daac="ORNL DAAC" data-show-fbm="false" data-width="950"></script>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WNP7MLF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- Add Status App -->
+<script src="https://status.earthdata.nasa.gov/assets/banner_widget.js"></script>
+
+<!-- common.js includes highlight current tab, Google Analytics, DAP UA -->
+<script src="/js/common.min.js"></script>
+
+<!-- add EUI js -->
+<script src="/js/eui/custom/javascript/eui.min.js"></script>
+
+  </div>
+</body>
+</html>

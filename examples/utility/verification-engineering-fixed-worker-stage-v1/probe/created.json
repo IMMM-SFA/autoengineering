@@ -1,0 +1,6 @@
+{
+  "Id": "ed29c60d6fb15203b7d05097c382569aa3f949682994fc39f373af47f3e8a0f1",
+  "Warnings": [
+    "The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested"
+  ]
+}

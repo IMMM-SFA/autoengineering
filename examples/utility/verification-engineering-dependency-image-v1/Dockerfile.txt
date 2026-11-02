@@ -1,0 +1,19 @@
+FROM localhost/ae-engineering-source-1fed24dc839d4e39a50fc9d820198706:frozen
+USER 0:0
+WORKDIR /engineering-build
+COPY wheels/ ./wheels/
+COPY model-source/ ./model-source/
+COPY checksums.sha256 ./checksums.sha256
+RUN sha256sum -c checksums.sha256
+RUN /usr/local/bin/python -I -m pip --python /opt/inference/bin/python install --no-index --no-deps --no-compile --disable-pip-version-check /engineering-build/wheels/openmdao-3.41.0-py3-none-any.whl /engineering-build/wheels/packaging-26.3-py3-none-any.whl /engineering-build/wheels/requests-2.34.2-py3-none-any.whl /engineering-build/wheels/urllib3-2.8.0-py3-none-any.whl /engineering-build/wheels/certifi-2026.10.23-py3-none-any.whl /engineering-build/wheels/charset_normalizer-3.5.1-py3-none-any.whl /engineering-build/wheels/idna-3.20-py3-none-any.whl
+RUN /opt/inference/bin/python -I -c "import openmdao.api, importlib.metadata as m; assert m.version('openmdao') == '3.41.0'"
+RUN cp -a model-source /opt/engineering-source && chmod -R a+rX /opt/engineering-source && rm -rf /engineering-build
+WORKDIR /work
+USER 1000:1000
+LABEL org.autoengineering.purpose="utility-coupled-load-environment-candidate-v1"
+LABEL org.autoengineering.environment="24be3793c90641a2de10966c8cd3af0be3e1f04f0f2d1e52d6751d45ccabf0ce"
+LABEL org.autoengineering.wheel="52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7"
+LABEL org.autoengineering.source-image="sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188"
+LABEL org.autoengineering.environment-recipe="pinned-engineering-dependency-overlay-v1"
+ENTRYPOINT []
+CMD ["/opt/inference/bin/python","-I","-c","import importlib.metadata as m; print(m.version('openmdao'))"]

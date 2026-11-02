@@ -1,0 +1,128 @@
+{
+  "commands": [
+    {
+      "environment": "default",
+      "argv": [
+        ".pixi/envs/default/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/private/tmp/utility-part5-base-q4xzM0/results.xml"
+      ],
+      "thread_environment": {
+        "OMP_NUM_THREADS": null,
+        "OPENBLAS_NUM_THREADS": null,
+        "VECLIB_MAXIMUM_THREADS": null
+      },
+      "stdout_stderr": "output.txt",
+      "junit": "results.xml",
+      "exit_status": 0
+    },
+    {
+      "environment": "bayes",
+      "argv": [
+        ".pixi/envs/bayes/bin/python",
+        "-m",
+        "pytest",
+        "tests",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/private/tmp/utility-part5-base-q4xzM0/bayes.xml"
+      ],
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "stdout_stderr": "bayes-output.txt",
+      "junit": "bayes.xml",
+      "exit_status": 0
+    },
+    {
+      "environment": "interoperability",
+      "argv": [
+        ".pixi/envs/interoperability/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_bmi_adapter.py",
+        "tests/test_openmdao_adapter.py",
+        "tests/test_optuna_backend.py",
+        "tests/test_integration_contracts.py",
+        "tests/test_integration_replay.py",
+        "tests/test_integration_supervision.py",
+        "tests/test_integration_evidence.py",
+        "tests/test_interoperability_identity.py",
+        "tests/test_circuit_integration.py",
+        "tests/test_solar_integration.py",
+        "tests/test_subdaily_contract.py",
+        "tests/test_optuna_replay_prototype.py",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/private/tmp/utility-part5-base-q4xzM0/interoperability.xml"
+      ],
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "stdout_stderr": "interoperability-output.txt",
+      "junit": "interoperability.xml",
+      "exit_status": 0
+    },
+    {
+      "environment": "interoperability",
+      "argv": [
+        ".pixi/envs/interoperability/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_utility_engineering.py",
+        "tests/test_utility_prediction_tasks.py",
+        "tests/test_utility_studies.py",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/private/tmp/utility-part5-base-q4xzM0/utility-domains.xml"
+      ],
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "stdout_stderr": "utility-domains-output.txt",
+      "junit": "utility-domains.xml",
+      "exit_status": 0
+    },
+    {
+      "environment": "wind",
+      "argv": [
+        ".pixi/envs/wind/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_utility_wind.py",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml=/private/tmp/utility-part5-base-q4xzM0/wind.xml"
+      ],
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "stdout_stderr": "wind-output.txt",
+      "junit": "wind.xml",
+      "exit_status": 0
+    }
+  ],
+  "runtime_limit": "Default and Bayes runs overlapped; durations are verification times, not performance comparisons"
+}

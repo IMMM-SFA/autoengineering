@@ -1,0 +1,90 @@
+{
+  "completion_digest": "d01f44b5195cca2ece81f49d2276e4641e8f9796570c7c72800fedb3eaba9f35",
+  "comparisons": {
+    "aet": {
+      "shape": [
+        140
+      ],
+      "dtype": "float64",
+      "max_abs_difference": 1.3322676295501878e-15,
+      "bitwise_equal": false,
+      "within_tolerance": true
+    },
+    "initial_reservoir": {
+      "shape": [],
+      "dtype": "float64",
+      "max_abs_difference": 0.0,
+      "bitwise_equal": true,
+      "within_tolerance": true
+    },
+    "initial_soil": {
+      "shape": [],
+      "dtype": "float64",
+      "max_abs_difference": 0.0,
+      "bitwise_equal": true,
+      "within_tolerance": true
+    },
+    "pet": {
+      "shape": [
+        140
+      ],
+      "dtype": "float64",
+      "max_abs_difference": 1.3322676295501878e-15,
+      "bitwise_equal": false,
+      "within_tolerance": true
+    },
+    "prediction": {
+      "shape": [
+        140
+      ],
+      "dtype": "float64",
+      "max_abs_difference": 7.105427357601002e-15,
+      "bitwise_equal": false,
+      "within_tolerance": true
+    },
+    "reservoir": {
+      "shape": [
+        140
+      ],
+      "dtype": "float64",
+      "max_abs_difference": 2.1316282072803006e-14,
+      "bitwise_equal": false,
+      "within_tolerance": true
+    },
+    "soil": {
+      "shape": [
+        140
+      ],
+      "dtype": "float64",
+      "max_abs_difference": 0.0,
+      "bitwise_equal": true,
+      "within_tolerance": true
+    }
+  },
+  "prediction_vector": {
+    "shape": [
+      140
+    ],
+    "dtype": "float64",
+    "max_abs_difference": 7.105427357601002e-15,
+    "bitwise_equal": false,
+    "within_tolerance": true
+  },
+  "prediction_document_exact": false,
+  "all_outputs_within_tolerance": true,
+  "new_processes": 0,
+  "runtime_qualified": false,
+  "verification": {
+    "tests": 154,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 117.238,
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "documentation_after_edits_passed": 19,
+    "full_default_rerun": false,
+    "core_sources_unchanged": 224,
+    "declared_wheel_sources_unchanged": 315
+  }
+}

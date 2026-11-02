@@ -1,0 +1,139 @@
+"""One fixed public development baseline, with durable physical reservations."""
+from pathlib import Path
+from dataclasses import replace
+import hashlib,json,math,os,platform,socket,subprocess,time
+from importlib.metadata import version
+import numpy as np
+from autoengineering.adapters.python import run_lifecycle
+from autoengineering.agents.batch import BatchCase,BatchSpec,BatchStore,PhysicalReservation,PhysicalObservation
+from autoengineering.agents.hosts.fake import FakeHost
+from autoengineering.agents.identity import host_source_identity,host_environment_identity
+from autoengineering.agents.records import HostSelection,ResourceLimits
+from autoengineering.campaign.acceptance import CheckContext,CheckRegistry
+from autoengineering.campaign.records import EvaluationRecord
+from autoengineering.campaign.serialization import digest
+from autoengineering.utility.outcomes import OutcomeRegistry
+from examples.utility import engineering_load as load
+from examples.utility.engineering import rules,source_power,required_voltage
+
+root=Path.cwd();proposal_root=root/'examples/utility/proposals/engineering-v3'
+proposal=json.loads((proposal_root/'proposal.json').read_text())
+inputs=json.loads((proposal_root/'development-inputs.json').read_text())
+assert digest(inputs)==proposal['development_input_digest']
+assert proposal['confirmation_seed_or_rows_generated'] is False
+assert version('openmdao')=='3.41.0'
+for name,pin in proposal['source_pins'].items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==pin
+output=root/'outputs/engineering-v3-development-v1'
+assert not output.exists();output.mkdir(mode=0o700)
+started=time.monotonic()
+import openmdao.api
+from openmdao.test_suite.scripts import circuit_analysis
+initialization_seconds=time.monotonic()-started
+original_factory=load.factory
+counts={'factory_starts':0,'cleanups_returned':0,'analytical_reference_solves':0,'analytical_bisection_steps':0}
+def tracked_factory(ctx):
+    counts['factory_starts']+=1
+    p=original_factory(ctx);cleanup=p.cleanup
+    def close():
+        value=cleanup();counts['cleanups_returned']+=1;return value
+    p.cleanup=close
+    return p
+load.factory=tracked_factory
+
+def denied(*args,**kwargs):raise AssertionError('public baseline attempted external execution')
+socket.socket=denied;subprocess.Popen=denied
+
+def analytic(case,current):
+    counts['analytical_reference_solves']+=1
+    forcing=case['forcing'];r1=forcing['resistor1_ohm'];r2=forcing['resistor2_ohm'];ground=forcing['ground_voltage']
+    lo,hi=0.,current*r1
+    for step in range(200):
+        middle=(lo+hi)/2
+        value=middle/r1+(1+r2/r1)*1e-15*math.expm1(middle/.025875)
+        counts['analytical_bisection_steps']+=1
+        if value<current:lo=middle
+        else:hi=middle
+        if hi-lo<=1e-14:break
+    v=(lo+hi)/2;diode=1e-15*math.expm1(v/.025875);node1=ground+v+r2*diode
+    return {'node1_voltage':node1,'node2_voltage':ground+v,'source_power_W':current*(node1-ground),'steps':step+1}
+
+configuration_digest=digest(proposal)
+batch_spec=BatchSpec('1.0','engineering-v3-public-reference',host_source_identity(),host_environment_identity(),
+    HostSelection('fake','none','not-invoked','1.0'),FakeHost(()).capabilities(),digest({'host_calls':0}),
+    ResourceLimits(1,1,0,0,240.,10.,1024,1024),24,(BatchCase('baseline','comparison',configuration_digest,0,24),))
+batch=BatchStore.create(output/'batch',batch_spec)
+batch.start_case('baseline',configuration_digest)
+request={'schema':'utility-engineering-v3-baseline-request-v1','proposal_digest':configuration_digest,'input_digest':digest(inputs),
+    'batch_spec_digest':batch_spec.digest,'model_digest':proposal['baseline']['model_digest'],'fixed_source_current_A':.05,
+    'maximum_coupled_model_starts':24,'maximum_analytical_reference_solves':24,'maximum_root_steps_per_reference':200,
+    'automatic_retries':0,'confirmation_access':False,'source_visibility':'public development only','OS_deadline_qualified':False,
+    'source_pins':proposal['source_pins'],'producer_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    'framework_source_sha256':hashlib.sha256(Path(circuit_analysis.__file__).read_bytes()).hexdigest(),
+    'environment':{'python':platform.python_version(),'system':platform.system(),'machine':platform.machine(),'openmdao':version('openmdao'),'numpy':version('numpy'),'scipy':version('scipy')}}
+(output/'request.json').write_text(json.dumps(request,sort_keys=True,indent=2)+'\n')
+contexts={};results=[]
+try:
+    for index,case in enumerate(inputs['cases']):
+        scratch=output/f'case-{index:02d}';scratch.mkdir(mode=0o700)
+        ctx=load.context(.05,scratch,source_root=root)
+        assert ctx.model.digest==request['model_digest']
+        forcing={name:np.asarray(value) for name,value in case['forcing'].items()}
+        identity=digest({'proposal':configuration_digest,'case':case,'baseline_current_A':.05})
+        reservation=PhysicalReservation('reference-'+identity[:32],'baseline','science',identity,None,batch.clock(),10.,0,0,0)
+        def perform(_):
+            began=time.monotonic()
+            reference=analytic(case,.05)
+            result=run_lifecycle(load.adapter(),ctx,forcing,ctx.model.inputs,ctx.model.outputs)
+            outputs={name:float(value) for name,value in result.outputs.items()}
+            diagnostics={name:float(value) for name,value in result.diagnostics.items()}
+            power=.05*(outputs['node1_voltage']-case['forcing']['ground_voltage'])
+            voltage_error=max(abs(outputs[name]-reference[name]) for name in ('node1_voltage','node2_voltage'))
+            power_error=abs(power-reference['source_power_W'])
+            physical=(all(math.isfinite(v) for v in (*outputs.values(),*diagnostics.values()))
+                and diagnostics['converged']==1. and diagnostics['residual_norm']<=1e-10
+                and diagnostics['residual_tolerance']==1e-10 and diagnostics['solver_iterations']<=100
+                and outputs['node2_voltage']>=.62 and power>0
+                and voltage_error<=1e-7 and power_error<=1e-8)
+            return {'scenario_id':case['scenario_id'],'forcing_digest':digest(case['forcing']),'outputs':outputs,
+                'diagnostics':diagnostics,'source_power_W':power,'analytical_reference':reference,
+                'voltage_absolute_error_V':voltage_error,'power_absolute_error_W':power_error,
+                'physical_and_reference_checks_passed':physical,'lifecycle_seconds':result.elapsed_seconds,
+                'operation_seconds':time.monotonic()-began}
+        def observe(reservation,result):
+            evidence=batch.evidence({'schema':'utility-engineering-v3-baseline-case-v1','proposal_digest':configuration_digest,'request_digest':digest(request),**result})
+            return PhysicalObservation(reservation.id,'success' if result['physical_and_reference_checks_passed'] else 'scientific_infeasible',
+                True,0,{},None,'not_applicable',result['operation_seconds'],(evidence,))
+        result=batch.execute(reservation,perform,observe)
+        results.append(result)
+        assert result['physical_and_reference_checks_passed'],'fixed baseline failed frozen checks'
+        contexts[case['scenario_id']]=CheckContext({name:np.asarray(value) for name,value in result['outputs'].items()},forcing,ctx.parameters)
+        print(json.dumps({'completed_cases':index+1,'planned_cases':24,'coupled_model_starts':counts['factory_starts']}),flush=True)
+    template=EvaluationRecord('public-baseline',ctx.model.digest,{'source_current':.05},'success',{},(),(),
+        'engineering-v3-public-development','public-baseline',sum(r['operation_seconds'] for r in results),{})
+    evaluation=OutcomeRegistry({'source_power':source_power}).evaluate(rules(.62,0.),contexts,CheckRegistry({('node_voltage','1'):required_voltage}),template)
+    value=evaluation.evaluation.metrics['source_power']
+    assert math.isfinite(value) and value>0 and all(c.status=='pass' for c in evaluation.evaluation.checks)
+    assert counts['factory_starts']==counts['cleanups_returned']==24
+    assert counts['analytical_reference_solves']==24
+    evidence=batch.evidence({'schema':'utility-engineering-v3-development-reference-receipt-v1','request_digest':digest(request),
+        'proposal_digest':configuration_digest,'input_digest':digest(inputs),'model_digest':ctx.model.digest,
+        'evaluation':evaluation.to_dict(),'case_results':results,'counts':counts,'mean_source_power_W':value,
+        'initialization_seconds':initialization_seconds,'operation_seconds':sum(r['operation_seconds'] for r in results),
+        'pipeline_seconds':time.monotonic()-started,'cpu_seconds':None,'peak_rss_bytes':None,
+        'confirmation_access':False,'reference_scope':'engineering-v3 public development definition only'})
+    batch.finish_case('baseline','passed',(evidence,))
+    summary={'schema':'utility-engineering-v3-development-baseline-v1','status':'public_reference_checks_passed_not_confirmation',
+        'request_digest':digest(request),'proposal_digest':configuration_digest,'input_digest':digest(inputs),
+        'model_digest':ctx.model.digest,'receipt':evidence.to_dict(),'mean_source_power_W':value,'gain_fraction':.05,
+        'proposed_absolute_useful_gain_W':.05*value,'all_24_checks_passed':True,'counts':counts,
+        'maximum_voltage_absolute_error_V':max(r['voltage_absolute_error_V'] for r in results),
+        'maximum_power_absolute_error_W':max(r['power_absolute_error_W'] for r in results),
+        'solver_iterations':sum(r['diagnostics']['solver_iterations'] for r in results),
+        'component_calls':sum(r['diagnostics']['component_calls'] for r in results),
+        'component_linearize_calls':sum(r['diagnostics']['derivative_calls'] for r in results),
+        'batch_integrity':batch.report(),'confirmation_rows_generated':False,'task_admitted':False,'utility_verdict':'not_attempted'}
+    (output/'summary.json').write_text(json.dumps(summary,sort_keys=True,indent=2)+'\n')
+    print(json.dumps({k:summary[k] for k in ('status','mean_source_power_W','proposed_absolute_useful_gain_W','counts')}),flush=True)
+except BaseException as error:
+    (output/'failure.json').write_text(json.dumps({'error_type':type(error).__name__,'counts':counts,'automatic_retry_allowed':False,'attempt_consumed':True,'actual_total_work':None},indent=2)+'\n')
+    raise

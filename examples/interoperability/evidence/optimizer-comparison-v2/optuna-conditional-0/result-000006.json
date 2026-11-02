@@ -1,0 +1,1 @@
+{"action_id": "eval-000006", "configuration": {"family": "quadratic", "quadratic_slope": 0.07103605819788694, "x": 0.7917250380826646, "y": 0.5288949197529045}, "result": {"constraint_residual": 0.32061995783556907, "feasible": false, "objective": null, "status": "scientific_infeasible"}}

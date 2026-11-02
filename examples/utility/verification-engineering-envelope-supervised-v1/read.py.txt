@@ -1,0 +1,87 @@
+"""Read original controller receipts after relocation; never execute the model."""
+from pathlib import Path
+import importlib.abc
+import json
+import math
+import os
+import socket
+import subprocess
+import sys
+
+root, installed = (Path(value).resolve() for value in sys.argv[1:])
+sys.path.insert(0,str(installed))
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if fullname.split('.')[0] in {'examples','openmdao','torch','pvlib','py_wake'}:
+            raise AssertionError('domain import denied')
+sys.meta_path.insert(0,NoModels())
+def denied(*args,**kwargs):raise AssertionError('external execution denied')
+socket.socket=subprocess.Popen=denied
+from autoengineering.agents.batch import BatchStore
+from autoengineering.utility.engineering_campaign import EngineeringCampaign
+from autoengineering.utility.native_costs import join_native_costs
+from autoengineering.utility.scenario_costs import join_scenario_costs
+from autoengineering.campaign.artifacts import ArtifactRef,read_bytes
+from autoengineering.campaign.serialization import digest
+request=json.loads((root/'request.json').read_text())
+summary=json.loads((root/'summary.json').read_text())
+batch=BatchStore(root/'batch')
+campaign=EngineeringCampaign(root/'campaign',batch,inspect_only=True)
+# Load only core metadata readers before installing the strict evidence-file guard.
+initial=campaign.state()
+join_native_costs(batch,{'conventional':digest(request)})
+join_scenario_costs(batch,{'conventional':digest(request)})
+inodes={(p.stat().st_dev,p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+def guard(event,args):
+    if event=='open':
+        path,mode,flags=args
+        if isinstance(path,int):
+            st=os.fstat(path)
+            if (st.st_dev,st.st_ino) not in inodes:raise AssertionError('outside descriptor')
+        elif not Path(path).resolve().is_relative_to(root):raise AssertionError('outside evidence')
+        if any(value in (mode or '') for value in 'wax+') or flags & (os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_APPEND|os.O_TRUNC):
+            raise AssertionError('reader write')
+    elif event=='import' or event.startswith(('socket.','subprocess.','os.exec')) or event in ('os.system','os.fork','os.posix_spawn'):
+        raise AssertionError('runtime or import')
+sys.addaudithook(guard)
+state=campaign.state();projection=batch.replay()
+assert len(projection.reservations)==len(projection.observations)==49 and not projection.pending
+receipt=ArtifactRef.from_dict(summary['receipt'])
+assert projection.finished['conventional'].status=='passed'
+assert projection.finished['conventional'].evidence==(receipt,)
+original=json.loads(read_bytes(batch.root,receipt,max_bytes=1048576).decode())
+assert original=={key:value for key,value in summary.items() if key!='receipt'}
+assert original['request_digest']==digest(request)
+def record(ref):return json.loads(read_bytes(batch.root,ArtifactRef.from_dict(ref),max_bytes=65536).decode())
+assert state['decision'].to_dict()==record(original['records']['decision'])
+assert state['selected'].evaluation==state['evaluations'][1].evaluation
+assert state['native_reports'][0].to_dict()==record(original['records']['native_report'])
+assert [value.to_dict() for value in state['evaluations']]==[record(ref) for ref in original['records']['evaluations']]
+assert state['selected'].to_dict()==record(original['records']['selected_state'])
+report=state['native_reports'][0]
+assert len(report.result.support_solves)==1 and not report.result.optimizer_target_met
+native_records=join_native_costs(batch,{'conventional':digest(request)})
+assert record(original['records']['costs'])=={'costs':[value.to_dict() for value in native_records]}
+native={r.resource:r.quantity for r in native_records}
+assert native['native_inner_model_calls']==35 and native['native_support_model_calls']==1
+scenario_costs=join_scenario_costs(batch,{'conventional':digest(request)})
+base,chosen=state['evaluations']
+assert len(base.scenarios)==len(chosen.scenarios)==24
+assert base.evaluation.eligible and chosen.evaluation.eligible
+assert original['outer_reservations']==49 and original['native_inner_model_calls']==35 and original['total_root_model_calls']==83
+for value in (base,chosen):
+    mean=math.fsum(case.values['source_power'] for case in value.scenarios)/24
+    assert math.isclose(mean,value.evaluation.metrics['source_power'],rel_tol=1e-14)
+assert all(c.values['source_power']<=1.01*b.values['source_power'] for b,c in zip(base.scenarios,chosen.scenarios,strict=True))
+assert base.evaluation.metrics['source_power']-chosen.evaluation.metrics['source_power']>=campaign.spec.execution.study.rules.minimum_gain
+assert all(Path(module.__file__).resolve().is_relative_to(installed)
+           for name,module in tuple(sys.modules.items())
+           if (name=='autoengineering' or name.startswith('autoengineering.')) and getattr(module,'__file__',None))
+print(json.dumps({'schema':'utility-engineering-envelope-supervision-read-v1',
+    'outer_process_receipts':49,'native_inner_model_calls':35,'independent_support_calls':1,
+    'total_root_model_calls':83,'scenario_cost_records':len(scenario_costs),
+    'baseline_power_W':base.evaluation.metrics['source_power'],
+    'selected_power_W':chosen.evaluation.metrics['source_power'],
+    'decision':state['decision'].outcome,'optimizer_target_met':False,
+    'archive_only_replay':'passed','all_core_modules_from_installed_target':True,
+    'new_model_calls':0,'independent_confirmation':False}))

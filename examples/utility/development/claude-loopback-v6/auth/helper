@@ -1,0 +1,4 @@
+#!/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12
+from pathlib import Path
+Path('/private/tmp/claude-loopback-probe-v6/home/helper-observed').write_text('synthetic helper executed')
+print('synthetic-loopback-fixture')

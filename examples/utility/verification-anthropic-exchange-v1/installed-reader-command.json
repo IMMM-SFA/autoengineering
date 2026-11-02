@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "archive_index_sha256": "90c32d39cc2a5a806e4ce734e80ade2817bbf529bed015bfac50e2a4c7958e92",
+  "regular_files_verified": 55,
+  "broker_usage": {
+    "uncached_input_tokens": 7,
+    "cached_input_tokens": 2,
+    "cache_creation_input_tokens": 3,
+    "input_tokens": 12,
+    "output_tokens": 10,
+    "total_tokens": 22,
+    "reasoning_output_tokens": null
+  },
+  "scope": "saved broker response from qualified authored CommandUpstream run; no live stop/source-worker reinspection",
+  "guards": "original checkout opens, all sockets and subprocesses denied",
+  "production_admission": false
+}

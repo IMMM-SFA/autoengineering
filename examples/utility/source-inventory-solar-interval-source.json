@@ -1,0 +1,17 @@
+{
+  "scope": "Provider interval-code definition, cached site metadata and bounded prefix listings only",
+  "predecessor": "examples/utility/source-inventory-guest-wheel-v6.json",
+  "predecessor_sha256": "e873cf40fcc555126c39b814ad52151bbe1c2988b3fb92901024848f26f90688",
+  "current_source_sha256": {
+    "docs/reviews/part-5-solar-interval-source-review.md": "85235186dbbddb8ffc250a3b2ff7e0c6245ef22f9bb3b582053bc8c154a44608",
+    "docs/reviews/part-5-progress.md": "4ded0026722a53b72ea0529b4c8173b39eed813acd0ec6c9839fc3eff9409974",
+    "docs/reviews/part-5-completion-audit.md": "79e10008d693133880a4897821c826eb64a5913973e1048448800332e1b6afec",
+    "docs/reviews/part-5-confirmation-preparation.md": "5b9f1f1d3709524a9a313eed7f1af880ad805d189eaa0be1d2d8839548344685"
+  },
+  "verification": "examples/utility/verification-solar-interval-source-v1/summary.json",
+  "verification_sha256": "bbe0fcfc1cb41fbcf0e8301b1faeb693980f510e6ae5e9092a025aacda71b104",
+  "core_and_test_source_pins_unchanged": 512,
+  "provider_document_commit": "7affccd25972e92c4de855ee98a20c0e85577b59",
+  "task_admitted": false,
+  "new_model_calls": 0
+}

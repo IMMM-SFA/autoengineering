@@ -1,0 +1,10 @@
+{
+  "filters_after_numpy_import": [
+    {
+      "action": "ignore",
+      "pattern": "numpy.ndarray size changed",
+      "category": "Warning"
+    }
+  ],
+  "new_model_calls": 0
+}

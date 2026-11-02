@@ -1,0 +1,54 @@
+{
+  "schema": "utility-engineering-campaign-verification-v1",
+  "purpose": "Local supplied engineering scientific tools and selection; no route/independent comparison",
+  "commands": {
+    "campaign": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility_engineering_campaign.py -q -x -p no:cacheprovider --junitxml=examples/utility/verification-engineering-campaign-v1/campaign.xml",
+    "default": "PATH=\"$PWD/.pixi/envs/default/bin:$PATH\" .pixi/envs/default/bin/python -m pytest tests/test_utility*.py tests/test_optimization_recovery.py tests/test_optimization_run_spec.py -q -rs -p no:cacheprovider --junitxml=examples/utility/verification-engineering-campaign-v1/default.xml",
+    "interoperability": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PATH=\"$PWD/.pixi/envs/interoperability/bin:$PATH\" .pixi/envs/interoperability/bin/python -m pytest tests/test_utility_engineering_campaign.py tests/test_utility_engineering_process.py tests/test_utility_engineering.py tests/test_utility_studies.py -q -rs -p no:cacheprovider --junitxml=examples/utility/verification-engineering-campaign-v1/interoperability.xml",
+    "documentation": ".pixi/envs/default/bin/python -m pytest tests/test_documentation.py -q -p no:cacheprovider --junitxml=examples/utility/verification-engineering-campaign-v1/documentation.xml",
+    "lint": ".pixi/envs/default/bin/ruff check src tests examples scripts/utility_installed_model_check.py",
+    "rehearsal": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 PATH=\"$PWD/.pixi/envs/interoperability/bin:$PATH\" .pixi/envs/interoperability/bin/python -m examples.utility.rehearse_engineering_campaign --output examples/utility/development/engineering-campaign-v2"
+  },
+  "results": {
+    "campaign": {
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "41.298"
+    },
+    "default": {
+      "tests": "331",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "15",
+      "time": "169.371"
+    },
+    "interoperability": {
+      "tests": "35",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "60.879"
+    },
+    "documentation": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.677"
+    }
+  },
+  "lint": "passed",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]",
+  "limits": [
+    "Trusted supplied scalar model and already exposed forcing",
+    "No filesystem/network/memory sandbox for scientific code",
+    "No route broker, suite coordinator or public CLI integration",
+    "No conventional native-driver orchestration in controller",
+    "No independent confirmation, provider, Linux, second host or remote execution",
+    "No full default/Bayes or installed-wheel rerun after this module",
+    "No scientific, efficiency or role-retention utility established"
+  ]
+}

@@ -1,0 +1,352 @@
+"""One actual frozen inference using a previously selected authored fixture.
+
+No fitting, optimization, scoring, provider call or independent-data admission.
+The driver contract is explicitly exposed. Existing selection metadata is reused,
+never regenerated. The production executor owns all guest transport and cleanup.
+"""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import replace
+import hashlib
+from pathlib import Path
+
+from autoengineering.campaign.artifacts import confined_file, put_bytes, read_bytes
+from autoengineering.campaign.records import ArtifactRef
+from autoengineering.campaign.serialization import canonical_json, digest, unique_json
+from autoengineering.campaign.store import checked_directory, durable_write
+from autoengineering.utility.confirmation import read_selected_state
+from autoengineering.utility.guest_archive import publisher_identity
+from autoengineering.utility.guest_daemon import GuestDaemonAPI
+from autoengineering.utility.guest_executor import GuestRoutingExecutor
+from autoengineering.utility.guest_owner import GuestOwnerManifest
+from autoengineering.utility.scoring import CompositeConfirmationGrant, validate_grant
+from autoengineering.utility.store import SuiteStore
+from examples.utility import guest_image_build as build
+from examples.utility import guest_resource_reader, guest_resource_runner, guest_resources
+from examples.utility.inference_environment import verify_inputs
+
+MAX_FILE = 8 * 1024**2
+MAX_TOTAL = 32 * 1024**2
+
+
+def raw(root, name):
+    path = confined_file(root, name)
+    if path.stat().st_size > MAX_FILE:
+        raise ValueError("authored fixture file exceeds envelope")
+    with path.open("rb") as stream:
+        result = stream.read(MAX_FILE + 1)
+    if len(result) > MAX_FILE:
+        raise ValueError("authored fixture file exceeds envelope")
+    return result
+
+
+def read(root, name):
+    return unique_json(raw(root, name).decode())
+
+
+def save(root, name, value):
+    durable_write(root / name, canonical_json(value).encode())
+
+
+def private_parents(root, relative):
+    path = Path(relative)
+    if path.is_absolute() or ".." in path.parts:
+        raise ValueError("authored fixture parent escapes its scope")
+    current = checked_directory(root)
+    for part in path.parts:
+        current = current / part
+        if current.exists() or current.is_symlink():
+            checked_directory(current)
+        else:
+            current.mkdir(mode=0o700)
+
+
+def copy_json_tree(original, output):
+    """Copy bounded metadata only; never copy arrays or follow a symlink."""
+    original = checked_directory(original)
+    entries = []
+    for path in sorted(original.rglob("*")):
+        if path.is_symlink():
+            raise ValueError("authored fixture contains a symlink")
+        if path.is_file() and path.suffix == ".json":
+            entries.append((str(path.relative_to(original)), path.stat().st_size))
+    if len(entries) > 4096 or sum(size for _, size in entries) > MAX_TOTAL:
+        raise ValueError("authored fixture metadata exceeds envelope")
+    output.mkdir(mode=0o700)
+    for name in ("events", "artifacts", "children", "attempts", "control", "reports"):
+        (output / name).mkdir(mode=0o700)
+    for name, _ in entries:
+        target = output / name
+        private_parents(output, Path(name).parent)
+        durable_write(target, raw(original, name))
+    return len(entries)
+
+
+def prepare(owner, suite, source, drivers, resources, environment, *, resource_digest, output):
+    owner, source, drivers = (checked_directory(p) for p in (owner, source, drivers))
+    suite = SuiteStore(suite)
+    template_bytes = raw(owner, "owner.json")
+    template = GuestOwnerManifest.from_json(template_bytes.decode()).job
+    state = suite.replay()
+    if state["confirmation_accesses"] or state["cancelled"]:
+        raise ValueError("fixture must have an untouched frozen selection")
+    selected = validate_grant(suite, template.grant, state["frozen"])
+    bound = read_selected_state(suite.root, selected.selected_state)
+    guest_resource_reader.read_completion(resources, expected_digest=resource_digest)
+    resource_request = guest_resource_runner.read(Path(resources), "request.json")
+    profile = guest_resources.validate_profile(resource_request["profile"])
+    if profile.image_id != guest_resources.DERIVATIVE_IMAGE:
+        raise ValueError("smoke requires the resource-checked derivative image")
+    inputs = verify_inputs(environment, expected_digest=profile.environment_inputs_digest)
+    profile.validate_environment(inputs.to_dict())
+    old = guest_resource_runner.read(Path(resources), "bindings.json")
+    if build._endpoint(old["endpoint"]) != resource_request["endpoint"]:
+        raise ValueError("smoke local endpoint changed")
+    output = Path(output).absolute()
+    build.guest_image._public_directory(output.parent)
+    if (
+        output.exists()
+        or output.is_symlink()
+        or any(
+            output.is_relative_to(p) or p.is_relative_to(output)
+            for p in (
+                owner,
+                source,
+                drivers,
+                suite.root,
+                checked_directory(resources),
+                checked_directory(environment),
+            )
+        )
+    ):
+        raise ValueError("smoke output must be absent and separate from fixture inputs")
+    output.mkdir(mode=0o700)
+    save(
+        output,
+        "preparation-intent.json",
+        {
+            "purpose": "authored exposed fixture; frozen inference only",
+            "template_owner_sha256": hashlib.sha256(template_bytes).hexdigest(),
+            "original_suite_digest": suite.spec.digest,
+            "resource_completion_digest": resource_digest,
+            "fitting_starts_allowed": 0,
+            "scoring_starts_allowed": 0,
+        },
+    )
+    copied = copy_json_tree(suite.root, output / "suite")
+    store = SuiteStore(output / "suite")
+    selected = validate_grant(store, template.grant, store.replay()["frozen"])
+    read_selected_state(store.root, selected.selected_state)
+    code, staged_drivers, work = (output / name for name in ("source", "drivers", "work"))
+    for path in (code, staged_drivers, work):
+        path.mkdir(mode=0o700)
+    needed = {ref.path: ref for ref in (*bound.model.source_bundle, template.lock)}
+    needed.update(
+        {
+            ref.path: ref
+            for ref in template.sources
+            if ref.path.startswith("src/autoengineering/") and ref.path.endswith(".py")
+        }
+    )
+    if sum(ref.size_bytes for ref in needed.values()) > MAX_TOTAL:
+        raise ValueError("authored source closure exceeds envelope")
+    for ref in needed.values():
+        target = code / ref.path
+        private_parents(code, Path(ref.path).parent)
+        durable_write(target, read_bytes(source, ref, max_bytes=MAX_FILE))
+    forcing = template.grant.inference.forcing
+    driver = staged_drivers / forcing.artifact.path
+    private_parents(staged_drivers, Path(forcing.artifact.path).parent)
+    save(
+        output,
+        "driver-copy-intent.json",
+        {"artifact": forcing.artifact.to_dict(), "prior_exposure": "exposed"},
+    )
+    durable_write(driver, read_bytes(drivers, forcing.artifact, max_bytes=MAX_FILE))
+    grant = replace(
+        template.grant,
+        inference=replace(
+            template.grant.inference, forcing=replace(forcing, prior_exposure="exposed")
+        ),
+    )
+    validate_grant(store, grant, store.replay()["frozen"])
+    envref = put_bytes(
+        store.root,
+        inputs.to_json().encode(),
+        name="environment.json",
+        media_type="application/json",
+        producer="authored-smoke",
+    )
+    bindings = {"endpoint": old["endpoint"], "root": str(output)}
+    request = {
+        "schema": "utility-authored-guest-inference-smoke-v1",
+        "purpose": "fixed exposed authored fixture; no independent confirmation",
+        "suite_digest": store.spec.digest,
+        "grant": grant.to_dict(),
+        "sources": [ref.to_dict() for ref in template.sources],
+        "lock": template.lock.to_dict(),
+        "guest": profile.to_dict(),
+        "environment": envref.to_dict(),
+        "daemon": resource_request["daemon"],
+        "endpoint": resource_request["endpoint"],
+        "resource_completion_digest": resource_digest,
+        "bindings_digest": digest(bindings),
+        "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "fixture_json_files_copied": copied,
+        "source_files_copied": len(needed),
+        "container_creations_reserved": 1,
+        "container_starts_reserved": 1,
+        "scientific_inference_starts_reserved": 1,
+        "fitting_starts_allowed": 0,
+        "scoring_starts_allowed": 0,
+        "automatic_retries": 0,
+        "runtime_qualified": False,
+    }
+    save(output, "request.json", request)
+    save(output, "bindings.json", bindings)
+    durable_write(output / "runner.py.txt", Path(__file__).read_bytes())
+    durable_write(output / "template-owner.json", template_bytes)
+    return request
+
+
+def execute(root, *, expected_digest):
+    root = checked_directory(root)
+    q, bindings = read(root, "request.json"), read(root, "bindings.json")
+    if (
+        q.get("schema") != "utility-authored-guest-inference-smoke-v1"
+        or digest(q) != expected_digest
+        or q["bindings_digest"] != digest(bindings)
+        or bindings["root"] != str(root)
+        or hashlib.sha256(Path(__file__).read_bytes()).hexdigest() != q["runner_sha256"]
+    ):
+        raise ValueError("smoke source, request or scope changed")
+    marker = root / "execution-intent.json"
+    if marker.exists() or marker.is_symlink():
+        raise ValueError("smoke attempt consumed; saved-evidence recovery only")
+    if (
+        q["container_creations_reserved"],
+        q["container_starts_reserved"],
+        q["scientific_inference_starts_reserved"],
+        q["fitting_starts_allowed"],
+        q["scoring_starts_allowed"],
+        q["automatic_retries"],
+        q["runtime_qualified"],
+    ) != (1, 1, 1, 0, 0, 0, False):
+        raise ValueError("smoke budgets differ")
+    if build._endpoint(bindings["endpoint"]) != q["endpoint"]:
+        raise ValueError("smoke local endpoint changed")
+    store = SuiteStore(root / "suite")
+    if store.spec.digest != q["suite_digest"]:
+        raise ValueError("smoke frozen suite changed")
+    grant = CompositeConfirmationGrant.from_dict(q["grant"])
+    if grant.inference.forcing.prior_exposure != "exposed":
+        raise ValueError("smoke drivers must be explicitly exposed")
+    guest = guest_resources.validate_profile(q["guest"])
+    if guest.image_id != guest_resources.DERIVATIVE_IMAGE:
+        raise ValueError("smoke requires the resource-checked derivative image")
+    api = GuestDaemonAPI(
+        bindings["endpoint"],
+        api_version=q["daemon"]["api_version"],
+        server_digest=q["daemon"]["server_digest"],
+    )
+    if api.profile.to_dict() != q["daemon"]:
+        raise ValueError("smoke daemon implementation changed")
+    save(
+        root,
+        "execution-intent.json",
+        {
+            "request_digest": expected_digest,
+            "grant_digest": grant.digest,
+            "container_starts_reserved": 1,
+            "scoring_starts_allowed": 0,
+        },
+    )
+    executor = GuestRoutingExecutor(
+        store,
+        root / "source",
+        root / "drivers",
+        root / "work",
+        sources=tuple(ArtifactRef.from_dict(ref) for ref in q["sources"]),
+        lock=ArtifactRef.from_dict(q["lock"]),
+        guest=guest,
+        environment=ArtifactRef.from_dict(q["environment"]),
+        api=api,
+        publisher_digest=publisher_identity(),
+    )
+    with store.writer():
+        arguments = {
+            "cell_digest": grant.cell_digest,
+            "attempt_id": "confirmation-" + grant.cell_digest[:48],
+            "child_digest": grant.digest,
+            "phase": "confirmation",
+        }
+        store.append(
+            request_id="authored-smoke-reserve",
+            operation="reserve",
+            resources=grant.resources,
+            **arguments,
+        )
+        store.append(request_id="authored-smoke-start", operation="start", **arguments)
+        ref = put_bytes(
+            store.root,
+            grant.to_json().encode(),
+            name="confirmation-grant.json",
+            media_type="application/json",
+            producer="authored-smoke",
+        )
+        store.append(
+            request_id="authored-smoke-access",
+            operation="confirmation_access",
+            result_digest=ref.sha256,
+            **arguments,
+        )
+        result = executor.execute(grant)
+    save(root, "result.json", result.to_dict())
+    recovered = GuestRoutingExecutor.for_recovery(store, grant, root / "work").recover(grant)
+    if recovered != result:
+        raise ValueError("original saved inference replay differs")
+    summary = {
+        "schema": "utility-authored-guest-inference-smoke-completion-v1",
+        "request_digest": expected_digest,
+        "execution": result.to_dict(),
+        "recovered_digest": recovered.digest,
+        "new_fitting_starts": 0,
+        "scoring_starts": 0,
+        "independent_confirmation": False,
+        "runtime_qualified": False,
+    }
+    save(root, "complete.json", summary)
+    return summary
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+    prep = sub.add_parser("prepare")
+    for name in ("owner", "suite", "source", "drivers", "resources", "environment", "output"):
+        prep.add_argument(name, type=Path)
+    prep.add_argument("--resource-digest", required=True)
+    run = sub.add_parser("execute")
+    run.add_argument("root", type=Path)
+    run.add_argument("--expected-digest", required=True)
+    args = parser.parse_args()
+    if args.command == "prepare":
+        result = prepare(
+            args.owner,
+            args.suite,
+            args.source,
+            args.drivers,
+            args.resources,
+            args.environment,
+            resource_digest=args.resource_digest,
+            output=args.output,
+        )
+    else:
+        result = execute(args.root, expected_digest=args.expected_digest)
+    print(canonical_json({"digest": digest(result), "schema": result["schema"]}))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,8 @@
+{
+  "phase": "first public preparation claim",
+  "exit_code": 1,
+  "source_asset_read": false,
+  "model_calls": 0,
+  "reason": "The checker rejected os.fdopen for the already opened scoped temporary claim file; the library failure was sanitized. Fresh checker verifies descriptor inode belongs to the permitted output scope. Initial partial scope retained.",
+  "wheel_changed": false
+}

@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "scope": "authored constant-driver parity; no acquired or reserved weather",
+  "request_digest": "a8df89361a03668a0212a6a4e6013250d2bc3a8ac0f379e2934d0204d18ebf39",
+  "kernel_energy_gwh": 41.6509656927988,
+  "direct_energy_gwh": 41.6509656927988,
+  "absolute_difference_gwh": 0.0,
+  "elapsed_seconds": 8.429423958063126,
+  "attempted_model_starts": 2,
+  "completed_model_starts": 2,
+  "known_inner_solver_work": null,
+  "total_cpu_seconds": null,
+  "rss_bytes": null,
+  "full_cost_evidence": false,
+  "private_weather_reads": 0,
+  "fitting_starts": 0,
+  "task_admitted": false,
+  "private_boundary_qualified": false,
+  "os_limits_qualified": false,
+  "automatic_retries": 0
+}

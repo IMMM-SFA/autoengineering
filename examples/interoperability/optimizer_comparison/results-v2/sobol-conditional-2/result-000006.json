@@ -1,0 +1,1 @@
+{"action_id": "eval-000006", "configuration": {"family": "linear", "linear_curvature": 0.896328292787075, "x": 0.6797990407794714, "y": 0.19095671083778143}, "result": {"constraint_residual": -0.12924424838274717, "feasible": true, "objective": 0.2767317358663093, "status": "success"}}

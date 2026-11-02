@@ -1,0 +1,143 @@
+"""One offline immutable source overlay; no installation or model execution."""
+import hashlib, json, os, re, shutil, time, uuid
+from pathlib import Path
+from autoengineering.campaign.serialization import canonical_json, digest, unique_json
+from examples.utility import guest_image_build as build
+from examples.utility import engineering_load_entrypoint as entry
+
+root = Path.cwd(); os.umask(0o077)
+p = root / 'examples/utility/verification-engineering-worker-image-v1'
+work = root / 'outputs/engineering-worker-image-v1'
+assert not work.exists(); work.mkdir(mode=0o700)
+for name in ('context', 'config', 'home'): (work / name).mkdir(mode=0o700)
+(work / 'config/config.json').write_text('{}')
+context = work / 'context'
+payload = context / 'source'; payload.mkdir()
+worker = context / 'worker'; worker.mkdir()
+previous_root = root / 'examples/utility/verification-engineering-dependency-image-v1'
+previous = unique_json((previous_root / 'complete.json').read_text())
+previous_request = unique_json((previous_root / 'request.json').read_text())
+assert previous['request_digest'] == digest(previous_request)
+source = previous['image_id']
+assert source == 'sha256:39fb6f877a99e384ec2af08363a598ea23fd6ef7ec3bae076e0ab1ffe99508b0'
+files = {}
+for name in entry.FILES:
+    raw = (root / name).read_bytes()
+    old = previous_request['environment']['payloads'].get('model-source/' + name)
+    if old is not None: assert hashlib.sha256(raw).hexdigest() == old
+    target = payload / name; target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(raw); files[name] = hashlib.sha256(raw).hexdigest()
+own = (root / 'examples/utility/engineering_load_entrypoint.py').read_bytes()
+(worker / 'entrypoint.py').write_bytes(own)
+manifest = {'schema': 'utility-coupled-entrypoint-source-v1',
+            'entrypoint_sha256': hashlib.sha256(own).hexdigest(), 'files': files}
+(worker / 'manifest.json').write_text(canonical_json(manifest))
+entry.verify_sources(payload, (worker / 'manifest.json').read_bytes(), own)
+# COPY preserves these directory/file modes. UID 1000 cannot alter image sources.
+for tree in (payload, worker):
+    for path in (tree, *tree.rglob('*')): path.chmod(0o755 if path.is_dir() else 0o444)
+nonce = uuid.uuid4().hex
+alias = 'localhost/ae-coupled-worker-source-' + nonce + ':frozen'
+environment = {'source_image': source, 'source_environment_digest': previous['environment_digest'],
+               'source_manifest': manifest, 'packet_schema': 'utility-coupled-load-packet-v1',
+               'child_output_bytes': 16384, 'fixed_entrypoint_active_seconds': entry.ACTIVE_SECONDS,
+               'purpose': 'fixed coupled-load worker candidate; no source or runtime admission'}
+labels = {'org.autoengineering.purpose': 'utility-coupled-worker-candidate-v1',
+          'org.autoengineering.environment': digest(environment),
+          'org.autoengineering.wheel': '52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7',
+          'org.autoengineering.source-image': source,
+          'org.autoengineering.environment-recipe': 'fixed-coupled-source-overlay-v1'}
+command = ['/opt/inference/bin/python', '-I', '-S', '-B', '/opt/coupled-worker/entrypoint.py']
+dockerfile = ('FROM ' + alias + '\nCOPY source/ /opt/coupled-source/\n'
+              'COPY worker/ /opt/coupled-worker/\nWORKDIR /work\nUSER 1000:1000\n')
+dockerfile += ''.join('LABEL ' + k + '=' + json.dumps(v) + '\n' for k, v in labels.items())
+dockerfile += 'ENTRYPOINT ' + canonical_json(command) + '\nCMD []\n'
+(context / 'Dockerfile').write_text(dockerfile)
+(context / '.dockerignore').write_text('**\n!Dockerfile\n!source/\n!source/**\n!worker/\n!worker/**\n')
+bindings = {'cli': '/usr/local/bin/docker',
+            'buildx': '/Applications/OrbStack.app/Contents/MacOS/xbin/docker-buildx',
+            'endpoint': '/Users/cam/.orbstack/run/docker.sock'}
+request = {'scope': 'one offline fixed worker source image overlay',
+           'environment': environment, 'environment_digest': digest(environment),
+           'source_image': source, 'source_alias': alias, 'labels': labels,
+           'entrypoint': command,
+           'files': {str(f.relative_to(context)): hashlib.sha256(f.read_bytes()).hexdigest()
+                     for f in context.rglob('*') if f.is_file()},
+           'binary': build._binary(bindings['cli']), 'buildx': build._binary(bindings['buildx']),
+           'endpoint': build._endpoint(bindings['endpoint']),
+           'helper_sha256': hashlib.sha256(Path(build.__file__).read_bytes()).hexdigest(),
+           'script_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+           'max_source_tags': 1, 'max_builds': 1, 'pull_commands': 0, 'install_commands': 0,
+           'build_network': 'none', 'active_seconds': 600, 'automatic_retries': 0,
+           'scientific_starts': 0, 'private_boundary_qualified': False,
+           'disk_quota_enforced': False, 'daemon_cancellation_qualified': False}
+def save(name, value):
+    for target in (p, work): (target / name).write_text(json.dumps(value, indent=2) + '\n')
+save('request.json', request); save('bindings.json', bindings); save('source-manifest.json', manifest)
+shutil.copyfile(context / 'Dockerfile', p / 'Dockerfile.txt')
+build._copy_plugin(work, bindings['buildx'], request['buildx'])
+env = {k: os.environ[k] for k in ('PATH', 'HOME', 'LANG', 'LC_ALL', 'TMPDIR') if k in os.environ}
+env.update(DOCKER_HOST='unix://' + bindings['endpoint'], DOCKER_CONFIG=str(work / 'config'),
+           BUILDKIT_PROGRESS='plain', DOCKER_BUILDKIT='1', NO_COLOR='1')
+commands = [
+    ['version', '--format', '{{json .Server}}'],
+    ['context', 'inspect', 'default', '--format', '{{json .}}'],
+    ['buildx', 'inspect', 'default'],
+    ['image', 'inspect', source, '--format', '{{json .}}'],
+    ['image', 'ls', '--quiet', alias], ['tag', source, alias],
+    ['image', 'inspect', alias, '--format', '{{json .}}'],
+    ['buildx', 'build', '--builder', 'default', '--load', '--platform', 'linux/amd64',
+     '--network', 'none', '--pull=false', '--no-cache', '--provenance=false', '--sbom=false',
+     '--resource', 'memory=2g', '--resource', 'memory-swap=2g', '--resource', 'cpu-period=100000',
+     '--resource', 'cpu-quota=100000', '--iidfile', str(work / 'image.id'),
+     '--metadata-file', str(work / 'build-metadata.json'), '--progress', 'plain', str(context)],
+]
+deadline = time.monotonic() + 600; image = None
+try:
+    for i, parts in enumerate(commands):
+        assert build._binary(bindings['cli']) == request['binary']
+        assert build._endpoint(bindings['endpoint']) == request['endpoint']
+        build._verify_plugin(work, request['buildx'])
+        save(f'{i:02d}-intent.json', {'command': parts, 'request_digest': digest(request)})
+        log = work / f'{i:02d}.log'
+        status = build._run([bindings['cli'], '--config', str(work / 'config'), '--host',
+                             'unix://' + bindings['endpoint'], *parts], env=env, cwd=work,
+                            deadline=deadline, log=log)
+        shutil.copyfile(log, p / log.name)
+        save(f'{i:02d}-result.json', {'exit_code': status,
+             'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+        assert status == 0, (i, status)
+        if i < 3: build._validate(i, log.read_bytes(), {'context_check': True}, bindings)
+        if i in (3, 6):
+            value = unique_json(log.read_text())
+            assert (value['Id'], value['Os'], value['Architecture']) == (source, 'linux', 'amd64')
+            assert value['Config']['Labels'] == previous_request['labels']
+        if i == 4: assert not log.read_text().strip(), 'source alias already exists'
+    image = (work / 'image.id').read_text().strip()
+    assert re.fullmatch('sha256:[0-9a-f]{64}', image)
+    parts = ['image', 'inspect', image, '--format', '{{json .}}']
+    save('08-intent.json', {'command': parts, 'request_digest': digest(request)})
+    log = work / '08.log'
+    status = build._run([bindings['cli'], '--config', str(work / 'config'), '--host',
+                         'unix://' + bindings['endpoint'], *parts], env=env, cwd=work,
+                        deadline=deadline, log=log)
+    shutil.copyfile(log, p / log.name)
+    save('08-result.json', {'exit_code': status,
+         'log_sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+    assert status == 0
+    value = unique_json(log.read_text()); config = value['Config']
+    assert (value['Id'], value['Os'], value['Architecture'], config['User'], config['WorkingDir']) == (
+        image, 'linux', 'amd64', '1000:1000', '/work')
+    assert config['Labels'] == labels and config['Entrypoint'] == command
+    assert config.get('Cmd') in (None, []) and config.get('Volumes') in (None, {})
+    assert config.get('OnBuild') in (None, [])
+    save('complete.json', {'request_digest': digest(request), 'image_id': image,
+         'source_image': source, 'environment_digest': digest(environment),
+         'source_tags': 1, 'builds': 1, 'pull_commands': 0, 'install_commands': 0,
+         'scientific_starts': 0, 'runtime_qualified': False, 'private_boundary_qualified': False})
+    print(canonical_json({'image_id': image, 'environment_digest': digest(environment),
+                          'builds': 1, 'scientific_starts': 0}))
+except BaseException as error:
+    save('failure.json', {'request_digest': digest(request), 'error_type': type(error).__name__,
+         'image_id_known': image, 'attempt_consumed': True, 'automatic_retry_forbidden': True})
+    raise

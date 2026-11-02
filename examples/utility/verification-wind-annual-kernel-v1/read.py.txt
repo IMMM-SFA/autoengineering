@@ -1,0 +1,66 @@
+"""Read producer metadata without models, source drivers, processes or networking."""
+
+import hashlib
+import json
+import math
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+
+
+def identity(value):
+    return hashlib.sha256(json.dumps(
+        value, sort_keys=True, separators=(",", ":"), allow_nan=False,
+    ).encode()).hexdigest()
+
+
+def read(name):
+    return json.loads((ROOT / name).read_text())
+
+
+manifest = read("manifest.json")
+for name, pin in manifest.items():
+    relative = Path(name)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise ValueError("archive manifest path escapes its scope")
+    path = ROOT / relative
+    components = [ROOT.joinpath(*relative.parts[:index]) for index in range(1, len(relative.parts)+1)]
+    if (any(component.is_symlink() for component in components)
+            or not path.is_file() or pin["size_bytes"] > 8 * 1024**2):
+        raise ValueError("archive member is not a bounded regular file")
+    data = path.read_bytes()
+    if len(data) != pin["size_bytes"] or hashlib.sha256(data).hexdigest() != pin["sha256"]:
+        raise ValueError("archive member changed")
+request = read("request.json")
+actual = read("actual-result.json")
+complete = read("kernel-journal/complete.json")
+assert actual["request_digest"] == identity(request)
+assert request["reserved_model_starts"] == 2
+assert actual["attempted_model_starts"] == actual["completed_model_starts"] == 2
+assert actual["task_admitted"] is actual["private_boundary_qualified"] is False
+assert complete["attempted_model_starts"] == complete["completed_model_starts"] == 1
+assert complete["last_attempt_work_unknown"] is False
+assert complete["score"]["status"] == "success"
+assert complete["score"]["value"] == actual["kernel_energy_gwh"]
+assert actual["direct_energy_gwh"] == read("direct-result.json")["annual_energy_gwh"]
+assert math.isclose(actual["kernel_energy_gwh"], actual["direct_energy_gwh"],
+                    abs_tol=request["absolute_tolerance_gwh"], rel_tol=request["relative_tolerance"])
+assert request["policy"]["scorer_source_digest"] == manifest[
+    "source/examples/utility/wind_annual_scoring.py"
+]["sha256"]
+assert request["policy"]["plan_digest"] == identity(request["plan"])
+assert complete["annual_run"]["plan_digest"] == identity(request["plan"])
+model = {
+    name: manifest["source/" + name]["sha256"] for name in (
+        "examples/utility/wind_hourly.py", "examples/utility/wind_parameters.py",
+        "examples/utility/wind.py", "examples/utility/wind_annual.py", "pixi.lock",
+    )
+}
+assert identity(model) == request["plan"]["model_digest"] == request["policy"]["model_digest"]
+assert len(complete["annual_run"]["results"]) == 1
+assert complete["annual_run"]["results"][0]["source_digest"] == identity(request["plan"]["sources"][0])
+print(json.dumps({
+    "status": "verified producer metadata", "model_calls": 0, "private_weather_reads": 0,
+    "task_admitted": False, "files_verified": len(manifest),
+}, sort_keys=True))

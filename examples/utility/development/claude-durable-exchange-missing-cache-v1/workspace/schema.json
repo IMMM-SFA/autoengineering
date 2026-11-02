@@ -1,0 +1,1 @@
+{"additionalProperties":false,"properties":{"handoff_json":{"type":"string"}},"required":["handoff_json"],"type":"object"}

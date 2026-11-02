@@ -1,0 +1,34 @@
+{
+  "changed_core_files": [
+    "src/autoengineering/utility/load_costs.py"
+  ],
+  "core_python_sources": 226,
+  "core_source_changed": true,
+  "current_source_sha256": {
+    "docs/reviews/part-5-completion-audit.md": "fc2e9325b7e24e290abd5bdce1a2e77aac7404efd43e1137fb7b00b919dd2606",
+    "docs/reviews/part-5-progress.md": "90d0d2d1950cffa4edf4a5a5c507fc18094484be0b3de59055d15d01acaa4535",
+    "docs/utility-handoff.md": "e76e7f1a694d2115b52f29edeff8a4c976b7eadfdd4d9f4552b298fc995e3d54",
+    "docs/utility.md": "d75cae58d5b37f9d893a79044e2968795d624d5885dfd88727d125f9d84c2c77",
+    "examples/utility/engineering_container_callback.py": "5664d9093b22b19118f9ad6106b57dc5f40b460da796dac153bbf1c117651a71",
+    "src/autoengineering/utility/load_container_costs.py": "0f3bb37df621a5b5df37e27fc7c02b7d33b110706e112d02f2f6c4962275c640",
+    "src/autoengineering/utility/load_costs.py": "90029e9dfe0422b17b6fb85b87530d1a5e9d43ad635a1dbc863d50791d78e5cd",
+    "tests/test_utility_container_load_costs.py": "c52938af6eb4757a884f33f54c7597e9416357f9b15a82cb87403641aee5b2df",
+    "tests/test_utility_engineering_container_callback.py": "f4848a0bb9bf51894f7190f16e7757eb879617df4e38515b63e209c98140dff2"
+  },
+  "frozen_images_and_v6_wheel_unchanged": true,
+  "frozen_v6_whole_core_alignment": false,
+  "full_part_5_complete": false,
+  "guest_accounting_v15_unchanged": true,
+  "new_container_starts": 0,
+  "new_core_files": [
+    "src/autoengineering/utility/load_container_costs.py"
+  ],
+  "new_physical_model_starts": 0,
+  "predecessor": "examples/utility/source-inventory-engineering-fixed-worker-stage-v1.json",
+  "predecessor_sha256": "05e9a7e978fd0da29af374d72a6baf93164441eb7d13a6fbc4f939e2d6f4e38b",
+  "protected_runtime_admitted": false,
+  "public_evidence_manifest_sha256": "eea061f1b4f5e5aa337c4c8a145e04c74595a1b81a130d93f5424f9271a29a02",
+  "scope": "Versioned coupled-container source callback and installed offline cost/report contracts; authored runtime only",
+  "verification": "examples/utility/verification-engineering-container-callback-v1/summary.json",
+  "verification_sha256": "84c78df857b3ea1fc205059415927214104001dff7b7505dae074b9b93d33879"
+}

@@ -1,0 +1,28 @@
+{
+  "automatic_retries": 0,
+  "batch_spec_digest": "9c403232318aefd39efc05f09d0a1722feb539804180f9b11e0333e188c3baae",
+  "confirmation_access": false,
+  "environment": {
+    "machine": "arm64",
+    "numpy": "2.5.4",
+    "openmdao": "3.41.0",
+    "python": "3.12.16",
+    "scipy": "1.18.1",
+    "system": "Darwin"
+  },
+  "input_digest": "95698ee20beafd091747c003be214f4ba9665e32916f0571841e39d844c56d8f",
+  "maximum_native_model_invocations": 53,
+  "model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
+  "native_driver_invocations": 1,
+  "producer_sha256": "d5b2d4f323e09888a4936b62ada3a720aa81f947da80ff4caefe9b0111b13491",
+  "proposal_digest": "7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5",
+  "recipe_digest": "e9e4817c23e09e80a047c75ee2e0a69fd7c84b7d64577089f7ae94daba5b020f",
+  "schema": "utility-engineering-v3-conventional-request-v1",
+  "source_pins": {
+    "examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+    "examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "examples/utility/engineering_load_native.py": "3a01b9d8d43673d9af48ea0a14274344d0ceff439a3125c4b038d98787ee04d7",
+    "examples/utility/engineering_native_accounting.py": "3afa93516d25e151e87d4393e3cb12d169d4dd509b566feb6758db74c1b9176d",
+    "pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c"
+  }
+}

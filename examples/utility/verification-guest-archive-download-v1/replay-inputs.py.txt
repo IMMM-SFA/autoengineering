@@ -1,0 +1,13 @@
+"""Copy real saved inputs and run a fresh isolated administrative reader."""
+from pathlib import Path
+import shutil,subprocess,sys,tempfile
+source=Path.cwd().resolve();out=source/'examples/utility/verification-guest-archive-download-v1'
+with tempfile.TemporaryDirectory(prefix='guest-archive-cold-',dir='/private/tmp') as temporary:
+ root=Path(temporary).resolve()
+ shutil.copytree(source/'outputs/guest-runtime-archives-v1',root/'cache')
+ shutil.copytree(source/'outputs/guest-build-context-v1',root/'context')
+ shutil.copyfile(out/'cold-inputs.py.txt',root/'reader.py')
+ result=subprocess.run([sys.executable,'-I',str(root/'reader.py'),str(source),str(root)],cwd=root,capture_output=True,text=True)
+ (out/'cold-inputs.log').write_text(result.stdout+result.stderr)
+ print(result.stdout.strip())
+ if result.returncode:raise RuntimeError(result.stderr)

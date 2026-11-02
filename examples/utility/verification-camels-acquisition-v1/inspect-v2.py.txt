@@ -1,0 +1,67 @@
+"""One trusted archive/member validation; export metadata and frozen quality counts only."""
+from pathlib import Path
+import hashlib,json,math,socket,subprocess,zipfile
+from collections import Counter
+from datetime import date
+from autoengineering.campaign.serialization import digest
+from examples.utility.hydrology_camels import CamelsArchiveDaymetSource,FORCING_COLUMNS
+from examples.utility.hydrology_camels_archive import _directory_bound,_member,read_archive_rows
+from examples.utility.hydrology_partitions import DailyHydrologyPlan,DailyWindow
+root=Path.cwd();out=root/'examples/utility/verification-camels-acquisition-v1/inspection-v2'
+assert not (out/'inspection-result.json').exists() and not (out/'inspection-failure.json').exists()
+receipt=json.loads((out.parent/'receipt.json').read_text());policy=json.loads((out/'inspection-policy.json').read_text())
+metadata=(out.parent/'zenodo-record.json').read_bytes();private=Path(receipt['private_archive'])
+assert private==root/'outputs/camels-acquisition-v1/archive.zip'
+assert receipt['provider_md5_verified'] and receipt['archive_bytes']==3406626583
+assert hashlib.sha256(metadata).hexdigest()==receipt['metadata_response']['sha256']
+request={'schema':'utility-camels-inspection-request-v1','acquisition_receipt_digest':digest(receipt),
+ 'policy_digest':digest(policy),'producer_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+ 'source_pins':{name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ['examples/utility/hydrology_camels.py','examples/utility/hydrology_camels_archive.py','examples/utility/hydrology_partitions.py']},
+ 'archive_file':str(private),'archive_sha256':receipt['archive_sha256'],'member_decompressions_planned':4,
+ 'scientific_model_calls':0,'network_requests':0,'export_observation_values':False}
+(out/'inspection-request.json').write_text(json.dumps(request,indent=2)+'\n')
+def denied(*args,**kwargs):raise AssertionError('trusted inspection attempted external execution')
+socket.socket=subprocess.Popen=denied
+phase='archive_metadata'
+try:
+ with private.open('rb') as handle:
+  count=_directory_bound(handle,receipt['archive_bytes'])
+  with zipfile.ZipFile(handle) as archive:
+   infos=archive.infolist();assert len(infos)==count and len({info.filename for info in infos})==count
+   forcing=_member(archive,policy['forcing_member']);flow=_member(archive,policy['streamflow_member'])
+ phase='declared_source_and_plan'
+ header=forcing.decode('ascii').splitlines()[:4];assert len(header)==4 and tuple(header[3].split())==FORCING_COLUMNS
+ latitude,elevation,area_m2=map(float,header[:3]);assert all(math.isfinite(v) for v in [latitude,elevation,area_m2]) and area_m2>0
+ source=CamelsArchiveDaymetSource(schema='utility-camels-us-daymet-source-v2',gauge_id=policy['gauge_id'],
+  forcing_sha256=hashlib.sha256(forcing).hexdigest(),streamflow_sha256=hashlib.sha256(flow).hexdigest(),forcing_hour=policy['forcing_hour'],
+  archive_sha256=receipt['archive_sha256'],archive_metadata_sha256=hashlib.sha256(metadata).hexdigest(),huc02=policy['huc02'])
+ plan=DailyHydrologyPlan('utility-daily-hydrology-preparation-v1','camels-us-daymet-v1p2','usgs-01491000',source.digest,
+  area_m2/1e6,latitude,tuple(DailyWindow.from_dict(window) for window in policy['windows']),tuple(policy['allowed_flow_flags']))
+ (out/'source.json').write_text(source.to_json());(out/'inspection-plan.json').write_text(plan.to_json())
+ del forcing,flow
+ phase='strict_archive_and_calendar_validation'
+ last=[0]
+ def progress(total):
+  if total-last[0]>=512*1024**2:last[0]=total;print(json.dumps({'archive_bytes_hashed':total}),flush=True)
+ with private.open('rb') as handle:
+  proof,rows=read_archive_rows(source,plan,handle,metadata,max_archive_bytes=receipt['archive_bytes'],progress=progress)
+ phase='frozen_window_quality_counts'
+ windows=[]
+ for window in plan.windows:
+  values=[row for row in rows if window.start<=row.date<=window.end]
+  flags=Counter(row.flow_flag if row.flow_flag in ('A','A:e','M') else 'other' for row in values)
+  windows.append({'role':window.role,'start':window.start,'end':window.end,'row_count':len(values),
+   'flow_flag_counts':dict(sorted(flags.items())),'missing_flow_count':sum(row.flow_cfs is None for row in values),
+   'usable_flow_count':sum(row.flow_cfs is not None and row.flow_flag in plan.allowed_flow_flags for row in values)})
+ result={'schema':'utility-camels-inspection-result-v1','request_digest':digest(request),'archive_verification':proof.to_dict(),
+  'source_digest':source.digest,'plan_digest':plan.digest,'basin_area_km2':plan.area_km2,'gauge_latitude_deg':latitude,
+  'row_count':len(rows),'window_quality_counts':windows,'complete_published_date_axis':True,
+  'physical_intervals_admitted':False,'source_timing_or_leap_transformation_proven':False,
+  'observation_values_exported':False,'model_calls':0,'private_partitions_published':False,'task_admitted':False}
+ del rows
+ (out/'inspection-result.json').write_text(json.dumps(result,indent=2)+'\n')
+ print(json.dumps({'inspection':'passed','row_count':result['row_count'],'task_admitted':False}),flush=True)
+except BaseException as error:
+ (out/'inspection-failure.json').write_text(json.dumps({'error_type':type(error).__name__,'phase':phase,
+  'automatic_retry_allowed':False,'observation_values_exported':False,'model_calls':0,'task_admitted':False},indent=2)+'\n')
+ raise RuntimeError('Trusted CAMELS inspection refused; see sanitized metadata record') from None

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/.pixi/envs/default/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_documentation.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/private/tmp/autoengineering-v5-documentation-cjzc_7an/pytest"
+  ],
+  "exit_code": 0,
+  "scope": "documentation checks after audit and verification README updates"
+}

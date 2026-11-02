@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "tests": 52,
+  "test_source_sha256": "288b0e51f1ba5de3f91c49c89f6b79e5f8942c74fff3efdbca18af3fe2eb5294",
+  "wheel_sha256": "efc99c556729b67495d375b52669ab55b252388d5f17a0eb8f1f8fa564487d2b",
+  "scope": "authored fixture set including saved-completion owner loss; no actual Claude inference",
+  "boundary_scope": "existing Python audit policy in parent and ordinary Python children, not an OS private boundary; fixed helper verifier uses isolated Python"
+}

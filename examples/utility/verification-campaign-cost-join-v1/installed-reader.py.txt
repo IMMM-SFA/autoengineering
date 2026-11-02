@@ -1,0 +1,26 @@
+import importlib.util,json,socket,subprocess,sys
+from pathlib import Path
+root=Path(__file__).parent
+manifest=json.loads((root/"fixtures.json").read_text())
+controls=[lambda:Path("/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/README.md").read_bytes(),lambda:socket.socket(),lambda:subprocess.run([sys.executable,"-c","pass"])]
+controls += [lambda p=v["original_root"]:(Path(p)/"batch.json").read_bytes() for v in manifest.values()]
+for action in controls:
+ try:action()
+ except RuntimeError as e:assert "offline guard denied" in str(e)
+ else:raise AssertionError("denial control failed")
+from autoengineering.agents.batch import BatchStore
+from autoengineering.utility.campaign_costs import join_campaign_costs
+import autoengineering.utility.campaign_costs as loaded
+assert Path(loaded.__file__).is_relative_to(root/"venv")
+results={}
+for name,item in manifest.items():
+ batch=BatchStore(root/"fixtures"/name);before=batch.replay()
+ records=join_campaign_costs(batch,{"model":"1"*64})
+ assert len(records)==item["rows"]
+ if name=="legacy": assert all(r.quantity is None for r in records) and len(before.pending)==1
+ else: assert all(r.quantity is not None for r in records) and not before.pending
+ assert join_campaign_costs(batch,{"model":"1"*64})==records and batch.replay()==before
+ results[name]=[r.to_dict() for r in records]
+assert all(importlib.util.find_spec(n) is None for n in ("py_wake","topfarm","openmdao","anthropic","torch","botorch"))
+(root/"records.json").write_text(json.dumps(results,indent=2)+"\n")
+print(json.dumps({"status":"verified_relocated_campaign_costs","rows":{k:len(v) for k,v in results.items()},"legacy_costs":"unknown_and_charged","denial_controls":len(controls),"bundled_inputs_and_implementations":"absent","optional_models_absent":True,"new_provider_or_scientific_calls":0}))

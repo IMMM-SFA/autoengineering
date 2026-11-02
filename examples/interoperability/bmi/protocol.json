@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "model": "preserved-local-LinearReservoirBmi",
+  "origin": "2000-01-01",
+  "dates": ["2000-01-02", "2000-01-03", "2000-01-04"],
+  "forcing": [1.0, 0.0, 3.0],
+  "recession": 0.7,
+  "rate_semantics": "interval_mean_end",
+  "storage_semantics": "instantaneous_end",
+  "dt_days": 1.0,
+  "parity_atol": 0.0,
+  "parity_rtol": 0.0,
+  "conservation_atol_mm": 1e-14,
+  "physical_starts": 2,
+  "wall_seconds": 30,
+  "memory_bytes": 1073741824
+}

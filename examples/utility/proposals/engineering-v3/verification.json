@@ -1,0 +1,54 @@
+{
+  "OS_deadline_qualified": false,
+  "analytical_bisection_steps": 1176,
+  "analytical_reference_solves": 24,
+  "cleanup_calls_returned": 24,
+  "confirmation_rows_generated": false,
+  "container_starts": 0,
+  "core_wheel_inputs_unchanged": 239,
+  "coupled_model_starts": 24,
+  "cpu_time_and_peak_rss": "unknown",
+  "documentation_source_pins": {
+    "docs/reviews/part-5-current-admission.md": {
+      "sha256": "3114a74a8b1f5fb214cc575ecc4412c6670237879e04ae393190f3f492cf821c",
+      "size_bytes": 10093
+    },
+    "docs/reviews/part-5-engineering-development-reference.md": {
+      "sha256": "612f846b88331c2f2641a619f4032930af0f1403b4dcaef6f160a82616c7dec6",
+      "size_bytes": 4662
+    },
+    "docs/utility-handoff.md": {
+      "sha256": "ae8ef2920052998315e7ca7b7f6175e8fa305bf0561dbfd3b124bc1ea30557e2",
+      "size_bytes": 131336
+    },
+    "examples/utility/README.md": {
+      "sha256": "d5a848a4cf5ba974a3ed5fec6be063c79196edfa7da50388d5c809e36b6895bd",
+      "size_bytes": 21515
+    }
+  },
+  "documentation_tests": 19,
+  "final_matrix_and_study_budgets_frozen": false,
+  "first_use_cost_complete": false,
+  "four_original_dossiers_and_v2_proposal": "pins unchanged",
+  "full_default_suite": "not rerun for new proposal/evidence; existing production code unchanged",
+  "historical_failed_private_grant": "untouched; no retry",
+  "host_calls": 0,
+  "installed_package_payloads_verified": 235,
+  "installed_reader": "passed outside checkout; relocated public evidence; model imports and external execution denied",
+  "lint": "passed",
+  "mean_source_power_W": 0.24974500426467053,
+  "native_runtime": "macOS ARM64; CPython 3.12.16; OpenMDAO 3.41.0",
+  "private_source_accesses": 0,
+  "proposal_scope": "engineering-v3 only",
+  "proposed_absolute_useful_gain_W": 0.012487250213233526,
+  "regression": {
+    "failures": 0,
+    "passed": 52,
+    "skipped_optional_OpenMDAO": 16
+  },
+  "schema": "utility-engineering-v3-verification-v1",
+  "status": "public_development_reference_verified_confirmation_not_admitted",
+  "task_admitted": false,
+  "utility_verdict": "not_attempted",
+  "wheel_rebuilt": false
+}

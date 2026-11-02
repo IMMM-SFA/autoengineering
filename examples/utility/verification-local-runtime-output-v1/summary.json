@@ -1,0 +1,186 @@
+{
+  "schema": "utility-local-runtime-output-development-v1",
+  "recorded_at_utc": "2026-10-30T04:17:00.019966+00:00",
+  "controls": [
+    {
+      "result": {
+        "container_id": "ff449b64411237d7cd209ac6e4ee0c334b40a481aa2bd30e1c8b94874b668d5f",
+        "exit_code": 0,
+        "mode": "output-small",
+        "nonce": "7f106fabd84448fd9979238ad167dade",
+        "oom_killed": false,
+        "passed": true,
+        "result": {
+          "mode": "output-small",
+          "nonce": "7f106fabd84448fd9979238ad167dade",
+          "observed_context": {
+            "effective_capabilities": "none",
+            "effective_limits": {
+              "cpu.max": "100000 100000",
+              "memory.max": "67108864",
+              "memory.swap.max": "0",
+              "pids.max": "16"
+            },
+            "gid": 65534,
+            "network_interfaces": [
+              "lo"
+            ],
+            "no_new_privileges": true,
+            "platform": "linux",
+            "root_read_only": true,
+            "temporary_filesystem_bytes": 4194304,
+            "uid": 65534
+          },
+          "output_capture": {
+            "captured_bytes": 4096,
+            "child_exit_code": 0,
+            "child_signal": null,
+            "mode": "output-small",
+            "output_limit_bytes": 16384,
+            "output_limited": false,
+            "private_scoring_qualified": false,
+            "schema": "private-container-output-v1"
+          },
+          "qualified": false,
+          "schema": "utility-container-probe-result-v1",
+          "status": "synthetic_control_observed"
+        }
+      },
+      "cleanup": {
+        "container_id": "ff449b64411237d7cd209ac6e4ee0c334b40a481aa2bd30e1c8b94874b668d5f",
+        "nonce": "7f106fabd84448fd9979238ad167dade",
+        "reason": "owner_pipe_eof",
+        "removed": true
+      }
+    },
+    {
+      "result": {
+        "container_id": "e6a150a33b1a627bac7a917bdc5b59c8b9d1b5949818a712f74bb650c2ea3605",
+        "exit_code": 0,
+        "mode": "output-overrun",
+        "nonce": "53f6c22b7f8847bbbdedb696c2b1bfa8",
+        "oom_killed": false,
+        "passed": true,
+        "result": {
+          "mode": "output-overrun",
+          "nonce": "53f6c22b7f8847bbbdedb696c2b1bfa8",
+          "observed_context": {
+            "effective_capabilities": "none",
+            "effective_limits": {
+              "cpu.max": "100000 100000",
+              "memory.max": "67108864",
+              "memory.swap.max": "0",
+              "pids.max": "16"
+            },
+            "gid": 65534,
+            "network_interfaces": [
+              "lo"
+            ],
+            "no_new_privileges": true,
+            "platform": "linux",
+            "root_read_only": true,
+            "temporary_filesystem_bytes": 4194304,
+            "uid": 65534
+          },
+          "output_capture": {
+            "captured_bytes": 16384,
+            "child_exit_code": null,
+            "child_signal": 25,
+            "mode": "output-overrun",
+            "output_limit_bytes": 16384,
+            "output_limited": true,
+            "private_scoring_qualified": false,
+            "schema": "private-container-output-v1"
+          },
+          "qualified": false,
+          "schema": "utility-container-probe-result-v1",
+          "status": "synthetic_control_observed"
+        }
+      },
+      "cleanup": {
+        "container_id": "e6a150a33b1a627bac7a917bdc5b59c8b9d1b5949818a712f74bb650c2ea3605",
+        "nonce": "53f6c22b7f8847bbbdedb696c2b1bfa8",
+        "reason": "owner_pipe_eof",
+        "removed": true
+      }
+    },
+    {
+      "result": {
+        "container_id": "569de0a15ec4347b307add808ac58e48566da23d2ec74d5be406a2d50da83d3e",
+        "exit_code": 0,
+        "mode": "bounded-score",
+        "nonce": "a894ac08e830486cb419e8622a59d1d9",
+        "oom_killed": false,
+        "passed": true,
+        "result": {
+          "mode": "bounded-score",
+          "nonce": "a894ac08e830486cb419e8622a59d1d9",
+          "observed_context": {
+            "effective_capabilities": "none",
+            "effective_limits": {
+              "cpu.max": "100000 100000",
+              "memory.max": "67108864",
+              "memory.swap.max": "0",
+              "pids.max": "16"
+            },
+            "gid": 65534,
+            "network_interfaces": [
+              "lo"
+            ],
+            "no_new_privileges": true,
+            "platform": "linux",
+            "root_read_only": true,
+            "temporary_filesystem_bytes": 4194304,
+            "uid": 65534
+          },
+          "output_capture": {
+            "captured_bytes": 78,
+            "child_exit_code": 0,
+            "child_signal": null,
+            "mode": "score",
+            "output_limit_bytes": 16384,
+            "output_limited": false,
+            "private_scoring_qualified": false,
+            "schema": "private-container-output-v1",
+            "score": {
+              "feasible": true,
+              "outcome": "rmse",
+              "status": "success",
+              "units": "1",
+              "value": 1.0
+            }
+          },
+          "qualified": false,
+          "schema": "utility-container-probe-result-v1",
+          "status": "synthetic_control_observed"
+        }
+      },
+      "cleanup": {
+        "container_id": "569de0a15ec4347b307add808ac58e48566da23d2ec74d5be406a2d50da83d3e",
+        "nonce": "a894ac08e830486cb419e8622a59d1d9",
+        "reason": "owner_pipe_eof",
+        "removed": true
+      }
+    }
+  ],
+  "container_starts": 3,
+  "private_confirmation_reads": 0,
+  "provider_calls": 0,
+  "remote_jobs": 0,
+  "image_pulls": 0,
+  "private_scoring_qualified": false,
+  "scope": "aggregate regular-file stdout/stderr cap for the fixed trusted scorer child; not arbitrary generated code or a daemon stdout quota",
+  "output_limit_bytes": 16384,
+  "tests": {
+    "passed": 112,
+    "seconds": 1.95
+  },
+  "wheel_core_python_files_byte_matched": 196,
+  "offline_manifest_sha256": "263e4cac0493286449c36c08168ff4c6735c739c169935186ad6d1d0c1f82405",
+  "offline_verified_files": 66,
+  "build_note": "python -m build found a local build namespace without __main__; isolated no-index no-build-isolation pip wheel succeeded without installing dependencies",
+  "remaining": [
+    "production private scorer integration and admission",
+    "independent task custody and frozen protocol"
+  ]
+}

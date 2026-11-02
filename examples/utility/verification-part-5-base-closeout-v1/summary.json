@@ -1,0 +1,26 @@
+{
+  "scope": "full current default pytest suite, not independent scientific confirmation",
+  "original_exec_session_id": 86834,
+  "terminal_exit_code": 0,
+  "passed": 2309,
+  "skipped": 109,
+  "seconds": 2231.82,
+  "junit_totals": {
+    "tests": 2418,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 109
+  },
+  "pinned_source_test_configuration_files": 401,
+  "changed_pinned_files": [],
+  "prior_inventoried_example_python_files": 11469,
+  "changed_example_python_files": [],
+  "predecessor_inventory": {
+    "path": "examples/utility/source-inventory-campaign-cost-join.json",
+    "sha256": "5ca0aff43ce3daac811468caa59e73910bc9a0ac2f5ffc6d387b271468570943"
+  },
+  "source_fixed_during_test_run": true,
+  "bayes_current_full_suite": "separate run initiated after this base checkpoint; no Bayes result claimed here",
+  "private_confirmation_and_actual_host_platform_qualification": "not_established",
+  "part_5": "incomplete"
+}

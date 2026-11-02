@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "source_sha256": "0b95839d5a62728a4ea92b08744bbc8497b05cf31e5e4aa13b4d4aa1fbef5a2b",
+  "relocated_files": 12,
+  "relocated_bytes": 111835,
+  "scope": "Fresh subprocess with source imports before guards; saved data only afterward. Not installed-package or OS qualification."
+}

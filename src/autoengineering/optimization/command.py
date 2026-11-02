@@ -41,6 +41,10 @@ def build_backend(run: OptimizationRunSpec) -> OptimizerBackend:
         return RandomBackend(run.study, run.search_space)
     if run.policy == "sobol":
         return SobolBackend(run.study, run.search_space)
+    if run.policy == "optuna":
+        from .optuna_backend import OptunaBackend
+
+        return OptunaBackend(run.study, run.search_space, **dict(run.policy_options))
     if run.policy == "botorch":
         try:
             from .system_backend import SystemBayesBackend

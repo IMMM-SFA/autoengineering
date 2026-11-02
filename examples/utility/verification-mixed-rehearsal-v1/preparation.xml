@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.372" timestamp="2026-10-28T14:38:09.378373-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_mixed_preparation" name="test_three_family_preparation_is_source_closed_and_starts_nothing" time="1.220"><failure message="AssertionError: Preparation attempted process or network dispatch">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4292/test_three_family_preparation_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x1030cd400&gt;
+
+    def test_three_family_preparation_is_source_closed_and_starts_nothing(tmp_path, monkeypatch):
+        from examples.utility.rehearse_mixed import prepare
+        from autoengineering.utility.mixed_execution import ScriptedMixedPlan
+        from autoengineering.utility.engineering_execution import TaskEngineeringCampaign
+        from autoengineering.campaign.artifacts import read_bytes
+    
+        def denied(*args, **kwargs):
+            raise AssertionError("Preparation attempted process or network dispatch")
+    
+        monkeypatch.setattr("subprocess.Popen", denied)
+        monkeypatch.setattr("socket.socket", denied)
+&gt;       output, source, plan, store = prepare(tmp_path / "prepared", Path(CACHE))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_mixed_preparation.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+examples/utility/rehearse_mixed.py:78: in prepare
+    solar = prepare_solar(solar_cache, output / "solar-preparation")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+examples/interoperability/solar/campaign.py:28: in prepare
+    import pvlib
+.pixi/envs/interoperability/lib/python3.12/site-packages/pvlib/__init__.py:3: in &lt;module&gt;
+    from pvlib import (  # noqa: F401
+.pixi/envs/interoperability/lib/python3.12/site-packages/pvlib/clearsky.py:13: in &lt;module&gt;
+    import h5py
+.pixi/envs/interoperability/lib/python3.12/site-packages/h5py/__init__.py:45: in &lt;module&gt;
+    from ._conv import register_converters as _register_converters, \
+h5py/_conv.pyx:1: in init h5py._conv
+    ???
+h5py/h5r.pyx:1: in init h5py.h5r
+    ???
+h5py/h5p.pyx:1: in init h5py.h5p
+    ???
+h5py/h5t.pyx:41: in init h5py.h5t
+    ???
+.pixi/envs/interoperability/lib/python3.12/platform.py:884: in __getitem__
+    return tuple(self)[key]
+           ^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:870: in __iter__
+    (self.processor,)
+     ^^^^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/functools.py:998: in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:865: in processor
+    return _unknown_as_blank(_Processor.get())
+                             ^^^^^^^^^^^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:805: in get
+    return func() or ''
+           ^^^^^^
+.pixi/envs/interoperability/lib/python3.12/platform.py:833: in from_subprocess
+    return subprocess.check_output(
+.pixi/envs/interoperability/lib/python3.12/subprocess.py:466: in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+.pixi/envs/interoperability/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (['uname', '-p'],)
+kwargs = {'stdout': -1, 'stderr': -3, 'text': True, 'encoding': 'utf8'}
+
+    def denied(*args, **kwargs):
+&gt;       raise AssertionError("Preparation attempted process or network dispatch")
+E       AssertionError: Preparation attempted process or network dispatch
+
+tests/test_utility_mixed_preparation.py:23: AssertionError</failure></testcase></testsuite></testsuites>

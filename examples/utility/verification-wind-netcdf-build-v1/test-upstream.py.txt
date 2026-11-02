@@ -1,0 +1,30 @@
+"""Exercise the local declaration patch with upstream I/O tests, warnings as errors."""
+from pathlib import Path
+import hashlib,json,os,sys
+root=Path.cwd();out=root/'examples/utility/verification-wind-netcdf-build-v1';stage=Path('/private/tmp/utility-wind-netcdf-build-v3')
+sys.path.insert(0,str(stage/'installed'))
+import numpy as np
+import warnings
+warnings.simplefilter('error')
+import netCDF4
+assert Path(netCDF4.__file__).resolve().is_relative_to(stage/'installed')
+assert netCDF4.__version__=='1.7.4'
+source=stage/'source/netcdf4-1.7.4'
+names=['test_atts.py','test_types.py','test_compoundvar.py','test_fancyslicing.py','test_scaled.py','test_masked5.py']
+intent={'schema':'utility-wind-netcdf-upstream-test-intent-v1','files':{name:hashlib.sha256((source/'test'/name).read_bytes()).hexdigest() for name in names},
+ 'warning_policy':'error after NumPy import; override upstream warning-ignore configuration',
+ 'scientific_model_calls':0,'network_allowed':False,'external_execution_allowed':False,'existing_environment_changes':False}
+(out/'upstream-test-intent.json').write_text(json.dumps(intent,indent=2)+'\n')
+scratch=stage/'upstream-tests';scratch.mkdir(mode=0o700);os.chdir(scratch)
+os.environ['PYTEST_DISABLE_PLUGIN_AUTOLOAD']='1'
+import pytest
+# The reviewed upstream files need local temporary I/O only.
+def guard(event,args):
+ if event.startswith(('socket.connect','socket.getaddrinfo','subprocess.Popen','os.exec')) or event in ('os.system','os.fork','os.posix_spawn'):
+  raise AssertionError('upstream I/O test attempted network or execution')
+sys.addaudithook(guard)
+code=pytest.main([*[str(source/'test'/name) for name in names],'-q','-p','no:cacheprovider','--tb=short',
+ '-o','filterwarnings=error','--junitxml='+str(out/'upstream-tests.xml')])
+(out/'upstream-test-result.json').write_text(json.dumps({'exit_code':code,'numpy':np.__version__,'netcdf4':netCDF4.__version__,
+ 'module_path':netCDF4.__file__,'model_calls':0,'warning_filters_relaxed':False},indent=2)+'\n')
+raise SystemExit(code)

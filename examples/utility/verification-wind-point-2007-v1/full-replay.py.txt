@@ -1,0 +1,72 @@
+"""Replay the exact point acquisition from retained local ranges, with no network."""
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(sys.argv[1]).resolve()))
+import hashlib,json,socket,subprocess
+import h5py,numpy as np
+from examples.utility.wind_range import WindObjectPin
+from examples.utility.wind_point_range import PointRangeLimits,WindPointRangeFile
+from examples.utility.wind_point import nearest_site,utc_axis,decode_variable
+from examples.utility.wind_point_extract import dataset,plain,sources
+from autoengineering.campaign.serialization import digest
+root=Path(sys.argv[2]).resolve();out=Path(sys.argv[3]).resolve()
+q=json.loads((root/'request.json').read_text());done=json.loads((root/'complete.json').read_text())
+assert q['sources']==sources() and digest(q)==done['request_digest']
+pin=WindObjectPin.from_dict(q['pin']);limits=PointRangeLimits.from_dict(q['stage_limits'])
+expected=json.loads((root/'selected-cell.json').read_text())
+raw_point=(root/'point.npz').read_bytes();assert hashlib.sha256(raw_point).hexdigest()==done['point_sha256']
+
+def denied(*a,**kw):raise RuntimeError('new process or network denied')
+socket.socket=subprocess.Popen=denied
+
+class Archive:
+    def __init__(self,stage):
+        self.rows={};self.calls=0;self.bytes=0
+        folder=root/stage/'ranges'
+        for path in folder.glob('*-complete.json'):
+            event=json.loads(path.read_text());body=folder/event['body_file']
+            self.rows[event['lo'],event['hi']]=(body,event)
+    def fetch(self,pin_value,lo,hi,timeout):
+        assert pin_value==pin
+        path,event=self.rows[lo,hi]
+        assert path.stat().st_size<=4*1024**2
+        raw=path.read_bytes();assert len(raw)==hi-lo+1
+        assert hashlib.sha256(raw).hexdigest()==event['sha256']
+        self.calls+=1;self.bytes+=len(raw)
+        return 206,{'etag':pin.etag,'content-range':f'bytes {lo}-{hi}/{pin.size_bytes}',
+                    'content-length':str(len(raw))},raw
+
+archives={}
+def opened(stage):
+    archive=Archive(stage);archives[stage]=archive
+    return WindPointRangeFile(pin,limits,fetch=archive.fetch)
+
+with opened('coordinates') as reader:
+    with h5py.File(reader,'r') as file:
+        coordinates=dataset(file,'coordinates',q);step=coordinates.chunks[0]
+        blocks=(coordinates[start:start+step] for start in range(0,len(coordinates),step))
+        selected=nearest_site(blocks,q['point']['latitude'],q['point']['longitude'])
+        for k,v in selected.items():assert expected[k]==v
+        row=dataset(file,'meta',q)[selected['index']]
+        assert float(row['latitude'])==expected['meta_latitude'] and float(row['longitude'])==expected['meta_longitude']
+        time=dataset(file,'time_index',q);axis=utc_axis(time[:],2007,plain(time.attrs['time_zone']))
+        assert digest(axis)==expected['axis_digest']
+with np.load(root/'point.npz',allow_pickle=False) as saved:
+    np.testing.assert_array_equal(saved['time_utc'],np.array(axis,dtype='U20'))
+    for kind in ('speed','direction'):
+        with opened(kind) as reader:
+            with h5py.File(reader,'r') as file:
+                item=dataset(file,'windspeed_80m' if kind=='speed' else 'winddirection_80m',q)
+                raw=item[:,selected['index']]
+                decoded,valid=decode_variable(raw,kind=kind,units=plain(item.attrs['units']),
+                    scale_factor=plain(item.attrs['scale_factor']),fill_value=plain(item.attrs['fill_value']))
+                np.testing.assert_array_equal(raw,saved['raw_'+kind])
+                np.testing.assert_array_equal(decoded,saved['speed_m_s' if kind=='speed' else 'direction_source_deg'])
+                np.testing.assert_array_equal(valid,saved[kind+'_valid'])
+result={'replayed_nearest_from_all_coordinates':True,'point_arrays_identical':True,
+        'source_bytes_hash_verified':True,'new_http_requests':0,'new_processes':0,
+        'archive_logical_reads':{k:v.calls for k,v in archives.items()},
+        'archive_response_bytes':{k:v.bytes for k,v in archives.items()},
+        'point_sha256':done['point_sha256'],'hour_count':done['hour_count'],
+        'models_started':0,'scientific_task_admitted':False}
+out.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))

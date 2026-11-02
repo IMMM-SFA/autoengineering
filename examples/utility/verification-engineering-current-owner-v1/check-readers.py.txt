@@ -1,0 +1,42 @@
+"""Run installed report reconstruction and guarded public receipt joins after relocation."""
+from pathlib import Path
+import hashlib,json,shutil,subprocess,sys,zipfile
+source=Path(sys.argv[1]).resolve();archive=source/'examples/utility/verification-engineering-current-owner-v1'
+stage=Path('/private/tmp/engineering-current-owner-readers-v1');stage.mkdir(mode=0o700)
+public=stage/'public';shutil.copytree(archive/'public',public)
+installed=Path('/private/tmp/utility-engineering-envelope-installed-v1/installed')
+wheel=source/'examples/utility/verification-engineering-envelope-registration-v1/autoengineering-0.2.0-py3-none-any.whl'
+assert hashlib.sha256(wheel.read_bytes()).hexdigest()=='4e4dd052bc1ea57609aa61a6454560d5784baad7989597a9eeda6f4991dd6fb7'
+verified=0
+with zipfile.ZipFile(wheel) as z:
+ for name in z.namelist():
+  if name.startswith('autoengineering/') and not name.endswith('/'):
+   assert (installed/name).read_bytes()==z.read(name);verified+=1
+assert not Path.cwd().resolve().is_relative_to(source)
+pins=archive/'public-pins.json';pin=hashlib.sha256(pins.read_bytes()).hexdigest()
+# The receipt reader uses only the standard library, pinned files and guarded reads.
+code='''
+from pathlib import Path
+import os,runpy,sys,json,hashlib
+root=Path(sys.argv[1]).resolve();pins=Path(sys.argv[2]).resolve();script=sys.argv[4]
+def guard(event,args):
+ if event=='open':
+  path,mode,flags=args
+  if isinstance(path,int):raise AssertionError('outside descriptor')
+  actual=Path(path).resolve()
+  if not actual.is_relative_to(root) and actual!=pins and actual!=Path(script).resolve():raise AssertionError('outside public evidence')
+  if any(c in (mode or '') for c in 'wax+') or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise AssertionError('write')
+ elif event.startswith(('socket.','subprocess.','os.exec')) or event in ('os.system','os.fork','os.posix_spawn'):raise AssertionError('external execution')
+sys.addaudithook(guard)
+sys.argv=[script,*sys.argv[1:4]]
+exec(compile(Path(script).read_bytes(),script,'exec'),{'__name__':'__main__'})
+'''
+joined=subprocess.run([sys.executable,'-I','-B','-c',code,str(public),str(pins),pin,str(archive/'receipt-reader.py.txt')],capture_output=True,text=True)
+assert joined.returncode==0,joined.stderr
+cli=subprocess.run([sys.executable,'-I','-B',str(archive/'installed-reader.py.txt'),str(installed),str(public),str(pins),'current'],capture_output=True,text=True)
+(archive/'installed-reader.stdout.txt').write_text(cli.stdout);(archive/'installed-reader.stderr.txt').write_text(cli.stderr)
+assert cli.returncode==0,cli.stderr
+result={'schema':'utility-current-owner-public-replay-v1','relocated_receipt_join':json.loads(joined.stdout),
+ 'installed_core_reader':json.loads(cli.stdout),'installed_payloads_verified':verified,'wheel_rebuilt':False,
+ 'new_model_calls':0,'new_container_or_source_calls':0,'outside_checkout':True,'private_runtime_qualified':False}
+(archive/'reader-verification.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))

@@ -1,0 +1,17 @@
+{
+  "scope": "primary documentation for local controlled-peer configuration; not evidence of an executed host",
+  "sources": [
+    {
+      "url": "https://code.claude.com/docs/en/llm-gateway-connect",
+      "used_for": "ANTHROPIC_BASE_URL in the settings env block, helper authentication and header mapping"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/llm-gateway-protocol",
+      "used_for": "Anthropic Messages compatible controlled peer and stream contract"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/env-vars",
+      "used_for": "CLAUDE_CODE_TMPDIR controls internal temp files on macOS independently of TMPDIR"
+    }
+  ]
+}

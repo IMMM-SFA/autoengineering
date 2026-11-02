@@ -1,0 +1,29 @@
+{
+  "created_utc": "2026-10-30T11:24:08.088422+00:00",
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "46e0ebecb05d1baf05f512725ffd155e707789d734e77bd90737a7e5bd7b1ba9",
+    "docs/reviews/part-5-confirmation-proposal.md": "8965791aa36b966bd74d00bf09d203c66889e4baf68ef04a2d100f9322a9c6cb",
+    "docs/reviews/part-5-progress.md": "8bce3d11c55105ee962408216b0cd4ae4add2c17dbaf47aeb9784929784ff232",
+    "docs/utility.md": "4ec9d759d4f355ab885ba00b8c48bfb5aa58ebe69ba4f430519166fe2579024a",
+    "examples/utility/README.md": "898af9404a972dff67c72cf20315f089b4763c74c7bf350cc025a4d36d375971",
+    "examples/utility/hydrology_camels.py": "6870b87ede3fd0d383b8d9b3cd12efb7350dd7036a16cd31d9776c52a4a49603",
+    "tests/test_utility_hydrology_camels.py": "511288042402e3bf94716a3ee7074a2d3d186a873c70909a386e78b62ca1baa2"
+  },
+  "limits": [
+    "no real observation files acquired or parsed",
+    "checksum identity does not authenticate source or establish rights",
+    "Daymet forcing/flow interval interpretation unresolved",
+    "new parser has no installed-package, exposure or private-runtime qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-hydrology-site.json",
+  "predecessor_sha256": "635a7dfff7b545ba1a22b70d469a067c43cba8896d876022337850d8f778f5f1",
+  "schema": "utility-source-increment-v1",
+  "scope": "bounded CAMELS-US Daymet byte parsing through authored preparation and site execution",
+  "unchanged_preceding_site_source_and_tests": true,
+  "unchanged_previous_packaged_python_files": 286,
+  "verification": {
+    "diff_check": "passed",
+    "lint": "passed",
+    "related_regression": "105 passed, 1 optional solar skip in 4.00s"
+  }
+}

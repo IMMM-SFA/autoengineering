@@ -1,0 +1,1 @@
+{"action_id": "eval-000008", "configuration": {"x": 0.11686139926314354, "y": 0.7523603532463312}, "result": {"status": "success", "feasible": true, "objective": 0.211541916121628, "constraint_residual": -0.13077824749052525}, "suggest_seconds": 0.006037374958395958, "tell_seconds": 0.006521208211779594, "evaluation_seconds": 2.00001522898674e-06}

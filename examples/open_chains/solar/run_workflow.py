@@ -28,7 +28,9 @@ TEMP = "thermocouple_pad_2_back-of-module_temperature_1_(c)_o_149730"
 POWER = "inverter_2_ac_power_(kw)_inv_150144"
 
 
-def load_data(start: str, end: str) -> tuple[pd.DataFrame, dict]:
+def load_data(
+    start: str, end: str, *, cache_directory: Path | None = None
+) -> tuple[pd.DataFrame, dict]:
     """Read only needed columns, preserving a documented complete-case mask."""
     parts = []
     for filename, columns in [
@@ -37,7 +39,8 @@ def load_data(start: str, end: str) -> tuple[pd.DataFrame, dict]:
         ("9068_ac_power_data.csv", [POWER]),
     ]:
         print(f"Reading {filename}", flush=True)
-        frame = pd.read_csv(HERE / "data" / filename, usecols=["measured_on", *columns])
+        cache = HERE / "data" if cache_directory is None else Path(cache_directory)
+        frame = pd.read_csv(cache / filename, usecols=["measured_on", *columns])
         index = pd.DatetimeIndex(pd.to_datetime(frame.pop("measured_on")))
         # Match the upstream convention; ambiguous/nonexistent local times are excluded.
         frame.index = index.tz_localize("US/Mountain", ambiguous="NaT", nonexistent="NaT")

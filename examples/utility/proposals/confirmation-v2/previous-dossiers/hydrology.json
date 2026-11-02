@@ -1,0 +1,117 @@
+{
+  "status": "blocked_draft",
+  "transfer_claim": "new-period or new-scenario only after custody review",
+  "routes": [
+    "unchanged_baseline",
+    "conventional",
+    "single_agent",
+    "multi_agent"
+  ],
+  "regimes": [
+    "fixed_evaluations",
+    "fixed_total_cost"
+  ],
+  "repetitions": {
+    "planning_default": 10,
+    "frozen": false,
+    "freeze_rule": "Use development variability and minimum useful effect before confirmation access"
+  },
+  "budget_status": "No execution authorized. Profile exposed development inputs then freeze numeric caps including confirmation reserve.",
+  "analysis_status": "Freeze effect margin, secondary tolerances, paired interval method, seed and multiplicity policy before access.",
+  "confirmation": {
+    "partition": null,
+    "status": "unknown_exposure",
+    "access": "No worker access; trusted custodian only after suite selection barrier"
+  },
+  "human_expert": "not_attempted",
+  "task_id": "hydrology",
+  "family": "Observed hydrology",
+  "question": "Does supplied component replacement and inner calibration improve unseen-period discharge without breaking water balance?",
+  "baseline": "Exposed daily bucket and linear reservoir adapter: Hamon PET, capacity 100 mm, recession 0.7; distinct from the original five-component workflow",
+  "candidate_pool": "Supplied deterministic chain alternatives; learned alternative blocked pending flux/state and training admission",
+  "conventional": "Sobol reference over frozen supplied bounds",
+  "primary_outcome": {
+    "name": "RMSE",
+    "units": "mm/day for the exposed Leaf River profile; independent source and basin-area audit remains required",
+    "direction": "minimize"
+  },
+  "physical_checks": [
+    "Implemented daily water balance with explicit soil/reservoir stores, AET, discharge and initial states; independent-task audit remains required",
+    "Nonnegative states",
+    "Bias tolerance",
+    "Causal warmup and gap handling"
+  ],
+  "blockers": [
+    "Independent basin or chronological partition with documented exposure and custody",
+    "Independent source rights, spatial support, units, quality flags and masks",
+    "Freeze preprocessing, warmup, initialization and final parameter domains for the admitted task",
+    "No admitted learned candidate with causal training and conservative stores/fluxes"
+  ],
+  "parameter_domains": "Not frozen; executable admission blocked",
+  "minimum_useful_gain": null,
+  "secondary_tolerances": null,
+  "source_closure": "See source inventory; data hashes and license closure pending",
+  "environment": "default",
+  "development_partition": "Previously exposed fixtures only; never confirmation",
+  "time_policy": "Freeze initialization, causal carryover, warmup, masks, gaps and embargo before execution",
+  "claim_limit": "Conditional prediction on explicitly admitted observations",
+  "development_evidence": "examples/utility/development/predictions-v1",
+  "development_matrix_evidence": {
+    "examples/utility/development/four-family-v1/summary.json": "8250213ec8103c5a10bf747d0b60742b719be5bcc507e7d6e548a49289ade0a1",
+    "examples/utility/development/four-family-v1/execution-plan.json": "ef1ad174e3b7742552820dba46de8624b480839b5e6b2161656e212f4a561571"
+  },
+  "development_contract": {
+    "status": "implemented_exposed_only",
+    "initialization": "soil = capacity / 2; reservoir = 0",
+    "supported_parameter_domain": {
+      "capacity_mm": [
+        20,
+        200
+      ],
+      "recession": [
+        0.05,
+        0.95
+      ],
+      "pet": [
+        "hamon",
+        "hargreaves"
+      ]
+    },
+    "final_study_domain_frozen": false,
+    "source_units": "Cached cfs converted using 0.0283168 m3/s per cfs, 86400 s/day and recorded basin area 1947.7 km2",
+    "rights_status": "Legacy manifest states federal observations with USGS/NOAA attribution; original HTTP responses and quality flags were not retained. This is not rights/quality closure for a new source.",
+    "learned_alternative_status": "unsupported_capability; no training performed",
+    "evidence": {
+      "examples/utility/hydrology.py": "5b03fe142fec20ab09e8c02ccd0bedb401b7201da0d0be3a176e08c5dd1b5f5c",
+      "examples/campaign_contracts/hydrology.py": "4ac1488c7724deb54bd43a38cb584b634eeaf476a4af4b9747c68fc36d150d46",
+      "examples/campaign_contracts/build_profile.py": "7b835138eb9fd71a8dd0731c9f130079fa656a4398d59dec8155c4f6e5e34743",
+      "examples/local_models/data/sources.json": "0944a49e92ae670d4acadb6b69e90a4b8c039db52c56680e6e6569cb55b9f512",
+      "examples/utility/development/predictions-v1/summary.json": "463b4c5f66801a52b8bf40be364431a76d909e894f8245b0be0008ae06593293"
+    }
+  },
+  "learned_alternative_development": {
+    "status": "authored_development_only_not_admitted",
+    "profile": "examples/utility/hydrology_learned.py",
+    "tests": "tests/test_utility_hydrology_learned.py",
+    "model": "Two-coefficient logistic storage-dependent release with explicit conservative reservoir",
+    "training": "Fitting prefix and quality mask only; bounded deterministic least squares",
+    "inference": "Digest-verified frozen coefficients; no optimizer or labels; causal driver replay",
+    "cost_scope": "V2 attempt IDs and offline cost reconstruction retain distinct fits and unknown work; authoritative parent-commit and suite integration remain open",
+    "real_basin_training_performed": false,
+    "remaining": [
+      "Independent source/data admission and training sufficiency",
+      "Supervised resource and failure qualification",
+      "Suite training reservations, cost extraction and frozen artifact admission"
+    ],
+    "offline_cost_reader": "autoengineering.utility.hydrology_training:read_training_costs",
+    "parent_transport": "Successful training artifacts and explicit bundles commit with the original campaign lifecycle on completion and saved-result recovery. Transport fixtures do not qualify learned training inside a worker.",
+    "selected_state": {
+      "status": "authored_implementation_not_executor_admission",
+      "schema": "utility-selected-state-v2",
+      "closure": "fit, profile, intent, result, bundle and parent lifecycle",
+      "capability_request": "frozen_trained_inference",
+      "reader": "autoengineering.utility.confirmation:read_selected_state",
+      "limits": "No fitting grant, supervised learned worker, private scorer or automatic cost-to-event integration"
+    }
+  }
+}

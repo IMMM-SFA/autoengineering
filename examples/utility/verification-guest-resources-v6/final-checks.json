@@ -1,0 +1,13 @@
+{
+  "related_tests_passed": 136,
+  "documentation_tests_passed": 19,
+  "ruff_src_tests_examples": "passed",
+  "changed_file_format_check": "passed",
+  "git_diff_check": "passed",
+  "source_inventory_verified": true,
+  "archived_evidence_unchanged": true,
+  "packaged_guest_resource_helpers": 0,
+  "core_sources_unchanged_in_this_increment": true,
+  "full_suite_rerun": false,
+  "full_suite_checkpoint": "examples/utility/verification-current-base-v6/verified-summary.json"
+}

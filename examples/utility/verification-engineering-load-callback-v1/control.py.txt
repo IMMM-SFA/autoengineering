@@ -1,0 +1,103 @@
+"""One 24-solve development callback on an authored selected-state fixture."""
+import hashlib
+import json
+import platform
+import sys
+from importlib.metadata import version
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path[:0] = [str(ROOT), str(ROOT / "tests")]
+from pytest import MonkeyPatch
+from autoengineering.campaign.serialization import canonical_json, digest, unique_json
+from autoengineering.campaign.store import durable_write, checked_directory
+from examples.utility import engineering_scenarios as source
+from examples.utility import engineering_load_callback as callback
+from test_utility_engineering_load_callback import setup
+
+FILES = (
+    "examples/utility/engineering_load_callback.py",
+    "examples/utility/engineering_load_scoring.py",
+    "examples/utility/engineering_source_binding.py",
+    "examples/utility/engineering_scenarios.py",
+    "examples/utility/engineering_load.py", "examples/utility/engineering.py",
+    "examples/interoperability/circuit/model.py",
+    "examples/interoperability/circuit/fixture.py", "pixi.lock",
+    "src/autoengineering/adapters/python.py", "src/autoengineering/adapters/openmdao.py",
+    "src/autoengineering/utility/scoring.py", "src/autoengineering/utility/confirmation.py",
+    "tests/test_utility_engineering_load_callback.py", "tests/test_utility_confirmation.py",
+    "tests/test_utility_contracts.py", "tests/test_utility_controller.py",
+    "tests/test_utility_store.py", "tests/test_agent_batch.py",
+)
+
+def pins():
+    return {
+        "python": platform.python_version(),
+        "packages": {n: version(n) for n in ("openmdao", "numpy", "scipy", "networkx")},
+        "files": {n: hashlib.sha256((ROOT / n).read_bytes()).hexdigest() for n in FILES},
+        "controller": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+
+def save(root, name, value):
+    durable_write(root / name, canonical_json(value).encode())
+
+phase, output = sys.argv[1], Path(sys.argv[2]).absolute()
+if phase == "prepare":
+    output.mkdir(mode=0o700)
+    request = {
+        "scope": "Native development callback on fresh generated cases and authored selected state",
+        "output_digest": digest(str(output)), "pins": pins(),
+        "scientific_callback_starts_cap": 1, "load_model_starts_cap": 24,
+        "load_solver_iterations_cap": 2400, "active_time_allocation_s": 60,
+        "source_current_A": .05, "minimum_node2_voltage_V": .62,
+        "automatic_retries": 0, "independent_confirmation": False,
+        "task_admitted": False, "private_boundary_qualified": False,
+        "os_deadline_qualified": False, "aggregate_rss_qualified": False,
+        "selection_metrics": "Authored fixture, not measured selection or optimization",
+    }
+    save(output, "request.json", request)
+    print(json.dumps({"prepared": True, "request_digest": digest(request)}))
+else:
+    checked_directory(output)
+    request = unique_json((output / "request.json").read_text())
+    assert digest(request) == sys.argv[3]
+    assert request["output_digest"] == digest(str(output)) and request["pins"] == pins()
+    save(output, "execution-intent.json", {
+        "request_digest": digest(request), "automatic_retries": 0, "model_starts_reserved": 24
+    })
+    scope = output / "control"
+    scope.mkdir(mode=0o700)
+    entropy = source.secrets.token_bytes
+    with MonkeyPatch.context() as mp:
+        store, grant, service, captured, work_root = setup(scope, mp, native=True, entropy=entropy)
+        save(output, "callback-intent.json", {
+            "grant": grant.to_dict(), "grant_digest": grant.digest,
+            "source_binding_artifact": captured["source_ref"].to_dict(),
+            "scorer_code_digest": captured["scorer"].code_digest,
+            "source_reads_reserved": 1, "model_starts_reserved": 24,
+            "source_generated_before_selection": True, "selection_fixture_authored": True,
+        })
+        print("Running one development callback with at most 24 native solves", flush=True)
+        receipt = service.confirm(grant)
+        before = len(store.replay()["events"])
+        mp.setattr(source, "read_private", lambda *a, **kw: (_ for _ in ()).throw(RuntimeError("reopen denied")))
+        mp.setattr(service, "scorer", lambda *a: (_ for _ in ()).throw(RuntimeError("rescore denied")))
+        assert service.confirm(grant) == receipt and len(store.replay()["events"]) == before
+        work = unique_json((store.root / callback.WORK_DIRECTORY / (grant.digest + ".json")).read_text())
+        result = {
+            "request_digest": digest(request), "grant_digest": grant.digest,
+            "receipt_digest": receipt.digest, "score_status": receipt.score.status,
+            "all_required_physical_checks_passed": receipt.score.feasible,
+            "attempted_model_starts": work["attempted_model_starts"],
+            "completed_model_starts": work["completed_model_starts"],
+            "work": work["total_inner_work"], "work_receipt_digest": digest(work),
+            "saved_receipt_replay_without_source_or_solver": True,
+            "scientific_callback_starts_charged": store.replay()["phase_used"][("fixed_evaluations", "confirmation", "scientific_starts")],
+            "reserved_native_starts_charged": store.replay()["phase_used"][("fixed_evaluations", "confirmation", "load_model_starts")],
+            "source_access_intents": len(list((store.root / "engineering-source-accesses").glob("*.json"))),
+            "source_rows_exported": False, "per_case_model_outputs_exported": False,
+            "task_admitted": False, "independent_confirmation": False,
+            "private_boundary_qualified": False, "runtime": request["pins"]["packages"],
+        }
+        save(output, "result.json", result)
+        print(json.dumps(result))

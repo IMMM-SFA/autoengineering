@@ -1,0 +1,367 @@
+"""Fixed runtime uses one start, bounded stdin and exact-owned cleanup."""
+
+from copy import deepcopy
+from dataclasses import replace
+import hashlib
+import json
+from pathlib import Path
+import sys
+import time
+from types import SimpleNamespace
+
+import pytest
+
+from autoengineering.campaign.serialization import canonical_json, digest
+from autoengineering.utility.contracts import ResourceCap
+from autoengineering.utility.load_container_costs import CoupledRuntimeRegistration
+from autoengineering.utility.scoring import ConfirmationGrant
+from examples.utility import engineering_container_runtime as module
+from test_utility_engineering_load_worker import packet as authored_packet
+
+ROOT = Path(__file__).resolve().parents[1]
+H = "1" * 64
+IMAGE = json.loads(
+    (ROOT / "examples/utility/verification-engineering-linux-worker-v1/image.json").read_bytes()
+)
+OUTPUT = (
+    ROOT / "examples/utility/verification-engineering-linux-worker-v1/output.log"
+).read_bytes()
+
+
+class Daemon:
+    def __init__(self, endpoint, *, api_version, server_digest):
+        self.profile = SimpleNamespace(server_digest=server_digest, api_version=api_version)
+        self._socket_path = endpoint
+        self.identity = H
+        self.created = self.deleted = False
+        self.status = "created"
+        self.calls = []
+        self.image = deepcopy(IMAGE)
+        self.lose_create_ack = False
+
+    def _identity(self):
+        pass
+
+    def _json(self, method, path, value=None, **kwargs):
+        self.calls.append((method, path))
+        if path == "/version":
+            return {"Version": "authored"}
+        if path.startswith("/images/"):
+            return self.image
+        assert method == "POST" and path.startswith("/containers/create?")
+        assert not self.created
+        self.created = True
+        self.config = deepcopy(value)
+        self.name = path.split("name=")[1]
+        if self.lose_create_ack:
+            raise OSError("authored create acknowledgement lost")
+        return {"Id": H}
+
+    def inspect(self, cid, **kwargs):
+        assert cid == H
+        if not self.created or self.deleted:
+            return None
+        config = {k: deepcopy(v) for k, v in self.config.items() if k != "HostConfig"}
+        return {
+            "Id": H,
+            "Image": module.IMAGE,
+            "Name": "/" + self.name,
+            "Config": config,
+            "HostConfig": deepcopy(self.config["HostConfig"]),
+            "RestartCount": 0,
+            "Mounts": [],
+            "State": {
+                "Status": self.status,
+                "Running": False,
+                "ExitCode": 0,
+                "OOMKilled": False,
+                "Paused": False,
+                "Restarting": False,
+            },
+        }
+
+    def _request(self, method, path, **kwargs):
+        self.calls.append((method, path))
+        if method == "DELETE":
+            assert path == "/containers/" + H + "?force=1" and not self.deleted
+            self.deleted = True
+            return 204, b""
+        assert method == "GET"
+        if not self.created or self.deleted:
+            return 404, b"{}"
+        return 200, canonical_json(self.inspect(H)).encode()
+
+
+def setup(monkeypatch):
+    monkeypatch.setattr(module, "GuestDaemonAPI", Daemon)
+    monkeypatch.setattr(module.build, "_binary", lambda _: {"sha256": H, "size_bytes": 1})
+    monkeypatch.setattr(module.build, "_endpoint", lambda _: {"inode": 1, "owner_uid": 1})
+
+    class AuthoredWatchdog:
+        def __init__(self, root, api, **kwargs):
+            self.api = api
+
+        def ready(self):
+            assert not self.api.created
+
+        def bind(self, cid):
+            assert cid == H
+            assert self.api.created and self.api.status == "created"
+
+        def finish(self):
+            assert not self.api.created or self.api.deleted
+
+        def check_alive(self):
+            pass
+
+    monkeypatch.setattr(module.supervision, "CoupledWatchdog", AuthoredWatchdog)
+    runtime = module.CoupledContainerRuntime(
+        cli="/explicit/client",
+        endpoint="/explicit/socket",
+        api_version="1.56",
+        server_digest=digest({"Version": "authored"}),
+    )
+    grant = ConfirmationGrant(
+        H,
+        H,
+        H,
+        H,
+        H,
+        H,
+        H,
+        (
+            ResourceCap("scientific_starts", "count", 1, "reservation"),
+            ResourceCap("container_starts", "count", 1, "reservation"),
+            ResourceCap("active_time", "s", 60, "reservation"),
+        ),
+    )
+    packet = authored_packet()
+    packet["execution_digest"] = grant.digest
+    packet["kernel_digest"] = module.KERNEL_SHA
+    raw = canonical_json(packet).encode()
+    pin = hashlib.sha256(raw).hexdigest()
+    return runtime, grant, raw, pin
+
+
+def test_one_dispatch_with_original_cleanup_and_transport_registration(tmp_path, monkeypatch):
+    runtime, grant, raw, pin = setup(monkeypatch)
+    calls = []
+
+    def exchange(argv, packet, **kwargs):
+        calls.append(argv)
+        assert packet == raw and argv[-4:-1] == ["start", "--attach", "--interactive"]
+        runtime.api.status = "exited"
+        return 0, OUTPUT
+
+    monkeypatch.setattr(module, "exchange", exchange)
+    runtime.preflight(grant)
+    result = runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert (
+        result.execution.container_starts == 1
+        and result.execution.runtime_digest == runtime.registration.digest
+    )
+    assert result.packet_sha256 == pin and runtime.api.deleted and len(calls) == 1
+    assert (
+        CoupledRuntimeRegistration.from_json(runtime.registration.to_json()) == runtime.registration
+    )
+    assert not any(p.name == "packet.json" for p in tmp_path.rglob("*"))
+    with pytest.raises(ValueError, match="consumed"):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    with pytest.raises(ValueError, match="consumed"):
+        runtime.preflight(grant)
+
+
+@pytest.mark.parametrize("change", ["transport", "image", "active"])
+def test_preflight_refuses_changed_transport_image_or_short_allocation(monkeypatch, change):
+    runtime, grant, _, _ = setup(monkeypatch)
+    if change == "transport":
+        monkeypatch.setattr(
+            module.build, "_binary", lambda _: {"sha256": "2" * 64, "size_bytes": 1}
+        )
+    elif change == "image":
+        runtime.api.image["Config"]["Labels"] = {}
+    else:
+        grant = replace(
+            grant,
+            resources=tuple(
+                replace(r, limit=45) if r.name == "active_time" else r for r in grant.resources
+            ),
+        )
+    with pytest.raises(ValueError):
+        runtime.preflight(grant)
+    assert not runtime.api.created
+
+
+def test_create_acknowledgement_loss_resolves_only_original_unstarted_name(tmp_path, monkeypatch):
+    runtime, grant, raw, pin = setup(monkeypatch)
+    runtime.api.lose_create_ack = True
+    monkeypatch.setattr(
+        module, "exchange", lambda *a, **kw: pytest.fail("unacknowledged creation started")
+    )
+    runtime.preflight(grant)
+    with pytest.raises(OSError):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert runtime.api.created and runtime.api.deleted
+    with pytest.raises(ValueError):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert len([c for c in runtime.api.calls if c[0] == "POST"]) == 1
+
+
+def test_failed_start_never_exports_raw_stderr_or_retries(tmp_path, monkeypatch):
+    runtime, grant, raw, pin = setup(monkeypatch)
+
+    def exchange(*a, **kw):
+        runtime.api.status = "exited"
+        return 70, b"PRIVATE-ERROR-CANARY"
+
+    monkeypatch.setattr(module, "exchange", exchange)
+    runtime.preflight(grant)
+    with pytest.raises(ValueError):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert runtime.api.deleted
+    assert all(
+        b"PRIVATE-ERROR-CANARY" not in p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()
+    )
+    with pytest.raises(ValueError):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+
+
+def test_malformed_create_acknowledgement_reconciles_original_unstarted_name(tmp_path, monkeypatch):
+    runtime, grant, raw, pin = setup(monkeypatch)
+    original = runtime.api._json
+
+    def malformed(method, path, *args, **kwargs):
+        value = original(method, path, *args, **kwargs)
+        return {"Id": "invalid"} if method == "POST" else value
+
+    monkeypatch.setattr(runtime.api, "_json", malformed)
+    monkeypatch.setattr(module, "exchange", lambda *a, **kw: pytest.fail("invalid CID started"))
+    runtime.preflight(grant)
+    with pytest.raises(ValueError, match="created identity"):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert runtime.api.deleted
+    with pytest.raises(ValueError):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+
+
+def test_missing_watchdog_binding_acknowledgement_prevents_start(tmp_path, monkeypatch):
+    runtime, grant, raw, pin = setup(monkeypatch)
+    original = module.supervision.CoupledWatchdog
+
+    class RefusedBinding(original):
+        def bind(self, cid):
+            raise ValueError("authored CID binding acknowledgement lost")
+
+    monkeypatch.setattr(module.supervision, "CoupledWatchdog", RefusedBinding)
+    monkeypatch.setattr(
+        module, "exchange", lambda *a, **kw: pytest.fail("unbound container started")
+    )
+    runtime.preflight(grant)
+    with pytest.raises(ValueError, match="binding acknowledgement"):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert runtime.api.created and runtime.api.deleted
+    assert not (tmp_path / "runtime/start-intent.json").exists()
+
+
+@pytest.mark.parametrize("change", ["command", "mount", "label", "privilege", "restart"])
+def test_exact_ownership_verification_rejects_mutations(monkeypatch, change):
+    runtime, grant, raw, pin = setup(monkeypatch)
+    nonce = "a" * 32
+    name = "ae-coupled-load-" + nonce
+    config = module.configuration(nonce, pin, grant.digest)
+    runtime.api.created = True
+    runtime.api.name = name
+    runtime.api.config = config
+    observed = runtime.api.inspect(H)
+    if change == "command":
+        observed["Config"]["Cmd"] = ["2" * 64]
+    elif change == "mount":
+        observed["HostConfig"]["Binds"] = ["/private:/work"]
+    elif change == "label":
+        observed["Config"]["Labels"]["org.autoengineering.grant"] = "2" * 64
+    elif change == "privilege":
+        observed["HostConfig"]["Privileged"] = True
+    else:
+        observed["RestartCount"] = 1
+    with pytest.raises(ValueError):
+        module.verify_owned(observed, config, cid=H, name=name)
+
+
+def test_bounded_client_transfers_input_without_a_packet_file(tmp_path):
+    raw = b"authored packet bytes"
+    argv = [
+        sys.executable,
+        "-I",
+        "-c",
+        "import sys;sys.stdout.buffer.write(sys.stdin.buffer.read())",
+    ]
+    code, output = module.exchange(argv, raw, env={}, cwd=tmp_path, deadline=time.monotonic() + 5)
+    assert code == 0 and output == raw and not list(tmp_path.iterdir())
+
+
+def test_supervisor_loss_aborts_live_owned_client(tmp_path):
+    polls = []
+
+    def check_alive():
+        polls.append(1)
+        if len(polls) >= 4:
+            raise ValueError("authored watchdog loss")
+
+    with pytest.raises(ValueError, match="watchdog loss"):
+        module.exchange(
+            [sys.executable, "-I", "-c", "import time;time.sleep(10)"],
+            b"authored",
+            env={},
+            cwd=tmp_path,
+            deadline=time.monotonic() + 5,
+            check_alive=check_alive,
+        )
+    assert len(polls) == 4
+
+
+def test_watchdog_loss_after_valid_output_cannot_publish_result(tmp_path, monkeypatch):
+    runtime, grant, raw, pin = setup(monkeypatch)
+
+    class LostWatchdog:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def ready(self):
+            pass
+
+        def bind(self, cid):
+            assert cid == H
+
+        def check_alive(self):
+            raise ValueError("authored watchdog lost after valid output")
+
+        def finish(self):
+            assert runtime.api.deleted
+
+    def completed(*args, **kwargs):
+        runtime.api.status = "exited"
+        return 0, OUTPUT
+
+    monkeypatch.setattr(module.supervision, "CoupledWatchdog", LostWatchdog)
+    monkeypatch.setattr(module, "exchange", completed)
+    runtime.preflight(grant)
+    with pytest.raises(ValueError, match="watchdog lost"):
+        runtime.run(grant, raw, expected_sha256=pin, work_root=tmp_path)
+    assert runtime.api.deleted
+    assert not (tmp_path / "runtime/output.json").exists()
+    assert not (tmp_path / "runtime/complete.json").exists()
+
+
+@pytest.mark.parametrize("kind", ["overflow", "deadline"])
+def test_bounded_client_kills_its_own_group_on_failure(tmp_path, kind):
+    body = (
+        "import os;os.write(1,b'x'*16385)" if kind == "overflow" else "import time;time.sleep(10)"
+    )
+    with pytest.raises((ValueError, TimeoutError)):
+        module.exchange(
+            [sys.executable, "-I", "-c", body],
+            b"x",
+            env={},
+            cwd=tmp_path,
+            deadline=time.monotonic() + (0.1 if kind == "deadline" else 5),
+        )

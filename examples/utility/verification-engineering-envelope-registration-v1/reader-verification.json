@@ -1,0 +1,17 @@
+{
+  "schema": "utility-engineering-envelope-installed-replay-v1",
+  "outside_checkout": true,
+  "relocated_result": "passed",
+  "dropped_support_call": "rejected",
+  "reader": {
+    "typed_result_digest": "feea60121508013b56e9f65ecdd3686beea4ca7343f5a5b758cbe742910dfd46",
+    "recorded_model_calls": 35,
+    "independent_support_calls": 1,
+    "scored_scenario_calls": 24,
+    "new_model_calls": 0,
+    "all_loaded_core_modules_from_installed_target": true,
+    "physical_driver_success": true,
+    "optimizer_target_met": false
+  },
+  "actual_full_job_source_closure_qualified": false
+}

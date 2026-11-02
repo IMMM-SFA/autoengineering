@@ -1,0 +1,33 @@
+{
+  "created_utc": "2026-10-30T10:16:27.657929+00:00",
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "281a5e5f1c3d6ea97d0b454e27229605ecbed3f64bf73865a3a930b72f5dd093",
+    "docs/reviews/part-5-confirmation-proposal.md": "bd33654164f0bbca5f72fc6995aef31452b5ae4e8f2cf7ae089336eb4f4c6af8",
+    "docs/reviews/part-5-progress.md": "e06f7c1023dd2d674f3e0a6c5e1dc2f233c1369c5a517d69d7c6bdc30895641b",
+    "docs/utility.md": "b3d25e151c68cb3557720ec6482b6642fd008fa1ca58f47b5b97e46599148e3e",
+    "examples/utility/README.md": "276a5547d95c677ee9f1d09903d1858123599e072c2f80038b7bcfa00947ca98",
+    "examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "tests/test_utility_engineering_load.py": "0ed4b1ea9e853086277a0c1917f1e83250a39eec4a2d679d7f31a2e70a031363"
+  },
+  "limits": [
+    "No proposed final scenario evaluated",
+    "No installed qualification of the new profile",
+    "No private scorer or native multi-load optimizer admitted"
+  ],
+  "predecessor": "examples/utility/verification-current-base-v1/source-before.json",
+  "predecessor_sha256": "e02a582f3e632c1ffc4048c1389e90f467de01ef6642f59473507e7b367bdfcb",
+  "schema": "utility-source-increment-v1",
+  "scope": "engineering load development binding; not final source release",
+  "unchanged_core_python_files": 202,
+  "unchanged_legacy_examples": [
+    "examples/utility/engineering.py",
+    "examples/interoperability/circuit/model.py",
+    "examples/interoperability/circuit/fixture.py"
+  ],
+  "verification": {
+    "default_import_and_docs": "20 passed, 8 skipped in 2.27s",
+    "diff_check": "passed",
+    "interoperability": "29 passed, 3 warnings in 5.79s",
+    "lint": "passed"
+  }
+}

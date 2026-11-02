@@ -1,0 +1,79 @@
+from pathlib import Path
+import ast
+root=Path.cwd()
+old=(root/'examples/utility/engineering_load_native.py').read_text()
+tree=ast.parse(old)
+parts={n.name:ast.get_source_segment(old,n) for n in tree.body if isinstance(n,ast.FunctionDef)}
+header='''"""Native current design for up to 24 supplied passive-circuit load cases.
+
+At the common absolute voltage threshold, each case has one required current.
+The largest requirement controls all voltage constraints because the passive
+circuit's current-voltage relation is strictly increasing. Source power also
+increases with positive current in every case, so the controlling case and mean
+power share the same current minimizer. SLSQP still uses the intact coupled
+OpenMDAO model and its total derivatives. Every supplied case is checked freshly.
+
+This development recipe opens no private source and admits no final scenarios.
+The older combined-corner recipe is unchanged.
+"""
+from __future__ import annotations
+
+from itertools import islice
+import math
+from pathlib import Path
+
+import numpy as np
+
+from examples.interoperability.circuit.model import factory
+from examples.utility.engineering_load import context, diagnostics
+from examples.utility.engineering_load_native import direct, dominant_scenario
+
+
+def controlling_scenario(scenarios, minimum_voltage):
+    """Return the threshold-controlling supplied case without running a model.
+
+    Kirchhoff and Ohm laws give I = v/R1 + (1 + R2/R1) Is expm1(v/Vt),
+    where v = minimum_voltage - ground and the fixed diode has Is=1e-15 A,
+    Vt=0.025875 V. An unrepresentable threshold refuses before model construction.
+    """
+    cases = tuple(islice(scenarios, 25))
+    if not cases or len(cases) > 24 or len({s.scenario_id for s in cases}) != len(cases):
+        raise ValueError("robust native load recipe requires 1 to 24 unique supplied cases")
+    if type(minimum_voltage) not in (int, float) or not math.isfinite(minimum_voltage):
+        raise ValueError("robust native load voltage requirement must be finite")
+    requirements = []
+    for case in cases:
+        dominant_scenario((case,))  # Reuse strict finite, positive-resistance validation.
+        ground, r1, r2 = (case.forcing[n] for n in
+                         ("ground_voltage", "resistor1_ohm", "resistor2_ohm"))
+        v = minimum_voltage - ground
+        try:
+            current = v / r1 + (1 + r2 / r1) * 1e-15 * math.expm1(v / .025875)
+        except OverflowError as error:
+            raise ValueError("robust native threshold current is not representable") from error
+        if not math.isfinite(current):
+            raise ValueError("robust native threshold current is not representable")
+        requirements.append(current)
+    return cases[max(range(len(cases)), key=requirements.__getitem__)]
+
+
+'''
+body=parts['native_design'].replace('"""Optimize the exact controlling case and separately check every supplied case."""','"""Optimize the threshold-controlling case and verify every supplied load."""')
+body=body.replace('scenarios = tuple(scenarios)','scenarios = tuple(islice(scenarios, 25))')
+body=body.replace('worst = dominant_scenario(scenarios)','worst = controlling_scenario(scenarios, minimum_voltage)')
+body=body.replace('fresh = [direct(current, scenario, scratch, source_root=source_root) for scenario in scenarios]', '''fresh = [direct(current, scenario, scratch, source_root=source_root) for scenario in scenarios]
+        powers = [current * (row["outputs"]["node1_voltage"] - case.forcing["ground_voltage"])
+                  for case, row in zip(scenarios, fresh, strict=True)]
+        feasible = all(
+            all(math.isfinite(value) for value in row["outputs"].values())
+            and row["work"]["converged"]
+            and row["work"]["residual_norm"] <= 1e-10
+            and row["work"]["residual_tolerance"] == 1e-10
+            and row["work"]["solver_iterations"] <= 100
+            and row["outputs"]["node2_voltage"] >= minimum_voltage
+            and math.isfinite(power) and power >= 0
+            for row, power in zip(fresh, powers, strict=True))''')
+body=body.replace('"feasible": all(s["outputs"]["node2_voltage"] >= minimum_voltage for s in fresh)', '"feasible": feasible, "mean_source_power_W": math.fsum(powers) / len(powers)')
+path=root/'examples/utility/engineering_load_robust_native.py'
+assert not path.exists()
+path.write_text(header+body+'\n\n\n'+parts['execute']+'\n')

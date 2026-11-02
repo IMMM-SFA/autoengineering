@@ -1,0 +1,72 @@
+"""Build and install an isolated core-only wheel offline, without changing the checkout."""
+
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import zipfile
+
+root = Path.cwd()
+out = root / "examples/utility/verification-wind-cost-report-v1"
+stage = Path("/private/tmp/utility-wind-cost-installed-v1")
+stage.mkdir(mode=0o700)
+source = stage / "source"
+source.mkdir(mode=0o700)
+old = json.loads((root / "examples/utility/verification-engineering-load-costs-v1/wheel-input-pins.json").read_text())
+names = {name for name in old if not name.startswith("examples/")}
+names.update(str(p.relative_to(root)) for p in (root / "src/autoengineering").rglob("*.py"))
+pins = {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in sorted(names)}
+for name in names:
+    target = source / name
+    target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    shutil.copyfile(root / name, target)
+(out / "wheel-input-pins.json").write_text(json.dumps(pins, indent=2) + "\n")
+env = os.environ.copy()
+env["SOURCE_DATE_EPOCH"] = "1793318400"
+build = subprocess.run(
+    [sys.executable, "-I", "-B", "-c",
+     "from setuptools.build_meta import build_wheel; build_wheel('../wheel')"],
+    cwd=source, env=env, capture_output=True, text=True,
+)
+(out / "build.stdout.txt").write_text(build.stdout)
+(out / "build.stderr.txt").write_text(build.stderr)
+assert build.returncode == 0
+wheel = next((stage / "wheel").glob("*.whl"))
+with zipfile.ZipFile(wheel) as zipped:
+    python = [name for name in zipped.namelist() if name.endswith(".py")]
+    assert len(python) == 227 and all(name.startswith("autoengineering/") for name in python)
+    for name in zipped.namelist():
+        if ".dist-info/" not in name:
+            assert hashlib.sha256(zipped.read(name)).hexdigest() == pins["src/" + name]
+saved = out / wheel.name
+shutil.copyfile(wheel, saved)
+target = stage / "installed"
+install = subprocess.run(
+    [sys.executable, "-I", "-m", "pip", "install", "--no-index", "--no-deps",
+     "--no-compile", "--no-cache-dir", "--target", str(target), str(wheel)],
+    cwd=stage, capture_output=True, text=True,
+)
+(out / "install.stdout.txt").write_text(install.stdout)
+(out / "install.stderr.txt").write_text(install.stderr)
+assert install.returncode == 0
+with zipfile.ZipFile(wheel) as zipped:
+    for name in zipped.namelist():
+        if ".dist-info/" not in name:
+            assert (target / name).read_bytes() == zipped.read(name)
+for name, expected in pins.items():
+    assert hashlib.sha256((root / name).read_bytes()).hexdigest() == expected
+shutil.copytree(out / "public", stage / "public")
+record = {
+    "wheel_sha256": hashlib.sha256(saved.read_bytes()).hexdigest(),
+    "python_files": 227, "example_python_files": 0, "copied_inputs": len(pins),
+    "all_package_payloads_match_inputs": True, "installed_payloads_match_wheel": True,
+    "build_exit_code": build.returncode, "install_exit_code": install.returncode,
+    "target": str(target), "public_scope": str(stage / "public"),
+    "network_or_dependency_installation": False, "inherited_base_dependencies": True,
+    "release_or_linux_qualification": False,
+}
+(out / "build-install-result.json").write_text(json.dumps(record, indent=2) + "\n")
+print(json.dumps(record, sort_keys=True))

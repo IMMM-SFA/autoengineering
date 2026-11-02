@@ -1,0 +1,16 @@
+{
+  "scope": "incremental saved numerical parity and guarded production preflight controls; not full source/platform/private or independent utility qualification",
+  "predecessor": "examples/utility/source-inventory-guest-inference-smoke.json",
+  "predecessor_sha256": "e9cec7d026d2f3d0a65d63177b44a0a8b4df073a0a3bac8b8fa65e861d902c3f",
+  "source_sha256": {
+    "examples/utility/guest_prediction_parity.py": "c5775a4517a22596975fc5f886458e263a40f7a2471bf3ce8ee70a00bc5db632",
+    "examples/utility/guest_parity_reader.py": "3ec202119628319c53a65575de600393ad2c14a8411bea6523f512d76abf8b64",
+    "examples/utility/guest_preflight_controls.py": "9055913218bd7fd874da7f73c0f686e056f5fd595b920407baa6080a7cc7ef8a",
+    "tests/test_utility_guest_prediction_parity.py": "cddee79bbe498700e5d312abd06811685858503a89a53b2134237a508e24fa73",
+    "tests/test_utility_guest_parity_reader.py": "a2bd299dfce7e9a0ae6e07438d9a09c4f7b75ff06c02f0fc2100f143a9719192",
+    "tests/test_utility_guest_preflight_controls.py": "e0da752b09f1c3db85739372d07ef50a2712ac83e5c0aa261b4a0ffa27a26ba9"
+  },
+  "verification": "examples/utility/verification-guest-preflight-controls-v1/summary.json",
+  "parity_verification": "examples/utility/verification-guest-prediction-parity-v1/summary.json",
+  "qualification_evidence_map": "examples/utility/qualification-state-guest-v1.json"
+}

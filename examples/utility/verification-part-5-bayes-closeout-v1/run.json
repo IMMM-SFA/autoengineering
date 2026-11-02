@@ -1,0 +1,14 @@
+{
+  "scope": "documented full test-bayes regression command in existing cached environment",
+  "command": "PATH=\"$PWD/.pixi/envs/bayes/bin:$PATH\" .pixi/envs/bayes/bin/python -m pytest tests -q -p no:cacheprovider --junitxml=examples/utility/verification-part-5-bayes-closeout-v1/tests.xml",
+  "original_exec_session_id": 35864,
+  "last_verified_state": "terminal exit 0; source hashes and JUnit counts verified after completion",
+  "last_verified_at_utc": "2026-10-29T17:28:15.120896+00:00",
+  "source_and_test_files": "must remain fixed until original process is terminal",
+  "not_authorized_by_this_run": [
+    "real provider calls",
+    "private confirmation",
+    "remote jobs",
+    "new frozen scientific matrices"
+  ]
+}

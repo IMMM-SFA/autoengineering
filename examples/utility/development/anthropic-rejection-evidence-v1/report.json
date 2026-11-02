@@ -1,0 +1,127 @@
+{
+  "version": "anthropic-rejection-probe-1.0",
+  "source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+  "cases": [
+    {
+      "mode": "tool",
+      "status": "rejected",
+      "reason": "anthropic_forbidden_content",
+      "provider_requests_reserved": 1,
+      "authored_callbacks": 1,
+      "replay_added_callbacks": 0,
+      "usage_observation": {
+        "basis": "reported_message_fields_only",
+        "billed_cost_usd": null,
+        "invalid_count_fields": [],
+        "raw_sha256": "206a3c479bb45519ee033117765b804c4982827c76b8c66c2025ed5b47ba1388",
+        "reported_model": "claude-sonnet-4-6",
+        "schema_version": "1.0",
+        "usage": {
+          "cache_creation_input_tokens": 3,
+          "cached_input_tokens": 2,
+          "input_tokens": 12,
+          "output_tokens": 10,
+          "reasoning_output_tokens": null,
+          "total_tokens": 22,
+          "uncached_input_tokens": 7
+        },
+        "usage_categories_complete": true
+      },
+      "delivered_response": false,
+      "external_provider_calls": 0
+    },
+    {
+      "mode": "wrong-model",
+      "status": "rejected",
+      "reason": "anthropic_response_identity_mismatch",
+      "provider_requests_reserved": 1,
+      "authored_callbacks": 1,
+      "replay_added_callbacks": 0,
+      "usage_observation": {
+        "basis": "reported_message_fields_only",
+        "billed_cost_usd": null,
+        "invalid_count_fields": [],
+        "raw_sha256": "dcade200580232694b4d7d860cbac4459d22ab6c0c1f0be2ddc2fd467db00b5f",
+        "reported_model": "claude-other-fixture",
+        "schema_version": "1.0",
+        "usage": {
+          "cache_creation_input_tokens": 3,
+          "cached_input_tokens": 2,
+          "input_tokens": 12,
+          "output_tokens": 10,
+          "reasoning_output_tokens": null,
+          "total_tokens": 22,
+          "uncached_input_tokens": 7
+        },
+        "usage_categories_complete": true
+      },
+      "delivered_response": false,
+      "external_provider_calls": 0
+    },
+    {
+      "mode": "missing-usage",
+      "status": "rejected",
+      "reason": "anthropic_missing_usage",
+      "provider_requests_reserved": 1,
+      "authored_callbacks": 1,
+      "replay_added_callbacks": 0,
+      "usage_observation": {
+        "basis": "reported_message_fields_only",
+        "billed_cost_usd": null,
+        "invalid_count_fields": [],
+        "raw_sha256": "84daf8e18f428fee317d01244f0b4075e30362a2b98c1fd22f97818e3059dde0",
+        "reported_model": "claude-sonnet-4-6",
+        "schema_version": "1.0",
+        "usage": {
+          "cache_creation_input_tokens": null,
+          "cached_input_tokens": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "reasoning_output_tokens": null,
+          "total_tokens": null,
+          "uncached_input_tokens": null
+        },
+        "usage_categories_complete": false
+      },
+      "delivered_response": false,
+      "external_provider_calls": 0
+    },
+    {
+      "mode": "transport-error",
+      "status": "reconciliation_required",
+      "reason": "upstream_transport_failure",
+      "provider_requests_reserved": 1,
+      "authored_callbacks": 1,
+      "replay_added_callbacks": 0,
+      "usage_observation": null,
+      "delivered_response": false,
+      "external_provider_calls": 0
+    },
+    {
+      "mode": "overflow",
+      "status": "rejected",
+      "reason": "upstream_response_size_limit",
+      "provider_requests_reserved": 1,
+      "authored_callbacks": 1,
+      "replay_added_callbacks": 0,
+      "usage_observation": null,
+      "delivered_response": false,
+      "external_provider_calls": 0
+    },
+    {
+      "mode": "dispatch-gap",
+      "status": "reconciliation_required",
+      "reason": "upstream_outcome_unknown",
+      "provider_requests_reserved": 1,
+      "authored_callbacks": 0,
+      "replay_added_callbacks": 0,
+      "usage_observation": null,
+      "delivered_response": false,
+      "external_provider_calls": 0
+    }
+  ],
+  "production_admission": false,
+  "scientific_calls": 0,
+  "provider_calls": 0,
+  "scope": "authored API failure fixtures; not actual provider work"
+}

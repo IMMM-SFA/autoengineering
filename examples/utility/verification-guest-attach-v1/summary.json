@@ -1,0 +1,57 @@
+{
+  "schema": "utility-guest-attach-verification-v1",
+  "created_utc": "2026-10-30T20:32:04.140064+00:00",
+  "scope": "bounded candidate Unix attach upgrade, one verified stdin transfer, Docker frame parsing and absolute I/O deadlines",
+  "focused": "48 passed in 9.52s",
+  "compatibility": "368 passed in 208.37s",
+  "final_attach": "53 passed in 9.28s",
+  "documentation": "19 passed in 0.87s",
+  "cold_relocated_replay": "passed with models, attach, processes, sockets and new clocks denied",
+  "lint": "passed",
+  "explicit_line_length": "passed",
+  "diff_check": "passed",
+  "native_ipc_proof": {
+    "scope": "authored owned Unix peer, not Docker or guest qualification",
+    "request_sha256": "0cfa68ff6356bc05349a7a094a93d9b78855c20590f05b494f167fcc698abfd1",
+    "response_digest": "823313e31d549c1d70769ecdd18f5a5c611e737c06812fb5db24aa326a0eb8db",
+    "stdout_bytes": 7423,
+    "stderr_bytes": 27,
+    "input_consumed": true,
+    "peer_observed_stdin_eof": true
+  },
+  "core_python_files": 218,
+  "boundary": "unqualified-candidate",
+  "daemon_container_guest_execution": "not attempted",
+  "sources": [
+    "https://github.com/moby/moby/blob/master/client/container_attach.go",
+    "https://github.com/moby/moby/blob/master/client/hijack.go",
+    "https://github.com/moby/moby/blob/master/daemon/internal/stream/attach.go"
+  ],
+  "limits": [
+    "native Unix IPC on the current host and authored peers, not actual daemon or guest qualification",
+    "connection outcomes and I/O cancellation/timeout do not attest container stop or model failure",
+    "daemon/image identity, durable ownership/start integration, watchdog/cleanup and actual OS/resource/privacy qualification remain open",
+    "no default executor/service or existing scorer allowlist activation",
+    "prepared environment v3 and full default checkpoint retain earlier source scopes",
+    "independent tasks, owner-approved useful gains/tolerances and scientific matrix remain open"
+  ],
+  "file_sha256": {
+    "README.md": "cf46e2cc11217d43cbee5dedeec997ac885bf7bec3394a75db12cde9bf51941a",
+    "authored-native-capsule.tar.gz": "91e8089fe2e94895a1d127ae56e95279c7c86700453aed62b104a195c87fa5ae",
+    "capsule-file-pins.json": "3ab36375469ac1797b2025b1fecc8db356d20c9ff70fd8b7c80a98dde0c41ce7",
+    "compatibility.log": "f5fa345b1663758dc0047a65bbdd0414e5c81660216be27e6b5b0d57d97c4dac",
+    "documentation.log": "8c776bb4fa98b32be608b2afe1d90a7255c18c27e43bd48fbb222c8001fe5d78",
+    "expected-replay.json": "f3bb5b952597f9e6f59d9f0dc072362fa9e53f67dc2b163a188a9ace34ee44d5",
+    "final-attach.log": "00485857eb37c86f466a7e18c718a88a5de4e8644dcefaa8b71dd9e48f425016",
+    "final-guest_attach.py.txt": "5054340c2c783ff0eb751a003293050294bd46f8b259578566f47621262c73e7",
+    "final-source-pins.json": "1ad48f83a1e13d217b614bd2b0be95fb60297fc7388be7eb5b4ba154605c57f5",
+    "final-test_utility_guest_attach.py.txt": "261b3a9679b02b72e7081d7048057d282ea4e2c1077867ede8ba991dbbb709cf",
+    "focused.log": "ededc7522e567b58dd6d6baf4b19f9a92b64d1eceef2c14c89d12013c4b513c1",
+    "native-unix-proof.json": "d1e5bed37730f31cf04ed744781b6e89e52fd86eb4f41e5047891fe1c4135da5",
+    "regression-guest_attach.py.txt": "5054340c2c783ff0eb751a003293050294bd46f8b259578566f47621262c73e7",
+    "regression-source-pins.json": "fc2c0fe2a1c97caa2e528a12405433f4c6a37ea325f9f1352198ad6e9629322c",
+    "regression-test_utility_guest_attach.py.txt": "b978f36fcb610bb8a02ae8d96a4a923e9712189412aed84cc848d0f4d4f193a3",
+    "relocated-replay.log": "8884a3fbf61e7fa5b9269180e5bd823f4b3537f9a5f87d09e0600ec6bdd35899",
+    "replay-capsule.py.txt": "536be82d9c9f8cc328af2bb6944ddec0d6f5e38661e5dafe89707a409faf1bd8"
+  }
+}

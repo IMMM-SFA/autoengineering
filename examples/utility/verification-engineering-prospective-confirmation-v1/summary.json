@@ -1,0 +1,83 @@
+{
+  "actual_work_totals_from_receipts": null,
+  "automatic_retry_allowed": false,
+  "complete_cost_evidence": false,
+  "confirmation_access_intents": 1,
+  "confirmation_scores_committed": 0,
+  "container_execution_receipts": 0,
+  "core_wheel_source_pins_unchanged": 239,
+  "focused_test_counts": {
+    "documentation-tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 19
+    },
+    "preflight-tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 44
+    },
+    "reporting-tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 47
+    },
+    "tests.xml": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 118
+    }
+  },
+  "four_dossiers_and_proposal": "original pins unchanged",
+  "full_default_suite": "not rerun for example-level preflight reporting repair",
+  "guarded_metadata_reader": "passed after core-schema initialization; private/model/network/process access denied; post-initialization files limited to public archive",
+  "independent_confirmation": false,
+  "initial_setup": "missing host OpenMDAO distribution metadata; corrected original verified empty scope",
+  "lint": "passed",
+  "live_attempt_predates_reporting_repair": true,
+  "live_attempt_rerun_after_repair": false,
+  "live_failure_diagnosis": "current daemon digest differs from pinned profile; read-only image inspection passed",
+  "model_start_reservations": 24,
+  "original_attempt_source_pins_verified": true,
+  "private_payload_access_receipts": 0,
+  "private_rows_seed_packet_copied": false,
+  "reader_initial_guard_failures": 2,
+  "runtime_admitted": false,
+  "schema": "utility-prospective-owner-preflight-review-v1",
+  "scientific_confirmation_attempts_charged": 1,
+  "solver_iteration_reservations": 2400,
+  "source_pins": {
+    "docs/reviews/part-5-engineering-preflight-refusal.md": {
+      "sha256": "db164ccb5223cc0f03f85d5351e4460d6f9af7652f12cb6c1dbfd583af625fec",
+      "size_bytes": 3764
+    },
+    "docs/utility.md": {
+      "sha256": "7be194f4b81402c3e2b627a9f8b4db7caf390e1c2be8666f026e75af8038fd91",
+      "size_bytes": 208518
+    },
+    "examples/utility/engineering_container_callback.py": {
+      "sha256": "88cf6e22ebbaa5fe6045c45676401e93e26d3296586a0ac02e577d8c34a5c368",
+      "size_bytes": 11316
+    },
+    "examples/utility/engineering_container_runtime.py": {
+      "sha256": "02edcd425b1cec825c213673726ce57e0d98b200908ae261c15a43c62e0d1ebf",
+      "size_bytes": 22537
+    },
+    "tests/test_utility_engineering_container_callback.py": {
+      "sha256": "f7547e4f243fb826cf2b7d1de5f971c853273762261c840840c142741de760b0",
+      "size_bytes": 20391
+    },
+    "tests/test_utility_engineering_container_runtime.py": {
+      "sha256": "e1dff5164aef65222d03181a498b57993691d828979b6680bfe8d8c3d3af2842",
+      "size_bytes": 13893
+    }
+  },
+  "status": "live_attempt_consumed_without_score_reporting_repaired_afterward",
+  "task_admitted": false,
+  "unknown_receipt_quantities": 12,
+  "v21_register": "unchanged historical scope; this additional charged attempt is separately recorded"
+}

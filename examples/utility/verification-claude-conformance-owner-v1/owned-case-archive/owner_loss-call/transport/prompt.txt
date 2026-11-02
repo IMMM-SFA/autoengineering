@@ -1,0 +1,3 @@
+Transport format: return one JSON object with exactly one field, handoff_json. Its value must be a string containing the complete role-handoff JSON object specified below. Do not add prose or tools. The broker validates that inner object and retains all scientific authority.
+
+Return one transport object whose handoff_json contains exactly {"ack":"conformance"}.

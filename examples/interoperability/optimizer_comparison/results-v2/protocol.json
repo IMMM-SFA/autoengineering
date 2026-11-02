@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_execution",
+  "policies": ["ax", "optuna", "sobol"],
+  "seeds": [0, 1, 2],
+  "cases": ["continuous", "mixed", "conditional"],
+  "evaluations_per_case_seed_policy": 12,
+  "initial_points": 4,
+  "total_physical_start_ceiling": 324,
+  "attempts_per_action": 1,
+  "repairs": 0,
+  "pruning": false,
+  "parallelism": 1,
+  "framework_retries": 0,
+  "wall_seconds_per_case_seed_policy": 120,
+  "wall_seconds_total": 3600,
+  "memory_bytes_per_process": 4294967296,
+  "timing_repetitions": 3,
+  "conditional_representation": "versioned_branch_mapping_v1",
+  "inactive_defaults": {"linear_curvature": 0.0, "quadratic_slope": 0.0},
+  "deduplication": "active_configuration_digest",
+  "objective_direction": "minimize",
+  "constraint": "x_plus_y_le_1",
+  "data_access": "analytic_functions_only",
+  "failure_projection": "no_objective_for_failed_or_infeasible_result",
+  "selection_order": [
+    "public_api_license_python312",
+    "faithful_translation",
+    "durable_recovery_no_duplicate_starts",
+    "base_independence_and_resources",
+    "measured_value_or_documented_burden_reduction"
+  ]
+}

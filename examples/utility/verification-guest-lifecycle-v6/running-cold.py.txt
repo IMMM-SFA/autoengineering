@@ -1,0 +1,57 @@
+"""Cold saved-running-cancellation verification with no model or external content reads."""
+import importlib.abc
+import sys
+
+
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, *args):
+        if (fullname.split('.')[0] in {'torch', 'openmdao', 'pvlib', 'py_wake'}
+            or fullname.startswith(('examples.leaf_river', 'examples.campaign_contracts',
+                                    'examples.utility.hydrology_'))):
+            raise AssertionError('model import during saved running-cancellation replay')
+
+
+sys.meta_path.insert(0, NoModels())
+from pathlib import Path
+import json
+import os
+import socket
+import subprocess
+import time
+import numpy
+from examples.utility.guest_running_cancellation_reader import read_completion
+
+root = Path(sys.argv[1]).resolve()
+expected = read_completion(root, expected_digest=sys.argv[2])
+allowed_inodes = {(p.stat().st_dev, p.stat().st_ino) for p in root.rglob('*') if p.is_file()}
+
+
+def forbidden(*args, **kwargs):
+    raise AssertionError('execution, clock, network or array load during saved recovery')
+
+
+subprocess.Popen = socket.socket = numpy.load = time.monotonic = time.time = forbidden
+
+
+def saved(event, args):
+    if event == 'open':
+        if isinstance(args[0], int):
+            info = os.fstat(args[0])
+            if (info.st_dev, info.st_ino) not in allowed_inodes:
+                raise AssertionError('unscoped descriptor read')
+        elif not Path(args[0]).resolve().is_relative_to(root):
+            raise AssertionError('outside saved running-cancellation scope')
+        mode, flags = args[1:3]
+        if any(c in (mode or '') for c in 'wax+') or flags & (
+            os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND
+        ):
+            raise AssertionError('write during saved replay')
+    elif event == 'import' or event.startswith(('socket.', 'subprocess.', 'os.exec')):
+        raise AssertionError('import, socket or process after initialization')
+    elif event in ('os.system', 'os.fork', 'os.posix_spawn'):
+        raise AssertionError('execution during saved replay')
+
+
+sys.addaudithook(saved)
+assert read_completion(root, expected_digest=sys.argv[2]) == expected
+print(json.dumps(expected))

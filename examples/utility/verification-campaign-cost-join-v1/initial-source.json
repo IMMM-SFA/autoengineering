@@ -1,0 +1,5 @@
+{
+  "src/autoengineering/utility/campaign_costs.py": "57427f23067a792e6623170e5af01b27f8ad33bd43275b462f1dd983542d90d2",
+  "src/autoengineering/utility/report.py": "e8d189f08e4e997127364fa852cb61ca80f0707e30d9e60e7ccaf33d9392837e",
+  "tests/test_utility_campaign_costs.py": "a8f0684a811d0dbfd920944662443bb4f5880d66eec906b2e4aa573fc14b3e19"
+}

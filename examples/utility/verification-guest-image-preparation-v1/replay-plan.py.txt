@@ -1,0 +1,15 @@
+"""Copy a pinned recipe and wheel outside the checkout for a fresh reader."""
+from pathlib import Path
+import os,shutil,subprocess,sys,tempfile,zipfile
+root=Path.cwd();out=root/'examples/utility/verification-guest-image-preparation-v1'
+with tempfile.TemporaryDirectory(prefix='guest-image-cold-',dir='/private/tmp') as temporary:
+ work=Path(temporary).resolve();package=work/'package';package.mkdir()
+ with zipfile.ZipFile(next(out.glob('*.whl'))) as archive:archive.extractall(package)
+ shutil.copytree(root/'examples/utility/prepared-guest-image-v1',work/'plan')
+ shutil.copyfile(out/'cold-plan.py.txt',work/'reader.py')
+ result=subprocess.run([sys.executable,'-I',str(work/'reader.py'),str(package),str(work/'plan'),
+ 'f9b1782fb389a6e7d262de44089c5cafb3bde1fb4852ffa36c0e1b57fbb252d3'],cwd=work,
+ env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},capture_output=True,text=True)
+ (out/'cold-plan.log').write_text(result.stdout+result.stderr)
+ print(result.stdout.strip())
+ if result.returncode:raise RuntimeError(result.stderr)

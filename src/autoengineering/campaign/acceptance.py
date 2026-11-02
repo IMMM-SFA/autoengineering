@@ -180,9 +180,29 @@ def routing_accounting(context: CheckContext, options):
     )
 
 
+def solar_physical(context: CheckContext, options):
+    """Check declared equipment limits without changing negative night-time tare."""
+    ac = np.asarray(context.outputs["prediction"])
+    poa = np.asarray(context.forcing["poa"])
+    wind = np.asarray(context.forcing["wind"])
+    capacity = float(options["capacity_kw"])
+    floor = float(options["standby_floor_kw"])
+    loss = context.parameters["dc_loss_scale"]
+    valid = (
+        np.isfinite(ac).all() and capacity > 0 and floor <= 0
+        and np.all(ac <= capacity + 1e-8) and np.all(ac >= floor - 1e-8)
+        and np.all(poa >= 0) and np.all(wind >= 0)
+        and np.all(ac[poa == 0] <= 1e-8)
+        and type(loss) in (int, float) and .9 <= loss <= 1.
+    )
+    return ("pass" if valid else "fail", float(np.max(ac)), capacity,
+            "Declared inverter capacity, standby, night-time and loss limits")
+
+
 DEFAULT_CHECKS = CheckRegistry(
     {
         ("finite", "1"): finite,
+        ("solar_physical", "1"): solar_physical,
         ("routing_accounting", "1"): routing_accounting,
         ("nonnegative", "1"): nonnegative,
         ("soil_capacity", "1"): soil_capacity,

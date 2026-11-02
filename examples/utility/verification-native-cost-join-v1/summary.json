@@ -1,0 +1,47 @@
+{
+  "status": "native_cost_reports_joined_with_original_process_output_checks",
+  "host_source_identity": "488b50a9b8eb383f988e1912fbd8e1cab341a32a2ccd2942deffb421ee77536a",
+  "source_files": {
+    "src/autoengineering/utility/native_costs.py": "da41582c9dab059d35cde9be827b4e5973ea8096d379d03c51e1d364a255e6e4",
+    "src/autoengineering/utility/engineering_native.py": "3eb9e051e85c0c3807eaf6a94da0709fd27563e9a9ef17dba398b41819ef0608",
+    "src/autoengineering/utility/callback_native.py": "d291616f9ff5f231240cb0fda7ea4cc9af02efe2b2a8f6684c987a7aea9cc69f",
+    "src/autoengineering/utility/report.py": "7a2121c788059cc1873a8a0f95577a7531c49b3231575b64bdc2483fbd6afcf9",
+    "tests/test_utility_native_costs.py": "fbd5a4c2f538993d41e3fe83e4fb5346535a9e4a5a534d1932a67b6b892f7dd6",
+    "tests/test_utility_engineering_native.py": "5a6f09842e764ab552194242d1bde29ef28ac51870d9ba24a7c354c468eff524"
+  },
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "147",
+    "time": "365.366",
+    "timestamp": "2026-10-29T07:37:15.279938-07:00",
+    "hostname": "m5-mbp"
+  },
+  "installed_wheel": {
+    "wheel": "autoengineering-0.2.0-py3-none-any.whl",
+    "sha256": "d716b6ada3ddcd091d49c239603481a50d33a0976f601b5aed967aba583523c9",
+    "matched_core_python_files": 193
+  },
+  "installed_rows": {
+    "circuit": 8,
+    "callback": 10,
+    "wind": 9
+  },
+  "installed_reader": "original checkout and original case roots denied with tested controls; sockets/processes denied; no captured model implementation or optional model packages supplied; cached base dependencies",
+  "legacy_rehearsal": {
+    "scope": "read-only exposed original rehearsal; no new science, private data or confirmation",
+    "assigned_cells": 28,
+    "native_rows": 108,
+    "confirmation_receipts": 0,
+    "original_head_unchanged": true,
+    "processes_and_network": "denied",
+    "complete_cost_evidence": false
+  },
+  "provider_calls": 0,
+  "independent_confirmation_accesses": 0,
+  "new_real_scientific_matrix": false,
+  "complete_cost_evidence": false,
+  "scope": "authored process fixtures and read-only exposed old rehearsal, not new utility evidence"
+}

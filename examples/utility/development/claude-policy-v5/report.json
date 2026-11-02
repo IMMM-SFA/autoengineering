@@ -1,0 +1,145 @@
+{
+  "version": "claude-policy-probe-1.3",
+  "status": "passed_limited_scope",
+  "source_identity": "86b89bd3d3f2dade5fe0cad06650a72267a4536d0e7db2d675b55e216d9fcb8d",
+  "runtime": {
+    "platform": "darwin",
+    "machine": "arm64",
+    "os_release": "25.5.0",
+    "os_version": "Darwin Kernel Version 25.5.0: Mon Apr 27 20:39:29 PDT 2026; root:xnu-12377.121.6~2/RELEASE_ARM64_T8142",
+    "python": "3.12.13"
+  },
+  "public_icu_files": {
+    "/usr/share/icu/icutzformat.txt": "327d09f9e798492441b2a7839e2ce11498c64ae4c36ea98e248b89c5fc3172fe",
+    "/usr/share/icu/icudt78l.dat": "b8427c952a9ebf0f468416a30dc6ecbe4215c5ff2da5e62c3b895ed75aa77237"
+  },
+  "policy_specification": {
+    "schema": "claude-helper-policy-1.2",
+    "workspace": "/private/tmp/claude-policy-probe-v5/workspace",
+    "home": "/private/tmp/claude-policy-probe-v5/home",
+    "executable": "/private/tmp/claude-policy-probe-v5/code/probe",
+    "helper": "/private/tmp/claude-policy-probe-v5/auth/helper",
+    "python": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
+    "python_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default",
+    "credential_files": [
+      "/private/tmp/claude-policy-probe-v5/auth/key.txt"
+    ],
+    "endpoints": [
+      {
+        "address": "localhost",
+        "port": 49873
+      }
+    ],
+    "forbidden_roots": [
+      "/private/tmp/claude-policy-probe-v5/private",
+      "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
+    ]
+  },
+  "actual_cli_policy_specification": {
+    "schema": "claude-helper-policy-1.2",
+    "workspace": "/private/tmp/claude-policy-probe-v5/workspace",
+    "home": "/private/tmp/claude-policy-probe-v5/home",
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "helper": "/private/tmp/claude-policy-probe-v5/auth/helper",
+    "python": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
+    "python_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default",
+    "credential_files": [
+      "/private/tmp/claude-policy-probe-v5/auth/key.txt"
+    ],
+    "endpoints": [
+      {
+        "address": "localhost",
+        "port": 49873
+      }
+    ],
+    "forbidden_roots": [
+      "/private/tmp/claude-policy-probe-v5/private",
+      "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
+    ]
+  },
+  "inventory": {
+    "executable": "/Users/cam/.local/share/claude/versions/2.1.310",
+    "sha256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+    "version": "2.1.310 (Claude Code)",
+    "supported_flags": [
+      "--print",
+      "--bare",
+      "--output-format",
+      "--input-format",
+      "--json-schema",
+      "--model",
+      "--tools",
+      "--disable-slash-commands",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "--setting-sources",
+      "--settings",
+      "--no-session-persistence",
+      "--permission-mode",
+      "--max-budget-usd"
+    ]
+  },
+  "observed": {
+    "control": {
+      "allowed_read": 1,
+      "private_read_denied": 0,
+      "credential_read": 1,
+      "outside_write_denied": 0,
+      "home_write": 1,
+      "workspace_write_denied": 0,
+      "symlink_read_denied": 0,
+      "symlink_write_denied": 0,
+      "hardlink_read_denied": 0,
+      "endpoint_allowed": 1,
+      "other_tcp_denied": 0,
+      "unix_denied": 0,
+      "exec_denied": 0,
+      "checkout_read_denied": 0
+    },
+    "sandbox": {
+      "allowed_read": 1,
+      "private_read_denied": 1,
+      "credential_read": 1,
+      "outside_write_denied": 1,
+      "home_write": 1,
+      "workspace_write_denied": 1,
+      "symlink_read_denied": 1,
+      "symlink_write_denied": 1,
+      "hardlink_read_denied": 1,
+      "endpoint_allowed": 1,
+      "other_tcp_denied": 1,
+      "unix_denied": 1,
+      "exec_denied": 1,
+      "checkout_read_denied": 1
+    },
+    "actual_cli_help": {
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "help_returned": true
+    },
+    "synthetic_helper_bootstrap": {
+      "status": "completed",
+      "returncode": 0,
+      "stopped": true,
+      "expected_synthetic_output": true,
+      "native_CLI_helper_hook_exercised": false
+    }
+  },
+  "raw_source_sha256": "f3cc2eaa394ed564ac89d1c6436a0e3ce692a9d3098d8116cb6d6560921f2398",
+  "provider_calls": 0,
+  "scientific_calls": 0,
+  "production_admission": false,
+  "unqualified": [
+    "actual_inference_and_role_conformance",
+    "real_credentials_and_authentication",
+    "native_cli_helper_hook",
+    "IPv6_and_UDP",
+    "DNS_TLS_and_external_egress",
+    "preference_service_and_shared_memory",
+    "process_environment_privacy",
+    "resource_and_workspace_limits",
+    "complete_lifecycle_matrix",
+    "Linux_x86_64"
+  ]
+}

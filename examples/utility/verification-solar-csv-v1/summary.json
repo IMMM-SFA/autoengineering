@@ -1,0 +1,44 @@
+{
+  "scope": "Authored raw CSV to existing solar interval/partition/readers; no site source observation or model admission",
+  "focused_parser_tests": 39,
+  "cold_reader": {
+    "guarded_public_reader": true,
+    "development_intervals": 12,
+    "fitting_score_rows": 4,
+    "selection_score_rows": 4,
+    "raw_source_read": false,
+    "reserved_artifacts_read": false,
+    "new_model_calls": 0,
+    "new_processes": 0,
+    "new_http_requests": 0,
+    "task_admitted": false
+  },
+  "cold_reader_exit_code": 0,
+  "public_bundle_only": true,
+  "actual_observation_files_read": 0,
+  "new_models": 0,
+  "new_training": 0,
+  "new_scoring": 0,
+  "new_provider_calls": 0,
+  "new_dependencies": 0,
+  "task_admitted": false,
+  "site_clock_or_equipment_qualified": false,
+  "independent_confirmation": false,
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "full_default_rerun": false,
+  "regression": {
+    "tests": 93,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "documentation": {
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": "passed: ruff check --no-cache src tests examples",
+  "whitespace": "git diff --check passed"
+}

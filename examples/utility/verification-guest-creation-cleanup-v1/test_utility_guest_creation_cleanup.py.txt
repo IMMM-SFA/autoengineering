@@ -1,0 +1,295 @@
+"""Original creation cleanup on authored API observations, never real Docker."""
+
+from copy import deepcopy
+import shutil
+import time
+
+import pytest
+
+from autoengineering.utility import guest_creation_cleanup as module
+from autoengineering.utility.guest_owner import GuestOwnerJournal
+from autoengineering.utility.guest_dispatch import GuestDispatchController
+from autoengineering.utility.guest_watchdog import arm
+import test_utility_guest_daemon as fixture
+
+metadata = fixture.metadata
+H = fixture.H
+
+
+def prepared(tmp_path, metadata, monkeypatch, *, creation="known"):
+    owner, store, api, daemon = fixture.prepared(tmp_path, metadata, monkeypatch)
+    original = daemon.request
+    daemon.kills = daemon.deletes = 0
+    daemon.lost_delete = False
+
+    def request(method, path, value=None, **kwargs):
+        if method == "POST" and "/kill?" in path:
+            daemon.calls.append((method, path, value))
+            daemon.kills += 1
+            daemon.created["State"].update(Status="exited", Running=False, Pid=0, ExitCode=137)
+            return 204, b""
+        if method == "DELETE":
+            daemon.calls.append((method, path, value))
+            daemon.deletes += 1
+            daemon.exists = False
+            if daemon.lost_delete:
+                raise OSError("authored lost remove response")
+            return 204, b""
+        return original(method, path, value, **kwargs)
+
+    monkeypatch.setattr(api, "_request", request)
+    if creation == "unknown":
+        daemon.lost = True
+        with pytest.raises(ValueError):
+            fixture.create(owner, store, api)
+    elif creation == "warnings":
+        daemon.warnings = ["authored unapproved resource"]
+        with pytest.raises(ValueError):
+            fixture.create(owner, store, api)
+    elif creation == "unsettled":
+
+        def fail(stage):
+            if stage == "before_daemon_create":
+                raise KeyboardInterrupt("authored before CREATE")
+
+        owner.fault = fail
+        with pytest.raises(KeyboardInterrupt):
+            fixture.create(owner, store, api)
+        owner.fault = lambda stage: None
+    else:
+        fixture.create(owner, store, api)
+    return owner, store, api, daemon
+
+
+def cleanup(owner, store, api):
+    with store.writer(), owner.writer():
+        return module.cleanup_creation(owner, store, api)
+
+
+@pytest.mark.parametrize("creation", ["known", "unknown", "warnings"])
+def test_cleanup_binds_original_creation_without_start_permission(
+    tmp_path, metadata, monkeypatch, creation
+):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch, creation=creation)
+    phase = owner.replay().phase
+    before = store.replay()
+    result = cleanup(owner, store, api)
+    assert result.result == "absent" and result.container_id == H
+    assert result.stopped and result.absence and not result.kill_intended and result.delete_intended
+    assert daemon.creates == daemon.deletes == 1 and daemon.kills == 0
+    assert owner.replay().phase == phase and store.replay() == before
+    assert module.read_creation_cleanup(owner) == result
+    calls = deepcopy(daemon.calls)
+    assert cleanup(owner, store, api) == result and daemon.calls == calls
+    if phase == "created":
+        with owner.writer(), pytest.raises(ValueError, match="cleanup already intended"):
+            owner.record("start_intent")
+        with (
+            store.writer(),
+            owner.writer(),
+            pytest.raises(ValueError, match="cleanup already intended"),
+        ):
+            arm(owner, store, api, deadline=time.monotonic() + 5)
+        with store.writer(), owner.writer(), pytest.raises(ValueError):
+            GuestDispatchController(api).run(owner, store, deadline=time.monotonic() + 5)
+    assert daemon.calls == calls
+
+
+def test_cancelled_suite_can_clean_owned_resource_with_resource_drift(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch)
+    grant = owner.manifest.job.grant
+    with store.writer():
+        store.append(
+            request_id="authored-cancel",
+            operation="cancel",
+            cell_digest=grant.cell_digest,
+            attempt_id="cancel-cleanup",
+            child_digest=grant.digest,
+            phase="confirmation",
+        )
+    daemon.created["HostConfig"]["Memory"] = 0
+    daemon.created["State"].update(Status="running", Running=True, Pid=123)
+    result = cleanup(owner, store, api)
+    assert result.result == "absent" and result.kill_intended and result.delete_intended
+    assert daemon.kills == daemon.deletes == 1 and store.replay()["cancelled"]
+
+
+@pytest.mark.parametrize("field", ["id", "image", "labels"])
+def test_foreign_resource_refuses_mutation_and_replays_refusal(
+    tmp_path, metadata, monkeypatch, field
+):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch)
+    if field == "id":
+        daemon.created["Id"] = "2" * 64
+    elif field == "image":
+        daemon.created["Image"] = "sha256:" + "2" * 64
+    else:
+        daemon.created["Config"]["Labels"] = {}
+    result = cleanup(owner, store, api)
+    assert result.result == "foreign_refused" and result.foreign
+    assert not result.kill_intended and not result.delete_intended
+    assert daemon.kills == daemon.deletes == 0
+    assert module.read_creation_cleanup(owner) == result
+
+
+def test_missing_name_after_unknown_create_is_not_final_cleanup(tmp_path, metadata, monkeypatch):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch, creation="unsettled")
+    result = cleanup(owner, store, api)
+    assert result.result == "creation_unresolved" and result.container_id is None
+    assert result.absence and not result.stopped and not result.delete_intended
+    assert daemon.creates == daemon.deletes == daemon.kills == 0
+    calls = deepcopy(daemon.calls)
+    daemon.exists = True  # A late original CREATE must not be hidden as verified absence.
+    assert cleanup(owner, store, api) == result and daemon.calls == calls
+
+
+def test_lost_delete_response_requires_observed_absence_without_repeat(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch)
+    daemon.lost_delete = True
+    result = cleanup(owner, store, api)
+    assert result.result == "absent" and daemon.deletes == 1
+    assert cleanup(owner, store, api) == result and daemon.deletes == 1
+
+
+@pytest.mark.parametrize(
+    "point",
+    [
+        "creation_cleanup_intended",
+        "before_creation_cleanup_delete",
+        "after_creation_cleanup_delete",
+        "before_creation_cleanup_outcome",
+        "after_creation_cleanup_outcome",
+    ],
+)
+def test_interrupted_cleanup_never_repeats_consumed_mutations(
+    tmp_path, metadata, monkeypatch, point
+):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch)
+
+    def fail(stage):
+        if stage == point:
+            raise KeyboardInterrupt("authored cleanup interruption")
+
+    owner.fault = fail
+    with pytest.raises(KeyboardInterrupt):
+        cleanup(owner, store, api)
+    reopened = GuestOwnerJournal(owner.root, suite_root=store.root)
+    result = cleanup(reopened, store, api)
+    assert daemon.deletes <= 1 and daemon.kills == 0
+    assert result.result == (
+        "unverified" if point == "before_creation_cleanup_delete" else "absent"
+    )
+    if point != "after_creation_cleanup_outcome":
+        assert result.elapsed_seconds is None
+    calls = deepcopy(daemon.calls)
+    assert cleanup(reopened, store, api) == result and daemon.calls == calls
+
+
+def test_original_cleanup_deadline_cannot_renew_after_interruption(tmp_path, metadata, monkeypatch):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch)
+
+    def fail(stage):
+        if stage == "creation_cleanup_intended":
+            raise KeyboardInterrupt("authored stop")
+
+    owner.fault = fail
+    with pytest.raises(KeyboardInterrupt):
+        cleanup(owner, store, api)
+    plan = module._json(
+        owner.root / "control/creation-cleanup", "plan.json", module.GuestCreationCleanupPlan
+    )
+    reopened = GuestOwnerJournal(owner.root, suite_root=store.root)
+    calls = deepcopy(daemon.calls)
+    monkeypatch.setattr(module.time, "monotonic", lambda: plan.deadline + 1)
+    result = cleanup(reopened, store, api)
+    assert result.result == "unverified" and result.elapsed_seconds is None
+    assert daemon.calls == calls and daemon.deletes == 0
+
+
+def test_relocated_cleanup_is_cold_and_does_not_touch_original_runtime(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, api, _ = prepared(tmp_path, metadata, monkeypatch)
+    result = cleanup(owner, store, api)
+    destination = tmp_path / "copied-owner"
+    shutil.copytree(owner.root, destination)
+    copied = GuestOwnerJournal(destination)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("cold cleanup cannot act or sample time")
+
+    monkeypatch.setattr(api, "_request", forbidden)
+    monkeypatch.setattr(module.time, "monotonic", forbidden)
+    assert module.read_creation_cleanup(copied) == result
+
+
+@pytest.mark.parametrize(
+    "point",
+    [
+        "after_daemon_create",
+        "daemon_create_response_saved",
+        "before_created",
+        "after_created",
+        "guest_executor_created",
+    ],
+)
+def test_native_facade_failure_cleans_original_resource_without_start(tmp_path, metadata, point):
+    import test_utility_guest_executor as facade
+
+    with facade.prepared(tmp_path, metadata) as (executor, grant, peer, configure):
+        before = executor.store.replay()
+
+        def fail(stage):
+            configure(stage)
+            if stage == point:
+                raise RuntimeError("authored early facade loss")
+
+        executor.store.fault = fail
+        with pytest.raises(RuntimeError):
+            facade.execute(executor, grant)
+        owner = GuestOwnerJournal(executor.work_root / grant.digest, suite_root=executor.store.root)
+        result = module.read_creation_cleanup(owner)
+        assert result.result == "absent" and result.container_id == H
+        assert peer.daemon.creates == 1 and peer.starts == peer.inputs == 0
+        assert peer.calls.count(("DELETE", f"/containers/{H}?force=1&v=0")) == 1
+        assert executor.store.replay() == before
+        calls = tuple(peer.calls)
+        executor.store.fault = lambda stage: None
+        with executor.store.writer():
+            assert executor.cleanup_creation(grant) == result
+        assert tuple(peer.calls) == calls
+        with executor.store.writer(), pytest.raises(ValueError):
+            executor.recover(grant)
+        assert tuple(peer.calls) == calls
+
+
+def test_cleanup_prevents_creation_reconciliation_and_second_resource_owner(
+    tmp_path, metadata, monkeypatch
+):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch, creation="unknown")
+    result = cleanup(owner, store, api)
+    calls = deepcopy(daemon.calls)
+    with (
+        store.writer(),
+        owner.writer(),
+        pytest.raises(ValueError, match="cleanup already intended"),
+    ):
+        fixture.module.GuestCreationController(api).reconcile_creation(
+            owner, store, deadline=time.monotonic() + 5
+        )
+    with owner.writer(), pytest.raises(ValueError, match="cleanup already intended"):
+        owner.record("created", daemon.created)
+    assert result.result == "absent" and daemon.calls == calls
+
+
+def test_existing_watchdog_lease_refuses_parallel_creation_cleanup(tmp_path, metadata, monkeypatch):
+    owner, store, api, daemon = prepared(tmp_path, metadata, monkeypatch)
+    (owner.root / "control/guest-watchdog").mkdir(mode=0o700)
+    calls = deepcopy(daemon.calls)
+    with pytest.raises(ValueError, match="watchdog owns cleanup"):
+        cleanup(owner, store, api)
+    assert not (owner.root / "control/creation-cleanup").exists() and daemon.calls == calls

@@ -1,0 +1,43 @@
+{
+  "combined": {
+    "created": 7,
+    "private_label_reads": 0,
+    "scientific_starts": 0,
+    "starts": 6
+  },
+  "completion_digest": "f5395216c48d94a2ada8f5090467178b2f3471d3026197c63e9412f12aa5c103",
+  "image_id": "sha256:fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399",
+  "original_26_case_matrix": "not executed as a whole; original proposal preserved; extra failed creation retained separately",
+  "owner_loss_qualified": false,
+  "remaining": "six preflight and fourteen fixed-inference/lifecycle handlers, full-chain private qualification and scientific admission",
+  "request_v1_digest": "0a99d30a1f5df56c3a10fa099ec23a92f66cbce4c6a646c9267fef01d1669206",
+  "request_v2_digest": "ad457623720c9d9514dc26c76bbae4f9624c9519f400e26391db1f91545db639",
+  "runtime_qualified": false,
+  "scope": "six local resource diagnostics; no full runtime or independent science admission",
+  "v1": {
+    "administrative_cleanup": "exact unstarted CID verified absent, one separate DELETE",
+    "created": 1,
+    "original_cleanup": "unknown; preserved",
+    "reason": "inherited public image environment",
+    "starts": 0,
+    "status": "refused_before_start"
+  },
+  "v2": {
+    "all_original_containers_absent": true,
+    "created": 6,
+    "passed_cases": 6,
+    "starts": 6
+  },
+  "verification": {
+    "cold_bytes": 403086,
+    "cold_files": 108,
+    "cold_reader_sha256": "b0a4401f03596b59f33de3f785c6205fbcef72730af1192988296dc5b86b2239",
+    "core_source_unchanged": true,
+    "errors": 0,
+    "failures": 0,
+    "full_default_rerun": false,
+    "related_passed": 254,
+    "ruff": "passed",
+    "skips": 0
+  }
+}

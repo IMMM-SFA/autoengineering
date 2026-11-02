@@ -1,0 +1,25 @@
+"""Verify relocated downloaded archives/context with original scopes denied."""
+from pathlib import Path
+import os,socket,subprocess,sys,time
+source=Path(sys.argv[1]);root=Path(sys.argv[2])
+sys.path.insert(0,str(source))
+from examples.utility import guest_archive_download as archives,guest_image_context as contexts,guest_image
+import numpy
+b''.decode('cp437')
+def forbidden(*args,**kwargs):raise AssertionError('execution, network, clock, arrays or source probe')
+subprocess.Popen=socket.socket=time.monotonic=time.time=numpy.load=forbidden
+archives._open=guest_image._source_alignment=forbidden
+active=[True]
+def reads(event,args):
+ if not active[0] or event!='open' or isinstance(args[0],int):return
+ path=Path(args[0]).resolve();mode,flags=args[1:3]
+ if not path.is_relative_to(root):raise AssertionError('original or unrelated file read')
+ if mode is not None and any(c in mode for c in 'wax+'):raise AssertionError('write')
+ if flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):raise AssertionError('write')
+sys.addaudithook(reads)
+a=archives.verify(root/'cache',expected_digest='cd89e6cb04b26261960045de4ee6d7e807f50f10a77c77e9aa3ccef21cc3b0d8')
+c=contexts.verify(root/'context',expected_digest='0e523c9b2dd0cc9bbc01bea14b185db87f14e982a495f5960b1c082804df2cce')
+assert a['received_payload_bytes']==272387807 and len(a['files'])==50
+assert c['payload_bytes']>272387807 and not c['build_authorized']
+print('50 real archive hashes and the materialized context agree after relocation with original scopes and execution denied.')
+active[0]=False

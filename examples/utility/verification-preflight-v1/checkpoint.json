@@ -1,0 +1,51 @@
+{
+  "schema": "utility-preflight-increment-checkpoint-v1",
+  "checks": {
+    "contracts": {
+      "tests": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    },
+    "accounting-contracts": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "optional": {
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "default-suite": {
+      "tests": 1960,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 106
+    },
+    "command-path": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "interoperability": {
+      "tests": 114,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "default_failure": "shell command could not find python outside activated PATH; focused test passed with project bin on PATH",
+  "bayes": {
+    "status": "running",
+    "session_id": 59944,
+    "log": "examples/utility/verification-preflight-v1/bayes-suite.log"
+  },
+  "source_matches_both_scientific_captures": true,
+  "goal": "active",
+  "confirmation": "not_attempted",
+  "utility_verdict": "not_attempted"
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "utility-coupled-entrypoint-source-v1",
+  "entrypoint_sha256": "4f8df511204e3625c2662eb38a5da90bb556ac78a4da9dacd00e47ae07f359f9",
+  "files": {
+    "examples/utility/__init__.py": "7487d8086d41856edb2b4eb96f6588ff0d172c1486bf43162a111422835ce4bc",
+    "examples/utility/engineering.py": "cbb785ec24ed030d67ba001c604f0e766272064b7c483386fee6c58e03ae818e",
+    "examples/utility/engineering_load.py": "b1926cc0c6644924489e08cec030943b1651908a12959925435adfed0f300649",
+    "examples/utility/engineering_load_scoring.py": "4d626d11aaeac0727f8820cc59968615fcaafe7789f979bf2def237531abf6a1",
+    "examples/utility/engineering_load_worker.py": "cb8ccb30ec38cded2cade797d5e971bd222b506ef8a100184490ceb59e5d9c82",
+    "examples/utility/guest_resource_probe.py": "2d335d1463ec77dbba20dc4fe5949bf9f61953be0f780fbf3c3cc46ffb4e343d",
+    "examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+    "examples/interoperability/circuit/fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+    "pixi.lock": "71feb84384d1ad0230c852d14e4953a28fe8640d6a55041126b57c9bf360023c"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "profile": "authored illustration; not actual utility evidence",
+  "width_inches": [
+    8,
+    5
+  ],
+  "observations": [
+    "Paired-effect axes, units, thresholds and assignment counts fit at both widths",
+    "Assignment status legends and route labels fit at both widths",
+    "Dependence panels label their distinct method and confidence; captions fit",
+    "Missing-pair effect and status counts now come from the same scored cells"
+  ],
+  "inspected_pngs": [
+    "missing-pair/5in-paired-effects-001.png",
+    "missing-pair/8in-paired-effects-001.png",
+    "missing-pair/5in-assigned-outcomes-001.png",
+    "missing-pair/8in-assigned-outcomes-001.png",
+    "dependence/5in-dependence-001.png",
+    "dependence/8in-dependence-001.png"
+  ]
+}

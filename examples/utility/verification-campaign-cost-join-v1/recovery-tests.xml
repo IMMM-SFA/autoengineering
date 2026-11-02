@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="11" time="36.714" timestamp="2026-10-29T08:47:21.608658-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_campaign_costs" name="test_recovered_worker_settles_original_batch_charge_and_retains_lifecycle" time="1.606"><failure message="Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4460/test_recovered_worker_settles_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x12fa9d3a0&gt;
+
+    def test_recovered_worker_settles_original_batch_charge_and_retains_lifecycle(
+        tmp_path, monkeypatch
+    ):
+&gt;       batch, controller = interrupted_completed_worker(tmp_path, monkeypatch)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_campaign_costs.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4460/test_recovered_worker_settles_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x12fa9d3a0&gt;
+
+    def interrupted_completed_worker(tmp_path, monkeypatch):
+        batch, controller = fixture(tmp_path)
+        checkpoint = controller._checkpoint
+    
+        def lose_before_commit(target, state, reason, artifacts=()):
+            if reason == "action_finished":
+                raise RuntimeError("authored loss after worker output before campaign commit")
+            return checkpoint(target, state, reason, artifacts)
+    
+        monkeypatch.setattr(controller, "_checkpoint", lose_before_commit)
+&gt;       with pytest.raises(RuntimeError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;
+
+tests/test_utility_campaign_costs.py:33: Failed</failure></testcase><testcase classname="tests.test_utility_campaign_costs" name="test_legacy_recovery_without_process_identity_keeps_unknown_work" time="1.552"><failure message="Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4460/test_legacy_recovery_without_p0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x13e724a70&gt;
+
+    def test_legacy_recovery_without_process_identity_keeps_unknown_work(tmp_path, monkeypatch):
+        from autoengineering.campaign.artifacts import put_bytes
+        from autoengineering.campaign.serialization import canonical_json
+    
+&gt;       batch, controller = interrupted_completed_worker(tmp_path, monkeypatch)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_utility_campaign_costs.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4460/test_legacy_recovery_without_p0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x13e724a70&gt;
+
+    def interrupted_completed_worker(tmp_path, monkeypatch):
+        batch, controller = fixture(tmp_path)
+        checkpoint = controller._checkpoint
+    
+        def lose_before_commit(target, state, reason, artifacts=()):
+            if reason == "action_finished":
+                raise RuntimeError("authored loss after worker output before campaign commit")
+            return checkpoint(target, state, reason, artifacts)
+    
+        monkeypatch.setattr(controller, "_checkpoint", lose_before_commit)
+&gt;       with pytest.raises(RuntimeError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'RuntimeError'&gt;
+
+tests/test_utility_campaign_costs.py:33: Failed</failure></testcase><testcase classname="tests.test_campaign_recovery" name="test_cancelled_service_request_never_reserves_or_launches_baseline" time="0.424" /><testcase classname="tests.test_campaign_recovery" name="test_queued_cancellation_preserves_unresolved_execution_state" time="0.375" /><testcase classname="tests.test_campaign_recovery" name="test_saved_worker_result_before_campaign_commit_is_reused" time="4.892" /><testcase classname="tests.test_campaign_recovery" name="test_saved_fitting_result_before_child_ack_preserves_selection" time="10.573" /><testcase classname="tests.test_campaign_recovery" name="test_unknown_child_attempt_keeps_allowance_when_child_recovers_zero_cost" time="8.942" /><testcase classname="tests.test_campaign_recovery" name="test_dead_supervisor_leaves_owned_group_uncertain_until_a_verified_stop" time="2.039" /><testcase classname="tests.test_campaign_recovery" name="test_duplicate_command_while_running_cannot_launch_a_second_attempt" time="4.458" /><testcase classname="tests.test_campaign_recovery" name="test_review_accepts_existing_fixed_attempt_reconciliation_destinations[model-completed]" time="0.391" /><testcase classname="tests.test_campaign_recovery" name="test_review_accepts_existing_fixed_attempt_reconciliation_destinations[confirmation-report_ready]" time="0.385" /></testsuite></testsuites>

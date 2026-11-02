@@ -1,0 +1,29 @@
+{
+  "purpose": "exposed development rehearsal; not independent confirmation",
+  "sources": {
+    "examples/utility/engineering.py": "b3a5d8fc3975c745154ffdc32d418f43e4c2c864c5fd425b6e83a5af0de96927",
+    "examples/utility/rehearse_engineering.py": "5a7ef2d992591f2c1d14a675fa710386f477044dc39a6cc54925ea5d13550ced",
+    "src/autoengineering/utility/outcomes.py": "0fa18a43f4c1ec77cb4cf2a2080f84bde25438930d717442d5490203b98b1924",
+    "src/autoengineering/adapters/openmdao.py": "55f6f96bb45076a9eb69daf3b1161c95ecfc24357f6439e5324a4e872fcfb6c9",
+    "src/autoengineering/adapters/python.py": "4a6f5a941241235d1067e0bcc6f8d2043f381a456571b8cdd7f72a9861959e9d",
+    "examples/interoperability/circuit/model.py": "f7158146212a672acdd1509d4780a37c47a22dde0408e0c7572509e6ecc8731a",
+    "examples/interoperability/circuit/fixture.py": "01407682dfa73b008360a53aa62676c1619270eb52c14fbc7a69a2682c74f88d",
+    "pixi.lock": "16f3911bdc180b361f4bbcb02d2a848d68107635f9eb830781b53ba691a52ce5"
+  },
+  "versions": {
+    "openmdao": "3.41.0",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "grounds_V": [
+    -0.05,
+    0.0,
+    0.05
+  ],
+  "baseline_current_A": 0.05,
+  "development_voltage_minimum_V": 0.62,
+  "native_max_solves": 40,
+  "native_max_iterations": 20,
+  "parity_rtol": 1e-10,
+  "parity_atol": 1e-12
+}

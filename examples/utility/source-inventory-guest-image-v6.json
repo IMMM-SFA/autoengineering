@@ -1,0 +1,25 @@
+{
+  "scope": "Current v6 image assembly, explicit environment and metadata-only interpreter discovery",
+  "predecessor": "examples/utility/source-inventory-solar-interval-source.json",
+  "predecessor_sha256": "df996fbf51dea21389889f19ba5aaf015caa8f3b522421d147706254f8754260",
+  "current_source_sha256": {
+    "examples/utility/guest_image_build.py": "2c98439f3716846d072d8187f828e6ba104dfc6ca1c66c84fe141d2fbe3ba93c",
+    "examples/utility/guest_image_environment.py": "9d1307e1e4d05821193d9313fac416f248dc499d7e33f20f0412fe0d45388de9",
+    "examples/utility/guest_identity.py": "ac1edb44353e4628e6a0e3e7e92566637b2d03a8316cf5c99ee71e0cf0b851c2",
+    "docs/utility.md": "6cb0c22ba4477d4390a7ba1193dee3f81216cb131704b0ec1a37e9b066814ff5",
+    "docs/utility-handoff.md": "44552da1f9877a1b220a94904e2b9512de91569f41e182f6cb736dc2c8eec9c9",
+    "docs/reviews/part-5-progress.md": "d99004b028ddaa7c1f9404b3a796dfbdeb6c9a0bcd70089ae1908a23dd6c3261",
+    "docs/reviews/part-5-completion-audit.md": "6ca0f95efab27d4481ea38e84186e3d661e46f1a91c294c69d580ebd094c9b9c",
+    "examples/utility/guest-qualification-accounting-v8.json": "abd958d15c0314d3704d0fcd69384b304688c3b1e780f5fbfb0c7b50fceb1bdc"
+  },
+  "verification": "examples/utility/verification-guest-image-v6/summary.json",
+  "verification_sha256": "3277d382f0e9c164009c266ee1634a7d8139c4c4d3c11f44391ca83f9588b687",
+  "default_checkpoint": "examples/utility/verification-current-base-v6/verified-summary.json",
+  "core_python_sources": 225,
+  "declared_guest_python_sources": 316,
+  "current_image": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
+  "new_runtime_container_starts": 1,
+  "new_model_starts": 0,
+  "runtime_qualified": false,
+  "full_part_5_complete": false
+}

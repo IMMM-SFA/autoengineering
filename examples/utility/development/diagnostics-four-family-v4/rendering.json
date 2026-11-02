@@ -1,0 +1,59 @@
+{
+  "rendered_at_utc": "2026-10-29T06:03:34.235726+00:00",
+  "width_inches": 11,
+  "plot_groups": {
+    "leaf": [
+      [
+        "baseline"
+      ],
+      [
+        "conventional",
+        "single_agent",
+        "multi_agent",
+        "no_investigator",
+        "no_implementer",
+        "no_reviewer"
+      ]
+    ],
+    "solar": [
+      [
+        "baseline"
+      ],
+      [
+        "conventional",
+        "single_agent",
+        "multi_agent",
+        "no_investigator",
+        "no_implementer",
+        "no_reviewer"
+      ]
+    ],
+    "wind_layout": [
+      [
+        "baseline",
+        "conventional",
+        "single_agent",
+        "multi_agent",
+        "no_investigator",
+        "no_implementer",
+        "no_reviewer"
+      ]
+    ]
+  },
+  "code_sha256": "ee59e01c6e42ad317178bd1cf34832c6b535d6f4168dc1d397b857ddc8532d27",
+  "files": {
+    "prediction-diagnostics.png": "ff72429a61bebc3ce56456eba1a7e92dd4ea2f7f12387f9818f0f258641694bb",
+    "checks.csv": "2d295d4c38e8c05735c92cf91be616713cb107d5e03977c023a13fce0f0fbd45",
+    "predictions.csv": "90212873af4f641112dc92f5ee67991770008c7105609af1888036d7de96714b",
+    "prediction-diagnostics.svg": "425da41cd422362ebd47fa7895499a7aa83d44f896b4fde17fc20d52de8f51ed",
+    "layouts.csv": "753cd916d0ac3ba190dadb521e1aa536faa010acd607ed62ad6ce633d5db49f2",
+    "scenarios.csv": "009e96f646a7a0c8b5f26e7ff2a06302b93ab2e61cc46bf881a69794f8ba56fc",
+    "engineering-diagnostics.png": "519e63366fe144d3328af4f2da34e5ee2566876a6bf63203cd933e29f4f5e9f0",
+    "engineering-diagnostics-narrow.svg": "ef4a0a7e4187639a31f713f8ff168a54029c546e5665da16d11fbcb36c03fcf5",
+    "prediction-diagnostics-narrow.png": "fcdd1c18ee1787d0dad05ad39ddff3ab44e676014bf5b7aca9afccfc0cf5d391",
+    "prediction-diagnostics-narrow.svg": "b6c510bac34ee54fecd298657ea2d5a43ca2d53ea0783862eefe2f13bb0e2a07",
+    "engineering-diagnostics-narrow.png": "d18afc56d1963307e249833a94c88d0e352568beeec1e3d90f00cb23a87b995e",
+    "engineering-diagnostics.svg": "39c03b6ea8fdacd3dae2623c073e349521fa8b577a78da53bfb5356226962fe1"
+  },
+  "scope": "one exposed scripted development repetition; comparison data only; not independent confirmation"
+}

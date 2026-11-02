@@ -1,0 +1,59 @@
+{
+  "request_digest": "49682ba80a8a6c5c6b10bf5df410043d2e499feedb8c4acdac27d941be9809de",
+  "plan_digest": "a27daa3516697990d6585fab31010fb0c8590cbda0896e8c114e6b70b1c1a41d",
+  "metadata_gets": 7,
+  "archive_gets": 7,
+  "downloaded_archive_bytes": 14243480,
+  "all_archive_hashes_verified": true,
+  "base_requirement_checks": [
+    {
+      "package": "openmdao",
+      "requirement": "networkx>=2.0",
+      "selected_version": "3.6.1"
+    },
+    {
+      "package": "openmdao",
+      "requirement": "numpy",
+      "selected_version": "2.5.2"
+    },
+    {
+      "package": "openmdao",
+      "requirement": "packaging",
+      "selected_version": "26.3"
+    },
+    {
+      "package": "openmdao",
+      "requirement": "requests",
+      "selected_version": "2.34.2"
+    },
+    {
+      "package": "openmdao",
+      "requirement": "scipy>=1.12",
+      "selected_version": "1.18.0"
+    },
+    {
+      "package": "requests",
+      "requirement": "charset_normalizer<4,>=2",
+      "selected_version": "3.5.1"
+    },
+    {
+      "package": "requests",
+      "requirement": "idna<4,>=2.5",
+      "selected_version": "3.20"
+    },
+    {
+      "package": "requests",
+      "requirement": "urllib3<3,>=1.26",
+      "selected_version": "2.8.0"
+    },
+    {
+      "package": "requests",
+      "requirement": "certifi>=2023.5.7",
+      "selected_version": "2026.10.23"
+    }
+  ],
+  "resolver_run": false,
+  "new_scientific_starts": 0,
+  "new_installs": 0,
+  "runtime_qualified": false
+}

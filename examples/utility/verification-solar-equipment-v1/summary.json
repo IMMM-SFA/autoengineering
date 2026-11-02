@@ -1,0 +1,35 @@
+{
+  "core_wheel_source_pins_unchanged": 239,
+  "documentation_tests": 19,
+  "duckdb_query_invocations": 3,
+  "failures": 0,
+  "four_dossiers_and_proposal": "original pins unchanged",
+  "full_default_suite": "not rerun; metadata/documentation increment",
+  "metadata_query_replay": "exact saved counts reconstructed",
+  "observation_objects_requested": false,
+  "production_code_changed": false,
+  "schema": "utility-solar-equipment-verification-v1",
+  "scientific_model_calls": 0,
+  "skips": 0,
+  "solar_regression_tests": 95,
+  "source_pins": {
+    "docs/reviews/part-5-solar-equipment-source-review.md": {
+      "sha256": "adb0cbf3c09cc0e6a9c3531b01bed80b8bb0110b5d5f5704769f9257a27510a9",
+      "size_bytes": 3047
+    },
+    "examples/utility/proposals/confirmation-v2/metadata-refresh/2107_system_metadata.json": {
+      "sha256": "17e4f7f448fcb2bec43f7610b40c1f7f4fc794ccc185e41dcde0514afba73ae5",
+      "size_bytes": 64652
+    },
+    "examples/utility/solar_csv.py": {
+      "sha256": "42ee5e6c7a5eac924bef628b37adb2cdff9078658a29ccb5427eb4bc70954bb7",
+      "size_bytes": 13200
+    },
+    "examples/utility/solar_metadata.py": {
+      "sha256": "8142622cf113d9f771a4c13a85f3f60c89b63119a403c3f8a24b140884473783",
+      "size_bytes": 6199
+    }
+  },
+  "status": "source_boundary_documented_not_admitted",
+  "task_admitted": false
+}

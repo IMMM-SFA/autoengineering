@@ -1,0 +1,8 @@
+Execution session 62483, terminal exit code 0.
+Command: .pixi/envs/wind/bin/python -m examples.utility.wind_hourly_check execute outputs/wind-hourly-2007-parity-v1 --expected-digest fe73070d9466379a853c5f234dade83fe26cbbec4ec402a73354db143a82d2e9
+Starting direct: wake calls 1/2, curve reference calls 0/1
+Matplotlib default cache was not writable; PyWake import used an automatic temporary font cache.
+Starting wrapped: wake calls 2/2, curve reference calls 0/1
+Starting curve-reference: wake calls 2/2, curve reference calls 1/1
+Completion digest: 2b844e40f58e1d91b359b63104beb45ec6bcc1ba79cca8f9495d04ab303ae2ed
+This file transcribes observed tool output and identifies its session. It is not an OS-attested log.

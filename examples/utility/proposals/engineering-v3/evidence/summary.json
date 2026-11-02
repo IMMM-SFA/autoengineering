@@ -1,0 +1,853 @@
+{
+  "all_24_checks_passed": true,
+  "batch_integrity": {
+    "active_case": null,
+    "batch_digest": "4217fdf3a526fb791d4eede8292799c12c119921c8fe684f93f509778aa5b3ff",
+    "batch_id": "engineering-v3-public-reference",
+    "case_results": {
+      "baseline": "passed"
+    },
+    "cases": [
+      {
+        "configuration_digest": "7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5",
+        "host_invocations": 0,
+        "id": "baseline",
+        "kind": "comparison",
+        "scientific_starts": 24
+      }
+    ],
+    "created_at": 1793572076.415621,
+    "deadline_at": 1793572316.415621,
+    "execution_authority": "not_granted_by_batch_manifest",
+    "host": {
+      "adapter_version": "1.0",
+      "auth_mode": "none",
+      "kind": "fake",
+      "requested_model": "not-invoked"
+    },
+    "host_invocations_with_unknown_usage": 0,
+    "host_reservations_charged": 0,
+    "limits": {
+      "elapsed_seconds": 240.0,
+      "max_invocations": 1,
+      "max_repairs": 0,
+      "max_tasks": 1,
+      "observed_tokens": null,
+      "repairs_per_task": 0,
+      "transcript_bytes": 1024,
+      "worker_seconds": 10.0,
+      "workspace_bytes": 1024
+    },
+    "observations": [
+      {
+        "elapsed_seconds": 0.012337707914412022,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/4002a51e6e23361d58595d7f221aa77d1d2d0f7ed30426ef20350438d25953a0/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "4002a51e6e23361d58595d7f221aa77d1d2d0f7ed30426ef20350438d25953a0",
+            "size_bytes": 1104
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-85f45a56390e71797ace60393f24b867",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005424541886895895,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/1dde7d9ef84a8e0ef80ca0fd8264d754511f12891284778e5ac630a261a6d402/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "1dde7d9ef84a8e0ef80ca0fd8264d754511f12891284778e5ac630a261a6d402",
+            "size_bytes": 1108
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-682ae62cc9c7e0597e0280b4be5599f1",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005327625200152397,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/89e8b916213e3643a62eb226c2c3fdc2ae9669e41cbaaed413072d5df81f8155/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "89e8b916213e3643a62eb226c2c3fdc2ae9669e41cbaaed413072d5df81f8155",
+            "size_bytes": 1105
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-fef56753c501dc62a5ece98acf7470a1",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005483041983097792,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/53bb3a64f3cb5319a39a9c90fa48c1a8b776ee95ca21dc869d100e932cb7587c/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "53bb3a64f3cb5319a39a9c90fa48c1a8b776ee95ca21dc869d100e932cb7587c",
+            "size_bytes": 1104
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-8242f3e13ff656e3eafcb4fec3899cdd",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005300791002810001,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/ab2da4cc25155fa637fd70d110241fcf4abb4f1f51649176362b6b470405204a/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "ab2da4cc25155fa637fd70d110241fcf4abb4f1f51649176362b6b470405204a",
+            "size_bytes": 1104
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-1f620f802fc6647c1a875ce9d77d1b56",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.00519145792350173,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/12f50d362379ba5269f4f3abc4d4b45bd066df30f2c0993557d760e0a32e2d97/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "12f50d362379ba5269f4f3abc4d4b45bd066df30f2c0993557d760e0a32e2d97",
+            "size_bytes": 1102
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-591ad6ff9b835256fa5e4f99a561e743",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005409583915024996,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/265dd465612243f719dbd3d10f912d679536bd666f60d426ec4f3b2ab015416c/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "265dd465612243f719dbd3d10f912d679536bd666f60d426ec4f3b2ab015416c",
+            "size_bytes": 1103
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-f605e3e39bf01a6a430b8443ab2ad23c",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005303707905113697,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/c6089534da1c446d44154f7180ae2660e1f9d34bb783bb79473a1bfeacd2cb03/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "c6089534da1c446d44154f7180ae2660e1f9d34bb783bb79473a1bfeacd2cb03",
+            "size_bytes": 1104
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-7bb647fff82d3fcbd798c14b5eaf4aae",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005166499875485897,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/1374a37b85c7477ed545d89a0434d31eb390930721ecff67e3dbd11bb6f7b187/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "1374a37b85c7477ed545d89a0434d31eb390930721ecff67e3dbd11bb6f7b187",
+            "size_bytes": 1109
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-ef3254d86a06462e1b909d69d38fd441",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.004985959269106388,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/dc204db9087dc5e39e858e4086e0b59b5922e0c63f67167d2db58f5ddc64d4ba/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "dc204db9087dc5e39e858e4086e0b59b5922e0c63f67167d2db58f5ddc64d4ba",
+            "size_bytes": 1108
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-664bd76038c1a8538048fb4cfe0ebbbe",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.0054417080245912075,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/91c956d8cca949a294a4bf944015a7a4c6461c0094d5819be89ca12cff3139ad/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "91c956d8cca949a294a4bf944015a7a4c6461c0094d5819be89ca12cff3139ad",
+            "size_bytes": 1112
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-c6eed9c621093a7bcdc5e68da392b6ac",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005145667120814323,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/99d49046c20f3ac85373364550d4e8100b6d4520cc213b1a2a0b420b480ac2d1/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "99d49046c20f3ac85373364550d4e8100b6d4520cc213b1a2a0b420b480ac2d1",
+            "size_bytes": 1106
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-41d81b4208183ed978c08a92644d8b72",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005356125067919493,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/f382274b710d2786690f354a4ea5b37e90b68291b39d1b76534eefc8f2b3077e/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "f382274b710d2786690f354a4ea5b37e90b68291b39d1b76534eefc8f2b3077e",
+            "size_bytes": 1108
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-f30bde1240d3e77ee57e57df284655e6",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005221833940595388,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/51bbe26b4f529e5aac8b27b4d024d667a17bfc02fbac02007f6d877bd79f2530/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "51bbe26b4f529e5aac8b27b4d024d667a17bfc02fbac02007f6d877bd79f2530",
+            "size_bytes": 1110
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-1fd33a249ab55825caeb0c399f95240d",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005503708031028509,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/034065b3f049f289cfde3d3fb42be470f511d809437b2e269b0df44db8dd8845/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "034065b3f049f289cfde3d3fb42be470f511d809437b2e269b0df44db8dd8845",
+            "size_bytes": 1105
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-8833e4def30874733f35740ac59d3785",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005086416844278574,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/3699ae11b3ffb50bae0e51178fb4cec98beeeef27a1ce1eb70349bf5d23d1fe3/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "3699ae11b3ffb50bae0e51178fb4cec98beeeef27a1ce1eb70349bf5d23d1fe3",
+            "size_bytes": 1102
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-29e2761a1f746731be2c642bd77f597f",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005055041052401066,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/b7326989a053363b1170a3b796d2478453c8ac451344898b5fa93c503012f01a/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "b7326989a053363b1170a3b796d2478453c8ac451344898b5fa93c503012f01a",
+            "size_bytes": 1104
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-9efad92fb3332a08b7040195311eaa60",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005451291333884001,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/83dcd14155bc85eb63124c4cf3593c2692b7ac29ff8b60ecb9eb84feed490af4/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "83dcd14155bc85eb63124c4cf3593c2692b7ac29ff8b60ecb9eb84feed490af4",
+            "size_bytes": 1103
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-666ff4f600cbab5e30c1cf618d75a619",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005049625411629677,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/8cfa7c6aaf4f5a83ee36dcdcde4494bccbd542a34c20a42d8a2831784cbd2718/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "8cfa7c6aaf4f5a83ee36dcdcde4494bccbd542a34c20a42d8a2831784cbd2718",
+            "size_bytes": 1104
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-8f7921a1dc31b32d2f028aeff3057d3a",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005090499762445688,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/ec26f0d1ac373bd3b58b39b20dd7caddde041607b5e971bdbe0d01ee7d09e739/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "ec26f0d1ac373bd3b58b39b20dd7caddde041607b5e971bdbe0d01ee7d09e739",
+            "size_bytes": 1106
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-3cf21fb3ee9c5ca7f8ffd35acf3da504",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005548709072172642,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/36e4b8f9dba787150707d9a5335a4c846f65440d36ccf903918ab4ba2d9c21f6/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "36e4b8f9dba787150707d9a5335a4c846f65440d36ccf903918ab4ba2d9c21f6",
+            "size_bytes": 1105
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-4800570abc6bc25e751a65204b3ea659",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005188416223973036,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/0b674d6e8135fb184240edd96b019ce85b31a37155cb7b38b6ba20c921a7725e/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "0b674d6e8135fb184240edd96b019ce85b31a37155cb7b38b6ba20c921a7725e",
+            "size_bytes": 1105
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-3cbad0b020371fb3fcc4f98f825f50ea",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.0051707918755710125,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/2c54af80112eebd2cf5534774d036e89a7120be336ccdee7e668c8594df8635e/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "2c54af80112eebd2cf5534774d036e89a7120be336ccdee7e668c8594df8635e",
+            "size_bytes": 1111
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-01d3769f9e0a4d8bfb5a8cc33e2f4b24",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      },
+      {
+        "elapsed_seconds": 0.005526500288397074,
+        "evidence": [
+          {
+            "media_type": "application/json",
+            "metadata": {},
+            "path": "artifacts/eda11bc31f96f69f84f64ba6f17c4a5461715a16fd9f4a7478af96b818215aad/receipt.json",
+            "producer": "trusted-batch-observer",
+            "sha256": "eda11bc31f96f69f84f64ba6f17c4a5461715a16fd9f4a7478af96b818215aad",
+            "size_bytes": 1105
+          }
+        ],
+        "request_intent": "not_applicable",
+        "reservation_id": "reference-3542372abdabc12c0b4e8e58f3ee24f2",
+        "resolved_model": null,
+        "status": "success",
+        "stop_verified": true,
+        "transcript_bytes": 0,
+        "usage": {}
+      }
+    ],
+    "pending_reservations": [],
+    "request_intents_present": 0,
+    "request_intents_unknown": 0,
+    "reservations": [
+      {
+        "case_id": "baseline",
+        "id": "reference-85f45a56390e71797ace60393f24b867",
+        "invocation_digest": "85f45a56390e71797ace60393f24b867afd087ebda557bb825ea4b7b421a5881",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.4251578,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-682ae62cc9c7e0597e0280b4be5599f1",
+        "invocation_digest": "682ae62cc9c7e0597e0280b4be5599f186258a8133fc7c88be02f0e8bbae74e4",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.462393,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-fef56753c501dc62a5ece98acf7470a1",
+        "invocation_digest": "fef56753c501dc62a5ece98acf7470a13e48c11f286e64471f45a8c7c8685cf9",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.484818,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-8242f3e13ff656e3eafcb4fec3899cdd",
+        "invocation_digest": "8242f3e13ff656e3eafcb4fec3899cdd21f676d734beaddc07685f45f2b82238",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.508377,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-1f620f802fc6647c1a875ce9d77d1b56",
+        "invocation_digest": "1f620f802fc6647c1a875ce9d77d1b5621c6968f25d544657330f16054ad3c08",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.534108,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-591ad6ff9b835256fa5e4f99a561e743",
+        "invocation_digest": "591ad6ff9b835256fa5e4f99a561e743844b756c1dd9098c07de2fbd702bf804",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.560341,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-f605e3e39bf01a6a430b8443ab2ad23c",
+        "invocation_digest": "f605e3e39bf01a6a430b8443ab2ad23c2b4590cdc2f79bda3a6ed44afb023e55",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.589097,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-7bb647fff82d3fcbd798c14b5eaf4aae",
+        "invocation_digest": "7bb647fff82d3fcbd798c14b5eaf4aae106da38eff4c96e68b8d8353d9855a07",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.619853,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-ef3254d86a06462e1b909d69d38fd441",
+        "invocation_digest": "ef3254d86a06462e1b909d69d38fd441955d1f33c8719fd02c8af8e84cf10d46",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.651262,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-664bd76038c1a8538048fb4cfe0ebbbe",
+        "invocation_digest": "664bd76038c1a8538048fb4cfe0ebbbe7e5964a35bea57caf1b4a29ca1745ba8",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.684191,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-c6eed9c621093a7bcdc5e68da392b6ac",
+        "invocation_digest": "c6eed9c621093a7bcdc5e68da392b6accb38ed0549e007eaa2e149a7c0fc588c",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.717781,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-41d81b4208183ed978c08a92644d8b72",
+        "invocation_digest": "41d81b4208183ed978c08a92644d8b7213ab0b91b7a3f44dc3996e0d00d0b16f",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.7536252,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-f30bde1240d3e77ee57e57df284655e6",
+        "invocation_digest": "f30bde1240d3e77ee57e57df284655e6eb8a24dce78a20e4b3ff908faf4a9e7a",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.790335,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-1fd33a249ab55825caeb0c399f95240d",
+        "invocation_digest": "1fd33a249ab55825caeb0c399f95240d14ecd994a805851470f40028eca99928",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.830571,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-8833e4def30874733f35740ac59d3785",
+        "invocation_digest": "8833e4def30874733f35740ac59d37855216675d2e087aeaad170c7d8c31e4e1",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.87126,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-29e2761a1f746731be2c642bd77f597f",
+        "invocation_digest": "29e2761a1f746731be2c642bd77f597fec90eda9cb1e00f002dc29bb71aa529b",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.913395,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-9efad92fb3332a08b7040195311eaa60",
+        "invocation_digest": "9efad92fb3332a08b7040195311eaa601817b3826444da8f0f1ccd2fa71985b1",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572076.956576,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-666ff4f600cbab5e30c1cf618d75a619",
+        "invocation_digest": "666ff4f600cbab5e30c1cf618d75a6196e6c6602993e7036afb19b75a544eeb2",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.0010612,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-8f7921a1dc31b32d2f028aeff3057d3a",
+        "invocation_digest": "8f7921a1dc31b32d2f028aeff3057d3a96b588f7cb9a775536d39d5f46f9ac10",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.047652,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-3cf21fb3ee9c5ca7f8ffd35acf3da504",
+        "invocation_digest": "3cf21fb3ee9c5ca7f8ffd35acf3da504e0f3158f4116d62c7721695703357787",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.095276,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-4800570abc6bc25e751a65204b3ea659",
+        "invocation_digest": "4800570abc6bc25e751a65204b3ea659f0ca955632eef12c341a513bb1a72d2d",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.1449568,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-3cbad0b020371fb3fcc4f98f825f50ea",
+        "invocation_digest": "3cbad0b020371fb3fcc4f98f825f50ea912efe10c712408085f2f9b4d310698c",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.197217,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-01d3769f9e0a4d8bfb5a8cc33e2f4b24",
+        "invocation_digest": "01d3769f9e0a4d8bfb5a8cc33e2f4b242f9c56dd5345f1493cd9bc4aaf7c8dab",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.25056,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      },
+      {
+        "case_id": "baseline",
+        "id": "reference-3542372abdabc12c0b4e8e58f3ee24f2",
+        "invocation_digest": "3542372abdabc12c0b4e8e58f3ee24f28fe3a731ff8849597355d8266590b308",
+        "output_limit": 0,
+        "prompt_bytes": 0,
+        "recorded_at": 1793572077.3054311,
+        "resource": "science",
+        "task_id": null,
+        "timeout_seconds": 10.0,
+        "workspace_bytes": 0
+      }
+    ],
+    "scientific_reservations_charged": 24,
+    "scientific_start_limit": 24,
+    "specification_digest": "6036b9efcb622328f50938ef23d9debf0ad4184d823abb7d51abe7ee9ad6bf57",
+    "status": "completed",
+    "transcript_bytes_charged": 0
+  },
+  "component_calls": 6232.0,
+  "component_linearize_calls": 1910.0,
+  "confirmation_rows_generated": false,
+  "counts": {
+    "analytical_bisection_steps": 1176,
+    "analytical_reference_solves": 24,
+    "cleanups_returned": 24,
+    "factory_starts": 24
+  },
+  "gain_fraction": 0.05,
+  "input_digest": "95698ee20beafd091747c003be214f4ba9665e32916f0571841e39d844c56d8f",
+  "maximum_power_absolute_error_W": 4.471423231677818e-14,
+  "maximum_voltage_absolute_error_V": 3.022693206844451e-11,
+  "mean_source_power_W": 0.24974500426467053,
+  "model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
+  "proposal_digest": "7f6072c4c52696681cc5f87acb2898db24e6a5436667cec0b27387b234f117f5",
+  "proposed_absolute_useful_gain_W": 0.012487250213233526,
+  "receipt": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "artifacts/5290b6c35f52c8e865549a499dcb353a2a35e87abe074048afaa0fc150c50302/receipt.json",
+    "producer": "trusted-batch-observer",
+    "sha256": "5290b6c35f52c8e865549a499dcb353a2a35e87abe074048afaa0fc150c50302",
+    "size_bytes": 32399
+  },
+  "request_digest": "9de7dfe4b3be8a90c0f0a9ed86005801c0fba4c35f967e151c933e264d1a4828",
+  "schema": "utility-engineering-v3-development-baseline-v1",
+  "solver_iterations": 382.0,
+  "status": "public_reference_checks_passed_not_confirmation",
+  "task_admitted": false,
+  "utility_verdict": "not_attempted"
+}

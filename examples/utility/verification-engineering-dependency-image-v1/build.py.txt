@@ -1,0 +1,95 @@
+"""One offline dependency overlay build from the exact existing local v6 image.
+
+BuildKit processes are not scientific starts. No pull, private data, model solve
+or retry. Client cancellation is not claimed to cancel daemon-side build work.
+"""
+import hashlib,json,os,re,shutil,time,uuid,zipfile
+from pathlib import Path
+from autoengineering.campaign.serialization import canonical_json,digest,unique_json
+from examples.utility import guest_image_build as build
+root=Path.cwd();os.umask(0o077)
+p=root/'examples/utility/verification-engineering-dependency-image-v1'
+work=root/'outputs/engineering-dependency-image-v1'
+assert not work.exists();work.mkdir(mode=0o700)
+for name in ('context','config','home'):(work/name).mkdir(mode=0o700)
+(work/'config/config.json').write_text('{}')
+context=work/'context';(context/'wheels').mkdir();(context/'model-source').mkdir()
+deps=root/'examples/utility/verification-engineering-container-dependencies-v1'
+plan=unique_json((deps/'download-plan.json').read_text());completed=unique_json((deps/'complete.json').read_text())
+assert completed['plan_digest']==digest(plan)
+files={}
+for item in plan['wheels']:
+ original=root/'outputs/engineering-container-wheels-v1/wheels'/item['filename']
+ assert original.stat().st_size==item['size_bytes'] and hashlib.sha256(original.read_bytes()).hexdigest()==item['sha256']
+ target=context/'wheels'/item['filename'];shutil.copyfile(original,target);files[str(target.relative_to(context))]=item['sha256']
+model_names=['examples/utility/engineering.py','examples/utility/engineering_load.py','examples/interoperability/circuit/model.py','examples/interoperability/circuit/fixture.py']
+for wheel in (root/'examples/utility/prepared-inference-environment-v6').rglob('*.whl'):
+ with zipfile.ZipFile(wheel) as z:
+  for name in model_names:
+   raw=z.read(name);assert raw==(root/name).read_bytes()
+   target=context/'model-source'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw);files[str(target.relative_to(context))]=hashlib.sha256(raw).hexdigest()
+target=context/'model-source/pixi.lock';shutil.copyfile(root/'pixi.lock',target);files[str(target.relative_to(context))]=hashlib.sha256(target.read_bytes()).hexdigest()
+nonce=uuid.uuid4().hex
+source='sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188'
+alias='localhost/ae-engineering-source-'+nonce+':frozen'
+environment={'base_image':source,'base_environment_digest':'aec404431cb50f0bf3e34362183dc74294ce47b8bd96eb52241245da80b4d824','dependency_plan_digest':digest(plan),'payloads':files,'model_library':'openmdao-3.41.0','purpose':'coupled-load dependency candidate, no private worker admission'}
+labels={'org.autoengineering.purpose':'utility-coupled-load-environment-candidate-v1','org.autoengineering.environment':digest(environment),'org.autoengineering.wheel':'52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7','org.autoengineering.source-image':source,'org.autoengineering.environment-recipe':'pinned-engineering-dependency-overlay-v1'}
+cmd=['/opt/inference/bin/python','-I','-c',"import importlib.metadata as m; print(m.version('openmdao'))"]
+paths=' '.join('/engineering-build/wheels/'+item['filename'] for item in plan['wheels'])
+dockerfile=f'''FROM {alias}
+USER 0:0
+WORKDIR /engineering-build
+COPY wheels/ ./wheels/
+COPY model-source/ ./model-source/
+COPY checksums.sha256 ./checksums.sha256
+RUN sha256sum -c checksums.sha256
+RUN /usr/local/bin/python -I -m pip --python /opt/inference/bin/python install --no-index --no-deps --no-compile --disable-pip-version-check {paths}
+RUN /opt/inference/bin/python -I -c "import openmdao.api, importlib.metadata as m; assert m.version('openmdao') == '3.41.0'"
+RUN cp -a model-source /opt/engineering-source && chmod -R a+rX /opt/engineering-source && rm -rf /engineering-build
+WORKDIR /work
+USER 1000:1000
+'''
+dockerfile+=''.join('LABEL '+k+'='+json.dumps(v)+'\n' for k,v in labels.items())
+dockerfile+='ENTRYPOINT []\nCMD '+canonical_json(cmd)+'\n'
+(context/'Dockerfile').write_text(dockerfile)
+(context/'checksums.sha256').write_text(''.join(h+'  '+name+'\n' for name,h in sorted(files.items())))
+(context/'.dockerignore').write_text('**\n!Dockerfile\n!checksums.sha256\n!wheels/\n!wheels/**\n!model-source/\n!model-source/**\n')
+bindings={'cli':'/usr/local/bin/docker','buildx':'/Applications/OrbStack.app/Contents/MacOS/xbin/docker-buildx','endpoint':'/Users/cam/.orbstack/run/docker.sock'}
+request={'scope':'one offline local engineering dependency image overlay','environment':environment,'environment_digest':digest(environment),'source_image':source,'source_alias':alias,'labels':labels,'command':cmd,'files':{str(f.relative_to(context)):hashlib.sha256(f.read_bytes()).hexdigest() for f in context.rglob('*') if f.is_file()},'binary':build._binary(bindings['cli']),'buildx':build._binary(bindings['buildx']),'endpoint':build._endpoint(bindings['endpoint']),'helper_sha256':hashlib.sha256(Path(build.__file__).read_bytes()).hexdigest(),'script_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'max_source_tags':1,'max_builds':1,'pull_commands':0,'build_network':'none','active_seconds':600,'requested_build_cpu_count':1,'requested_build_memory_bytes':2147483648,'automatic_retries':0,'scientific_starts':0,'disk_quota_enforced':False,'daemon_cancellation_qualified':False,'runtime_qualified':False}
+def save(name,value):
+ (p/name).write_text(json.dumps(value,indent=2)+'\n')
+ (work/name).write_text(json.dumps(value,indent=2)+'\n')
+save('request.json',request);save('bindings.json',bindings)
+shutil.copyfile(context/'Dockerfile',p/'Dockerfile.txt')
+shutil.copyfile(Path(build.__file__),p/'build-helper.py.txt')
+build._copy_plugin(work,bindings['buildx'],request['buildx'])
+env={k:os.environ[k] for k in ('PATH','HOME','LANG','LC_ALL','TMPDIR') if k in os.environ}
+env.update(DOCKER_HOST='unix://'+bindings['endpoint'],DOCKER_CONFIG=str(work/'config'),BUILDKIT_PROGRESS='plain',DOCKER_BUILDKIT='1',NO_COLOR='1')
+commands=[['version','--format','{{json .Server}}'],['context','inspect','default','--format','{{json .}}'],['buildx','inspect','default'],['image','inspect',source,'--format','{{json .}}'],['image','ls','--quiet',alias],['tag',source,alias],['image','inspect',alias,'--format','{{json .}}'],['buildx','build','--builder','default','--load','--platform','linux/amd64','--network','none','--pull=false','--no-cache','--provenance=false','--sbom=false','--resource','memory=2g','--resource','memory-swap=2g','--resource','cpu-period=100000','--resource','cpu-quota=100000','--iidfile',str(work/'image.id'),'--metadata-file',str(work/'build-metadata.json'),'--progress','plain',str(context)]]
+deadline=time.monotonic()+600;image=None
+try:
+ for i,parts in enumerate(commands):
+  assert build._binary(bindings['cli'])==request['binary'] and build._endpoint(bindings['endpoint'])==request['endpoint']
+  build._verify_plugin(work,request['buildx'])
+  save(f'{i:02d}-intent.json',{'command':parts,'request_digest':digest(request)})
+  log=work/f'{i:02d}.log';status=build._run([bindings['cli'],'--config',str(work/'config'),'--host','unix://'+bindings['endpoint'],*parts],env=env,cwd=work,deadline=deadline,log=log)
+  shutil.copyfile(log,p/log.name);save(f'{i:02d}-result.json',{'exit_code':status,'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+  assert status==0,(i,status)
+  if i<3:build._validate(i,log.read_bytes(),{'context_check':True},bindings)
+  if i in (3,6):
+   v=unique_json(log.read_text());assert (v['Id'],v['Os'],v['Architecture'])==(source,'linux','amd64')
+  if i==4:assert not log.read_text().strip(),'source alias was already present'
+ image=(work/'image.id').read_text().strip();assert re.fullmatch('sha256:[0-9a-f]{64}',image)
+ parts=['image','inspect',image,'--format','{{json .}}'];save('08-intent.json',{'command':parts,'request_digest':digest(request)})
+ log=work/'08.log';status=build._run([bindings['cli'],'--config',str(work/'config'),'--host','unix://'+bindings['endpoint'],*parts],env=env,cwd=work,deadline=deadline,log=log)
+ assert status==0;shutil.copyfile(log,p/log.name)
+ v=unique_json(log.read_text());config=v['Config']
+ assert (v['Id'],v['Os'],v['Architecture'],config['User'],config['WorkingDir'])==(image,'linux','amd64','1000:1000','/work')
+ assert config['Labels']==labels and config['Cmd']==cmd and config.get('Entrypoint') in ([],None)
+ assert config.get('Volumes') in ({},None) and config.get('OnBuild') in ([],None)
+ save('08-result.json',{'exit_code':0,'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
+ save('complete.json',{'request_digest':digest(request),'image_id':image,'source_image':source,'environment_digest':digest(environment),'source_tags':1,'builds':1,'pull_commands':0,'scientific_starts':0,'coupled_model_solves':0,'runtime_qualified':False,'disk_quota_enforced':False,'daemon_cancellation_qualified':False})
+ print(canonical_json({'image_id':image,'environment_digest':digest(environment),'builds':1,'scientific_starts':0}))
+except BaseException as error:
+ save('failure.json',{'request_digest':digest(request),'error_type':type(error).__name__,'image_id_known':image,'attempt_consumed':True,'automatic_retry_forbidden':True})
+ raise

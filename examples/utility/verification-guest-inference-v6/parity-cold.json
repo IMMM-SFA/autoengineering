@@ -1,0 +1,9 @@
+{
+  "relocated": true,
+  "exit_code": 0,
+  "initialization_before_guard": true,
+  "guarded_array_recomputation": true,
+  "guarded_processes_network_writes_outside_reads_imports_clocks": false,
+  "dependency_environment": "inherited",
+  "model_runs": 0
+}

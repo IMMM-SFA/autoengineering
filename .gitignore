@@ -242,7 +242,46 @@ autoresearch.jsonl
 # Local campaign qualification evidence is retained on disk, summarized in docs.
 /outputs/campaign-*/
 
+# Downloaded runtime archives and generated guest image contexts remain local.
+/outputs/guest-runtime-archives*/
+/outputs/guest-build-context*/
+/outputs/guest-image-build*/
+# Machine-specific build bindings remain private; reviewable requests use scope hashes.
+/examples/utility/prepared-guest-build-*/bindings.json
+/examples/utility/prepared-guest-identity-*/bindings.json
+/outputs/guest-identity*/
+/examples/utility/prepared-guest-resources-*/bindings.json
+/examples/utility/prepared-guest-resources-*/ae-host-canary-*
+/outputs/guest-resources*/
+/examples/utility/prepared-guest-image-environment-*/bindings.json
+/outputs/guest-image-environment*/
+/outputs/guest-inference-smoke*/
+/outputs/guest-parity*/
+
 # Runtime coordination locks for campaigns, studies, and observation ledgers.
 .campaign.lock
 .study.lock
 observations.jsonl.lock
+.operation.lock
+.writer.lock
+.worker.lock
+.integration.lock
+.exchange.lock
+.cleanup.lock
+cleanup.lock
+
+/outputs/guest-preflight*/
+
+/outputs/guest-cancellation*/
+
+/outputs/guest-response-loss*/
+
+/outputs/guest-owner-loss*/
+
+/outputs/guest-running-cancellation*/
+
+# Raw CAMELS archives remain local; public acquisition/inspection receipts live with examples.
+/outputs/camels-acquisition-v*/
+
+# Generated source rows and packets for current-owner development controls.
+/outputs/engineering-current-owner-v*/

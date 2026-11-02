@@ -1,0 +1,1 @@
+{"automatic_retries":0,"case":"lost_create_response","container_starts_reserved":0,"creations_reserved":1,"expected_exception":"ResponseLost","expected_reason":"authored acknowledgment loss: lost_create_response","grant_digest":"d1decd8fffcc7c66de261d5a73339dff3821fc3cdeef9d4e9f22911abc368fc2","withhold":"lost_create_response"}

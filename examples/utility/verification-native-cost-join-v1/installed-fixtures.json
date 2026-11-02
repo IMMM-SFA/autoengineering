@@ -1,0 +1,80 @@
+{
+  "circuit": {
+    "original_root": "/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4453/test_native_join_preserves_out0/batch",
+    "files": {
+      ".writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "batch.json": "dffecddda7d93a034f7a66789b97d954643689d61fb66fc0dc39b929cdc079d8",
+      ".operation.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "events/000000000003.json": "d7fd0b5c96e10dc2249a4bd3decd3c9e8c52ac2f976234913a3f94a8d455fb36",
+      "events/000000000002.json": "8e1369ad8a2b191c32d324eaade7e311cedd6b023c783708f6e65107e307b63c",
+      "events/000000000001.json": "f8da5d4fcf15e8da8b4e36c836c2e3c34b4d3fb969f2bc4ff70def72510f81c9",
+      "artifacts/e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f/receipt.json": "e4a98829f1964c7804a59c78cdf17994268f69da465c65d9930d8d7ad498554f",
+      "cases/first/engineering-processes/execution.json": "ce59e6caf330c8eff370f75b02c427f44eab5332664817d018a032a07185eed8",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/binding.json": "c4cae79e65fb069da3af964920993bedf3aa313b3e82e94f8222064fd2104c1d",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/job.json": "114aa07750027a835f5dc39f264c3867483afbc6a1f981ea68501dcddf2cbd18",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/intent.json": "eff16871e23e56e26f97488f2726bd97c96e6b93c20f635052d16b42e9b80bae",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/stdout.bin": "300587fe2e79f2cabc416bf51d31b5837f568ee0d04b367ace898f3338a4b5e6",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/watchdog-result.json": "f028c49f0ca43612012dbf786c558c20919c7754fe479f545f1004b2c7ed1ee0",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/watchdog-job.json": "8a827899c29d249c02f45c6da28683dfcd3f9db2f6c73a6d779e8d5c98d5b264",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/launch-gate.json": "eff16871e23e56e26f97488f2726bd97c96e6b93c20f635052d16b42e9b80bae",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/watchdog-ready.json": "3948da32268b13e25d6d03d0baf7bb1e62b637f56c9f49aa79f144e3ce6c2db0",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/stderr.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/job.json": "30d21b3e16d2cd066ae565664deba60d3e9892603a64d8e12332e449c2216c54",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/process.json": "1314339e61ba71810f92eafc6696cfc0f38d893d21fd84f6632cf3ce515b6913",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/completion.json": "fe8373eebee3b2c2f482e41aad4c542ddec88095bc06662f45d11fb27becc65a",
+      "cases/first/native-drivers/25173c61e5d303800fa9a6e1e7b62e6e41a0d52d6a49fa2536cc1613be5db33b/process/stdin.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "callback": {
+    "original_root": "/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4453/test_callback_join_keeps_wake_0/batch",
+    "files": {
+      ".writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "batch.json": "78dc4d57a98678e9b7865797e3bfca645c408b7133739d8f3238291f90c30d4c",
+      ".operation.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "events/000000000003.json": "aac454d7bf27722490a55d1f97cbb4768b7893263eeece3e3ab79bd23b8cd94c",
+      "events/000000000002.json": "8ec775507ab34d1023f5ad007ede917cb1d602f0d45567b1981de930bf6b3b25",
+      "events/000000000001.json": "ca9c5faf3606c3fe9a670e33bf19c362269b7947ccdc5af251b2cfa41f8e4669",
+      "artifacts/8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a/receipt.json": "8ea98ba69e916a0e70313445c50c772f7de888dfcb0c9b5632700a674058a32a",
+      "cases/first/engineering-processes/execution.json": "eea3536204f843e0eb6037e0ac45e76adef871a33f81a698eea24fdc7fefc906",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/binding.json": "997a319d16952350c05a97727a1d3066530cc589188f8302fa38ff7e5057f616",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/job.json": "c47543a4fb68d1e425fcb2da13233432b0b0d92e1f8ed251fe270b1ae67cad02",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/intent.json": "4dca70e365d6fc11ae96e5303767f1ce52821219ea01fc243b5eb00658172d06",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/stdout.bin": "ad434e2517565a3947685f88913067114a343efb552dedb04fb35a41a37e4686",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/watchdog-result.json": "d69095406c44a212b50c77f3b88f9511c30f4d4d711d3c026c3af9a9d6d19928",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/watchdog-job.json": "0b0f74025f6ae1475dd0290cea5506996213cd0b898f04396c424debf0d9d347",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/launch-gate.json": "4dca70e365d6fc11ae96e5303767f1ce52821219ea01fc243b5eb00658172d06",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/watchdog-ready.json": "a8bcd350d772893be7d42bc8af977141063c3e7a3dc441239cf5fa6f789358ab",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/stderr.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/job.json": "55727500fd3d648ec938b203fc1c373e364f430a082b64fac3163703970d2438",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/process.json": "b714331da703b7c77e82f106e15ebb7bf8b3249aa7beff62a1b97757b4e02643",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/completion.json": "9ea4f7d8b45673f69233312535b070489f562d7709637e84a8f22e51fc78d211",
+      "cases/first/native-drivers/f0f43e766aac209c64dc295a421887953d42cbdbe5fd55b107d9081b58d0356f/process/stdin.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "wind": {
+    "original_root": "/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4453/test_wind_join_uses_original_t0/batch",
+    "files": {
+      ".writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "batch.json": "1eef205ada5e25f2aba48a3682cbe33736c4f1bcde7ba43b6ae33b4043c697d6",
+      ".operation.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "events/000000000003.json": "47e01530a9296571a873666c0b5d55167b9ae62deb274e2ade91cf5152dd05de",
+      "events/000000000002.json": "19ac28110eed2f15ef650567866a59f38181d596567212ee5cf00123e14f8242",
+      "events/000000000001.json": "e155dd5ff6dbb6f7b85322c23b7ec8f9cedd1ff969ffcfbceb3f37fdef351950",
+      "artifacts/62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a/receipt.json": "62914371c1c92263f3e5a73c8a42a89b327729612df8719edeb71d3a35c0140a",
+      "cases/first/engineering-processes/execution.json": "f9858757a6eb9ed9a7e2433c868b2f97b213c5243cf948390a8574536772f335",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/binding.json": "00189aa9d3ed460f0a278d17e19a40ad01b4a2bf16d0a02f396968a68ccd3293",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/job.json": "481d80caccfa2bacea33651aaecaf822918da0e28ade89f88dd719c3325c0e13",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/intent.json": "d6010f09ab7e0b3e9e9f6d6e29de61b9d64b4cbe33ecfe0998e80a0a07ac3fb7",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/stdout.bin": "e77e80653c094d26e25b3ec3f55ad30ff877f150846a3909069ee7cb0e317223",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/watchdog-result.json": "a5f5ed912f7fbe4258276c43489cafc0bbe16e1c7d07708d989de114b2ec5861",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/watchdog-job.json": "75ca04b0627ec95b1aceb7c529657a3c8621ae5dcee517f3301ad4d1ba7fb4ef",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/launch-gate.json": "d6010f09ab7e0b3e9e9f6d6e29de61b9d64b4cbe33ecfe0998e80a0a07ac3fb7",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/watchdog-ready.json": "a2d6795c3c7d9d87efa16fc34c8de0a22c064b7cac5ba9e3debfb506b753315b",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/stderr.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/job.json": "1b4ede754528f1ea4531e5fd0793f01b07f4581af7bfe2307c830969aa1b1f67",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/process.json": "ffedc25543b2a75c4d52c98444e90b32224ade76c33daa866dd1d49c68e7559f",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/completion.json": "797f3da3b346b94258b4d452443f93ea7135cd62dd68b59cd221a118de2e41e0",
+      "cases/first/native-drivers/2425c642fcfdea7f9404a28d3e8fc6f0e08e760f921e5ac98d9605597f969910/process/stdin.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

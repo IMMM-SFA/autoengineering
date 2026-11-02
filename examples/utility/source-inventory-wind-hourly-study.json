@@ -1,0 +1,18 @@
+{
+  "scope": "Actual 2007-only baseline and four Sobol trials through shared scientific controller; local corner-neighborhood qualification, not final conventional recipe",
+  "predecessor": "examples/utility/source-inventory-wind-hourly.json",
+  "predecessor_sha256": "7b91752a5eaced0cf577812cc2cef1370d37f7cae7c6f2b2d4ce477773bae356",
+  "source_sha256": {
+    "examples/utility/wind_hourly_scenario.py": "3e364c338c7aac09fee2c12dc1ebb1c78479c1f5d489df9691440286b840a1c7",
+    "examples/utility/wind_hourly_study.py": "93bad1de8315ef5f49c13f7b68cf5839bb44890d5c14ed13d96eabc932f8ea68",
+    "examples/utility/wind_hourly_study_reader.py": "55ec123b611b4f4a7a6860937e800cf71d19ae1c58b7d722975ea0abf6defcdb",
+    "tests/test_utility_wind_hourly_scenario.py": "3a1c34815db9b67a7488775f9af8572067d91b0b3abccc16f2ef7d8a3d819842",
+    "tests/test_utility_wind_hourly_study.py": "75cd53139354fbfbd09e7586017a35253b4433cda07b4c1ea7800c00da678fa8",
+    "tests/test_utility_wind_hourly_study_reader.py": "fe05e95f22bb4f8ab379a4b044004be49a3ec647e768c5fa29918293eaa434c2",
+    "examples/utility/exposure-register.json": "918399b80b2ed026a3d8c46db832c00d588f3c0e2f5eb03cf36b114577ab3391"
+  },
+  "verification": "examples/utility/verification-wind-hourly-study-v1/summary.json",
+  "core_sources_unchanged": 224,
+  "declared_guest_sources_unchanged": 315,
+  "new_profile_in_guest_wheel": false
+}

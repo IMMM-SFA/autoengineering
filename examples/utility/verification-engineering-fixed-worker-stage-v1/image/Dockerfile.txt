@@ -1,0 +1,12 @@
+FROM localhost/ae-coupled-worker-source-960162e60c154f418f72ca47f4fb5511:frozen
+COPY source/ /opt/coupled-source/
+COPY worker/ /opt/coupled-worker/
+WORKDIR /work
+USER 1000:1000
+LABEL org.autoengineering.purpose="utility-coupled-worker-candidate-v1"
+LABEL org.autoengineering.environment="1567a187b04e1e2d1fe3dd164098ee22579b79c78dd58b62d40dbbb1f2dc5afe"
+LABEL org.autoengineering.wheel="52b76635374ca3e4c50f773aa00c4f184341f907a2bb428c277b7ae9700d86e7"
+LABEL org.autoengineering.source-image="sha256:39fb6f877a99e384ec2af08363a598ea23fd6ef7ec3bae076e0ab1ffe99508b0"
+LABEL org.autoengineering.environment-recipe="fixed-coupled-source-overlay-v1"
+ENTRYPOINT ["/opt/inference/bin/python","-I","-S","-B","/opt/coupled-worker/entrypoint.py"]
+CMD []

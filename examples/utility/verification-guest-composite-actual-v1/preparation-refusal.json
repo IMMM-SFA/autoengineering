@@ -1,0 +1,8 @@
+{
+  "cause": "first preparation selected original-image resource record v2, not derivative-image record v3",
+  "refusal": "smoke requires the resource-checked derivative image",
+  "created_output": false,
+  "created_containers": 0,
+  "started_containers": 0,
+  "correction": "selected verified derivative v3 completion before creating the request"
+}

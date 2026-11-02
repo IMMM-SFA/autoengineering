@@ -1,0 +1,6 @@
+{
+  "operation": "fixture discovery in temporary reader setup",
+  "failure": "StopIteration from overly specific pytest directory glob",
+  "correction": "used actual completed test directory name",
+  "provider_or_scientific_work": 0
+}

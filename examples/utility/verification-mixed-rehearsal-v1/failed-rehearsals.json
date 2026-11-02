@@ -1,0 +1,50 @@
+[
+  {
+    "run": "mixed-v1",
+    "protocol": "6b34d412f389a2eb5963f5bc27e4c5964ef211857b6843619727f8dbc48d9c42",
+    "states": {
+      "started": 1,
+      "reserved": 20
+    },
+    "physical_reservations": {},
+    "observed": 0,
+    "unresolved": 0,
+    "all_observed_stops_verified": true,
+    "frozen": null,
+    "confirmation_accesses": 0
+  },
+  {
+    "run": "mixed-v2",
+    "protocol": "4d1ebf9e39f517c6cd396962980ec7930081c3f8f6ecea9f047a3f2af651c720",
+    "states": {
+      "started": 1,
+      "reserved": 20
+    },
+    "physical_reservations": {
+      "science": 1
+    },
+    "observed": 1,
+    "unresolved": 0,
+    "all_observed_stops_verified": true,
+    "frozen": null,
+    "confirmation_accesses": 0
+  },
+  {
+    "run": "mixed-v3",
+    "protocol": "d2b419c9dfdec62d20975da651da5e8860d3e822dabc9009f0ed2507cd038f50",
+    "states": {
+      "finished": 7,
+      "started": 1,
+      "reserved": 13
+    },
+    "physical_reservations": {
+      "science": 231,
+      "host": 56
+    },
+    "observed": 287,
+    "unresolved": 0,
+    "all_observed_stops_verified": true,
+    "frozen": null,
+    "confirmation_accesses": 0
+  }
+]

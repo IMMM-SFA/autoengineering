@@ -1,0 +1,319 @@
+"""Fixed diagnostic policy and pure evidence checks for the candidate image.
+
+No function in this module contacts a daemon or starts a process. A separate
+owner must provide the original start, terminal observation and cleanup proof.
+"""
+
+from __future__ import annotations
+
+import hashlib
+from pathlib import Path
+import re
+
+from autoengineering.campaign.serialization import canonical_json, digest, unique_json
+from autoengineering.utility.guest_observations import BASE_ENV, _environment
+from autoengineering.utility.guest_receipts import ENVIRONMENT, _timestamp
+from examples.utility import guest_resource_probe as probe
+
+IMAGE = "sha256:fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399"
+PURPOSE = "utility-guest-resource-diagnostic-v1"
+MAX_OUTPUT = 16384
+# Docker merges image defaults into Config.Env. Clear these unused public base
+# image variables explicitly. The interpreter identity comes from sys.version,
+# never from the inherited PYTHON_VERSION string.
+CLEARED_IMAGE_ENV = (("GPG_KEY", ""), ("PYTHON_VERSION", ""), ("PYTHON_SHA256", ""))
+LIMITS = {
+    "memory.max": str(probe.MEMORY),
+    "memory.swap.max": "0",
+    "pids.max": "16",
+    "cpu.max": "100000 100000",
+}
+OBSERVED = {
+    "effective_limits": LIMITS,
+    "workspace_bytes": probe.WORKSPACE,
+    "root_read_only": True,
+    "network_interfaces": ["lo"],
+    "uid": 1000,
+    "gid": 1000,
+    "seccomp": 2,
+    "capabilities": "none",
+}
+
+
+def _same(left, right):
+    return canonical_json(left) == canonical_json(right)
+
+
+def _arguments(mode, nonce, canary):
+    if (
+        mode not in probe.MODES
+        or not isinstance(nonce, str)
+        or not re.fullmatch(r"[0-9a-f]{32}", nonce)
+    ):
+        raise ValueError("resource diagnostic identity differs")
+    if mode == "host_canary_denied":
+        if (
+            not isinstance(canary, str)
+            or not canary.startswith("/")
+            or "\x00" in canary
+            or (Path(canary).name != "ae-host-canary-" + nonce)
+            or ".." in Path(canary).parts
+        ):
+            raise ValueError("resource diagnostic canary metadata differs")
+    elif canary is not None:
+        raise ValueError("resource diagnostic has an unexpected input path")
+
+
+def worker_source():
+    path = Path(probe.__file__)
+    if path.is_symlink() or path.stat().st_size > 65536:
+        raise ValueError("resource diagnostic worker source differs")
+    return path.read_text(encoding="utf-8")
+
+
+def configuration(mode, nonce, *, canary=None):
+    """Return the only allowed command, image and policy for this diagnostic."""
+    return _configuration(mode, nonce, worker_source(), canary=canary)
+
+
+def _configuration(mode, nonce, source, *, canary=None):
+    """Derive a saved projection from archived text without executing it."""
+    _arguments(mode, nonce, canary)
+    if not isinstance(source, str) or len(source.encode()) > 65536:
+        raise ValueError("resource diagnostic source exceeds envelope")
+    return {
+        "Image": IMAGE,
+        "User": "1000:1000",
+        "WorkingDir": "/work",
+        "Entrypoint": ["/opt/inference/bin/python", "-I", "-S", "-B", "-c", source],
+        "Cmd": [mode, nonce, *([canary] if canary is not None else [])],
+        "Env": [f"{key}={value}" for key, value in (*BASE_ENV, *ENVIRONMENT, *CLEARED_IMAGE_ENV)],
+        "NetworkDisabled": True,
+        "AttachStdout": True,
+        "AttachStderr": True,
+        "AttachStdin": False,
+        "OpenStdin": False,
+        "StdinOnce": False,
+        "Tty": False,
+        "Labels": {
+            "org.autoengineering.purpose": PURPOSE,
+            "org.autoengineering.nonce": nonce,
+            "org.autoengineering.diagnostic": mode,
+            "org.autoengineering.worker": hashlib.sha256(source.encode()).hexdigest(),
+        },
+        "Volumes": {},
+        "Healthcheck": {"Test": ["NONE"]},
+        "StopSignal": "SIGTERM",
+        "StopTimeout": 5,
+        "HostConfig": {
+            "NetworkMode": "none",
+            "ReadonlyRootfs": True,
+            "Memory": probe.MEMORY,
+            "MemorySwap": probe.MEMORY,
+            "NanoCpus": 1000000000,
+            "PidsLimit": 16,
+            "CapDrop": ["ALL"],
+            "CapAdd": [],
+            "SecurityOpt": ["no-new-privileges"],
+            "Privileged": False,
+            "CgroupnsMode": "private",
+            "IpcMode": "private",
+            "PidMode": "",
+            "Binds": [],
+            "Mounts": [],
+            "VolumesFrom": [],
+            "Devices": [],
+            "DeviceRequests": [],
+            "PublishAllPorts": False,
+            "PortBindings": {},
+            "AutoRemove": False,
+            "RestartPolicy": {"Name": "no", "MaximumRetryCount": 0},
+            "Tmpfs": {"/work": "rw,noexec,nosuid,nodev,size=134217728,mode=0700,uid=1000,gid=1000"},
+            "LogConfig": {"Type": "none", "Config": {}},
+        },
+    }
+
+
+def verify_owned(value, mode, nonce, *, cid, canary=None, source=None):
+    """Check original exact ownership and projected policy before mutation."""
+    expected = (
+        configuration(mode, nonce, canary=canary)
+        if source is None
+        else _configuration(mode, nonce, source, canary=canary)
+    )
+    if (
+        not isinstance(cid, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", cid)
+        or not isinstance(value, dict)
+        or (value.get("Id"), value.get("Image"), value.get("Name"))
+        != (cid, IMAGE, "/ae-guest-resource-" + nonce)
+    ):
+        raise ValueError("resource diagnostic container identity differs")
+    config, host = value.get("Config"), value.get("HostConfig")
+    if not isinstance(config, dict) or not isinstance(host, dict):
+        raise ValueError("resource diagnostic configuration is missing")
+    for key, wanted in expected.items():
+        if key in ("HostConfig", "Env", "Volumes"):
+            continue
+        if not _same(config.get(key), wanted):
+            raise ValueError("resource diagnostic command or binding differs")
+    if _environment(config.get("Env")) != _environment(expected["Env"]) or config.get(
+        "Volumes"
+    ) not in (None, {}):
+        raise ValueError("resource diagnostic environment or volumes differ")
+    for key, wanted in expected["HostConfig"].items():
+        observed = host.get(key)
+        if key == "SecurityOpt" and observed == ["no-new-privileges:true"]:
+            continue
+        if key in {"Binds", "Mounts", "VolumesFrom", "Devices", "DeviceRequests", "CapAdd"}:
+            if observed is None and wanted == []:
+                continue
+        if key == "PortBindings" and observed is None and wanted == {}:
+            continue
+        if not _same(observed, wanted):
+            raise ValueError("resource diagnostic isolation or limits differ")
+    for key in (
+        "DeviceCgroupRules",
+        "GroupAdd",
+        "Links",
+        "ExtraHosts",
+        "Dns",
+        "DnsOptions",
+        "DnsSearch",
+        "Ulimits",
+    ):
+        if host.get(key) not in (None, []):
+            raise ValueError("resource diagnostic has extra host settings")
+    for key in ("Sysctls", "StorageOpt"):
+        if host.get(key) not in (None, {}):
+            raise ValueError("resource diagnostic has extra kernel settings")
+    for key in ("UsernsMode", "UTSMode", "CgroupParent", "ContainerIDFile", "Isolation"):
+        if host.get(key) not in (None, ""):
+            raise ValueError("resource diagnostic namespace differs")
+    if host.get("Runtime", "runc") != "runc":
+        raise ValueError("resource diagnostic runtime differs")
+    mounts = value.get("Mounts")
+    if (
+        not isinstance(mounts, list)
+        or len(mounts) > 1
+        or (
+            mounts
+            and (
+                not isinstance(mounts[0], dict)
+                or not _same(
+                    (mounts[0].get("Type"), mounts[0].get("Destination"), mounts[0].get("RW")),
+                    ("tmpfs", "/work", True),
+                )
+                or mounts[0].get("Source") not in (None, "")
+            )
+        )
+    ):
+        raise ValueError("resource diagnostic mount differs")
+    if type(value.get("RestartCount")) is not int or value["RestartCount"] != 0:
+        raise ValueError("resource diagnostic restart history differs")
+    state = value.get("State")
+    if (
+        not isinstance(state, dict)
+        or state.get("Paused") is not False
+        or state.get("Restarting") is not False
+    ):
+        raise ValueError("resource diagnostic state is unverified")
+    return state
+
+
+def verify_terminal(value, output, mode, nonce, *, cid, canary=None, source=None):
+    """Require specific enforcement evidence, never merely a nonzero exit."""
+    state = verify_owned(value, mode, nonce, cid=cid, canary=canary, source=source)
+    if (
+        state.get("Status") != "exited"
+        or any(state.get(k) is not False for k in ("Running", "Dead"))
+        or type(state.get("Pid")) is not int
+        or state["Pid"] != 0
+    ):
+        raise ValueError("resource diagnostic terminal state is unverified")
+    start, finish = (_timestamp(state.get(name)) for name in ("StartedAt", "FinishedAt"))
+    if finish < start or (finish - start).total_seconds() > 60:
+        raise ValueError("resource diagnostic lifecycle exceeds its original bound")
+    if not isinstance(output, bytes) or not 0 < len(output) <= MAX_OUTPUT:
+        raise ValueError("resource diagnostic output exceeds envelope")
+    lines = output.decode("ascii").splitlines()
+    expected_lines = 1 if mode == "memory_limit" else 2
+    if len(lines) != expected_lines:
+        raise ValueError("resource diagnostic result framing differs")
+    ready = unique_json(lines[0])
+    if not _same(
+        ready,
+        {
+            "schema": "utility-guest-resource-ready-v1",
+            "mode": mode,
+            "nonce": nonce,
+            "observed": OBSERVED,
+        },
+    ):
+        raise ValueError("resource diagnostic effective policy differs")
+    if type(state.get("ExitCode")) is not int or state.get("OOMKilled") is not (
+        mode == "memory_limit"
+    ):
+        raise ValueError("resource diagnostic OOM evidence differs")
+    if mode == "memory_limit":
+        if state["ExitCode"] != 137:
+            raise ValueError("resource diagnostic OOM exit differs")
+        result = {"oom_killed": True, "exit_code": 137}
+    else:
+        if state["ExitCode"] != 0:
+            raise ValueError("resource diagnostic exited unsuccessfully")
+        envelope = unique_json(lines[1])
+        if (
+            not isinstance(envelope, dict)
+            or set(envelope) != {"schema", "mode", "nonce", "result"}
+            or (envelope["schema"], envelope["mode"], envelope["nonce"])
+            != ("utility-guest-resource-result-v1", mode, nonce)
+        ):
+            raise ValueError("resource diagnostic result binding differs")
+        result = envelope["result"]
+        if not isinstance(result, dict):
+            raise ValueError("resource diagnostic result is invalid")
+        if mode == "pid_limit":
+            valid = set(result) == {"errno", "pids_current", "children"} and (
+                result["errno"] == "EAGAIN"
+                and type(result["pids_current"]) is int
+                and result["pids_current"] == 16
+                and type(result["children"]) is int
+                and 1 <= result["children"] <= 15
+            )
+        elif mode == "workspace_limit":
+            valid = (
+                set(result) == {"errno", "written_bytes"}
+                and result["errno"] == "ENOSPC"
+                and (
+                    type(result["written_bytes"]) is int
+                    and 0 < result["written_bytes"] <= probe.WORKSPACE
+                )
+            )
+        elif mode == "read_only_root":
+            valid = _same(result, {"errno": "EROFS"})
+        elif mode == "network_denied":
+            valid = any(
+                _same(result, {"errno": name, "attempts": 1})
+                for name in ("ENETUNREACH", "EHOSTUNREACH")
+            )
+        else:
+            valid = any(_same(result, {"errno": name}) for name in ("ENOENT", "ENOTDIR"))
+        if not valid:
+            raise ValueError("resource diagnostic did not establish the requested limit")
+    return {
+        "schema": "utility-guest-resource-observation-v1",
+        "mode": mode,
+        "nonce": nonce,
+        "container_id": cid,
+        "image_id": IMAGE,
+        "configuration_digest": digest(
+            configuration(mode, nonce, canary=canary)
+            if source is None
+            else _configuration(mode, nonce, source, canary=canary)
+        ),
+        "output_sha256": hashlib.sha256(output).hexdigest(),
+        "result": result,
+        "runtime_qualified": False,
+        "owner_loss_qualified": False,
+    }

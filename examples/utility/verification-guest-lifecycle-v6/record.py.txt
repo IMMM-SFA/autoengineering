@@ -1,0 +1,119 @@
+"""Record the completed v6 controls without changing prior attempts or criteria."""
+import hashlib,json,shutil
+from pathlib import Path
+root=Path.cwd(); proof=root/'examples/utility/verification-guest-lifecycle-v6'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,v):p.write_text(json.dumps(v,indent=2)+'\n')
+s=json.loads((proof/'summary.json').read_text())
+prev=root/'examples/utility/qualification-state-guest-v10.json'; v=json.loads(prev.read_text())
+v.update(schema='utility-guest-qualification-evidence-map-v11',predecessor=str(prev.relative_to(root)),predecessor_sha256=sha(prev))
+v['current_v6_scope'].update(unstarted_cancellations_complete=2,running_before_input_cancellation_complete=True,producer_acknowledgment_loss_controls_complete=2,lifecycle_evidence=str((proof/'summary.json').relative_to(root)),lifecycle_evidence_sha256=sha(proof/'summary.json'),exact_owner_watchdog_sigkill_controls_complete=False,during_model_computation_cancellation_qualified=False,full_inference_lifecycle_private_matrix_complete=False,runtime_qualified=False)
+save(root/'examples/utility/qualification-state-guest-v11.json',v)
+prev=root/'examples/utility/guest-qualification-accounting-v10.json'; v=json.loads(prev.read_text())
+v.update(schema='utility-candidate-guest-qualification-accounting-v11',predecessor=str(prev.relative_to(root)),predecessor_sha256=sha(prev),current_evidence_map='examples/utility/qualification-state-guest-v11.json')
+v['scope']+=' plus five v6 cancellation and producer acknowledgment-loss controls'
+for x in s['controls']:
+ v['operations'].append({'operation':'v6 '+x['kind']+' lifecycle controls','evidence':str((proof/'summary.json').relative_to(root)),'evidence_sha256':sha(proof/'summary.json'),'image_id':s['image_id'],'container_creations':x['container_creations'],'container_starts':x['container_starts'],'charged_inference_starts':x['charged_inference_starts'],'model_inference_starts':None if x['container_starts'] else 0,'model_inference_results_observed':0,'native_reference_starts':0,'charged_scoring_starts':0,'inference_elapsed_seconds':None if x['container_starts'] else 0,'note':'Original START retained with unobserved model work and unknown lifecycle time; no retry' if x['container_starts'] else 'Created original containers, no START requests sent'})
+v['totals']['container_creations']+=5;v['totals']['container_starts']+=2;v['totals']['charged_inference_starts']+=2;v['totals']['started_attempts_without_model_result']+=2
+assert v['totals']['model_inference_starts_total'] is None
+v['current_v6_scope'].update(lifecycle_control_creations=5,lifecycle_control_starts=2,lifecycle_control_charged_inference_starts=2,lifecycle_control_model_work_total=None,lifecycle_control_model_results_observed=0,lifecycle_evidence=str((proof/'summary.json').relative_to(root)),runtime_qualified=False)
+v['current_v6_lifecycle_parent_reservations']={'unstarted_cancel_clones':4,'running_cancel_clone':2,'response_loss_clones':4,'retained_unchanged':True,'parent_confirmations_completed':False,'unused_authority_not_transferable':True}
+save(root/'examples/utility/guest-qualification-accounting-v11.json',v)
+(proof/'README.md').write_text('''# Current v6 cancellation and acknowledgment-loss controls
+
+Five actual local lifecycle controls passed using the existing v6 frozen authored
+fit. They created five containers and sent two START requests. Every original
+container was confirmed absent, including a separate actual GET after cleanup.
+No new fit, score, provider call or independent observation was used.
+
+| Control | Created | Started | Observed boundary |
+| --- | ---: | ---: | --- |
+| Cancel after create | 1 | 0 | Original created event |
+| Cancel before start | 1 | 0 | Original start intent; START prevented |
+| Cancel running guest | 1 | 1 | Actually running, before input transfer |
+| Lost CREATE acknowledgment | 1 | 0 | Real success saved, then withheld |
+| Lost START acknowledgment | 1 | 1 | Real success saved, then withheld |
+
+The two starts remain charged. Model work and elapsed inference time remain
+unknown because no model result was observed. The running cancellation recovered
+as `infrastructure_failure` with no model result or numeric penalty. Redispatch
+was refused without a daemon request. Parent composite reservations remain
+charged and unfinished. Acknowledgment loss was injected by a producer wrapper
+that preserved the real response. It does not establish a real network outage.
+
+The unchanged production executor, watchdog and ownership-checked cleanup paths
+performed the work. No scientific criteria or runtime code changed in this
+increment. A new reusable fixture copy preserves the previously saved v6 fit and
+selection. It contains known exposed synthetic meteorological drivers. Its
+authored owner template makes no OS claim. Actual execution required the v6
+identity/resource proof and exact installed wheel provenance.
+
+[Summary](summary.json) and the three public archives retain the evidence:
+[unstarted](unstarted-public-proof.tar.gz), [running](running-public-proof.tar.gz)
+and [response loss](response-loss-public-proof.tar.gz). They contain 104, 163 and
+103 files. The matching manifests record every file's hash and size. Input-transfer
+tars contain declared code, fit metadata and exposed drivers. Fitting/comparison
+and private-label arrays are absent. Source and driver roots are not needed for
+saved replay.
+
+All three archives replayed after relocation in fresh processes. Model imports
+were blocked from startup. Imports and metadata initialization preceded guards
+that denied processes, sockets, array loading, clocks, writes and outside content
+reads. Dependencies and example helpers were inherited. This verifies saved
+producer evidence, not independent OS attestation or installed-reader coverage.
+
+The first archive pass omitted the running reader's required helper snapshot.
+The corrected pass copied only source matching the digest pinned before runtime
+execution and preserved the already completed unstarted archive. No control,
+fit, guest or model was restarted. Both archival scripts and the refusal remain.
+
+The related tests passed 27 cases. Full default tests were not rerun because no
+core, test or example runtime source changed. Current-image owner/watchdog process
+loss, cancellation during model computation, private scoring, independent task
+admission and the full Part 5 study remain open. The host was local OrbStack Linux
+amd64 emulation on macOS ARM64. Runtime qualification remains false.
+
+Cumulative explicit runtime accounting now records 43 creations and 34 starts.
+There are 12 charged inference starts and two native references. Five started
+attempts have no observed model result. Earlier unknown model/label quantities
+remain unknown. The original 26-case proposal and its criteria remain unchanged.
+
+Saved readers accept the corresponding extracted archive and the completion
+digest in [summary.json](summary.json), for example:
+
+```sh
+pixi run python -m examples.utility.guest_running_cancellation_reader PATH_TO_PROOF \\
+  --expected-digest 58b25cd13e33f1063b2a3bc0fb95dcbcc5b751dd1152a87e353ac0432d5e6b98
+```
+''')
+text='''
+
+Five fresh v6 lifecycle controls passed: two unstarted cancellations, cancellation
+of an actually running guest before input transfer, and two producer-side lost
+acknowledgments after real successful CREATE/START responses. Five containers
+were created and two started. All original containers were confirmed absent.
+Both starts remain charged with unknown model work/time and no observed model
+result. Parent reservations remain unfinished. No new fitting or scoring ran.
+
+Three public proof archives passed fresh relocated replay with model imports
+blocked. After initialization, guards denied runtime activity, arrays, clocks,
+writes and outside content reads. The archive helper's missing source snapshot
+was repaired using its already pinned digest, without rerunning any control.
+The related tests passed 27 cases. Runtime code did not change.
+
+The cumulative runtime register now lists 43 creations and 34 starts, including
+12 charged inference starts and two native references. Five started attempts have
+no observed model result. Earlier unknown quantities remain unknown. The v6
+owner/watchdog process-loss and private-scoring controls, cancellation during
+model computation, independent task admission and Part 5 completion remain open.
+
+[Current lifecycle evidence](PREFIXexamples/utility/verification-guest-lifecycle-v6/README.md),
+[cumulative register](PREFIXexamples/utility/guest-qualification-accounting-v11.json).
+'''
+paths=['docs/utility.md','docs/utility-handoff.md','docs/reviews/part-5-progress.md','docs/reviews/part-5-completion-audit.md']
+for name in paths:
+ with (root/name).open('a') as f:f.write(text.replace('PREFIX','../../' if '/reviews/' in name else '../'))
+prev=root/'examples/utility/source-inventory-guest-inference-v6.json'
+names=paths+['examples/utility/guest_cancellation_controls.py','examples/utility/guest_cancellation_reader.py','examples/utility/guest_running_cancellation.py','examples/utility/guest_running_cancellation_reader.py','examples/utility/guest_response_loss_controls.py','examples/utility/guest_response_loss_reader.py','examples/utility/guest_owner_loss_controls.py','examples/utility/guest_inference_smoke.py','examples/utility/guest-qualification-accounting-v11.json','examples/utility/qualification-state-guest-v11.json']
+save(root/'examples/utility/source-inventory-guest-lifecycle-v6.json',{'scope':s['scope'],'predecessor':str(prev.relative_to(root)),'predecessor_sha256':sha(prev),'current_source_sha256':{n:sha(root/n) for n in names},'verification':str((proof/'summary.json').relative_to(root)),'verification_sha256':sha(proof/'summary.json'),'core_sources':225,'declared_guest_code_sources':316,'runtime_source_changed':False,'related_tests_passed':27,'new_guest_creations':5,'new_guest_starts':2,'model_work_total':None,'runtime_qualified':False,'full_part_5_complete':False})
+print(json.dumps(v['totals']))

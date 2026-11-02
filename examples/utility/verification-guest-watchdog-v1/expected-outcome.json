@@ -1,0 +1,35 @@
+{
+  "absence": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "artifacts/04770c6c052c41294fad3ae07c7e37908f7d7897b4cb2ccba38f89e46188809e/observed-absent.json",
+    "producer": "guest-watchdog",
+    "sha256": "04770c6c052c41294fad3ae07c7e37908f7d7897b4cb2ccba38f89e46188809e",
+    "size_bytes": 230
+  },
+  "before": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "artifacts/41d7dab8c0b639efc7b8da206112b27c0c64a416af8ee9ed0b43e0cd0a7da000/cleanup-before.json",
+    "producer": "guest-watchdog",
+    "sha256": "41d7dab8c0b639efc7b8da206112b27c0c64a416af8ee9ed0b43e0cd0a7da000",
+    "size_bytes": 2564
+  },
+  "container_id": "1111111111111111111111111111111111111111111111111111111111111111",
+  "delete_intended": true,
+  "kill_intended": true,
+  "owner_digest": "b84c903d3bd5a06c4557c213aca3fb856d5a433fb0b2d18f4cab3aa105c21f4e",
+  "parent_cleanup_head": null,
+  "plan_digest": "e87eb4f0e3d87b668afcf537876ef08284887ba9d8f2639705279be894f0bbf6",
+  "reason": "owner_lost",
+  "result": "absent",
+  "schema": "utility-guest-watchdog-outcome-v1",
+  "stopped": {
+    "media_type": "application/json",
+    "metadata": {},
+    "path": "artifacts/a9b18f70504b93e6bd18ecbe1d83d1d5e64706abef62546a9e6cfa3481694a71/cleanup-stopped.json",
+    "producer": "guest-watchdog",
+    "sha256": "a9b18f70504b93e6bd18ecbe1d83d1d5e64706abef62546a9e6cfa3481694a71",
+    "size_bytes": 2564
+  }
+}

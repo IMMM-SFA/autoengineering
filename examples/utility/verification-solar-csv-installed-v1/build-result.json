@@ -1,0 +1,10 @@
+{
+  "command": "python -I -B -c import setuptools.build_meta; build_wheel(../wheel)",
+  "cwd": "/private/tmp/utility-solar-csv-install-v1/source",
+  "exit_code": 0,
+  "build_backend": "existing setuptools 81.0.0",
+  "build_output": "tool terminal output was verbose and truncated; payload verification is recorded separately",
+  "clean_staging": true,
+  "input_pins": "input-pins.json",
+  "source_checkout_not_used_as_build_cwd": true
+}

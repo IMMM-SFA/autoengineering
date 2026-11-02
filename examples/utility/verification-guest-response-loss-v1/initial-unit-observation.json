@@ -1,0 +1,7 @@
+{
+  "command": "pytest tests/test_utility_guest_response_loss_controls.py tests/test_utility_guest_response_loss_reader.py --basetemp=/private/tmp/autoengineering-response-loss-reader-v1",
+  "result_handle": "not retained by orchestration call",
+  "exit_status": "not captured",
+  "kernel_query": "successful ps query found no original matching pytest process; terminal before later targeted regression",
+  "initial_pgrep": "unavailable sysmond service; not treated as terminal evidence"
+}

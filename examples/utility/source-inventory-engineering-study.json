@@ -1,0 +1,18 @@
+{
+  "schema": "utility-increment-source-inventory-v1",
+  "increment": "engineering-study-bridge-partial",
+  "files": {
+    "src/autoengineering/utility/studies.py": "ed7241eb876b5c10ebead1d93cb8be5b3fc6b06ac886632e6d768cb81cb84c8f",
+    "src/autoengineering/optimization/controller.py": "cd6b2f1a93586459d362aedc2a26e6b75435a5b431b072964d3d5e0947eb23be",
+    "tests/test_utility_studies.py": "5094017e3c215ff124e5710cf0a8fe452e741e559c07a4bf73daec06e0eb027e"
+  },
+  "checks": {
+    "bridge_and_optimizer_recovery": "113 passed, 21 skipped in 5.52s",
+    "final_bridge": "6 passed in 1.35s",
+    "ruff": "repository-wide pass"
+  },
+  "limits": [
+    "No real task calibration rehearsal",
+    "No route registration or confirmation"
+  ]
+}

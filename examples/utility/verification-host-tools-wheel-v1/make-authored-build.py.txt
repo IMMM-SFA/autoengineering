@@ -1,0 +1,23 @@
+"""Retain one authored build-job metadata sample; no Docker execution."""
+from pathlib import Path
+import json,sys,tarfile,tempfile
+root=Path.cwd();sys.path.insert(0,str(root));sys.path.insert(0,str(root/'tests'))
+import pytest
+import test_utility_guest_image_build as fixture
+from examples.utility import guest_image_build
+from autoengineering.campaign.serialization import digest,canonical_json
+out=root/'examples/utility/verification-host-tools-wheel-v1'
+with tempfile.TemporaryDirectory(prefix='authored-build-record-',dir='/private/tmp') as temporary:
+ stage=Path(temporary).resolve()
+ with pytest.MonkeyPatch.context() as patch:
+  bundle,request,work,calls,_=fixture.prepared(stage,patch)
+  completion=guest_image_build.execute(bundle,expected_digest=digest(request))
+  assert len(calls)==6
+  assert guest_image_build.read_completion(work,expected_digest=digest(completion))==completion
+  with tarfile.open(out/'authored-build-metadata.tar.gz','w:gz') as archive:
+   archive.add(work,arcname='build')
+  (out/'expected-build.json').write_text(canonical_json(completion))
+  (out/'fixture-summary.json').write_text(json.dumps({'authored_build_metadata':True,
+   'actual_docker_execution':False,'commands_stubbed':len(calls),
+   'completion_digest':digest(completion),'runtime_qualified':False},indent=2)+'\n')
+print('Retained authored build metadata only; no Docker, installer or model execution.')

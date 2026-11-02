@@ -1,0 +1,16 @@
+{
+  "schema": "utility-engineering-rehearsal-verification-v1",
+  "captured_source_files_match_current": 173,
+  "scenario_processes": 6,
+  "verified_stops": 6,
+  "reservations_before_resume": 3,
+  "reservations_after_resume": 6,
+  "completed_resume_additional_reservations": 0,
+  "utility_verdict": "not_attempted",
+  "limits": [
+    "Already exposed development forcing",
+    "Trusted supplied code, no filesystem/network/memory sandbox",
+    "No independent confirmation, provider, Linux or second host",
+    "No complete cost or utility finding"
+  ]
+}

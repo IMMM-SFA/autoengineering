@@ -5,18 +5,33 @@ admission, optional calibration, scientific acceptance, selection freeze, and re
 Python broker is `autoengineering.campaign.controller.CampaignController`. No LLM or host SDK runs
 inside the campaign package.
 
+The separate [worker contract layer](agents.md) currently supports fake-host dispatch only.
+Its source closure policy lets new scientific profiles exclude worker prompts and host code.
+Historical profiles retain their frozen source checks and cannot resume under changed science.
+
 A fixed replacement and a parameter search produce `EvaluationRecord` and `DecisionRecord` objects
 with full precision metrics. Required checks can veto an attractive metric. A missing or unavailable
 required check prevents eligibility. An ineligible baseline cannot become a fallback selection.
 The existing `improve` retention rule and `optimize` CLI keep their earlier semantics.
+
+The Python `CampaignController.create` method decodes `.json` paths as strict JSON,
+including uppercase `.JSON`. This preserves scientific notation in suite-generated
+calibration inputs. Duplicate keys fail before campaign files are created. Other
+input paths use the existing YAML decoder.
 
 ## Commands
 
 Run from the repository root in Python 3.12 with the default Pixi environment:
 
 ```sh
-pixi run autoengineering campaign validate examples/campaign_contracts/fixture.yaml
-pixi run autoengineering campaign run examples/campaign_contracts/fixture.yaml \
+pixi run python - <<'PY'
+from pathlib import Path
+from examples.agent_campaign.fixture import agent_fixture
+Path("outputs").mkdir(exist_ok=True)
+agent_fixture().to_yaml("outputs/campaign-fixture.yaml")
+PY
+pixi run autoengineering campaign validate outputs/campaign-fixture.yaml
+pixi run autoengineering campaign run outputs/campaign-fixture.yaml \
   --workdir outputs/campaign-fixture --max-new-evaluations 1
 pixi run autoengineering campaign status outputs/campaign-fixture --format json
 pixi run autoengineering campaign resume outputs/campaign-fixture --max-new-evaluations 1
@@ -47,6 +62,8 @@ pixi run autoengineering campaign cancel outputs/campaign-fixture --request-id s
 The running supervisor consumes the intent and stops its owned process group. For an idle campaign,
 `resume` consumes the queued intent and records cancellation. A queued intent is not proof of a
 completed stop. Inspect the resulting campaign state and attempt receipts.
+Direct `evaluate` and `confirm` requests also check queued cancellation before reserving new
+numerical work. Exact replay of an already committed request still returns its original response.
 
 ## Specification and trust
 
@@ -65,11 +82,22 @@ execution cost units (`calls`, `physical_executions`, or `model_call`) and the e
 metrics. Unsupported noise/cost/outcome contracts fail validation. Registered checks use names and
 versions, never YAML expressions.
 
-The local registry supplies `linear`, `hydrology`, and `routing` adapters. Their factories are
+The local registry supplies `linear`, `linear-fixed`, `hydrology`, and `routing` adapters. Their factories are
 application code. Requests cannot provide Python entries, shell commands, uploads, or arbitrary
 file paths. Extending the registry requires a trusted implementation with a declared source closure.
 Process separation supplies timeout, cancellation, cleanup and state isolation. It is not a security
 sandbox. Trusted code can access files with its operating-system permissions.
+
+A new version 2 scientific source profile can also predeclare one reviewed
+`generated-<registration digest>` entry. It uses a fixed application factory and qualified local
+Docker boundary. Requests cannot register or replace it. The initial entry supports one fixed
+component, exact reviewed scalar/daily float ports, empty parameters and no calibration or training.
+Its source closure includes the isolated execution and recovery helpers. The controller binds
+native and container ownership separately, verifies both stops, and checks native output against
+the container result before scientific scoring. See the [worker guide](agents.md) for preparation,
+limits and the authored saved-result recovery fixture. A fake-host source handoff can now create
+a separately budgeted successor through trusted review. It preserves the originating campaign and
+binds the proposal/source lineage in `generated/origin.json`. Live host generation remains unqualified.
 
 Fitting adapters receive permitted forcing and optional fitting labels. Comparison labels stay
 in the broker. The supplied hydrology adapter needs no training labels. A new parameter configuration
@@ -111,6 +139,16 @@ handlers explicitly. These commands are not an API for arbitrary generated execu
 Worker-facing errors contain neither tracebacks nor observation paths.
 
 ## Persistence and recovery
+
+New saved-result recovery receipts use `campaign-recovery-receipt-v2`. They retain
+the verified original process identity, stop and output hash. Recovered evaluation
+provenance retains the execution seed and committed lifecycle reference. Batch
+reconciliation can then settle
+the original reservation without launching a replacement worker. Legacy incomplete
+receipts are not rewritten or upgraded from mutable scratch files. Lifecycle time
+ends before cleanup and overlaps outer process time. The unitless adapter training
+cost is not interpreted as time or money.
+
 
 The writer commits individual canonical event files under `events/`, linked by hashes and revision.
 Artifacts are immutable and verified. `state.json` is a derived projection. A missing or stale
@@ -156,6 +194,17 @@ See the [example](../examples/campaign_contracts/README.md) and
 Token ceilings, provider portability, production investigator/implementer/reviewer roles, installed
 host plugins, cloud workers and general model training remain later work. BO remains experimental.
 
+Campaign schema 1.1 adds explicit trusted-adapter fitting permission. Its training
+profile currently supports daily prefix supervision only. The parent commits an
+attempt-specific fitting grant before launch. The worker checks the declared
+fitting role, exposure, exact prefix, masks and original reservation before passing
+labels to the adapter. Each attempt has separate scratch. Schema 1.0 retains its
+serialized fields and no fitting access. The supplied `hydrology-learned-routing-v1`
+adapter uses a declared runtime profile for training or verified frozen inference.
+It requires the current entire engine source closure. Private confirmation remains
+unadmitted. See
+[the utility training contract](utility.md#learned-hydrology-development-profile).
+
 ## Qualification
 
 The final macOS ARM64 qualification passed in `outputs/campaign-qualification-v3`: 38 direct and
@@ -175,3 +224,7 @@ command prints links relative to the campaign directory. To save its output with
 ```sh
 pixi run autoengineering campaign report outputs/campaign-fixture > outputs/campaign-fixture/report.md
 ```
+
+Review reconciliation can retire an uncertain fixed attempt as `failed_execution`, or mark an
+unavailable confirmation for reporting. It does not retry the model or refund its allowance.
+Unknown cost remains visible after the attempt is retired.

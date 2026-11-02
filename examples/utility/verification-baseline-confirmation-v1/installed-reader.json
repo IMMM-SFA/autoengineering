@@ -1,0 +1,22 @@
+{
+  "schema": "utility-baseline-confirmation-installed-reader-v1",
+  "installed_core_files": 201,
+  "logical_scored_cells": 2,
+  "physical_receipts": 1,
+  "allocated_confirmation_reservations": [
+    0.25,
+    0.75
+  ],
+  "allocation_total": 1,
+  "source_and_reuse_markers": [
+    false,
+    true
+  ],
+  "export_reconstruction_verified": true,
+  "journal_unchanged": true,
+  "legacy_v1_bytes_and_digest_preserved": true,
+  "original_roots_network_and_process_denied": true,
+  "optional_frameworks_not_imported": true,
+  "private_scoring_qualified": false,
+  "independent_confirmation": false
+}

@@ -1,0 +1,12 @@
+{
+  "actual_total_work": null,
+  "automatic_retry_allowed": false,
+  "counts": {
+    "cleanups_returned": 1,
+    "coupled_evaluation_intents": 1,
+    "coupled_evaluations_completed": 1,
+    "problem_instances": 1
+  },
+  "error_type": "AssertionError",
+  "native_driver_invocations_intended": 1
+}

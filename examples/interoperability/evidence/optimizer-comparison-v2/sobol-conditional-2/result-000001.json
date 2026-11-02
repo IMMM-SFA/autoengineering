@@ -1,0 +1,1 @@
+{"action_id": "eval-000001", "configuration": {"family": "linear", "linear_curvature": 0.8124904586002231, "x": 0.5811401344835758, "y": 0.9755651252344251}, "result": {"feasible": false, "objective": null, "reason": "frozen_failure_control", "status": "model_failure"}}

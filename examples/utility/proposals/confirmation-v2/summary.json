@@ -1,0 +1,38 @@
+{
+  "scope": "metadata-only four-task proposal preparation, explicit gain/secondary policies, authored engineering scenario construction and development reference binding; not admission or execution",
+  "proposal_digest": "59099fffedbc3aed4cc04b03cf1a5fb3d92678e48fdf231be74a47e5030e3c9e",
+  "tasks": 4,
+  "engineering_scenarios": 24,
+  "numeric_absolute_gains_frozen": 0,
+  "observations_accessed": false,
+  "models_started": 0,
+  "protocol_frozen": false,
+  "solar_metadata_sha256": "17e4f7f448fcb2bec43f7610b40c1f7f4fc794ccc185e41dcde0514afba73ae5",
+  "verification": {
+    "tests": 38,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 0.954,
+    "exit_code": 0,
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "core_sources_unchanged": 224,
+    "declared_wheel_sources_unchanged": 315,
+    "full_default_rerun": false,
+    "documentation_after_edits_passed": 19
+  },
+  "initial_unit_fixture_failure": {
+    "failed": 5,
+    "passed": 9,
+    "cause": "authored tests omitted the artifacts directory required by put_bytes; fixture corrected before passing runs",
+    "scientific_work": 0
+  },
+  "preceding_regression": {
+    "tests": 36,
+    "source_scope": "before two added proposal/dossier identity tests",
+    "file": "final.xml"
+  },
+  "llm_provider_calls": 0,
+  "public_metadata_gets": 1
+}

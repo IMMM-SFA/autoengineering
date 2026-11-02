@@ -1,0 +1,70 @@
+from pathlib import Path
+import builtins
+import hashlib
+import importlib.abc
+import io
+import json
+import os
+import shutil
+import socket
+import subprocess
+import sys
+
+base = Path(sys.argv[1])
+c = json.loads((base / "configuration.json").read_text())
+sys.path.insert(0, c["installed"])
+from autoengineering.agents.batch import BatchStore
+from autoengineering.utility.engineering_native import (
+    NativeDriverReport, NativeDriverSpec, native_cost_records, verify_native_report,
+)
+archive = Path(c["archive"])
+shutil.copytree(archive / "public-batch", base / "relocated-batch")
+batch = BatchStore(base / "relocated-batch")
+spec = NativeDriverSpec.from_json((archive / "native-spec.json").read_text())
+report = NativeDriverReport.from_json((archive / "native-report.json").read_text())
+before = {str(p.relative_to(batch.root)): hashlib.sha256(p.read_bytes()).hexdigest()
+          for p in batch.root.rglob("*") if p.is_file()}
+blocked = [Path(c["original_checkout"]), Path(c["source"]), base / "batch"]
+
+def guard_path(value):
+    if isinstance(value, (str, bytes, os.PathLike)):
+        path = Path(os.fsdecode(value)).absolute()
+        if any(path == root or path.is_relative_to(root) for root in blocked):
+            raise AssertionError("offline reader touched an original source or run root")
+
+original_open, original_io_open, original_os_open = builtins.open, io.open, os.open
+def guarded_open(path, *args, **kwargs):
+    guard_path(path)
+    return original_open(path, *args, **kwargs)
+def guarded_io_open(path, *args, **kwargs):
+    guard_path(path)
+    return original_io_open(path, *args, **kwargs)
+def guarded_os_open(path, *args, **kwargs):
+    guard_path(path)
+    return original_os_open(path, *args, **kwargs)
+def forbidden(*args, **kwargs):
+    raise AssertionError("offline reader attempted a process or network access")
+class NoModels(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == "openmdao" or fullname.startswith(("openmdao.", "examples.")):
+            raise AssertionError("offline reader imported a scientific model")
+        return None
+builtins.open, io.open, os.open = guarded_open, guarded_io_open, guarded_os_open
+socket.socket = forbidden
+subprocess.Popen = forbidden
+sys.meta_path.insert(0, NoModels())
+assert "openmdao" not in sys.modules
+verify_native_report(batch, "loads", spec, report)
+costs = {row.resource: row.quantity for row in native_cost_records(report, "0" * 64)}
+state = batch.replay()
+assert len(state.reservations) == 3 and not state.pending
+assert costs["native_inner_model_calls"] == len(report.result.solves)
+after = {str(p.relative_to(batch.root)): hashlib.sha256(p.read_bytes()).hexdigest()
+         for p in batch.root.rglob("*") if p.is_file()}
+assert after == before
+summary = {"status": "passed", "verified_batch_files": len(before), "reservations": 3,
+           "journal_unchanged": True, "original_roots_denied": True,
+           "models_processes_network_denied": True, "native_costs": costs,
+           "dependencies": "base", "scope": "native report and parent receipts"}
+(base / "installed-reader.json").write_text(json.dumps(summary, indent=2) + "\n")
+print(json.dumps(summary))

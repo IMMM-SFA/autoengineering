@@ -1,0 +1,19 @@
+{
+  "failures": [
+    {
+      "exit_code": 127,
+      "stage": "shell_interpreter_path",
+      "reason": "PWD expanded in /private/tmp rather than checkout",
+      "batch_created": false,
+      "scientific_reservations": 0
+    },
+    {
+      "exit_code": 1,
+      "stage": "batch_parent_permission_check",
+      "reason": "new temporary parent mode 0755 was not owner-private",
+      "batch_created": false,
+      "scientific_reservations": 0
+    }
+  ],
+  "correction": "Used the explicit pinned interpreter and changed only the new temporary parent to mode 0700. No scientific attempt was retried."
+}

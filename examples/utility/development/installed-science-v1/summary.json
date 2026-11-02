@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "installed_module": "/private/tmp/utility-installed-science-v1/venv/lib/python3.12/site-packages/autoengineering/__init__.py",
+  "input_scope": "exported bound source/data bundle; not installed preparation from scratch",
+  "reservations": 2,
+  "observed_stops": 2,
+  "completed_replay_added_reservations": 0,
+  "native_status": "converged",
+  "callback_entries": 3,
+  "fresh_modelled_energy_GWh": 37.06343379120568,
+  "source_files_bound": 228,
+  "runtime_policy_sha256": "e396b96f54177ddd3a2a05a14a49ede32e35a55f1c9884e3af8d836ee1d1f492",
+  "original_checkout_python_access": "denied",
+  "network_sockets": "denied",
+  "boundary_limit": "Python audit policy; not an OS private-data boundary",
+  "confirmation": "not_attempted",
+  "utility_verdict": "not_attempted"
+}

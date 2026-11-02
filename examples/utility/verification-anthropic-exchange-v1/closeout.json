@@ -1,0 +1,32 @@
+{
+  "status": "verified_increment_only",
+  "part_5_complete": false,
+  "production_admission": false,
+  "host_source_identity": "b595972dc5e2e20320bb5b4b1c960c42b3dc7d98cd7ea8c103308e30dc83ced8",
+  "default_suite": {
+    "passed": 2016,
+    "skipped": 106,
+    "seconds": 2145.54
+  },
+  "focused_contracts": 222,
+  "installed_exchange_tests": 46,
+  "installed_endpoint_tests": 13,
+  "installed_policy_scopes": "deny-all sockets for exchange/readers; loopback-only for HTTP fixtures",
+  "installed_core_python_bytes_match": 184,
+  "original_study_files_unchanged": 15634,
+  "study_provider_calls": 0,
+  "study_scientific_calls": 0,
+  "independent_confirmation_accesses": 0,
+  "authored_probe_scope": "native local peer plus authored JSON callbacks/processes; no actual LLM or real credentials",
+  "authentication_profile_choice": "pending user preference; no live-call authority requested or granted",
+  "remaining": [
+    "real trusted upstream and credential interface",
+    "qualified host profile/admission",
+    "host records and scheduler/factory/cost integration",
+    "complete privacy/resource/platform qualification",
+    "actual authorized LLM conformance",
+    "independent task data/custody and qualified scoring",
+    "full protocol execution costs effort and paired analysis"
+  ],
+  "checked_at_utc": "2026-10-29T10:15:24.491749+00:00"
+}

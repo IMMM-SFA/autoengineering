@@ -1,0 +1,1 @@
+{"purpose": "exposed engineering scientific tools; no independent confirmation or route comparison", "physical_reservations_before_reopen": 3, "physical_reservations_total": 16, "verified_process_stops": 16, "repeat_request_added_reservations": 0, "evaluation_count": 5, "native_inner_model_calls": 12, "utility_verdict": "not_attempted"}

@@ -1,0 +1,17 @@
+{
+  "installed_target_used": true,
+  "python_files_in_wheel": 231,
+  "source_asset_reads": 1,
+  "source_read_after_both_claims": true,
+  "development_intervals": 12,
+  "confirmation_intervals": 4,
+  "changed_source_refused": true,
+  "consumed_preparation_refused": true,
+  "public_reader_cannot_open_reserved": true,
+  "reader_replay_equal": true,
+  "editable_source_fallback": false,
+  "new_model_calls": 0,
+  "new_processes_after_initialization": 0,
+  "new_http_requests": 0,
+  "task_admitted": false
+}

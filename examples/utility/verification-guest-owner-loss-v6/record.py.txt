@@ -1,0 +1,117 @@
+"""Append current-image process-loss evidence without changing frozen criteria."""
+import hashlib,json
+from pathlib import Path
+root=Path.cwd();p=root/'examples/utility/verification-guest-owner-loss-v6'
+def sha(f):return hashlib.sha256(f.read_bytes()).hexdigest()
+def save(f,v):f.write_text(json.dumps(v,indent=2)+'\n')
+s=json.loads((p/'summary.json').read_text())
+prev=root/'examples/utility/qualification-state-guest-v11.json';v=json.loads(prev.read_text())
+v.update(schema='utility-guest-qualification-evidence-map-v12',predecessor=str(prev.relative_to(root)),predecessor_sha256=sha(prev))
+v['current_v6_scope'].update(exact_owner_watchdog_sigkill_controls_complete=True,owner_loss_evidence=str((p/'summary.json').relative_to(root)),owner_loss_evidence_sha256=sha(p/'summary.json'),captured_result_recovery_without_restart_complete=True,during_model_computation_cancellation_qualified=False,full_inference_lifecycle_private_matrix_complete=False,runtime_qualified=False)
+save(root/'examples/utility/qualification-state-guest-v12.json',v)
+prev=root/'examples/utility/guest-qualification-accounting-v11.json';v=json.loads(prev.read_text())
+v.update(schema='utility-candidate-guest-qualification-accounting-v12',predecessor=str(prev.relative_to(root)),predecessor_sha256=sha(prev),current_evidence_map='examples/utility/qualification-state-guest-v12.json')
+v['scope']+=' plus four current v6 exact owner/watchdog process-loss controls'
+v['operations'].append({'operation':'v6 four exact owned-process loss controls','evidence':str((p/'summary.json').relative_to(root)),'evidence_sha256':sha(p/'summary.json'),'image_id':s['image_id'],'container_creations':4,'container_starts':2,'charged_inference_starts':2,'model_inference_starts':None,'model_inference_results_observed':1,'native_reference_starts':0,'charged_scoring_starts':0,'owner_children':4,'watchdogs':3,'owner_sigkills':3,'watchdog_sigkills':1,'inference_elapsed_seconds':None,'note':'One captured result replayed with no restart. The other started guest has no model capture; both starts stay charged and lifecycle times remain unknown.'})
+v['totals']['container_creations']+=4;v['totals']['container_starts']+=2;v['totals']['charged_inference_starts']+=2;v['totals']['model_inference_starts_known_lower_bound']+=1;v['totals']['started_attempts_without_model_result']+=1
+assert v['totals']['model_inference_starts_total'] is None
+v['current_v6_scope'].update(owner_loss_creations=4,owner_loss_starts=2,owner_loss_model_results_observed=1,owner_loss_model_work_total=None,owner_loss_lifecycle_seconds=None,owner_loss_evidence=str((p/'summary.json').relative_to(root)),runtime_qualified=False)
+v['current_v6_owner_loss_parent_reservations']={'four_clones_scientific_starts_reserved':8,'charged_inference_starts':2,'captured_results_replayed':1,'parent_confirmations_completed':False,'retained_unchanged':True,'unused_authority_not_transferable':True}
+save(root/'examples/utility/guest-qualification-accounting-v12.json',v)
+(p/'README.md').write_text('''# Current v6 owner and watchdog process loss
+
+Four actual local controls passed against the current v6 image using its existing
+exposed authored fit. Four containers were created and two started. All original
+containers were confirmed absent, including separate actual GETs after cleanup.
+Three exact owned owner processes were killed with SIGKILL. A fourth owner killed
+its own exact ready watchdog handle, then exited normally after production
+liveness checking refused START. Only owned Popen handles were signaled.
+
+| Control | Observed outcome |
+| --- | --- |
+| Before watchdog readiness | Owner killed after saving the watchdog plan, before spawn. Explicit parent startup cleanup removed the unstarted guest. |
+| Running owner | Owner killed after actual START, before input transfer. Detached watchdog observed owner loss and cleaned the original guest. |
+| After capture | Owner killed after result capture, before the stop journal. Watchdog cleaned the original guest. Saved recovery returned that successful result without rerunning it. |
+| Ready watchdog child | Owner killed its own watchdog after attach, before START. Liveness checking refused START. Startup cleanup removed the unstarted original guest. |
+
+Both starts remain charged and lifecycle time remains unknown. One captured
+model result is known. Work in the other started guest remains unknown. No new
+fit, score, private observation or provider call was used. Every case refused
+redispatch without contacting the daemon. Parent composite reservations remain
+charged and unfinished. These cases do not establish interruption during model
+computation or autonomous cleanup before watchdog ownership.
+
+The [351-file public archive](public-proof.tar.gz) contains original process,
+owner, API, input-transfer and cleanup records, plus a saved public suite for
+captured-result recovery. Input-transfer tars include declared source, fit
+metadata and known exposed meteorological drivers. Fitting/comparison and private
+label arrays are absent. The [manifest](evidence-manifest.json) binds every regular
+file's size and hash. Source and driver roots are unnecessary for saved replay.
+
+A fresh process verified the extracted archive after relocation. Model imports
+were blocked from startup. Imports and metadata initialization preceded guards
+that denied processes, sockets, arrays, clocks, writes and outside content reads.
+The captured result replayed through the production recovery-only facade. This
+verifies saved producer evidence, not independent OS attestation. Dependencies
+and example helpers were inherited before the guard.
+
+A separate altered proof with the wrong owner PID was rejected. The original
+proof hashes remained unchanged. Read-only process-table checks found all three
+recorded watchdog PIDs absent. Their first diagnostic referenced the wrong JSON
+field before running ps. That refusal and the corrected diagnostic are retained.
+No control or guest was restarted.
+
+Request digest:
+`608f49736fd42cb82a02ce618d2e31be516f2eaf37ce3fcda1bc065a51b01911`.
+Completion digest:
+`994ab5b042da691d65e5a1f81e7105e97a26e67f0a4a93763068f270466bc311`.
+
+```sh
+pixi run python -m examples.utility.guest_owner_loss_reader PATH_TO_PROOF \\
+  --expected-digest 994ab5b042da691d65e5a1f81e7105e97a26e67f0a4a93763068f270466bc311
+```
+
+The related regression passed 73 tests in 92.86 seconds. No runtime source
+changed. This host is local OrbStack Linux amd64 emulation on macOS ARM64.
+Independent physical x86 qualification, private scoring, the full matrix and
+scientific task admission remain open. Runtime qualification remains false.
+The original 26-case proposal and all earlier evidence remain unchanged.
+
+Cumulative explicit runtime accounting now records 47 creations and 36 starts,
+including 14 charged inference starts and two native references. The known model
+inference lower bound is eight; total model work remains unknown. Six started
+attempts have no observed model result. Earlier unknown label quantities remain
+unknown. BuildKit internals and authored unit fixtures remain outside this scope.
+''')
+text='''
+
+Four actual v6 owner/watchdog process-loss controls passed. Three exact owned owner
+handles were killed with SIGKILL. A fourth owner killed its own ready watchdog
+handle before START. Four containers were created and two started. Every original
+container and all three recorded watchdog PIDs were confirmed absent. One result
+captured before owner death replayed without a model or container restart. The
+other started guest has no model capture. Both lifecycle durations remain unknown.
+
+A 351-file public proof passed fresh relocated replay with model imports blocked
+and, after initialization, processes, network, arrays, clocks, writes and outside
+content reads denied. A separate changed-owner-PID proof was rejected. The focused
+regression passed 73 tests. Runtime code, the existing fit and frozen criteria did
+not change. No new fitting or scoring ran.
+
+Cumulative explicit runtime accounting now lists 47 creations and 36 starts,
+including 14 charged inference starts and two native references. Known model
+inference starts have lower bound eight, with total work still unknown. Six
+started attempts have no observed model result. The v6 private-scoring and full
+matrix gates, independent physical host qualification, task admission and Part 5
+completion remain open. Interruption during model computation is not qualified.
+
+[Current process-loss evidence](PREFIXexamples/utility/verification-guest-owner-loss-v6/README.md),
+[cumulative register](PREFIXexamples/utility/guest-qualification-accounting-v12.json).
+'''
+paths=['docs/utility.md','docs/utility-handoff.md','docs/reviews/part-5-progress.md','docs/reviews/part-5-completion-audit.md']
+for name in paths:
+ with (root/name).open('a') as f:f.write(text.replace('PREFIX','../../' if '/reviews/' in name else '../'))
+prev=root/'examples/utility/source-inventory-guest-lifecycle-v6.json'
+names=paths+['examples/utility/guest_owner_loss_controls.py','examples/utility/guest_owner_loss_reader.py','examples/utility/guest_inference_smoke.py','examples/utility/guest-qualification-accounting-v12.json','examples/utility/qualification-state-guest-v12.json']
+save(root/'examples/utility/source-inventory-guest-owner-loss-v6.json',{'scope':s['scope'],'predecessor':str(prev.relative_to(root)),'predecessor_sha256':sha(prev),'current_source_sha256':{n:sha(root/n) for n in names},'verification':str((p/'summary.json').relative_to(root)),'verification_sha256':sha(p/'summary.json'),'core_sources':225,'declared_guest_code_sources':316,'runtime_source_changed':False,'related_tests_passed':73,'new_guest_creations':4,'new_guest_starts':2,'new_model_results_observed':1,'model_work_total':None,'runtime_qualified':False,'full_part_5_complete':False})
+print(json.dumps(v['totals']))

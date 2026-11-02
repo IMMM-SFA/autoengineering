@@ -1,0 +1,32 @@
+{
+  "status": "supplied_resource_development_implemented",
+  "scope": "hand-authored probability tables, not independent weather or private scoring",
+  "base_tests": {
+    "passed": 62,
+    "skipped": 9,
+    "seconds": 19.33
+  },
+  "wind_tests": {
+    "passed": 71,
+    "warnings": 4,
+    "seconds": 25.37
+  },
+  "native_and_fresh": "same resource digest; native callback energy matches direct weighted power; fresh evaluation has a separate reservation and unchanged replay",
+  "installed_model_demo": "passed with original opens and sockets denied; cached wind dependencies, private font cache, subprocess helpers not denied",
+  "installed_offline_reader": "verified digest-bound NPZ/JSON arithmetic with optional models absent, original opens/sockets/processes denied",
+  "real_weather_acquired": false,
+  "independent_confirmation_accesses": 0,
+  "provider_calls": 0,
+  "source_files": {
+    "examples/utility/wind_resource.py": "1dc6f01c19413ad402dd3b687e782d10a62a85dbcad0b743e4a43712ae9f7585",
+    "examples/utility/wind_resource_scenario.py": "12623519b6fb036945a34fdf057eb512311daad9311218468265bf7b5f232bac",
+    "examples/utility/wind_scenario.py": "5282ff9183278f7a8a3e547739c07275761a35385798f761ca3f7ad5b4171bba",
+    "examples/utility/wind_native.py": "c5c0039eea09ebe0aa415579964a7b3278aba5f8a11da27167ff6a5ab625ca59",
+    "examples/utility/wind_proposal.py": "38927945664e7dd7897d3245b0727a79479c81597f4cc513395d48158c3b9979",
+    "examples/utility/wind_process.py": "bfda776a9b172d1b44fa2a79ac274bb2a0a5c43d4fe9b10ca8ded376e0d36365",
+    "examples/utility/fixtures/wind-resource-demo.json": "c54e2d539b9d3a71d94b057d86aa65b1aa730e53d63dd5421c764043d98631a3",
+    "tests/test_utility_wind_resource.py": "52c65f17a8dfa06201f98eafb41dacfc6752a5fcce732ba0e403a30100e11b14",
+    "tests/test_utility_wind_resource_process.py": "3690882cd485fe91eaff5a0e0e3aa8fbb2e705fe6e11a0385c5b90e58eb15c7d"
+  },
+  "prior_full_default_scope": "2127 passed, 106 skipped before these wind source changes; no new full default or frozen benchmark matrix"
+}

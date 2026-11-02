@@ -89,8 +89,10 @@ estimate of the benefit of a model replacement. Use the
 ## Deep research handoff
 
 The agent skills under `.claude/skills/` cover candidate research, citation searches, and execution.
-They operate through the tools available to the agent. The Python package does not call an LLM or
-search for papers. The `candidates` command only writes a scaffold.
+They operate through the tools available to the agent. The scientific controller does not call an
+LLM or search for papers. The `candidates` command only writes a scaffold. The separate experimental
+[worker layer](agents.md) currently runs scripted replies. Its Codex transport prototype remains
+unqualified for live dispatch.
 
 A candidate needs the target component name, compatible ports and inputs, a runnable implementation,
 a rationale, and source references. `Candidate`, `load_candidates`, and `save_candidates` provide

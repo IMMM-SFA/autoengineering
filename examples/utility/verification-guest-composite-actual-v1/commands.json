@@ -1,0 +1,7 @@
+{
+  "prepare": "python -m examples.utility.guest_composite_smoke prepare outputs/guest-inference-smoke-fixture-v1 outputs/guest-resources-v3 examples/utility/prepared-inference-environment-v5 outputs/guest-composite-smoke-v1 --resource-digest e899a83865a1ae3619af3fcfbbf68b204525566f168350ffa258582556a6df8b",
+  "execute": "python -m examples.utility.guest_composite_smoke execute outputs/guest-composite-smoke-v1 --expected-digest 8a4eb468cb27dd4146e9eab8cc45b9ee0982da9ac1138e9e26505f1f74bd3701",
+  "regression": "python -m pytest tests/test_utility_guest_composite_smoke.py tests/test_utility_guest_composite.py tests/test_utility_guest_executor.py tests/test_utility_composite_scoring.py tests/test_utility_container_scoring.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-guest-composite-actual-regression-v2 --junitxml=examples/utility/verification-guest-composite-actual-v1/regression-permitted.xml",
+  "cold_reader": "python -B cold-reader-v4.py PUBLIC_SUITE EXPECTED_JSON",
+  "environment": "existing default Pixi Python 3.12; local owned daemon; no dependency installation or new images"
+}

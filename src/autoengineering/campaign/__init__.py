@@ -16,6 +16,7 @@ from .records import (
     Response,
     StudyLink,
     TimeContract,
+    SubdailyTimeContract,
 )
 from .spec import CampaignSpec
 
@@ -36,4 +37,5 @@ __all__ = [
     "Response",
     "StudyLink",
     "TimeContract",
+    "SubdailyTimeContract",
 ]

@@ -17,6 +17,7 @@ from .records import ArtifactRef
 from .runtime import registry
 from .serialization import canonical_json
 from .store import durable_write
+from .training import worker_fitting_data
 
 
 def main(job_path: Path):
@@ -33,10 +34,32 @@ def main(job_path: Path):
         }
     else:
         forcing = read_arrays(forcing_root, forcing_ref)
-    adapters = registry()
+    if (
+        job["adapter_id"].startswith("generated-")
+        or job["adapter_id"] == "hydrology-learned-routing-v1"
+    ):
+        from .spec import CampaignSpec
+
+        spec = CampaignSpec.from_yaml(job_path.parent.parent / "campaign.yaml")
+        adapters = registry(spec=spec, root=root)
+    else:
+        adapters = registry()
     adapters.validate(job["adapter_id"], context.model, root)
     adapter = adapters.create(job["adapter_id"])
-    result = run_lifecycle(adapter, context, forcing, context.model.inputs, context.model.outputs)
+    if job["adapter_id"].startswith("generated-"):
+        from autoengineering.adapters.isolated import IsolatedAdapter
+        from .container_execution import launch_observer
+
+        if not isinstance(adapter, IsolatedAdapter):
+            raise ValueError("generated ID requires the fixed isolated adapter factory")
+        adapter.launch_observer = launch_observer(
+            job_path.parent.parent, job, attempt_id=job["attempt_id"], nonce=job["nonce"]
+        )
+    fitting = worker_fitting_data(job_path, job, context, root, forcing)
+    result = run_lifecycle(
+        adapter, context, forcing, context.model.inputs, context.model.outputs,
+        fitting_data=fitting,
+    )
     output_path = Path(job["output_path"])
     # Scratch is owner-private. Campaign commit hashes/copies these bytes before use.
     with output_path.open("xb") as stream:

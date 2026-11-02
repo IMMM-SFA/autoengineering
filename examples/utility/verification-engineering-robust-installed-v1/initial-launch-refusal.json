@@ -1,0 +1,7 @@
+{
+  "stage": "shell file staging before execution-request creation",
+  "reason": "outside-checkout cwd was applied to relative staging paths",
+  "new_native_or_scenario_processes": 0,
+  "request_consumed": false,
+  "correction": "stage from repository first, then execute from private temporary cwd"
+}

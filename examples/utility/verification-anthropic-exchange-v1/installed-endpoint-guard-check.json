@@ -1,0 +1,9 @@
+{
+  "blocked_audit_events": [
+    "socket.connect",
+    "socket.getaddrinfo",
+    "subprocess.Popen"
+  ],
+  "scope": "policy self-check only; audit events emitted without network or process operations",
+  "loopback_fixture_tests": "13 passed"
+}

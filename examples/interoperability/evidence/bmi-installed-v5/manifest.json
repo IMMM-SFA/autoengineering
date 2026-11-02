@@ -1,0 +1,221 @@
+{
+  "protocol": {
+    "schema_version": 1,
+    "model": "preserved-local-LinearReservoirBmi",
+    "origin": "2000-01-01",
+    "dates": [
+      "2000-01-02",
+      "2000-01-03",
+      "2000-01-04"
+    ],
+    "forcing": [
+      1.0,
+      0.0,
+      3.0
+    ],
+    "recession": 0.7,
+    "rate_semantics": "interval_mean_end",
+    "storage_semantics": "instantaneous_end",
+    "dt_days": 1.0,
+    "parity_atol": 0.0,
+    "parity_rtol": 0.0,
+    "conservation_atol_mm": 1e-14,
+    "physical_starts": 2,
+    "wall_seconds": 30,
+    "memory_bytes": 1073741824
+  },
+  "context": {
+    "model": {
+      "graph_digest": "a7d5e0a9f0ab3a63591e7f2129489f17c3ae41135fd120418cb06126720647e8",
+      "implementations": {
+        "reservoir": "local-bmi-v1"
+      },
+      "source_bundle": [
+        {
+          "path": "examples/interoperability/bmi/run.py",
+          "sha256": "77b965ba467dffe59885b2ac650c85b58a3826b78b8fe642b709f3950127cc79",
+          "size_bytes": 4209,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/interoperability/bmi/protocol.json",
+          "sha256": "14c5be86262a09c6ec01385f25c8ff04a5bf720046e7fa0ff198128c04ecdbbc",
+          "size_bytes": 462,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/local_models/bmi_base.py",
+          "sha256": "168a7d578991b3395944e1d8d3706046b2556e2f161d6505cfa43624762bb041",
+          "size_bytes": 8282,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/local_models/bmi_components.py",
+          "sha256": "90931443ffd97ca1c9f529879d1de809471d52df79f4604629e63f0306c084df",
+          "size_bytes": 6195,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/local_models/bmi_chain.py",
+          "sha256": "50608d4026ae4a90764690488316157eb89eff302d035c2dbc92a88f205f32b4",
+          "size_bytes": 6435,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/local_models/kernels.py",
+          "sha256": "f50c427c67a82ea8780ae1a13151bfd7848ef3617ea32d117a19dce1fcb49b7b",
+          "size_bytes": 7921,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/leaf_river/models/pet_hamon.py",
+          "sha256": "2ad68c49aa44034f8c72a6e17dc40752f8b37b60cbba4a0b2bae20f8c941537a",
+          "size_bytes": 1544,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/leaf_river/models/pet_hargreaves.py",
+          "sha256": "125c061a4e6f496bee8078fc034fd731f4ab6510f9095a0eed7bade4778df6e8",
+          "size_bytes": 2047,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        },
+        {
+          "path": "examples/leaf_river/models/soil_moisture.py",
+          "sha256": "b54f046468f7062ba6c01252edd082e25020b24ea8271c2f6799013cf7785c52",
+          "size_bytes": 1708,
+          "media_type": "text/plain",
+          "producer": "bmi-parity",
+          "metadata": {}
+        }
+      ],
+      "dependency_bundle": "d5f03ab40d478e809bf4b35d0951779f3977136787203294909f2a3180c12eb2",
+      "inputs": [
+        {
+          "name": "excess_water",
+          "dimensions": [
+            "time"
+          ],
+          "units": "mm d-1",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "time": {
+            "dates": [
+              "2000-01-02",
+              "2000-01-03",
+              "2000-01-04"
+            ],
+            "semantics": "interval_mean",
+            "timestep": "P1D",
+            "calendar": "proleptic_gregorian",
+            "timestamp": "end",
+            "warmup_mask": [
+              false,
+              false,
+              false
+            ],
+            "scoring_mask": [
+              true,
+              true,
+              true
+            ]
+          },
+          "missing": "forbid"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "flow",
+          "dimensions": [
+            "time"
+          ],
+          "units": "mm d-1",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "time": {
+            "dates": [
+              "2000-01-02",
+              "2000-01-03",
+              "2000-01-04"
+            ],
+            "semantics": "interval_mean",
+            "timestep": "P1D",
+            "calendar": "proleptic_gregorian",
+            "timestamp": "end",
+            "warmup_mask": [
+              false,
+              false,
+              false
+            ],
+            "scoring_mask": [
+              true,
+              true,
+              true
+            ]
+          },
+          "missing": "forbid"
+        },
+        {
+          "name": "reservoir_storage",
+          "dimensions": [
+            "time"
+          ],
+          "units": "mm",
+          "dtype_family": "float",
+          "coordinates": [],
+          "grid_id": "scalar",
+          "coordinate_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "time": {
+            "dates": [
+              "2000-01-02",
+              "2000-01-03",
+              "2000-01-04"
+            ],
+            "semantics": "instantaneous",
+            "timestep": "P1D",
+            "calendar": "proleptic_gregorian",
+            "timestamp": "end",
+            "warmup_mask": [
+              false,
+              false,
+              false
+            ],
+            "scoring_mask": [
+              true,
+              true,
+              true
+            ]
+          },
+          "missing": "forbid"
+        }
+      ]
+    },
+    "parameters": {
+      "recession": 0.7,
+      "end_time": 3
+    },
+    "seed": 17,
+    "scratch_path": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/part-4-installed-supervised-v5/bmi/result",
+    "permitted_data_ids": []
+  },
+  "bmipy": "2.0.1"
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "utility-wind-netcdf-upstream-test-intent-v1",
+  "files": {
+    "test_atts.py": "f90e7250a84b320f27a38ed703fc22ea4d6b345c749a0d01ade8d829b82b4834",
+    "test_types.py": "84aeb100053b7778bdb5b4a965fd99d394008d1bfc698ff422775514d8c7507c",
+    "test_compoundvar.py": "95c26cb4e90542831851a3bbf75b6731c9af5e407d7de6a434954b8aaa01c645",
+    "test_fancyslicing.py": "5b39cab80d86e201a619df218b97b2b05de9e9bfcee5c12ceab10b18d7329c93",
+    "test_scaled.py": "816ec6cb0a4647b8a95f04a13e19f17f2c58dd5b01471e86605fb057e56f25df",
+    "test_masked5.py": "e03ce7020bf3b3a917350fd2bf26a1b9264a0269712728d0717d14d32a1011f1"
+  },
+  "warning_policy": "error after NumPy import; override upstream warning-ignore configuration",
+  "scientific_model_calls": 0,
+  "network_allowed": false,
+  "external_execution_allowed": false,
+  "existing_environment_changes": false
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="3.614" timestamp="2026-10-28T19:41:40.362697-07:00" hostname="m5-mbp"><testcase classname="tests.test_utility_preflight" name="test_infeasible_layout_is_saved_without_process_or_reservation" time="0.638" /><testcase classname="tests.test_utility_preflight" name="test_missing_rejection_is_not_automatically_recreated_on_recovery" time="0.418" /><testcase classname="tests.test_utility_preflight" name="test_saved_rejection_recovers_after_owner_loss" time="0.544" /><testcase classname="tests.test_utility_preflight" name="test_modified_rejection_is_not_accepted" time="0.468" /><testcase classname="tests.test_utility_preflight" name="test_preflight_preserves_conflicting_physical_charge[False]" time="0.495"><failure message="AssertionError: assert (PhysicalRese...ace_bytes=0),) == {'uncertain-o...pace_bytes=0)}&#10;  &#10;  Use -v to get more diff">tmp_path = PosixPath('/private/var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/pytest-of-cam/pytest-4346/test_preflight_preserves_confl0')
+saved = False
+
+    @pytest.mark.parametrize("saved", [False, True])
+    def test_preflight_preserves_conflicting_physical_charge(tmp_path, saved):
+        from autoengineering.agents.batch import PhysicalReservation
+    
+        executor, batch, _, action, _ = setup(tmp_path)
+        if saved:
+            executor(action)
+        identity = executor.identity(action, executor.spec.scenarios[0])
+        reservation = PhysicalReservation(
+            "uncertain-original", "first", "science", identity, None, batch.clock(), 10.0, 0, 0, 0
+        )
+        batch.reserve(reservation)
+        with pytest.raises(StoreError, match="conflicts"):
+            executor(action)
+        with pytest.raises(StoreError, match="conflicts"):
+            executor.recover_completed(action)
+&gt;       assert batch.replay().pending == {reservation.id: reservation}
+E       AssertionError: assert (PhysicalRese...ace_bytes=0),) == {'uncertain-o...pace_bytes=0)}
+E         
+E         Use -v to get more diff
+
+tests/test_utility_preflight.py:146: AssertionError</failure></testcase></testsuite></testsuites>

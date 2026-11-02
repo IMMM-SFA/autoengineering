@@ -1,0 +1,36 @@
+{
+  "created_utc": "2026-10-30T14:03:37.521196+00:00",
+  "current_core_python_files": 204,
+  "files": {
+    "docs/reviews/part-5-completion-audit.md": "bdf56cd918c28e066d84252a579bc3de923dcdd7617c27306462700d4fb4bacb",
+    "docs/reviews/part-5-progress.md": "79fab6a16baa27e65efcf7f7ef16fc81a885bf7b58e726f957719150b8835d6c",
+    "docs/reviews/part-5-readiness.md": "f3ffc29d1295e3467b4602b14cae2e4ef33652fcad1c6e2d2ef99ef83fb64408",
+    "docs/utility-handoff.md": "1866ac5dab9ac27a8f78e4e06ce6fe0da2d12c6c8abe26f3754c7c4f1647fbe5",
+    "docs/utility.md": "8396b494d1f98f631858887b505b3ed50243ccc31b8bb2343af07aeea57e0254",
+    "examples/utility/verification-training-campaign-costs-v1/campaign-baseline.log": "d1656324d5f94f18ec8c42c9bf11cd438f7da7cd22407c92ec1d360c8004bc1b",
+    "examples/utility/verification-training-campaign-costs-v1/final.log": "90a48f2f4e086ff59badf766fe58e9e82d6e877eb15cd50a06e7c75a6fe7a5c9",
+    "examples/utility/verification-training-campaign-costs-v1/focused.log": "5d2bb326bb6b48b88cc86b80e027dc522996ff05f542764291ca9515866d99f4",
+    "src/autoengineering/utility/baseline_selection.py": "037bb0e6c65f2e513a381ab0d6fc8cc14eda1722b112ed46f9b023d38dc2a822",
+    "src/autoengineering/utility/campaign_costs.py": "610a63782988ebed1f8ac42933ce218da5943d123bee3afb143dd09731b360b7",
+    "tests/test_utility_baseline_selection.py": "19cf5ab689dc809f1c10abb0bff35ece70649bd997330a6bd629c50d864c218a",
+    "tests/test_utility_campaign_training_costs.py": "20da82e0000c64edc1b138dc47daeaf2ef123ec0f11876906184fd763460f1aa"
+  },
+  "limits": [
+    "authored supervised helper is not a public learned runtime registration",
+    "fitting grants and failed/interrupted training capture remain open",
+    "external/shared preparation without verified allocation remains unknown",
+    "full default checkpoint predates this increment",
+    "no independent data, private scoring, new host, optional or installed qualification"
+  ],
+  "predecessor": "examples/utility/source-inventory-trained-selection.json",
+  "predecessor_sha256": "9f19dd3ccc1fa07e938993abc6b19d681b0a50ae562fbe1f878116b672a1e47f",
+  "schema": "utility-source-increment-v1",
+  "scope": "original-event campaign training cost reconstruction and frozen baseline allocation",
+  "verification": {
+    "campaign_baseline": "34 passed in 119.17s",
+    "diff_check": "passed",
+    "final_cold_reader_and_documentation": "20 passed in 4.04s",
+    "focused": "52 passed in 24.79s",
+    "lint": "passed"
+  }
+}

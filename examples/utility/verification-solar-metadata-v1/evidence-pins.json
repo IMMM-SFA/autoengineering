@@ -1,0 +1,15 @@
+{
+  "README.md": "0fc7147a97ddd2dba668c45ca0f7bf9d0f2a5adce8cf91cf99215911a29bdc40",
+  "command.json": "b9e132b648641353987424cf5392b6eb2487cf70d012bd55895cd716fb8943e1",
+  "documentation-final.log": "c1dec8025fe3985249dbc92bc918250ebfaf065c98097b87f511407a985620c2",
+  "documentation-final.xml": "e13d739e1bb876d0338eb72c7c21a2ead21cb038a9fa29606b5c4b5e5cf5be18",
+  "lint.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+  "official-source-review.json": "cfc480598342cb230141907504fd8b971cd5a927d40492e572c38f742c8c5d1c",
+  "previous-exposure-register.json": "3e6e7be19baf57f8b71313c6503f23389161a4f415ab27c4e8066e84002b26e5",
+  "regression.log": "31927957f8f7faa4f92499f6452b8c98bb357e5a7b42eba24bf278b73c7203ba",
+  "regression.xml": "af49e57a75cd3554054f208953824b5867121caec13170dbd12537ee252a63ed",
+  "review.json": "3ba6981476e5e5573a09fa76c7b5793d8ec0e3b38113898546f3d6a4f2ff215b",
+  "source-snapshot/examples/utility/solar_metadata.py": "8142622cf113d9f771a4c13a85f3f60c89b63119a403c3f8a24b140884473783",
+  "source-snapshot/tests/test_utility_solar_metadata.py": "fa225982cd0d337059238d75386dca15694a273b31fc114da702a63f0fad61a7",
+  "summary.json": "482f63152991c6d11a1666a1c99c0fb1758a3342bdde553fd15b7d8dfe1335c1"
+}

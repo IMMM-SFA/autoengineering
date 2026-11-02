@@ -4,10 +4,63 @@ import json
 import subprocess
 import sys
 
+import pytest
+
 from autoengineering.campaign.controller import CampaignController
 from autoengineering.optimization import ObservationLedger
-from examples.campaign_contracts.build_fixture import ROOT
+from examples.campaign_contracts.build_fixture import ROOT, fixture
 from test_campaign_studies import calibrated_spec
+
+
+def fresh_spec(tmp_path):
+    path = tmp_path / "current-fixture.yaml"
+    fixture().to_yaml(path)
+    return path
+
+
+def test_cancelled_service_request_never_reserves_or_launches_baseline(tmp_path):
+    from autoengineering.campaign.records import Request
+
+    controller = CampaignController.create(fresh_spec(tmp_path), ROOT, tmp_path / "cancelled")
+    controller.cancel("stop-before-evaluate")
+    request = Request(
+        "1.0",
+        controller.spec.name,
+        "pending-evaluate",
+        0,
+        "evaluate",
+        {"candidate_id": "baseline", "mode": "fixed"},
+    )
+    response = controller.service.handle(request)
+    assert response.status == "ok"
+    assert controller.state().outcome == "cancelled"
+    assert not controller.state().budget.attempts
+    assert not controller.state().budget.reservations
+    assert controller.service.handle(request) == response
+
+
+def test_queued_cancellation_preserves_unresolved_execution_state(tmp_path):
+    from dataclasses import replace
+    from autoengineering.campaign.records import AttemptRecord
+
+    controller = CampaignController.create(fresh_spec(tmp_path), ROOT, tmp_path / "uncertain")
+    state = controller.state()
+    attempt = AttemptRecord(
+        "unknown-start", "reserved", "launched", None, "nonce", None, None, True, None
+    )
+    budget = state.budget.reserve("reserved", 1).start(attempt)
+    with controller.store.writer():
+        controller._checkpoint(
+            "evaluating",
+            replace(state, budget=budget, active_reservation="reserved"),
+            "uncertain-fixture",  # No assertion that physical work has stopped.
+        )
+    controller.cancel("stop-uncertain")
+    response = controller.request("evaluate", {"candidate_id": "baseline", "mode": "fixed"})
+    assert response.status == "ok"
+    assert controller.store.replay().state == "reconciliation_required"
+    assert controller.state().budget == budget
+    assert controller.state().outcome is None
 
 
 CODE = """
@@ -32,7 +85,7 @@ c.advance()
 
 
 def test_saved_worker_result_before_campaign_commit_is_reused(tmp_path):
-    path = ROOT / "examples/campaign_contracts/fixture.yaml"
+    path = fresh_spec(tmp_path)
     work = tmp_path / "campaign"
     process = subprocess.run(
         [sys.executable, "-c", CODE, str(path), str(ROOT), str(work), "output"]
@@ -44,6 +97,16 @@ def test_saved_worker_result_before_campaign_commit_is_reused(tmp_path):
     assert len(controller.state().budget.attempts) == 2  # Baseline reused, one candidate start.
     assert controller.state().outcome == "accepted_candidate"
     assert controller.state().budget.unresolved_attempts == 0
+    attempt = controller.state().budget.attempts[0]
+    from autoengineering.campaign.artifacts import read_bytes
+
+    receipt = json.loads(read_bytes(controller.store.root, attempt.receipt))
+    assert receipt["schema"] == "campaign-recovery-receipt-v2"
+    assert receipt["identity"]["nonce"] == attempt.launch_nonce and receipt["stopped"]
+    lifecycle = controller.state().evaluations[0].provenance["lifecycle_record"]
+    assert any(
+        r.sha256 == lifecycle for event in controller.store.replay().events for r in event.artifacts
+    )
 
 
 def test_saved_fitting_result_before_child_ack_preserves_selection(tmp_path):
@@ -124,7 +187,7 @@ with c.store.writer():
             sys.executable,
             "-c",
             code,
-            str(ROOT / "examples/campaign_contracts/fixture.yaml"),
+            str(fresh_spec(tmp_path)),
             str(ROOT),
             str(work),
         ]
@@ -187,7 +250,7 @@ print(c.request('evaluate', {'candidate_id':'baseline','mode':'fixed'}, request_
             sys.executable,
             "-c",
             code,
-            str(ROOT / "examples/campaign_contracts/fixture.yaml"),
+            str(fresh_spec(tmp_path)),
             str(ROOT),
             str(work),
         ],
@@ -224,3 +287,56 @@ print(c.request('evaluate', {'candidate_id':'baseline','mode':'fixed'}, request_
         if parent.poll() is None:
             parent.kill()
             parent.wait(timeout=5)
+
+
+@pytest.mark.parametrize(
+    "phase,expected",
+    [("model", "completed"), ("confirmation", "report_ready")],
+)
+def test_review_accepts_existing_fixed_attempt_reconciliation_destinations(
+    tmp_path, monkeypatch, phase, expected
+):
+    from dataclasses import replace
+    from autoengineering.campaign.records import AttemptRecord
+
+    controller = CampaignController.create(fresh_spec(tmp_path), ROOT, tmp_path / "campaign")
+    state = controller.state()
+    budget = state.budget
+    for number in range(1, 2):
+        reservation = f"fixed-{number}"
+        attempt = AttemptRecord(
+            f"attempt-{number:06d}",
+            reservation,
+            "launched",
+            None,
+            f"test-nonce-{number}",
+            None,
+            None,
+            True,
+            None,
+        )
+        budget = budget.reserve(reservation, 1).start(attempt)
+        budget = budget.resolve(replace(attempt, state="uncertain"))
+    with controller.store.writer():
+        controller._checkpoint(
+            "reconciliation_required",
+            replace(state, budget=budget, phase=phase, resume_state="evaluating"),
+            "authored-unlaunched-uncertainty",
+        )
+    monkeypatch.setattr(
+        controller,
+        "_physical_attempt",
+        lambda *args, **kwargs: pytest.fail("reconciliation launched science"),
+    )
+    response = controller.request("review", {"reconcile_attempt_id": "attempt-000001"})
+    assert response.status == "ok"
+    assert controller.store.replay().state == expected
+    state = controller.state()
+    assert state.budget.attempts[0].state == "reconciled"
+    assert state.budget.attempts[0].uncertain_cost
+    assert state.budget.attempts[0].measured_cost is None
+    assert state.budget.cost_is_uncertain and state.budget.committed_capacity >= 1
+    if phase == "confirmation":
+        assert state.confirmation == "unavailable"
+    else:
+        assert state.outcome == "failed_execution"
