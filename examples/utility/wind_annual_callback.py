@@ -199,7 +199,7 @@ class TrustedAnnualWindScorer:
         state = self.store.replay()
         selected = validate_grant(self.store, grant, state["frozen"])
         cell = next(c for c in self.store.spec.cells if c.digest == grant.cell_digest)
-        if cell.regime != "fixed_evaluations":
+        if not self._selection_regime_allowed(cell.regime):
             raise ValueError("annual wind callback has no qualified fixed-total-cost boundary")
         bound = read_selected_state(self.store.root, selected.selected_state)
         if bound.model != self.expected_model:
@@ -237,6 +237,9 @@ class TrustedAnnualWindScorer:
         ):
             raise ValueError("annual wind callback needs its original charged access")
         return state, attempt, status, dict(bound.configuration)
+
+    def _selection_regime_allowed(self, regime):
+        return regime == "fixed_evaluations"
 
     def _validate_work(self, work, grant, configuration):
         if (

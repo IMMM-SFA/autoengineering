@@ -1,0 +1,971 @@
+{
+  "schema": "utility-consolidated-study-design-v1",
+  "status": "sources_staged_baselines_bound_runtime_integration_blocked",
+  "execution_allowed": false,
+  "reason": "Saved native host qualification.json is missing; final protected suite/scorer integration is incomplete",
+  "protocol_frozen": false,
+  "task_sites": {
+    "hydrology": "CAMELS-01491000",
+    "solar": "PVDAQ-1278",
+    "engineering": "engineering-v3",
+    "wind": "WTK-80m-41.5--70.5"
+  },
+  "cost_amendment": {
+    "comparison": "equal selection cost; separate common confirmation allowance",
+    "end_to_end_cost_matching_claim": false,
+    "accounting": "report preparation, selection, confirmation and unknown costs separately; no cost omitted"
+  },
+  "design": {
+    "paired_repetitions": 3,
+    "regimes": 2,
+    "primary_adaptive_cells": 72,
+    "engineering_ablation_cells": 18,
+    "adaptive_cells": 90,
+    "baseline_physical_reference_policy": "one per deterministic task identity, reused only by explicit references",
+    "confirmation_reuse": "only exact identical selected model/data/state identities; preserve each logical cell"
+  },
+  "planning_caps_not_execution_grants": {
+    "selection_active_seconds_per_cell": 600,
+    "fixed_evaluations_candidate_limit": 8,
+    "fixed_total_cost_candidate_safety_limit": 32,
+    "host_invocations_per_agent_cell": 12,
+    "host_timeout_seconds": 45,
+    "native_inner_model_solves_per_job": 64,
+    "common_wind_confirmation": {
+      "model_starts": 3,
+      "private_reads": 3,
+      "private_bytes": 420864,
+      "active_seconds_reserved_not_os_enforced": 60
+    },
+    "all_adaptive_selection_seconds_ceiling": 54000
+  },
+  "analysis": {
+    "scope": "exploratory within-task comparisons",
+    "paired_by": [
+      "task",
+      "regime",
+      "repetition"
+    ],
+    "report_all_cells_including_failures": true,
+    "equivalence_claim": false,
+    "role_claim_scope": "engineering only",
+    "uncertainty": "Report every paired repetition and annual/scenario stratum; no pooled independent-time confidence intervals or equivalence claims"
+  },
+  "cells": [
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "hydrology",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "solar",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "no_reviewer",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "no_implementer",
+      "order_within_block": 3,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 4,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "no_investigator",
+      "order_within_block": 5,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "no_reviewer",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 3,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "no_investigator",
+      "order_within_block": 4,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "no_implementer",
+      "order_within_block": 5,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "no_reviewer",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "no_investigator",
+      "order_within_block": 3,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 4,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "no_implementer",
+      "order_within_block": 5,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "no_implementer",
+      "order_within_block": 3,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "no_reviewer",
+      "order_within_block": 4,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "no_investigator",
+      "order_within_block": 5,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "no_reviewer",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "no_implementer",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 3,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "no_investigator",
+      "order_within_block": 4,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 5,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "no_implementer",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "no_reviewer",
+      "order_within_block": 3,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 4,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "engineering",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "no_investigator",
+      "order_within_block": 5,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_evaluations",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "conventional",
+      "order_within_block": 1,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 0,
+      "route": "single_agent",
+      "order_within_block": 2,
+      "paired_seed": 1729,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 1,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1730,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "multi_agent",
+      "order_within_block": 0,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "single_agent",
+      "order_within_block": 1,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    },
+    {
+      "task": "wind",
+      "regime": "fixed_total_cost",
+      "repetition": 2,
+      "route": "conventional",
+      "order_within_block": 2,
+      "paired_seed": 1731,
+      "selection_budget_scope": "selection_only",
+      "confirmation_policy": "common_post_selection"
+    }
+  ],
+  "pending": [
+    "Valid current native-host qualification",
+    "Final protected suite/scorer registrations and one suite-bound engineering draw"
+  ],
+  "source_hashes": {
+    "examples/utility/wind_common_confirmation.py": "25a571700db301cffd25bf37e0ebae3fb49681677751ff134bfffc8c4d201b88",
+    "examples/utility/wind_reserve_extract.py": "1603449c6ef3b325ec1d05369aefaece48df7a87222b3e610639f7910d57ccab",
+    "examples/utility/solar_1278_development.py": "f0ac315b7fe63809ee7a38284c47f617fa7f9636e6a468cbfd0cace06b5d06e0"
+  },
+  "wind_reserve_preparation": "examples/utility/wind-reserve-preparation.json",
+  "task_bindings": "examples/utility/consolidated/task-bindings.json",
+  "exposure_record": "examples/utility/consolidated/exposure.json",
+  "qualification": "examples/utility/consolidated/qualification.json",
+  "execution_readiness": "examples/utility/consolidated/execution-readiness.json",
+  "baseline_references": "examples/utility/consolidated/baseline-references.json"
+}

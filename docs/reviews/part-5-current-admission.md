@@ -1,7 +1,35 @@
 # Current Part 5 admission decision
 
+Latest [execution preparation](../../examples/utility/consolidated/README.md): CAMELS, solar and all wind
+periods staged; numeric baseline gains bound; selection supervisor and common
+engineering confirmation implemented. Final integration remains incomplete.
+The saved live-host qualification artifact is missing. No confirmation score ran.
+
+Latest [consolidated qualification](../../examples/utility/consolidated/qualification.json): four task definitions bound,
+solar-1278 personal exposure resolved, 281 checks passed. Dispatch remains
+incomplete for the three execution contracts recorded there.
+
+Current workaround: [selection-cost amendment](part-5-consolidated-audit.md#selection-cost-amendment-and-continuation).
+The new opt-in annual scorer supports common confirmation after either selection
+regime. The reserve extractor is separate from the development reader. Continue
+preparation under the narrowed cost claim; the old wind-regime refusal is no
+longer the stopping condition. The 90-cell design is not yet dispatchable.
+
+Current admission pass: [post-replacement result](part-5-consolidated-audit.md#resumed-admission-result-after-solar-replacement).
+Four concrete task definitions are recorded. Solar's 365 reserve-day objects and
+the three wind objects exist, but their measurements were not read. The actual
+annual wind callback rejects fixed-total-cost grants, so both mandatory regimes
+cannot yet execute. This supersedes solar mapping as the decisive blocker.
+
+Latest solar decision: [PVDAQ 2107 hypotheses and 1278 replacement](../../examples/utility/development/solar-mapping-v1/README.md).
+The user authorized equipment inference and source replacement. The bounded 2107
+attempt failed; 1278 passed a development screen after a recorded calibration
+amendment. Provider-confirmed 2107 mappings are no longer required. The new site's
+reserve and full study remain unadmitted; the old dossiers are preserved.
+
 Read the [consolidated audit and stopping rule](part-5-consolidated-audit.md)
-for the current decision. The study is paused. The checkpoint narrative below
+for the current decision. Its bounded admission pass is complete and blocked on
+solar source semantics; no experimental execution followed. The narrative below
 contains superseded statements about personal exposure, CAMELS acquisition and
 the engineering owner's normal path; the consolidated audit resolves them.
 

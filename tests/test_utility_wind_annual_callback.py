@@ -20,7 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def setup(
-    tmp_path, monkeypatch, *, change=None, fail_model=False, native=False, analysis_plan=None
+    tmp_path, monkeypatch, *, change=None, fail_model=False, native=False, analysis_plan=None,
+    scorer_class=callback.TrustedAnnualWindScorer,
 ):
     geometry, plan, drivers, policy = inputs()
     expected = callback.model_snapshot(geometry, plan, ROOT)
@@ -42,7 +43,7 @@ def setup(
             target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             target.write_bytes(read_bytes(ROOT, ref))
         artifact = source.prepare(store, "task", plan, drivers, public, private)
-        captures["scorer"] = callback.TrustedAnnualWindScorer(
+        captures["scorer"] = scorer_class(
             store,
             artifact,
             public,

@@ -1,0 +1,22 @@
+{
+  "schema": "utility-consolidated-exposure-v1",
+  "solar": {
+    "site": 1278,
+    "period": ["2013-01-01", "2013-12-31"],
+    "personal_prior_use": "none_attested",
+    "user_answer": "No prior inspection or use",
+    "attested_date": "2026-11-01",
+    "repository_preparation": "2013 object listing only; no measurement values inspected",
+    "development_excluded": ["2011-10-01", "2011-10-14"],
+    "scope": "Personal prior use resolved; source coverage and runtime custody are separate checks"
+  },
+  "hydrology_and_wind": {
+    "personal_prior_use": "none_attested",
+    "evidence": "docs/reviews/part-5-reserve-exposure-attestation.md",
+    "wind_trusted_preparation": "Private drivers prepared for 2012-2014; no scientific scores or advisory weather values"
+  },
+  "engineering": {
+    "policy": "new private 24-case draw before any selection; do not reuse development scenarios",
+    "draw_status": "not_generated"
+  }
+}

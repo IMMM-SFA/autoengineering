@@ -285,3 +285,12 @@ cleanup.lock
 
 # Generated source rows and packets for current-owner development controls.
 /outputs/engineering-current-owner-v*/
+
+# Raw development solar acquisitions; decisions and recipes live with examples.
+/outputs/solar-mapping-development-v*/
+
+# Trusted reserve preparation contains weather unavailable to advisory workers.
+/outputs/wind-reserve-preparation-v*/
+
+# Private consolidated study inputs and execution state.
+/outputs/consolidated-execution-v*/

@@ -24,7 +24,15 @@ from test_utility_confirmation import selected_suite
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def setup(tmp_path, monkeypatch, *, native=False, change=None, entropy=None):
+def setup(
+    tmp_path,
+    monkeypatch,
+    *,
+    native=False,
+    change=None,
+    entropy=None,
+    scorer_class=callback.TrustedLoadScorer,
+):
     if not native:
         monkeypatch.setattr(engineering, "version", lambda name: "3.41.0")
     model = load.context(0.05, tmp_path, source_root=ROOT).model
@@ -63,7 +71,7 @@ def setup(tmp_path, monkeypatch, *, native=False, change=None, entropy=None):
             store, source_policy, public, private, expected_suite_digest=store.spec.digest
         )
         ref = binding.seal(store, public, expected_manifest_digest=digest(metadata))
-        scorer = callback.TrustedLoadScorer(
+        scorer = scorer_class(
             store, ref, public, private, ROOT, work, expected_model=model, policy=policy
         )
         captured.update(scorer=scorer, source_ref=ref, source_metadata=metadata)

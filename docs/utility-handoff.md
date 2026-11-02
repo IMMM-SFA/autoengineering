@@ -1,8 +1,38 @@
 # Utility implementation handoff
 
+Latest [execution preparation](../examples/utility/consolidated/README.md): CAMELS, solar and all wind
+periods staged; numeric baseline gains bound; selection supervisor and common
+engineering confirmation implemented. Final integration remains incomplete.
+The saved live-host qualification artifact is missing. No confirmation score ran.
+
+Latest [consolidated qualification](../examples/utility/consolidated/qualification.json): four task definitions bound,
+solar-1278 personal exposure resolved, 281 checks passed. Dispatch remains
+incomplete for the three execution contracts recorded there.
+
+Use the [selection-cost workaround](reviews/part-5-consolidated-audit.md#selection-cost-amendment-and-continuation)
+and [90-cell preparation design](../examples/utility/consolidated-study.json).
+The user authorized continuation. Compare equal selection cost, with common
+confirmation work reported separately; do not claim equal end-to-end cost.
+The opt-in annual scorer and separate bounded reserve extractor supersede the
+wind-related stop described in older checkpoints below.
+
+Current execution checkpoint: [resumed admission result](reviews/part-5-consolidated-audit.md#resumed-admission-result-after-solar-replacement).
+Solar 2013 object availability and all three wind source objects were checked
+without reading measurements. The remaining decisive gap is the annual wind
+scorer's explicit refusal of the required fixed-total-cost regime, together with
+the missing reserved-year extraction path. The audit names the two implementation
+deliverables; the 90-cell study has not been frozen or run.
+
+Latest solar work: [inferred mapping and replacement decision](../examples/utility/development/solar-mapping-v1/README.md).
+Use PVDAQ 1278 as the replacement development example. The user-authorized 2107
+guess/check attempt failed, while 1278 passed the amended development screen.
+Its future reserve remains unread and unadmitted. This supersedes the prior
+instruction to await provider confirmation for site 2107.
+
 Current decision: [consolidated audit and stopping rule](reviews/part-5-consolidated-audit.md).
-The study remains paused. Use that review's bounded admission and qualification
-passes instead of continuing the historical sequence of small controls below.
+The bounded admission pass is complete with a blocked outcome. Solar source
+semantics prevent full-suite preparation; steps 2-5 were not attempted. Use the
+review's reopening conditions instead of continuing the small controls below.
 
 Start with the [current four-task admission review](reviews/part-5-current-admission.md).
 Continuation approval is recorded. Missing scientific evidence remains separate

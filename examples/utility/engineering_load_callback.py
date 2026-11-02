@@ -76,30 +76,27 @@ class TrustedLoadScorer:
             raise ValueError("coupled callback model or kernel identity differs")
         self.binding = binding.read_binding(store, binding_artifact)
         self.outcome_contract = outcome_contract(policy)
-        self.code_digest = digest(
+        self.code_digest = self._code_digest()
+        self.identity = binding.scorer_identity(self.binding, self.code_digest)
+
+    def _code_digest(self):
+        return digest(
             {
                 "schema": "utility-trusted-load-callback-v1",
                 "source": source_identity(),
-                "kernel_policy": policy.digest,
-                "expected_model": expected_model.digest,
+                "kernel_policy": self.policy.digest,
+                "expected_model": self.expected_model.digest,
                 "outcome": self.outcome_contract.digest,
             }
         )
-        self.identity = binding.scorer_identity(self.binding, self.code_digest)
+
+    def _selection_regime_allowed(self, regime):
+        return regime == "fixed_evaluations"
 
     def _scope(self, grant, model):
         if (
             self.policy.scorer_source_digest != kernel.source_identity()
-            or self.code_digest
-            != digest(
-                {
-                    "schema": "utility-trusted-load-callback-v1",
-                    "source": source_identity(),
-                    "kernel_policy": self.policy.digest,
-                    "expected_model": self.expected_model.digest,
-                    "outcome": self.outcome_contract.digest,
-                }
-            )
+            or self.code_digest != self._code_digest()
             or grant.scorer_digest != self.identity
             or grant.outcome_digest != self.outcome_contract.digest
             or model.sha256 != grant.model_digest
@@ -108,7 +105,7 @@ class TrustedLoadScorer:
         state = self.store.replay()
         selected = validate_grant(self.store, grant, state["frozen"])
         cell = next(c for c in self.store.spec.cells if c.digest == grant.cell_digest)
-        if cell.regime != "fixed_evaluations":
+        if not self._selection_regime_allowed(cell.regime):
             raise ValueError("trusted coupled callback has no qualified fixed-total-cost boundary")
         bound = read_selected_state(self.store.root, selected.selected_state)
         if bound.model != self.expected_model or set(bound.configuration) != {"source_current"}:

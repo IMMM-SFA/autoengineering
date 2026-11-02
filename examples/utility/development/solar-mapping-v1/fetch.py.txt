@@ -1,0 +1,24 @@
+import csv, hashlib, json, time, urllib.request
+from pathlib import Path
+root=Path(__file__).parent
+base='https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/2107_OEDI/data/'
+receipts=[]
+for filename,limit in [('2107_electrical_data_v1.csv',80*1024**2),('2107_environment_data.csv',4*1024**2),('2107_irradiance_data.csv',6*1024**2)]:
+ start=time.monotonic(); n=0; rows=0; last=None
+ print('Fetching development prefix:',filename,flush=True)
+ req=urllib.request.Request(base+filename,headers={'Range':f'bytes=0-{limit-1}'})
+ with urllib.request.urlopen(req,timeout=30) as r, (root/filename).open('xb') as f:
+  header=r.readline(65536);n+=len(header);f.write(header)
+  print('Columns:',header.decode().strip()[:700],flush=True)
+  while True:
+   line=r.readline(65536);n+=len(line)
+   if not line:break
+   if n>limit or time.monotonic()-start>240:raise RuntimeError('bounded acquisition exceeded')
+   stamp=line.split(b',',1)[0].strip(b'"')
+   if stamp[:4].isdigit() and stamp[:10]>=b'2019-07-01':break
+   if not stamp[:4].isdigit():raise RuntimeError('unexpected date format')
+   if not line.endswith(b'\n'):raise RuntimeError('truncated prefix before cutoff')
+   f.write(line);rows+=1;last=stamp.decode()
+  receipts.append({'url':base+filename,'status':r.status,'etag':r.headers.get('ETag'),'bytes_read':n,'rows_saved':rows,'last_timestamp':last,'seconds':time.monotonic()-start,'sha256':hashlib.sha256((root/filename).read_bytes()).hexdigest()})
+ (root/'acquisition.json').write_text(json.dumps(receipts,indent=2))
+ print('Saved',rows,'rows through',last,flush=True)
