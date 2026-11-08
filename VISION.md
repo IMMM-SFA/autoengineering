@@ -50,15 +50,15 @@ Before modifying any model or launching an expensive search, Autoengineering emp
 - **Empirical Error-Propagation Probing:** Perturbs intermediate component outputs (scale/bias, noise attenuation, or oracle/reference blending) and runs the downstream graph to measure **downstream Jacobian sensitivity**—how much a $10\%$ improvement in Component $A$ actually changes terminal metrics in Component $C$.
 - **Regime-Aware Attribution:** Evaluates sensitivity across distinct physical subsets (e.g., small natural headwaters where land-surface runoff dominates vs. heavily regulated river basins where reservoir operating rules and demand withdrawals dominate).
 
-### Capability 2: Investment & Emulator ROI Assessment
-Operationalizing the criteria in [`docs/model-improvement.md`](docs/model-improvement.md), Autoengineering translates triage measurements into an explicit engineering recommendation for each component:
+### Capability 2: Investment & Emulator ROI Assessment (Sub-Component First, Whole-Model Emulator as Last Resort)
+Operationalizing the criteria in [`docs/model-improvement.md`](docs/model-improvement.md), Autoengineering decomposes macro-models into their **internal physical sub-processes, sector downscalers, and routing/management modules** (for example, decomposing `CLM5/ELMv3` into canopy/snow/ET, surface infiltration, and vadose/aquifer subsurface drainage; `Tethys` into sector-specific irrigation, thermoelectric/industrial, and municipal downscalers; and `mosartwmpy` into hillslope routing, channel network routing, and reservoir/demand management) and translates triage measurements into an explicit engineering recommendation:
 
 | Recommendation | When Autoengineering Selects It |
 | --- | --- |
-| **Retain Baseline** | Downstream terminal metrics are insensitive to this component's output perturbations, or existing performance already satisfies physical and accuracy thresholds. |
-| **Parameter Calibration (`optimize`)** | Component has high downstream sensitivity, a sound physical structure, low per-evaluation runtime, and sufficient observation support relative to its parameter count. |
-| **Physics / Component Swap (`improve`)** | Component exhibits structural regime failure (e.g., systematic low-flow drought bias or missing human-water coupling) that parameter tuning cannot fix, and alternative formulations exist. |
-| **AI Emulator Replacement** | Component dominates system compute cost (e.g., $>80\%$ of HPC node-hours) while its input-output mapping is smooth enough that a statistical or ML surrogate can achieve massive speedup within acceptable downstream error tolerance. Includes explicit **break-even math** (training/data cost vs. per-scenario compute savings). |
+| **Retain Baseline** | Downstream terminal metrics are insensitive to this sub-component's output perturbations, or existing performance already satisfies physical and accuracy thresholds. |
+| **Parameter Calibration (`optimize`)** | Sub-component has high downstream sensitivity, a sound physical structure, low per-evaluation runtime, and sufficient observation support relative to its parameter count. |
+| **Internal Physics / Sub-Component Swap (`improve`)** | Sub-component exhibits structural regime failure (e.g., negative baseflow drainage, uncalibrated infiltration excess, missing irrigation canal conveyance loss, small-basin grid-routing distortion, or uncalibrated reservoir rule curves) that must be fixed inside the model before any surrogate is considered. |
+| **Targeted Sub-Component or Whole-Model AI Emulator** | **Targeted sub-component emulator:** Replaces a single computationally dominant numerical kernel (e.g., an iterative 20-layer Richards vadose solver) while preserving surrounding physical modules. **Whole-model emulator (Benchmark / Last Resort):** Replaces an entire macro-model only as a comparison benchmark or last resort when internal sub-component engineering leaves an irreducible HPC bottleneck. Includes explicit **break-even math** and proves that upstream emulation alone cannot rescue downstream structural physics errors. |
 
 ### Capability 3: Agent-Driven Intervention with Hard Physical Guardrails (`autoengineering improve` & `optimize`)
 When an intervention is selected, Autoengineering pairs modern coding agents (via `.claude/skills/`) with a deterministic scientific harness:

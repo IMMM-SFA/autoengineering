@@ -186,13 +186,25 @@ class TriageReport:
 
 
 def _compute_emulator_roi(comp: Component, compute_share: float) -> EmulatorROI:
-    cost_meta = comp.metadata.get("compute_cost", {}) if isinstance(comp.metadata, dict) else {}
-    hpc_hours = float(cost_meta.get("hpc_hours_per_run", cost_meta.get("hours_per_run", 0.0)))
+    meta = comp.metadata if isinstance(comp.metadata, dict) else {}
+    cost_meta = meta.get("compute_cost", {}) if isinstance(meta.get("compute_cost"), dict) else {}
+    hpc_hours = float(
+        cost_meta.get(
+            "hpc_hours_per_run",
+            cost_meta.get("hours_per_run", meta.get("hpc_node_hours", 0.0)),
+        )
+    )
     training_hours = float(
-        cost_meta.get("emulator_training_hours", max(hpc_hours * 5.0, 10.0) if hpc_hours > 0 else 0.0)
+        cost_meta.get(
+            "emulator_training_hours",
+            meta.get("emulator_train_hours", max(hpc_hours * 5.0, 10.0) if hpc_hours > 0 else 0.0),
+        )
     )
     inference_hours = float(
-        cost_meta.get("emulator_inference_hours", max(hpc_hours * 0.001, 0.0001) if hpc_hours > 0 else 0.0)
+        cost_meta.get(
+            "emulator_inference_hours",
+            meta.get("emulator_inference_hours", max(hpc_hours * 0.001, 0.0001) if hpc_hours > 0 else 0.0),
+        )
     )
     if hpc_hours <= 0.0:
         return EmulatorROI(
@@ -404,7 +416,12 @@ def triage_system(
         cost_meta = (
             meta.get("compute_cost", {}) if isinstance(meta.get("compute_cost"), dict) else {}
         )
-        hpc = float(cost_meta.get("hpc_hours_per_run", cost_meta.get("hours_per_run", 0.0)))
+        hpc = float(
+            cost_meta.get(
+                "hpc_hours_per_run",
+                cost_meta.get("hours_per_run", meta.get("hpc_node_hours", 0.0)),
+            )
+        )
         loc_rt = float(
             measured_runtimes.get(
                 name, cost_meta.get("local_runtime_seconds", base_elapsed / max(len(comp_map), 1))

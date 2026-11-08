@@ -1,0 +1,262 @@
+candidates:
+  # ---------------------------------------------------------------------------
+  # 1. CLM5 / ELMv3 Internal Sub-Component Candidates
+  # ---------------------------------------------------------------------------
+  - name: lsm_canopy_snow_et
+    model_type: land_surface_physics
+    description: CLM5-SP Prescribed MODIS Satellite Phenology Canopy/Snow/ET Partitioning (dMAE).
+    rationale: >-
+      Test replacing CLM5-BGC-Crop prognostic carbon-nitrogen crop canopy (LUH2) with CLM5-SP
+      prescribed MODIS Satellite Phenology (dMAE) to save ~65% of canopy/BGC compute; improves
+      eastern humid basins (HUC02/03/05) but degrades western snowmelt/arid ET partitioning.
+    sources:
+      - "Lawrence et al. (2019) CLM5.0 Technical Description — BGC-Crop vs Satellite Phenology (SP)"
+    metadata:
+      parent_model: CLM5 / ELMv3
+      variant: clmsp_satellite_phenology_et
+      hpc_node_hours: 24.0
+      n_parameters: 4
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:lsm_canopy_snow_et_clmsp_candidate
+        inputs: [climate_forcing]
+        outputs: [throughfall_snowmelt_net]
+
+  - name: lsm_canopy_snow_et
+    model_type: land_surface_physics
+    description: ELMv3 Demeter Crop LULCC + Calibrated Leaf-Wetted Fraction & Snowmelt Partitioning.
+    rationale: >-
+      Replace CLM5 LUH2 default canopy/snow/ET (f_wet=0.05, d_max=15mm) with ELMv3 Demeter
+      transient crop LULCC (20261020_ELMv3...demeter.lulcc) and LHS-1500 calibrated maximum
+      leaf-wetted fraction (f_wet), snowmelt factor (n_melt_coef), and dry-surface soil resistance.
+    sources:
+      - "Yan et al. (2023) / IM3 ELMv3 Demeter LULCC & LHS-1500 Canopy/Snow PPE Calibration"
+    metadata:
+      parent_model: CLM5 / ELMv3
+      variant: elm_demeter_canopy_snow_et
+      hpc_node_hours: 62.0
+      n_parameters: 6
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:lsm_canopy_snow_et_elm_demeter_candidate
+        inputs: [climate_forcing]
+        outputs: [throughfall_snowmelt_net]
+
+  - name: lsm_surface_infiltration
+    model_type: land_surface_physics
+    description: Uncalibrated ELMv3 Surface Infiltration & Ponded Water Storage (QOVER + QH2OSFC).
+    rationale: >-
+      Test raw uncalibrated ELMv3-BGC-Crop surface infiltration (20260831 default
+      clm_params_c251006.nc where QOVER + QH2OSFC is +35% higher than CLM5); expected to trigger
+      low-flow / moderate-flow volume bias guardrail veto.
+    sources:
+      - "E3SMv3 / ELMv3 Default Parameterization (clm_params_c251006.nc, case 20260831)"
+    metadata:
+      parent_model: CLM5 / ELMv3
+      variant: elmv3_uncalibrated_infiltration
+      hpc_node_hours: 46.0
+      n_parameters: 3
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:lsm_surface_infiltration_elmv3_uncal_candidate
+        inputs: [throughfall_snowmelt_net]
+        outputs: [qover_surface_m3s]
+
+  - name: lsm_surface_infiltration
+    model_type: land_surface_physics
+    description: ELMv3 Modified Frozen-Soil Infiltration + Basin-Calibrated TOPMODEL fover.
+    rationale: >-
+      Replace default TOPMODEL saturation-excess decay factor (fover=0.5 m^-1) with ELMv3
+      modified frozen-soil infiltration (run_default_modified_infil_True) and LHS-1500 basin-cluster
+      calibrated fover and porosity scaling (watsat_sf) fit on 1981-1999.
+    sources:
+      - "Niu et al. (2005) TOPMODEL fover / IM3 ELMv3 modified_infil_True & LHS-1500 Calibration"
+    metadata:
+      parent_model: CLM5 / ELMv3
+      variant: modified_infil_fover_calibrated
+      hpc_node_hours: 46.0
+      n_parameters: 3
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:lsm_surface_infiltration_calibrated_candidate
+        inputs: [throughfall_snowmelt_net]
+        outputs: [qover_surface_m3s]
+
+  - name: lsm_subsurface_drainage
+    model_type: land_surface_physics
+    description: ELMv3 Non-Negative Perched & Power-Law Aquifer Baseflow (Calibrated K_bf/N_bf/S_y).
+    rationale: >-
+      Replace CLM5 unclipped linear baseflow drainage (which produces 124 negative QDRAI cell-months
+      down to -9.06e-8 mm/s in I-25) with ELMv3 non-negative perched + unconfined aquifer drainage
+      (QDRAI + QDRAI_PERCH >= 0) calibrated via LHS-1500 (K_bf, N_bf, S_y, hksat_sf, bsw_sf).
+    sources:
+      - "Swenson & Lawrence (2015) Perched Water Table / IM3 Issue I-25 & LHS-1500 Baseflow PPE"
+    metadata:
+      parent_model: CLM5 / ELMv3
+      variant: calibrated_nonlinear_baseflow_aquifer
+      hpc_node_hours: 105.0
+      n_parameters: 6
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:lsm_subsurface_drainage_calibrated_candidate
+        inputs: [throughfall_snowmelt_net]
+        outputs: [qdrai_subsurface_m3s]
+
+  - name: lsm_subsurface_drainage
+    model_type: land_surface_physics
+    description: Unconstrained ML Vadose Drainage Regressor (violates non-negativity in drought).
+    rationale: >-
+      Attempt to replace the 120 node-hr 20-layer Richards vadose solver with an unconstrained
+      neural regressor trained on peak hydrographs; tests whether Autoengineering's physical check
+      vetoes negative drought baseflow (-2.4 m3/s) despite higher aggregate KGE.
+    sources:
+      - "Unconstrained ML Vadose Surrogate (Canary Test for PhysicalCheck Veto)"
+    metadata:
+      parent_model: CLM5 / ELMv3
+      variant: unconstrained_neural_vadose_emulator
+      hpc_node_hours: 0.05
+      n_parameters: 18
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:lsm_subsurface_unconstrained_ml_candidate
+        inputs: [throughfall_snowmelt_net]
+        outputs: [qdrai_subsurface_m3s]
+
+  # ---------------------------------------------------------------------------
+  # 2. Tethys Internal Sector-Specific Downscaling Candidates
+  # ---------------------------------------------------------------------------
+  - name: tethys_irrigation_downscaler
+    model_type: demand_downscaling
+    description: Tethys v2.2.0 Irrigation Downscaler (0.829937 Canal Efficiency + USGS Method 2 Shares).
+    rationale: >-
+      Replace Tethys 2.1.0 irrigation downscaler (which ignored canal loss and double-subtracted
+      groundwater shares) with Tethys 2.2.0 (commit 2683048): enables irrigation_conveyance_efficiency
+      = 0.829937 (1.2049x withdrawal scaling, I-07/I-10), pre-normalized crop weights (I-31),
+      populated 6-year share interpolation (fixing zero-valued 1980/1985/1995/2000 years, I-11),
+      and USGS Method 2 empirical HUC2 surface/groundwater partitioning (I-13).
+    sources:
+      - "Khan et al. (2023) Tethys v2.2.0 (2683048) / IM3 Revised Pipeline Issues I-07, I-10, I-11, I-13"
+    metadata:
+      parent_model: Tethys
+      variant: tethys_m2_usgs_canal_loss
+      hpc_node_hours: 0.45
+      n_parameters: 4
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:tethys_irrigation_v220_m2_candidate
+        inputs: [gcam_regional_demands]
+        outputs: [irr_withdrawal_m3s, irr_consumption_m3s]
+
+  - name: tethys_thermoelectric_industrial_downscaler
+    model_type: demand_downscaling
+    description: Tethys v2.2.0 + 0-LMP CERF Power-Plant Cooling Technology & Industrial Downscaler.
+    rationale: >-
+      Replace static thermoelectric & industrial downscaling with rebuilt 0-LMP CERF power-plant
+      cooling-technology siting (once-through vs recirculating cooling return-flow ratios, I-08/I-09)
+      and degree-day seasonal electricity dispatch.
+    sources:
+      - "Vernon et al. / CERF 0-LMP Plant Proxy & Tethys Thermoelectric Downscaling (I-08, I-09)"
+    metadata:
+      parent_model: Tethys
+      variant: cerf_0lmp_thermoelectric_downscaler
+      hpc_node_hours: 0.20
+      n_parameters: 4
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:tethys_thermoelectric_cerf_0lmp_candidate
+        inputs: [gcam_regional_demands]
+        outputs: [ind_elec_withdrawal_m3s, ind_elec_consumption_m3s]
+
+  - name: tethys_municipal_domestic_downscaler
+    model_type: demand_downscaling
+    description: Tethys Transient Urban Population & Seasonal Outdoor Municipal Downscaler.
+    rationale: >-
+      Replace static 1990 population municipal downscaling with transient decadal urban population
+      weights aligned with ELMv3 do_transient_urban=.true. and temperature-modulated summer outdoor
+      municipal consumption.
+    sources:
+      - "Tethys Domestic Sector Downscaling & IM3 Transient Urban Alignment (I-30)"
+    metadata:
+      parent_model: Tethys
+      variant: transient_urban_municipal_downscaler
+      hpc_node_hours: 0.15
+      n_parameters: 3
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:tethys_municipal_transient_urban_candidate
+        inputs: [gcam_regional_demands]
+        outputs: [dom_withdrawal_m3s, dom_consumption_m3s]
+
+  # ---------------------------------------------------------------------------
+  # 3. mosartwmpy Internal Routing & Water-Management Sub-Component Candidates
+  # ---------------------------------------------------------------------------
+  - name: mosart_hillslope_tributary_routing
+    model_type: river_routing
+    description: MOSART Hillslope & Tributary Routing with I-23 NaN Slope Floor & Calibrated Lag.
+    rationale: >-
+      Repair the 987 land cells with NaN hillslope slope (hslp) and 703 land cells with NaN channel
+      slope (rslp) in mosart_conus_nldas_grid.nc (Issue I-23) using minimum slope floor (1e-4) and
+      calibrated sub-network tributary roughness (nt), eliminating storage stalls in low-relief basins.
+    sources:
+      - "Li et al. (2013) MOSART Hillslope Routing & IM3 Issue I-23 (Grid Slope NaN Repair)"
+    metadata:
+      parent_model: mosartwmpy
+      variant: slope_repaired_hillslope_routing
+      hpc_node_hours: 0.70
+      n_parameters: 4
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:mosart_hillslope_slope_repaired_candidate
+        inputs: [qover_surface_m3s, qdrai_subsurface_m3s]
+        outputs: [tributary_inflow_m3s]
+
+  - name: mosart_channel_network_routing
+    model_type: river_routing
+    description: MOSART Main-Channel Network Routing + Sub-Grid Headwater Area Reconciliation (#129).
+    rationale: >-
+      Replace pure 0.125-deg gridded main-channel outlet extraction across all basin sizes with
+      sub-grid drainage-area reconciliation (IM3 Hybrid selector: exact catchment-area runoff
+      aggregation for headwater basins <= 4 cells where 0.125-deg grid quantization causes >20%
+      area distortion, coupled with mosartwmpy release/1.0.0 a69c2a7 #129 aggregation fix, I-01).
+    sources:
+      - "mosartwmpy release/1.0.0 (a69c2a7 PR #129, Issue I-01) & IM3 Small-Basin Area Filter"
+    metadata:
+      parent_model: mosartwmpy
+      variant: subgrid_area_filtered_channel_routing
+      hpc_node_hours: 0.90
+      n_parameters: 4
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:mosart_channel_subgrid_hybrid_candidate
+        inputs: [tributary_inflow_m3s]
+        outputs: [naturalized_channel_m3s]
+
+  - name: mosart_reservoir_demand_wm
+    model_type: water_management
+    description: MOSART-WM Broman 9505v4 Reservoir Rule Curves + Irrigation-First + Return Flows.
+    rationale: >-
+      Replace 20230629 Biemans/Hanasaki reservoir parameters (where release_min is negative in
+      1,847 of 1,863 reservoirs, I-22) and gross withdrawal extraction with Broman-corrected
+      9505v4 reservoir storage/release rule curves, non-negative environmental release floor,
+      coordinate-aligned 6-year reservoir demand reference (I-17), wmpy_irrigation_first_mask
+      (I-21), and explicit return-flow routing (return_flow_enabled: true, I-20).
+    sources:
+      - "Voisin et al. (2013) / Broman et al. (9505v4) & IM3 Issues I-17, I-20, I-21, I-22"
+    metadata:
+      parent_model: mosartwmpy
+      variant: broman_rules_plus_return_flow_wm
+      hpc_node_hours: 0.90
+      n_parameters: 9
+      runnable:
+        kind: python
+        entry: examples.im3_water_scarcity.run_workflow:mosart_reservoir_wm_broman_returnflow_candidate
+        inputs:
+          - naturalized_channel_m3s
+          - irr_withdrawal_m3s
+          - irr_consumption_m3s
+          - ind_elec_withdrawal_m3s
+          - ind_elec_consumption_m3s
+          - dom_withdrawal_m3s
+          - dom_consumption_m3s
+        outputs: [discharge_m3s]
+

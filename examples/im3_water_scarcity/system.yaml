@@ -1,0 +1,293 @@
+system:
+  name: im3_conus_water_scarcity_subcomponents
+  description: >-
+    DOE IM3 CONUS Water-Scarcity Modeling Chain decomposed into 9 internal physical sub-components
+    across CLM5/ELMv3 (canopy/snow/ET, surface infiltration, subsurface vadose/aquifer drainage),
+    Tethys (agricultural irrigation, thermoelectric/industrial, and municipal/domestic sector
+    downscalers), and mosartwmpy (hillslope/tributary routing, main-channel network routing with
+    drainage-area reconciliation, and GRanD 9505 reservoir rule-curve & return-flow management)
+    evaluated across 1,190 USGS 70/70 gauges (1981-2015, 420 months).
+  components:
+    - name: lsm_canopy_snow_et
+      model_type: land_surface_physics
+      description: >-
+        CLM5/ELMv3 Canopy Interception, Multilayer Snowpack Melt & Evapotranspiration Partitioning
+        (CanopyHydrologyMod / SnowHydrologyMod / PhotosynthesisMod; LUH2 vs Demeter crop LULCC).
+      ports:
+        - name: climate_forcing
+          direction: in
+        - name: throughfall_snowmelt_net
+          direction: out
+      metadata:
+        parent_model: CLM5 / ELMv3
+        variant: clm5_luh2_canopy_snow_et_baseline
+        hpc_node_hours: 68.0
+        n_parameters: 6
+        emulator_train_hours: 4.0
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:lsm_canopy_snow_et_clm5_baseline
+          inputs: [climate_forcing]
+          outputs: [throughfall_snowmelt_net]
+
+    - name: lsm_surface_infiltration
+      model_type: land_surface_physics
+      description: >-
+        CLM5/ELMv3 Surface Saturation-Excess & Infiltration-Excess Overland Runoff (QOVER + QH2OSFC;
+        TOPMODEL fover decay factor and frozen-soil infiltration impedance).
+      ports:
+        - name: throughfall_snowmelt_net
+          direction: in
+        - name: qover_surface_m3s
+          direction: out
+      metadata:
+        parent_model: CLM5 / ELMv3
+        variant: clm5_fover_infiltration_baseline
+        hpc_node_hours: 52.0
+        n_parameters: 3
+        emulator_train_hours: 3.0
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:lsm_surface_infiltration_clm5_baseline
+          inputs: [throughfall_snowmelt_net]
+          outputs: [qover_surface_m3s]
+
+    - name: lsm_subsurface_drainage
+      model_type: land_surface_physics
+      description: >-
+        CLM5/ELMv3 20-Layer Nonlinear Richards Vadose Solver, Perched Lateral Drainage & Unconfined
+        Aquifer Baseflow (QDRAI + QDRAI_PERCH; Clapp-Hornberger bsw/sucsat/hksat and K_bf/N_bf/S_y).
+      ports:
+        - name: throughfall_snowmelt_net
+          direction: in
+        - name: qdrai_subsurface_m3s
+          direction: out
+      metadata:
+        parent_model: CLM5 / ELMv3
+        variant: clm5_richards_linear_baseflow_baseline
+        hpc_node_hours: 120.0
+        n_parameters: 6
+        emulator_train_hours: 8.0
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:lsm_subsurface_drainage_clm5_baseline
+          inputs: [throughfall_snowmelt_net]
+          outputs: [qdrai_subsurface_m3s]
+
+    - name: tethys_irrigation_downscaler
+      model_type: demand_downscaling
+      description: >-
+        Tethys Agricultural Irrigation Downscaler (spatial crop-grid downscaling, canal conveyance
+        efficiency 0.829937, and USGS Method 2 vs Superwell surface/groundwater partitioning).
+      ports:
+        - name: gcam_regional_demands
+          direction: in
+        - name: irr_withdrawal_m3s
+          direction: out
+        - name: irr_consumption_m3s
+          direction: out
+      metadata:
+        parent_model: Tethys
+        variant: tethys_v210_irrigation_baseline
+        hpc_node_hours: 0.45
+        n_parameters: 4
+        emulator_train_hours: 1.0
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:tethys_irrigation_v210_baseline
+          inputs: [gcam_regional_demands]
+          outputs: [irr_withdrawal_m3s, irr_consumption_m3s]
+
+    - name: tethys_thermoelectric_industrial_downscaler
+      model_type: demand_downscaling
+      description: >-
+        Tethys Thermoelectric Power Cooling (0-LMP CERF plant siting & once-through/recirculating
+        cooling mix) plus Manufacturing, Mining, and Livestock Downscaler.
+      ports:
+        - name: gcam_regional_demands
+          direction: in
+        - name: ind_elec_withdrawal_m3s
+          direction: out
+        - name: ind_elec_consumption_m3s
+          direction: out
+      metadata:
+        parent_model: Tethys
+        variant: tethys_static_thermoelectric_ind_baseline
+        hpc_node_hours: 0.20
+        n_parameters: 4
+        emulator_train_hours: 0.5
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:tethys_thermoelectric_ind_baseline
+          inputs: [gcam_regional_demands]
+          outputs: [ind_elec_withdrawal_m3s, ind_elec_consumption_m3s]
+
+    - name: tethys_municipal_domestic_downscaler
+      model_type: demand_downscaling
+      description: >-
+        Tethys Municipal & Domestic Sector Downscaler (gridded urban/rural population masks and
+        temperature-driven seasonal lawn-watering consumption profiles).
+      ports:
+        - name: gcam_regional_demands
+          direction: in
+        - name: dom_withdrawal_m3s
+          direction: out
+        - name: dom_consumption_m3s
+          direction: out
+      metadata:
+        parent_model: Tethys
+        variant: tethys_static_municipal_baseline
+        hpc_node_hours: 0.15
+        n_parameters: 3
+        emulator_train_hours: 0.5
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:tethys_municipal_domestic_baseline
+          inputs: [gcam_regional_demands]
+          outputs: [dom_withdrawal_m3s, dom_consumption_m3s]
+
+    - name: mosart_hillslope_tributary_routing
+      model_type: river_routing
+      description: >-
+        mosartwmpy Hillslope Overland Kinematic Wave & Within-Cell Tributary Sub-Network Routing
+        (hslp, tslp, nh, nt; subject to 987 land cells with NaN hillslope slope in I-23).
+      ports:
+        - name: qover_surface_m3s
+          direction: in
+        - name: qdrai_subsurface_m3s
+          direction: in
+        - name: tributary_inflow_m3s
+          direction: out
+      metadata:
+        parent_model: mosartwmpy
+        variant: mosart_unpatched_hillslope_baseline
+        hpc_node_hours: 0.70
+        n_parameters: 4
+        emulator_train_hours: 1.5
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:mosart_hillslope_tributary_baseline
+          inputs: [qover_surface_m3s, qdrai_subsurface_m3s]
+          outputs: [tributary_inflow_m3s]
+
+    - name: mosart_channel_network_routing
+      model_type: river_routing
+      description: >-
+        mosartwmpy 0.125-deg NLDAS2 Main-Channel Kinematic/Diffusive Routing & USGS Gauge Outlet
+        Drainage-Area Reconciliation (rslp, nr, #129 aggregation fix, and small-basin area filter).
+      ports:
+        - name: tributary_inflow_m3s
+          direction: in
+        - name: naturalized_channel_m3s
+          direction: out
+      metadata:
+        parent_model: mosartwmpy
+        variant: mosart_gridded_channel_baseline
+        hpc_node_hours: 0.90
+        n_parameters: 4
+        emulator_train_hours: 1.5
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:mosart_channel_network_baseline
+          inputs: [tributary_inflow_m3s]
+          outputs: [naturalized_channel_m3s]
+
+    - name: mosart_reservoir_demand_wm
+      model_type: water_management
+      description: >-
+        mosartwmpy GRanD 9505 Reservoir Storage/Release Rule-Curve Operations, Irrigation-First
+        Demand Allocation, and Return-Flow Routing (20230629 vs Broman 9505v4 rules, I-17/I-20/I-22).
+      ports:
+        - name: naturalized_channel_m3s
+          direction: in
+        - name: irr_withdrawal_m3s
+          direction: in
+        - name: irr_consumption_m3s
+          direction: in
+        - name: ind_elec_withdrawal_m3s
+          direction: in
+        - name: ind_elec_consumption_m3s
+          direction: in
+        - name: dom_withdrawal_m3s
+          direction: in
+        - name: dom_consumption_m3s
+          direction: in
+        - name: discharge_m3s
+          direction: out
+      metadata:
+        parent_model: mosartwmpy
+        variant: mosart_wm_20230629_withdrawal_baseline
+        hpc_node_hours: 0.90
+        n_parameters: 9
+        emulator_train_hours: 2.0
+        PlannedScenarios: 20
+        runnable:
+          kind: python
+          entry: examples.im3_water_scarcity.run_workflow:mosart_reservoir_wm_baseline
+          inputs:
+            - naturalized_channel_m3s
+            - irr_withdrawal_m3s
+            - irr_consumption_m3s
+            - ind_elec_withdrawal_m3s
+            - ind_elec_consumption_m3s
+            - dom_withdrawal_m3s
+            - dom_consumption_m3s
+          outputs: [discharge_m3s]
+
+  connections:
+    - source: lsm_canopy_snow_et
+      target: lsm_surface_infiltration
+      port_from: throughfall_snowmelt_net
+      port_to: throughfall_snowmelt_net
+    - source: lsm_canopy_snow_et
+      target: lsm_subsurface_drainage
+      port_from: throughfall_snowmelt_net
+      port_to: throughfall_snowmelt_net
+    - source: lsm_surface_infiltration
+      target: mosart_hillslope_tributary_routing
+      port_from: qover_surface_m3s
+      port_to: qover_surface_m3s
+    - source: lsm_subsurface_drainage
+      target: mosart_hillslope_tributary_routing
+      port_from: qdrai_subsurface_m3s
+      port_to: qdrai_subsurface_m3s
+    - source: mosart_hillslope_tributary_routing
+      target: mosart_channel_network_routing
+      port_from: tributary_inflow_m3s
+      port_to: tributary_inflow_m3s
+    - source: mosart_channel_network_routing
+      target: mosart_reservoir_demand_wm
+      port_from: naturalized_channel_m3s
+      port_to: naturalized_channel_m3s
+    - source: tethys_irrigation_downscaler
+      target: mosart_reservoir_demand_wm
+      port_from: irr_withdrawal_m3s
+      port_to: irr_withdrawal_m3s
+    - source: tethys_irrigation_downscaler
+      target: mosart_reservoir_demand_wm
+      port_from: irr_consumption_m3s
+      port_to: irr_consumption_m3s
+    - source: tethys_thermoelectric_industrial_downscaler
+      target: mosart_reservoir_demand_wm
+      port_from: ind_elec_withdrawal_m3s
+      port_to: ind_elec_withdrawal_m3s
+    - source: tethys_thermoelectric_industrial_downscaler
+      target: mosart_reservoir_demand_wm
+      port_from: ind_elec_consumption_m3s
+      port_to: ind_elec_consumption_m3s
+    - source: tethys_municipal_domestic_downscaler
+      target: mosart_reservoir_demand_wm
+      port_from: dom_withdrawal_m3s
+      port_to: dom_withdrawal_m3s
+    - source: tethys_municipal_domestic_downscaler
+      target: mosart_reservoir_demand_wm
+      port_from: dom_consumption_m3s
+      port_to: dom_consumption_m3s
