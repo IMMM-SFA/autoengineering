@@ -31,3 +31,13 @@ pixi run autoengineering triage examples/im3_water_scarcity/system.yaml
 # 3. Execute the full sub-component triage, guarded improvement loop, and emulator comparisons
 pixi run python examples/im3_water_scarcity/run_workflow.py
 ```
+
+## 3. Generated Conference Figures (`outputs/`)
+
+Running `run_workflow.py` writes 6 standalone SVG conference graphics to `examples/im3_water_scarcity/outputs/`:
+1. `figure1_triage_and_emulator_roi.svg`: 9-Subcomponent HPC Cost Share vs. Downstream Streamflow Sensitivity & Whole-Model Emulator Comparison.
+2. `figure2_im3_intervention_progression.svg`: 12-Stage Internal Sub-Component Progression (`✓` Kept, `✗` Reverted, `⊘` Vetoed).
+3. `figure3_conus_spatial_gain_map.svg`: CONUS Spatial Map of Baseline KGE vs. $\Delta\text{KGE}$ Gain Across All 1,190 USGS Gauges (`672` Natural Circles + `518` Regulated Dam Triangles).
+4. `figure4_small_basin_vs_regulated_diagnostics.svg`: Small-Basin Grid-Quantization Bottleneck by Cell Count (`1` to `>15` Cells) & Regulated Dam Seasonal Climatology + `PhysicalCheck` Veto Canary.
+5. `figure5_tethys_sectoral_and_reservoir_water_balance.svg`: Inside `Tethys` Sectoral Withdrawal/Consumption/Return Flow & 35-Year (`1981–2015`) Annual Unmet Demand + `GRanD` Reservoir `release_min` Audit (`I-22`).
+6. `figure6_pareto_cost_accuracy_frontier.svg`: Multi-Objective Cost–Accuracy Pareto Frontier & Cumulative Multi-Scenario Campaign Break-Even ($N = 1..50$ Runs).

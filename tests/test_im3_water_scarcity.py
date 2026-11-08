@@ -77,3 +77,7 @@ class TestIM3WaterScarcityExample:
         assert (tmp_path / "im3_conference_summary.md").is_file()
         assert (tmp_path / "figure1_triage_and_emulator_roi.svg").is_file()
         assert (tmp_path / "figure2_im3_intervention_progression.svg").is_file()
+        assert (tmp_path / "figure3_conus_spatial_gain_map.svg").is_file()
+        assert (tmp_path / "figure4_small_basin_vs_regulated_diagnostics.svg").is_file()
+        assert (tmp_path / "figure5_tethys_sectoral_and_reservoir_water_balance.svg").is_file()
+        assert (tmp_path / "figure6_pareto_cost_accuracy_frontier.svg").is_file()
