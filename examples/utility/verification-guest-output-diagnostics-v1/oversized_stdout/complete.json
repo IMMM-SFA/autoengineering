@@ -1,1 +1,0 @@
-{"cleanup_absent":true,"container_creations":1,"container_id":"2c5df1d1acf1770aeaaf55ebcdc6513583a3f80380228994dcca911aa29fbadd","container_starts":1,"mode":"oversized_stdout","refusal":{"exception":"GuestAttachError","message":"guest attach stdout exceeds bound","stderr_bytes_discarded":0,"stdout_bytes_accepted":68222976,"stdout_bytes_declared":68255744},"scientific_starts":0}

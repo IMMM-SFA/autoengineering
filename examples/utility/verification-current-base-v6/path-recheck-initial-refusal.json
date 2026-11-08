@@ -1,7 +1,0 @@
-{
-  "exit_code": 1,
-  "test_started": false,
-  "reason": "Initial recheck wrapper treated a JUnit class name as part of the module path",
-  "source_changed": false,
-  "successor": "recheck-path-v2.py.txt"
-}

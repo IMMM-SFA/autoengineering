@@ -1,8 +1,0 @@
-{
-  "observed_utc": "2026-10-31T08:19:01.217388+00:00",
-  "monotonic_implementation": "mach_absolute_time()",
-  "waketime_exit_code": 0,
-  "waketime": "{ sec = 1793433950, usec = 502012 } Sat Oct 31 01:05:50 2026",
-  "error": "",
-  "last_wake_utc": "2026-10-31T08:05:50+00:00"
-}

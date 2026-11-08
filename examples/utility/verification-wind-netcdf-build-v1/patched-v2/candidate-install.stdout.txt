@@ -1,3 +1,0 @@
-Processing /private/tmp/utility-wind-netcdf-build-v3/wheel/netcdf4-1.7.4-cp312-cp312-macosx_26_0_arm64.whl
-Installing collected packages: netcdf4
-Successfully installed netcdf4-1.7.4

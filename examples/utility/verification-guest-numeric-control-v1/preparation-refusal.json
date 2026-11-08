@@ -1,9 +1,0 @@
-{
-  "scope": "outputs/guest-numeric-control-v1",
-  "reason": "compared the selected 120-row prefix hash to the 80-row fitting hash",
-  "container_creations": 0,
-  "container_starts": 0,
-  "models_started": 0,
-  "reused_scope": false,
-  "correction": "preserve all 120 selected-prefix rows; compare the exact original 80-row fitting prefix separately"
-}

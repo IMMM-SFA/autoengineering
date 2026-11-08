@@ -1,7 +1,0 @@
-{
-  "exception": "KeyError: pid",
-  "stage": "before first ps invocation",
-  "correction": "Use the saved watchdog_pid field in a separate read-only diagnostic",
-  "new_guest_starts": 0,
-  "signals_sent": 0
-}

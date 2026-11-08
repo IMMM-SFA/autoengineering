@@ -1,7 +1,0 @@
-{
-  "original_receipt_reader_exit_code": 0,
-  "forged_normal_disarm_rejected": true,
-  "forged_file_pins_intentionally_rehashed": true,
-  "negative_reader_exit_code": 1,
-  "new_runtime_or_source_calls": 0
-}

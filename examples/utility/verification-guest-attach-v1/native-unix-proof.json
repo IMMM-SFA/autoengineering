@@ -1,9 +1,0 @@
-{
-  "scope": "authored owned Unix peer, not Docker or guest qualification",
-  "request_sha256": "0cfa68ff6356bc05349a7a094a93d9b78855c20590f05b494f167fcc698abfd1",
-  "response_digest": "823313e31d549c1d70769ecdd18f5a5c611e737c06812fb5db24aa326a0eb8db",
-  "stdout_bytes": 7423,
-  "stderr_bytes": 27,
-  "input_consumed": true,
-  "peer_observed_stdin_eof": true
-}

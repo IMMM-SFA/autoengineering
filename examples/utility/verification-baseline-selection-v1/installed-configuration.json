@@ -1,9 +1,0 @@
-{
-  "installed_root": "/private/tmp/utility-baseline-selection-installed-v1",
-  "root": "/private/tmp/utility-baseline-selection-fixture-v1",
-  "suite": "/private/tmp/utility-baseline-selection-fixture-v1/reference-suite",
-  "source_root": "/private/tmp/utility-baseline-selection-fixture-v1/captured",
-  "plan_path": "/private/tmp/utility-baseline-selection-fixture-v1/plan.json",
-  "matched_core_files": 202,
-  "wheel_sha256": "b5b3b6a28cd157d170e5b8f1a1b0640d6a6538ae466dfe26f896ef0a16db24ed"
-}

@@ -1,1 +1,0 @@
-{"action_id":"eval-000010","config":{"capacity":74.72642179578543,"recession":0.8600565404631197},"feasible":true,"message":"best feasible observed configuration","outcomes":{"bias":-0.19870980391534127,"correlation":0.7939428636005004,"kge":0.7153786472141006,"nse":0.6248415150579498,"relative_bias":-0.10846002185123127,"rmse":1.999105603875805}}

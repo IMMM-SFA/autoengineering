@@ -1,6 +1,0 @@
-{
-  "wheel_sha256": "14426c2923313dc9eafea37c347b89128297d5a7e5c6f088f17ed8c4634c0c6a",
-  "core_python_files_verified": 187,
-  "base_interpreter": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
-  "dependencies": "cached base path without editable activation"
-}

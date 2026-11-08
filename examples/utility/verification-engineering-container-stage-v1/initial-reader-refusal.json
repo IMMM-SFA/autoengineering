@@ -1,7 +1,0 @@
-{
-  "stage": "before metadata replay",
-  "reason": "first reader blocked numpy while importing shared canonical JSON utilities that transitively import it",
-  "correction": "stdlib-only canonical JSON and digest checks in a separately saved reader",
-  "new_model_runs": 0,
-  "new_daemon_calls": 0
-}

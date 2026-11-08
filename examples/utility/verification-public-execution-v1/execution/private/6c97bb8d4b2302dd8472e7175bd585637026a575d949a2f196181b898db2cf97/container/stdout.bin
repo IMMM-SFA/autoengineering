@@ -1,1 +1,0 @@
-{"captured_bytes": 78, "child_exit_code": 0, "child_signal": null, "mode": "score", "output_limit_bytes": 16384, "output_limited": false, "private_scoring_qualified": false, "schema": "private-container-output-v1", "score": {"feasible": true, "outcome": "rmse", "status": "success", "units": "W", "value": 1.0}}

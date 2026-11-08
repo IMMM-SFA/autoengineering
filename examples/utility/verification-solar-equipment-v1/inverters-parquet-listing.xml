@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>oedi-data-lake</Name><Prefix>pvdaq/parquet/inverters/</Prefix><KeyCount>1</KeyCount><MaxKeys>10</MaxKeys><IsTruncated>false</IsTruncated><Contents><Key>pvdaq/parquet/inverters/part-00000-a9a6892f-3bca-42b7-a65e-2d8355306319-c000.snappy.parquet</Key><LastModified>2022-02-16T05:24:02.000Z</LastModified><ETag>&quot;022e9bfc4d5dd23f14a2500b8b8fb8c0&quot;</ETag><Size>13891</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>

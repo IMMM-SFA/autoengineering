@@ -1,1 +1,0 @@
-{"netcdf4": "1.7.4", "numpy": "2.5.2", "pywake": "2.6.20", "module_path": "/private/tmp/utility-wind-netcdf-build-v3/installed/netCDF4/__init__.py", "netcdf_c": "4.10.1", "hdf5": "2.2.0", "warnings": [], "checks": "passed", "mode": "write", "scientific_model_calls": 0, "private_reads": 0}

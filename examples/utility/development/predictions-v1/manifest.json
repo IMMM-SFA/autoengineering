@@ -1,9 +1,0 @@
-{
-  "purpose": "previously exposed development; not confirmation",
-  "sources": {
-    "examples/utility/rehearse_predictions.py": "e8076c0d918d9eb0d68131997d0b6774f3b9e64187632d5fd9940ba45e1194e8",
-    "examples/utility/hydrology.py": "5b03fe142fec20ab09e8c02ccd0bedb401b7201da0d0be3a176e08c5dd1b5f5c",
-    "examples/utility/solar.py": "e34d5ba078eba841ac5cee2a17bdc83385c79acef6adf302056cf7dde209dae8"
-  },
-  "physical_start_cap": 10
-}

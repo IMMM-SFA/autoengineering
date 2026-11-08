@@ -1,7 +1,0 @@
-{
-  "name": "autoengineering-0.2.0-py3-none-any.whl",
-  "sha256": "ece92a9322ea5b9a200c13598ae4ff1acf2f623cad99dcb49317993d291b4509",
-  "size_bytes": 791834,
-  "build_root": "local checkout; installed execution outside checkout",
-  "dependency_profile": "utility, external cached site packages referenced without editable activation"
-}

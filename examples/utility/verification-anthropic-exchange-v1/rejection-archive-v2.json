@@ -1,6 +1,0 @@
-{
-  "archive": "examples/utility/development/anthropic-rejection-evidence-v2",
-  "index_sha256": "d9120bbc15d194443745b60e5e02110e6726454a71ec079f07f653d9f01a16e3",
-  "replay_callback_instrumentation": "explicit; previous v1 guard used an exception only",
-  "production_admission": false
-}

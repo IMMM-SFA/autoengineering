@@ -1,7 +1,0 @@
-{
-  "changed_payload_rejected": true,
-  "exit_code": 1,
-  "new_model_calls": 0,
-  "changed_control_scope_retained": "/private/tmp/utility-guest-wheel-v6-v2/relocated-context",
-  "original_context_changed": false
-}

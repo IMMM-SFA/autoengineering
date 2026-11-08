@@ -1,7 +1,0 @@
-{
-  "fault": "deadline",
-  "owner_pid": 37912,
-  "returncode": 2,
-  "expected_returncode": 2,
-  "output": "/private/tmp/utility-runtime-lifecycle-deadline-v1"
-}

@@ -1,6 +1,0 @@
-apiKeyHelper failed: exited 1: Error opening /private/var/select/sh: Operation not permitted
-Failed to exec /bin/bash as variant for /bin/sh (1: Operation not permitted).
-apiKeyHelper failed: exited 1: Error opening /private/var/select/sh: Operation not permitted
-Failed to exec /bin/bash as variant for /bin/sh (1: Operation not permitted).
-apiKeyHelper failed: exited 1: Error opening /private/var/select/sh: Operation not permitted
-Failed to exec /bin/bash as variant for /bin/sh (1: Operation not permitted).

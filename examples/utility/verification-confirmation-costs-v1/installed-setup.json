@@ -1,5 +1,0 @@
-{
-  "scope": "fresh wheel extraction in new venv; inherited cached base dependencies; fixture prepared by explicit repository test helpers",
-  "dependency_root": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/lib/python3.12/site-packages",
-  "repository": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture"
-}

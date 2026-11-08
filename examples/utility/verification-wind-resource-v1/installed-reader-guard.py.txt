@@ -1,8 +1,0 @@
-import pathlib,sys
-original=pathlib.Path('/Users/cam/projects/autoengineering')
-def guard(event,args):
- if event=='open' and isinstance(args[0],(str,bytes)):
-  value=args[0].decode() if isinstance(args[0],bytes) else args[0]
-  if pathlib.Path(value).absolute().is_relative_to(original): raise RuntimeError('original checkout access denied')
- if event in ('socket.__new__','subprocess.Popen'): raise RuntimeError('sockets and processes denied')
-sys.addaudithook(guard)

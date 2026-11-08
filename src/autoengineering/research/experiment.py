@@ -174,6 +174,7 @@ class ExperimentTree:
             "baseline": "●",
             "kept": "✓",
             "reverted": "✗",
+            "vetoed": "⊘",
             "failed": "!",
         }
         lines = ["# Experiment Tree", ""]

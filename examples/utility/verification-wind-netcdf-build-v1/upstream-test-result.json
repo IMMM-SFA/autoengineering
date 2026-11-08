@@ -1,8 +1,0 @@
-{
-  "exit_code": 1,
-  "numpy": "2.5.2",
-  "netcdf4": "1.7.4",
-  "module_path": "/private/tmp/utility-wind-netcdf-build-v3/installed/netCDF4/__init__.py",
-  "model_calls": 0,
-  "warning_filters_relaxed": false
-}

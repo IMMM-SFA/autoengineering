@@ -1,8 +1,0 @@
-{
-  "command": [
-    "tag",
-    "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188",
-    "localhost/ae-engineering-source-1fed24dc839d4e39a50fc9d820198706:frozen"
-  ],
-  "request_digest": "28e0b2f8acc86aec430e8920600aa63cc44328b9b11f3d1329f318300145c5d6"
-}

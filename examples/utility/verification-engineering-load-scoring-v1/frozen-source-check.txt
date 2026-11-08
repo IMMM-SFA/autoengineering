@@ -1,1 +1,0 @@
-Environment 7c66ecada3955ad940d07fcf409b7f78bf68fc643950340f408d9d398a6fa06e and frozen 224 core / 315 guest Python source sets verified. New kernel is outside that wheel. Executed and current kernel snapshots retain their distinct counter-description hashes. No model rerun after description correction.

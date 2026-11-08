@@ -1,2 +1,0 @@
-task_id,regime,route_id,comparator_id,outcome,units,repetition,scenario_digest,route_value,comparator_value,gain
-task,fixed_evaluations,multi,conventional,power,W,0,1111111111111111111111111111111111111111111111111111111111111111,3.0,3.0,0.0

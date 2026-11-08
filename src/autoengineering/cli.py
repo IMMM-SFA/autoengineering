@@ -14,25 +14,6 @@ from autoengineering.system.graph import System
 console = Console()
 
 
-class _LazyGroup(click.Group):
-    """Register help and names without importing execution backends."""
-
-    def __init__(self, name, module, help):
-        super().__init__(name=name, help=help)
-        self.module = module
-
-    def _load(self):
-        from importlib import import_module
-
-        return getattr(import_module(self.module), self.name)
-
-    def list_commands(self, ctx):
-        return self._load().list_commands(ctx)
-
-    def get_command(self, ctx, name):
-        return self._load().get_command(ctx, name)
-
-
 @click.group()
 @click.version_option(package_name="autoengineering")
 def cli():
@@ -334,26 +315,49 @@ def experiments(tree_file):
     click.echo(tree.to_markdown())  # pre-formatted tree; echo verbatim to keep indentation
 
 
-cli.add_command(
-    _LazyGroup(
-        "campaign",
-        "autoengineering.campaign.command",
-        "Run deterministic campaigns with supplied trusted adapters.",
-    )
+@cli.command()
+@click.argument("system_file", type=click.Path(exists=True))
+@click.option(
+    "--results",
+    "-r",
+    type=click.Path(exists=True),
+    help="Optional JSON file of ValidationResult records.",
 )
-cli.add_command(
-    _LazyGroup(
-        "agents",
-        "autoengineering.agents.command",
-        "Run bounded worker workflows with fake or explicitly configured Codex hosts.",
-    )
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["markdown", "json"]),
+    default="markdown",
+    help="Output format.",
 )
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    help="Optional output file path.",
+)
+def triage(system_file, results, output_format, output):
+    """Diagnose system bottlenecks, error propagation, and Emulator/Swap ROI."""
+    from autoengineering.triage import triage_system
+    from autoengineering.validate.compare import ValidationResult
 
+    system = System.from_yaml(system_file)
+    validation_results = []
+    if results:
+        with open(results) as f:
+            raw = json.load(f)
+        validation_results = [ValidationResult(**r) for r in raw]
 
-cli.add_command(
-    _LazyGroup("utility", "autoengineering.utility.command",
-               "Prepare utility suites and verify offline comparison evidence.")
-)
+    report = triage_system(system, validation_results=validation_results)
+    content = report.to_json() if output_format == "json" else report.to_markdown()
+
+    if output:
+        Path(output).write_text(content)
+        click.echo(f"Triage report written to {output}")
+    elif output_format == "json":
+        click.echo(content)
+    else:
+        console.print(Markdown(content))
 
 
 if __name__ == "__main__":

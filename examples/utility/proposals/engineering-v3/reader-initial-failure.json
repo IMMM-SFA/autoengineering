@@ -1,6 +1,0 @@
-{
-  "status": "metadata_reader_interface_error",
-  "reason": "BatchProjection exposes finished, not results",
-  "model_rerun": false,
-  "correction": "Use the existing finished mapping for receipt reconstruction"
-}

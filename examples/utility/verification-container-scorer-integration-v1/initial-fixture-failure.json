@@ -1,7 +1,0 @@
-{
-  "passed": 1,
-  "failed": 7,
-  "cause": "authored unit fixture did not create its public artifacts directory before put_bytes",
-  "correction": "create the required fixture artifacts directory",
-  "container_starts": 0
-}

@@ -1,6 +1,0 @@
-sandbox-exec: host must be * or localhost in network address
-
-Backtrace: 
-/private/tmp/claude-policy-probe-v1/canary.sb:11:26:
-	(remote ip "127.0.0.1:65039")
-

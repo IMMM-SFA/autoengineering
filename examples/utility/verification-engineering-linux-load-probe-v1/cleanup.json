@@ -1,9 +1,0 @@
-{
-  "container_id": "5ad32fa1779123839af59ce02c6605a20d505bcb840ba47ad9a880cc3c030ce7",
-  "absent": true,
-  "delete_attempts": 1,
-  "original_cleanup_acknowledgment_parse_failed": true,
-  "separate_read_only_absence_observation": true,
-  "new_mutations": 0,
-  "owner_loss_qualified": false
-}

@@ -1,8 +1,0 @@
-{
-  "original_execution_exit_code": 1,
-  "operation": "one DELETE of the exact original CID with expected HTTP 204",
-  "exception": "GuestDaemonError: guest daemon JSON projection is malformed",
-  "cause": "JSON-only helper was used for the empty successful DELETE response",
-  "action": "separate read-only exact-CID absence observation; no repeated DELETE or model run",
-  "scientific_request_remains_consumed": true
-}

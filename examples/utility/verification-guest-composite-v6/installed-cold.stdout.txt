@@ -1,1 +1,0 @@
-{"cold_public_replay": true, "confirmed_scores": 1, "inference_starts": 1.0, "scoring_starts": 1.0, "container_starts": 2.0, "new_processes": 0, "network": false, "private_labels_read": false, "numpy_archives_loaded": false, "model_imports": false, "writes": false}

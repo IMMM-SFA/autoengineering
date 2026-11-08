@@ -1,9 +1,0 @@
-{
-  "module": "/private/tmp/anthropic-upstream-installed-v1/venv/lib/python3.12/site-packages/autoengineering/agents/hosts/anthropic_worker.py",
-  "checks": {
-    "original_open": "denied",
-    "socket": "denied",
-    "subprocess": "denied"
-  },
-  "optional_packages": "absent"
-}

@@ -1,7 +1,0 @@
-{
-  "wheel_sha256": "1ab9aa7306113fb3ae05fa8e2c1add943d533d56589c8d71fff0e463146a8eee",
-  "core_python_files_verified": 188,
-  "host_source_identity": "bf795307c0b31643daa37651c6ea91fbbd1f2adc44c1fe5c4606c91f4a9b8eca",
-  "guard_scope": "test parent original checkout opens, external sockets/lookup and arbitrary subprocesses denied; fixed Python/ps and loopback allowed; isolated children do not inherit audit hook",
-  "dependencies": "cached base site path without editable activation"
-}

@@ -1,8 +1,0 @@
-{
-  "status": "failed_before_execution",
-  "reason": "current wheel excludes examples.campaign_contracts fixture module",
-  "wheel_sha256": "494741718a4692a3ee221509db9fa5e2a7046665b34cdb011d63ce39b5d92a36",
-  "suite_attempts": 0,
-  "models_started": 0,
-  "providers_contacted": 0
-}

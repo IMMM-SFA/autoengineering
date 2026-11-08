@@ -1,5 +1,0 @@
-{
-  "cli": "/usr/local/bin/docker",
-  "buildx": "/Applications/OrbStack.app/Contents/MacOS/xbin/docker-buildx",
-  "endpoint": "/Users/cam/.orbstack/run/docker.sock"
-}

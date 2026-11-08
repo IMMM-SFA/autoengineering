@@ -1,8 +1,0 @@
-{
-  "stage": "unstarted proof archived and cold-verified; running scope copied but not verified",
-  "exception": "ValueError: artifact must be a regular file",
-  "missing_file": "running/helper.py.txt",
-  "reason": "reader requires the helper snapshot whose hash the running controller already pinned",
-  "correction": "copy exact digest-matched helper source, preserve completed unstarted archive and continue metadata-only finalization",
-  "new_fitting_or_guest_or_model_starts": 0
-}

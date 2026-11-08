@@ -1,8 +1,0 @@
-/Users/cam/.matplotlib is not a writable directory
-Matplotlib created a temporary cache directory at /var/folders/fh/9cg4m7ms61135w3wnpgg71lr0000gn/T/matplotlib-v8szvnhl because there was an issue with the default path ({configdir}); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
-
-Fontconfig error: No writable cache directories
-	/opt/homebrew/var/cache/fontconfig
-	/Users/cam/.cache/fontconfig
-	/Users/cam/.fontconfig
-Matplotlib is building the font cache; this may take a moment.

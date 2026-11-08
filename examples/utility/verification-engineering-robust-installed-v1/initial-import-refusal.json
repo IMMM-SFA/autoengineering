@@ -1,8 +1,0 @@
-{
-  "stage": "read-only import probes before scientific request creation",
-  "reason": "guard compared an unresolved dependency symlink path under the checkout with its resolved cache prefix",
-  "correction": "resolve opened paths before comparing to the explicit dependency root",
-  "native_processes": 0,
-  "scenario_processes": 0,
-  "checkout_model_sources_remain_denied": true
-}

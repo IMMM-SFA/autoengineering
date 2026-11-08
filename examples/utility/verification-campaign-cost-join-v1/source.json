@@ -1,7 +1,0 @@
-{
-  "src/autoengineering/utility/campaign_costs.py": "f8a90fc180fe67121ac70be7c3333a4e601cf4923d28dc00357891edf176e28a",
-  "src/autoengineering/utility/report.py": "e8d189f08e4e997127364fa852cb61ca80f0707e30d9e60e7ccaf33d9392837e",
-  "src/autoengineering/campaign/controller.py": "bb376378bf41165dd8352f7c017964455eb4eebce35989ebfafcb599529039f1",
-  "tests/test_utility_campaign_costs.py": "9344d5258f714638c0cc03ee69c7792fba4baf94fbedabb5c19a351629104408",
-  "tests/test_campaign_recovery.py": "9aebb37aaf7273625dfac31a21b064fcebf999153d7fe38f52e4a331fa857866"
-}

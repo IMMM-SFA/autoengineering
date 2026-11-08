@@ -1,7 +1,0 @@
-{
-  "stage": "after public cold recovery and parity file copy, before parity metadata reader",
-  "exception": "ModuleNotFoundError: No module named examples.utility",
-  "reason": "archive helper launched with script directory on sys.path",
-  "action": "preserve copied archive and logs, finish metadata using runpy from checkout",
-  "new_model_or_guest_starts": 0
-}

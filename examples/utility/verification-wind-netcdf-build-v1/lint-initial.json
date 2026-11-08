@@ -1,7 +1,0 @@
-{
-  "initial_status": "failed",
-  "upstream_style_findings": 6,
-  "file": "upstream-source/setup.py",
-  "resolution": "Preserved unmodified upstream source as setup.py.txt, an archived build input rather than project Python code",
-  "upstream_source_reformatted": false
-}

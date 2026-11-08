@@ -1,8 +1,0 @@
-{
-  "root": "/private/tmp/claude-loopback-installed-v2",
-  "resolved_base_interpreter": "/Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/default/bin/python3.12",
-  "wheel": "unchanged from installed-setup.json",
-  "fresh_virtual_environment": true,
-  "original_failed_root_retained": "/private/tmp/claude-loopback-installed-v1",
-  "sys_path_root": "explicit private reader-root.pth; interpreter run with -P"
-}

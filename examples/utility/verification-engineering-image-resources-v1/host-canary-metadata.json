@@ -1,7 +1,0 @@
-{
-  "path": "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/outputs/engineering-image-resources-v1/ae-host-canary-72f423ae33394a10a267b6fcc7f55954",
-  "exists_after_probe": true,
-  "size_bytes": 49,
-  "sha256": "ffa50e094eb5ff64e40e3d18cc18b7704ad1b51f496490f23e8e467536dcf42a",
-  "data_kind": "fresh authored public canary, no scientific data"
-}

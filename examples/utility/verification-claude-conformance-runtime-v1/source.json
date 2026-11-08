@@ -1,9 +1,0 @@
-{
-  "src/autoengineering/agents/conformance_runtime.py": "aaec3eb8a47127158581911dd94a3c71903293ef53baadd50c86c978c3719ed3",
-  "src/autoengineering/agents/conformance_report.py": "49d8bf1accfd01a9c182e918b20dceeac8c556a794afe1d1e684d751d0decdac",
-  "src/autoengineering/agents/conformance_protocol.py": "1f5d56eb68052ad91cd0d634bed2e1de31f5d0a4d18bb49025e2c012828134a5",
-  "src/autoengineering/agents/conformance_anthropic.py": "8e7c9e0bb26f69f8a78218049e5efdfccc8de20d40023dc7bd2750fc9fc7ffcb",
-  "tests/test_agent_claude_conformance.py": "eba2fff51feea937a9632dacc3a22d5a6de2647094c04301f423c6908aadfd7d",
-  "tests/test_agent_claude_conformance_runtime.py": "ad1d7a67d6244cccc39ee847540d1074a981defdd92aafa32e8e8c483867b5a5",
-  "tests/test_agent_conformance_anthropic.py": "ea0accd4bbdf4c2345858acd9db9ad98087656e72dce8d2b636ada8bf14b75d3"
-}

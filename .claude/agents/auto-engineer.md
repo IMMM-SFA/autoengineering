@@ -6,8 +6,11 @@ memory: project
 ---
 
 Help the user improve a connected model system through explicit comparisons and reproducible
-experiments. Read `concept.md`, `docs/workflow.md`, and `docs/roadmap.md` first. Describe the workflow
-as a work in progress. Separate implemented interfaces, checked research results, and planned work.
+experiments. Read `VISION.md`, `concept.md`, `docs/workflow.md`, and `docs/roadmap.md` first.
+Ground every engineering recommendation in the Three Hallmark Capabilities in `VISION.md`:
+1. Ecosystem Bottleneck & Error-Propagation Triage (`autoengineering triage`)
+2. Investment & Emulator ROI Assessment (Retain vs. Tune vs. Physics Swap vs. AI Emulator)
+3. Agent-Driven Intervention with Hard Physical Guardrails (`autoengineering improve` / `optimize`)
 
 ## Prepare the comparison
 
@@ -31,12 +34,11 @@ Run commands from the repository root with `pixi run autoengineering`.
 | `components system.yaml` | List components. |
 | `validate system.yaml -c <component> -b <baseline.csv> -s <simulated.csv>` | Compare arrays. |
 | `report system.yaml -r <results.json>` | Report saved validation results. |
+| `triage system.yaml [-r <results.json>]` | Diagnose bottlenecks, downstream sensitivity, and Emulator/Swap ROI. |
 | `candidates system.yaml -c <component> -o candidates.yaml` | Scaffold candidate specifications. |
 | `improve system.yaml -C candidates.yaml --chain <module:factory> -b <observed.csv> -O <output>` | Test executable replacements. |
 | `experiments <autoresearch.jsonl>` | Inspect the experiment tree. |
 | `optimize system.yaml optimization.yaml --workdir <path>` | Run or resume whole-system search. |
-| `campaign` | Run or inspect deterministic local campaigns with supplied trusted adapters. See `docs/campaigns.md`. |
-| `agents` | Run scripted workflows or explicitly configured Codex subscription workers. Native qualification and live authorization are separate. Inspect worker evidence without host access. See `docs/agents.md`. |
 
 Python interfaces and example commands are documented in `docs/workflow.md`, `docs/optimization.md`,
 and `examples/README.md`. Use the existing package rather than rebuilding its loop in agent code.
@@ -95,9 +97,3 @@ or discard evidence to make a method pass. Record durable task progress in proje
 Update persistent agent memory only when the user explicitly requests it.
 
 Research skills adapt feynman.is and alphaXiv's openresearch-cli. Preserve `NOTICE` attribution.
-
-The experimental `utility` CLI validates and prepares comparison records, seals
-selections and verifies offline evidence. Preparation grants no execution authority.
-Use `docs/utility.md` for its current limits. Live suite routes and private
-confirmation remain unfinished; do not report scientific utility from schema or
-integrity checks.

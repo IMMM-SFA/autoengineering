@@ -1,9 +1,0 @@
-{
-  "full_model_digest": "46f920a1aec4bb294ebf7fb76b0bbae69674688fec9a14a2c1f8ad5104dc6f69",
-  "ground_only_projection_digest": "9b62e8501f9fa2e3aa13b91090aec6431c034b76ac0b360be81446bca590e098",
-  "both_exact_views_matched": true,
-  "foreign_graph_rejected": true,
-  "new_model_starts": 0,
-  "prior_charges": 11,
-  "remaining_cap": 53
-}

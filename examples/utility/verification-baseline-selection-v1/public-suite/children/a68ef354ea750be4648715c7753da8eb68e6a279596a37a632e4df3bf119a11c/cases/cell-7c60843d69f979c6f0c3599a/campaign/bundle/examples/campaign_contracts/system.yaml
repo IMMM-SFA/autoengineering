@@ -1,8 +1,0 @@
-name: contract-fixture
-components:
-  - name: response
-    inputs:
-      - {name: forcing, direction: in, data_type: scalar, units: mm/day}
-    outputs:
-      - {name: prediction, direction: out, data_type: scalar, units: mm/day}
-connections: []

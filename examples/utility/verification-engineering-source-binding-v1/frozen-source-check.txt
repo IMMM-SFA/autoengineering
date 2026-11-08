@@ -1,1 +1,0 @@
-Environment 7c66ecada3955ad940d07fcf409b7f78bf68fc643950340f408d9d398a6fa06e verified. _source_alignment passed for all 224 core and 315 frozen guest Python sources. New binding module is outside that wheel. Archived actual binding matches current binding module bytes. No guest execution or native model solve.

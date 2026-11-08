@@ -1,7 +1,0 @@
-Processing ./wheel/autoengineering-0.2.0-py3-none-any.whl
-Installing collected packages: autoengineering
-  Attempting uninstall: autoengineering
-    Found existing installation: autoengineering 0.2.0
-    Not uninstalling autoengineering at /Users/cam/Library/Caches/rattler/cache/envs/autoengineering-2706574624935427595/envs/interoperability/lib/python3.12/site-packages, outside environment /private/tmp/utility-robust-installed-v1/venv
-    Can't uninstall 'autoengineering'. No files were found to uninstall.
-Successfully installed autoengineering-0.2.0

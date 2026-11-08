@@ -1,9 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/cam/projects/autoengineering/.worktrees/agentic-architecture/examples/utility/verification-guest-composite-v6/installed-cold-reader.py.txt", line 48, in <module>
-  File "/private/tmp/utility-load-cost-report-v1/installed/autoengineering/utility/store.py", line 221, in replay
-  File "/private/tmp/utility-load-cost-report-v1/installed/autoengineering/utility/store.py", line 153, in _reduce
-  File "/private/tmp/utility-load-cost-report-v1/installed/autoengineering/utility/scoring.py", line 273, in validate_score
-  File "/private/tmp/utility-load-cost-report-v1/installed/autoengineering/utility/scoring.py", line 128, in _read
-  File "/private/tmp/utility-load-cost-report-v1/installed/autoengineering/campaign/artifacts.py", line 49, in reference
-  File "/private/tmp/utility-load-cost-report-v1/installed/autoengineering/campaign/artifacts.py", line 26, in confined_file
-ValueError: artifact must be a regular file

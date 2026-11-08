@@ -1,1 +1,0 @@
-{"automatic_retries":0,"cancel_at_phase":"created","case":"cancel_after_create","container_starts_allowed":0,"creations_reserved":1,"expected_exception":"GuestAttachCancelled","expected_reason":"guest executor cancelled","grant_digest":"d1decd8fffcc7c66de261d5a73339dff3821fc3cdeef9d4e9f22911abc368fc2"}

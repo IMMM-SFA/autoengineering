@@ -29,26 +29,31 @@ bounded caller until the planned harness provides a common lifecycle.
 
 ```python
 from autoengineering.research import auto_improve, load_candidates, write_report
+from autoengineering.validate import PhysicalCheck
 
 tree = auto_improve(
     system, run_chain, observed,
     validate_output="routing.streamflow",
     candidates=load_candidates("candidates.yaml"),
-    metrics=["rmse", "bias", "nse", "kge"],
+    metrics=["rmse", "bias", "nse", "kge", "pbias", "low_flow_pbias"],
     thresholds={"nse": 0.4, "kge": 0.4},
+    physical_checks=[
+        PhysicalCheck(name="nonnegative_flow", kind="nonnegative", port="routing.streamflow"),
+    ],
+    max_degradation={"low_flow_pbias": 5.0},
     target={"nse": 0.5}, max_iterations=20,
     workdir="outputs/replacement-study", slug="replacement-study",
 )
 write_report(tree, system, "replacement-study", "outputs/replacement-study")
 ```
 
-This template requires a prepared system, runner, observations, and candidate file. For a complete
-example, run `pixi run python examples/leaf_river/run_auto_research.py`.
+This template requires a prepared system, runner, observations, and candidate file. For complete
+examples, run `pixi run python examples/leaf_river/run_auto_research.py` or
+`pixi run python examples/im3_water_scarcity/run_workflow.py`.
 
 The baseline remains immutable. Each candidate is tried once in order against the current retained
-system. Strictly greater fitness produces a kept node. Fitness uses available skill metrics or
-negative absolute RMSE. Thresholds annotate results and do not enforce scientific acceptance.
-Stochastic models need explicit seed handling in their runner.
+system. Strictly greater fitness without any `PhysicalCheck` or `max_degradation` veto produces a
+kept node; candidates that violate a physical guardrail are marked `vetoed`.
 
 ## Inspect the evidence
 

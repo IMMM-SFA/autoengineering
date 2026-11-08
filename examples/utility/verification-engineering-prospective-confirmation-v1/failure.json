@@ -1,7 +1,0 @@
-{
-  "request_digest": "fe7bef6be70210af645dac1ff9233fefe2664b114f8807c23ec51f3e8bd3e15b",
-  "error_type": "StoreError",
-  "attempt_consumed": true,
-  "automatic_retry_forbidden": true,
-  "model_work_total": null
-}

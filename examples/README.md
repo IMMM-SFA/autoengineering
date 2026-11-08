@@ -11,9 +11,9 @@ water, solar energy and materials comparisons on measured observations.
 | [`signal_chain`](signal_chain/) | Synthetic signal generator, filter, and detector workflow. | No | `pixi run python examples/signal_chain/run_workflow.py` |
 | [`lotka_volterra`](lotka_volterra/) | Predator-prey ODE workflow and functional-response replacement. | No | `pixi run python examples/lotka_volterra/run_workflow.py` |
 | [`leaf_river`](leaf_river/) | Rainfall-runoff workflow using USGS and NOAA observations. | No with checked cache | `pixi run python examples/leaf_river/run_workflow.py` |
+| [`im3_water_scarcity`](im3_water_scarcity/) | Flagship DOE IM3 CONUS Water-Scarcity chain (`CLM5/ELMv3 + Tethys -> mosartwmpy`) with ecosystem triage, AI emulator ROI, and physical vetoes across 1,190 USGS gauges. | No with local IM3 bundle | `pixi run python examples/im3_water_scarcity/run_workflow.py` |
 | [`optimization_chain`](optimization_chain/) | Deterministic mixed-space whole-system optimization with resume. | No | See below. |
 | [`function_network`](function_network/) | NPZ-backed system and component evaluation with deterministic training-table replay. | No | See below. |
-| [`campaign_contracts`](campaign_contracts/) | Experimental campaign schemas, synthetic lifecycle checks, and an audited hydrology development profile. Implementation is in progress. | No | See its README. |
 | [`local_models`](local_models/) | Real water, solar and materials models with swaps, random/Sobol/BO comparisons and component reuse tests. | No after environment setup | `pixi run -e examples python -m examples.local_models.run --output outputs/local-models` |
 | [`complex_models`](complex_models/) | Larger BMI hydrology and single-diode solar models, 12/24/48/96-call checkpoints and 2,000-call target tests. | No after environment setup | See its README. |
 

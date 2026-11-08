@@ -1,1 +1,0 @@
-{"kind": "identity", "verified_digest": "d2741dc1bdda3374dcdbbf475d0c3c2e3f9db654913733bc99901e2b5611dda8", "image_id": "sha256:5fcc625ec3f746219ad50dbe7cd49886362702a17e211e1ffbefc39dd44f4188", "new_models": 0, "new_private_reads": 0, "new_daemon_calls": 0, "network": 0, "processes": 0, "runtime_qualified": false}

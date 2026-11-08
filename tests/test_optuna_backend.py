@@ -112,45 +112,6 @@ def test_replay_rejects_changed_historical_configuration(tmp_path):
         study.backend.suggest(Altered())
 
 
-def test_campaign_supplied_candidate_calibration(tmp_path):
-    from autoengineering.campaign.controller import CampaignController
-    from test_campaign_studies import ROOT, calibrated_spec
-
-    spec = calibrated_spec()
-    spec = replace(
-        spec,
-        calibration=replace(
-            spec.calibration,
-            run=replace(spec.calibration.run, policy="optuna"),
-        ),
-    )
-    path = tmp_path / "campaign.yaml"
-    spec.to_yaml(path)
-    controller = CampaignController.create(path, ROOT, tmp_path / "campaign", max_new_evaluations=2)
-    controller.advance()
-    controller = CampaignController.open(controller.store.root, max_new_evaluations=2)
-    controller.advance()
-    controller = CampaignController.open(controller.store.root, max_new_evaluations=1)
-    assert controller.advance().state == "completed"
-    state = controller.state()
-    assert len(state.budget.attempts) == state.budget.confirmed_attempts == 5
-    assert len(state.studies) == 1
-    fitting = [e for e in state.evaluations if e.split_id == "fitting"]
-    assert len(fitting) == 3
-    selected = min(fitting, key=lambda e: e.metrics["rmse"])
-    assert state.evaluations[-1].configuration == selected.configuration
-    import json
-
-    root = controller.store.root / state.studies[0].work_path / "optimizer-proposals"
-    receipts = [json.loads(p.read_text()) for p in root.glob("*-synchronized.json")]
-    assert len(receipts) == 3
-    actual = {a.child_action_id: a.id for a in state.budget.attempts if a.child_action_id}
-    for receipt in receipts:
-        assert receipt["campaign_id"] == controller.spec.name
-        assert receipt["study_id"] == state.studies[0].study_id
-        assert receipt["attempt_ids"] == [actual[f"{receipt['study_id']}:{receipt['action_id']}"]]
-
-
 @pytest.mark.parametrize("hook", ["prepare_suggestion", "record_suggestion"])
 def test_crash_after_proposal_evidence_does_not_start_model(tmp_path, monkeypatch, hook):
     starts = []

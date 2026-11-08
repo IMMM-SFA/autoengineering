@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>oedi-data-lake</Name><Prefix>pvdaq/parquet/modules/</Prefix><KeyCount>1</KeyCount><MaxKeys>10</MaxKeys><IsTruncated>false</IsTruncated><Contents><Key>pvdaq/parquet/modules/part-00000-4a77878b-ac1d-4920-966b-0536b3ff617b-c000.snappy.parquet</Key><LastModified>2022-02-16T05:23:21.000Z</LastModified><ETag>&quot;1f0ed97cc7e3685ec1ebade34f1a0991&quot;</ETag><Size>16897</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>

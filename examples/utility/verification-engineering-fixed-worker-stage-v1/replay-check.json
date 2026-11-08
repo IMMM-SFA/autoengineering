@@ -1,7 +1,0 @@
-{
-  "model_imports_processes_network_clocks_writes_and_outside_file_reads_denied": true,
-  "new_runtime_contacts": 0,
-  "new_scientific_starts": 0,
-  "relocated_guarded_reader_exit_code": 0,
-  "tampered_cleanup_with_rehashed_manifest_exit_code": 1
-}

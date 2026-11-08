@@ -1,1 +1,0 @@
-The first cold-reader attempt used operational recover_completed_process. Its watchdog recovery attempted to read current source outside the public archive, so the guard refused. No model or process ran. The successor reader verifies saved archived source and stop receipts only and makes no current-PID assertion.

@@ -1,9 +1,0 @@
-{
-  "scope": "/private/tmp/load-costs-regression-v1",
-  "observed_at_utc": "2026-10-31T20:23:19.047557+00:00",
-  "process_completion_receipts": 21,
-  "executable_launch_gates": 0,
-  "matching_original_workers_alive": [],
-  "original_receipts_rewritten": false,
-  "observation_is_separate_from_original_stop_receipts": true
-}

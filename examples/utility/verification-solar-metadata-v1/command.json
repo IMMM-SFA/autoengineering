@@ -1,5 +1,0 @@
-{
-  "regression": "python -m pytest tests/test_utility_solar_metadata.py tests/test_utility_solar_inputs.py tests/test_utility_solar_intervals.py tests/test_utility_solar_partitions.py tests/test_utility_hydrology_partitions.py tests/test_utility_confirmation_choices.py tests/test_documentation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-solar-metadata-regression-v1 --junitxml=examples/utility/verification-solar-metadata-v1/regression.xml",
-  "exit_code": 0,
-  "environment": "existing default Pixi Python 3.12; no new dependencies"
-}

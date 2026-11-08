@@ -1,9 +1,0 @@
-{
-  "wheel": "autoengineering-0.2.0-py3-none-any.whl",
-  "sha256": "aac713a46e1747cff07ec3355a706fcb61174df2c257c1c81496534c6907751f",
-  "size_bytes": 774187,
-  "python_sources": 228,
-  "core_sources": 224,
-  "copied_input_pins": 240,
-  "unexpected_python_sources": 0
-}

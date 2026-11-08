@@ -16,15 +16,14 @@ from autoengineering.optimization import OptimizationRunSpec
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE_DOCUMENTS = (
+    ROOT / "VISION.md",
     ROOT / "README.md",
     ROOT / "CLAUDE.md",
     ROOT / ".claude/agents/auto-engineer.md",
     ROOT / "docs/optimization.md",
     ROOT / "examples/README.md",
     ROOT / "examples/leaf_river/README.md",
-    ROOT / "docs/agents.md",
-    ROOT / "docs/campaigns.md",
-    ROOT / "examples/agent_campaign/README.md",
+    ROOT / "examples/im3_water_scarcity/README.md",
 )
 MARKDOWN_LINK = re.compile(r"\[[^]]*]\(([^)]+)\)")
 PIXI_COMMAND = re.compile(r"\bpixi run(?: -e [a-z0-9_-]+)? ([a-z][a-z0-9_-]*)")
@@ -54,8 +53,6 @@ def test_local_markdown_links_resolve(document: Path):
 def test_documented_cli_commands_match_click_registry():
     registered = set(cli.commands)
     expected = {
-        "agents",
-        "campaign",
         "candidates",
         "components",
         "describe",
@@ -63,8 +60,8 @@ def test_documented_cli_commands_match_click_registry():
         "graph",
         "improve",
         "optimize",
-        "utility",
         "report",
+        "triage",
         "validate",
     }
     assert registered == expected
@@ -287,9 +284,9 @@ def test_example_index_matches_checked_system_examples():
         if path.parent.is_dir()
     }
     expected_network = {
-        "campaign_contracts": "No",
         "function_network": "No",
         "hydro_chain": "No",
+        "im3_water_scarcity": "No with local IM3 bundle",
         "leaf_river": "No with checked cache",
         "lotka_volterra": "No",
         "optimization_chain": "No",

@@ -1,9 +1,0 @@
-{
-  "observed_exit_code": 1,
-  "passed": 55,
-  "failed": 3,
-  "seconds": 2.31,
-  "cause": "intermediate proof directories created with default permissions, refused by private-directory verifier",
-  "full_stdout_saved": false,
-  "raw_evidence": "initial tool output in this session"
-}

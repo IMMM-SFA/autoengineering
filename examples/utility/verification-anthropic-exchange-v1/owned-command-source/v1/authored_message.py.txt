@@ -1,8 +1,0 @@
-import json,sys
-from pathlib import Path
-request=json.loads(Path(sys.argv[1]).read_bytes())
-assert request['stream'] is False and request['tools']==[]
-assert request['max_tokens']==512
-text=json.dumps({'handoff_json':json.dumps({'role':'reviewer','fixture':True},sort_keys=True,separators=(',',':'))},sort_keys=True,separators=(',',':'))
-response={'id':'msg_authored_owned_command','type':'message','role':'assistant','model':request['model'],'stop_reason':'end_turn','stop_sequence':None,'content':[{'type':'text','text':text}],'usage':{'input_tokens':7,'output_tokens':10,'cache_read_input_tokens':2,'cache_creation_input_tokens':3}}
-Path(sys.argv[2]).write_text(json.dumps(response))

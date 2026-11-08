@@ -1,7 +1,0 @@
-{
-  "source_root": "/private/tmp/claude-host-installed-v1/venv/lib/python3.12/site-packages",
-  "engine_module": "/private/tmp/claude-host-installed-v1/venv/lib/python3.12/site-packages/autoengineering/agents/scheduler.py",
-  "source_refs": 77,
-  "model_started": false,
-  "credential_read": false
-}

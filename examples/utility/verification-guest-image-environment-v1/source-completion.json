@@ -1,1 +1,0 @@
-{"daemon_cancellation_qualified":false,"disk_quota_enforced":false,"elapsed_seconds":45.40991362510249,"image_id":"sha256:fc19692dff41a699600f76a79a97ed6cdcdf927f28e09984a79f33dcee46c399","request_digest":"c5fe7f7072d84cb436c5fa866cc39fe7b70506692ec4774c68f68424469ce0ec","runtime_qualified":false,"schema":"utility-local-image-build-completion-v1","status":"candidate_image_built"}

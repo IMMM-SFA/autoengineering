@@ -1,9 +1,0 @@
-{
-  "schema": "utility-wind-netcdf-build-result-v1",
-  "returncode": 1,
-  "timed_out": false,
-  "seconds": 1.5483879162929952,
-  "build_attempts": 1,
-  "compiler_process_group_terminated_on_timeout": false,
-  "new_model_calls": 0
-}

@@ -20,15 +20,14 @@ for improving models are also needed.
 | Capability | Current scope |
 | --- | --- |
 | Describe a model system | YAML components, ports, connections, graph queries, and Mermaid diagrams. |
-| Validate and prioritize | Array metrics and a heuristic ranking of component weaknesses. The ranking does not estimate the gain from replacing a component. |
-| Deep research | Agent skills investigate alternatives and record citations, rationale, and executable candidates. The scientific controller makes no LLM calls. The optional worker CLI supports scripted replies and an explicitly configured native adapter. |
-| Test replacements | `auto_improve` tries candidates in order, records failures and reversions, and retains changes that improve its fitness score. |
-| Local campaigns | Experimental immutable contracts, trusted adapter lifecycle, scientific checks, sequential calibration, event replay, and local CLI. See [campaigns](docs/campaigns.md) for current qualification limits. |
-| Experimental worker workflows | Four serial roles or a supplied-only single agent, bounded handoffs, brokered scientific requests and private evidence reports. Scripted replies run offline. Codex requires an explicit pinned native profile and prepared lease. Current-source live conformance and the three-route Leaf River pilot passed. All routes chose the same candidate; the agent routes added overhead without objective gain. See the [final audit](docs/reviews/part-3-final-audit.md). See [worker workflows](docs/agents.md). |
+| Validate and prioritize | Array metrics (`rmse`, `bias`, `relative_bias`, `correlation`, `nse`, `kge`, `pbias`, `low_flow_pbias`), `PhysicalCheck` vetoes, and a heuristic ranking of component weaknesses. |
+| Ecosystem triage | `triage` measures component compute share, downstream error-propagation sensitivity, and Emulator/Swap ROI (`ai_emulator`, `component_swap`, `parameter_calibration`, `retain_baseline`). See [`VISION.md`](VISION.md). |
+| Deep research | Agent skills investigate alternatives and record citations, rationale, and executable candidates. The scientific controller makes no LLM calls. |
+| Test replacements | `auto_improve` tries candidates in order, enforces optional `PhysicalCheck` and secondary degradation vetoes, and retains changes that improve its fitness score. |
 | Whole-system BO | The Release A workflow runs sequential, constrained optimization with durable records and resume. Random and Sobol search are available alongside optional BoTorch. |
 | Function-network research | A component representation and full-observability BO backend have checked evidence. Partial-observability BO remains experimental after failed comparison gates. |
 
-See [workflow and architecture](docs/workflow.md), [optimization](docs/optimization.md), and
+See [`VISION.md`](VISION.md), [workflow and architecture](docs/workflow.md), [optimization](docs/optimization.md), and
 [current BO evidence](docs/bayesian-optimization-status.md) for contracts and limits. Passing a
 benchmark does not establish that the workflow is complete or that it will improve a new model.
 
@@ -40,6 +39,7 @@ Run commands from the repository root. Pixi installs the package in editable mod
 pixi install
 pixi run python examples/signal_chain/run_workflow.py
 pixi run python examples/leaf_river/run_auto_research.py
+pixi run python examples/im3_water_scarcity/run_workflow.py
 ```
 
 The signal example uses synthetic data. Leaf River uses checked observation files. The
@@ -112,12 +112,11 @@ Run commands with `pixi run autoengineering`.
 | `components <system.yaml>` | List components and model types. |
 | `validate <system.yaml> -c <name> -b <baseline.csv> -s <simulated.csv>` | Compare component arrays. |
 | `report <system.yaml> -r <results.json>` | Report saved validation results. |
+| `triage <system.yaml> [-r <results.json>]` | Diagnose bottlenecks, downstream error propagation, and Emulator/Swap ROI. |
 | `candidates <system.yaml> -c <name> [-o candidates.yaml]` | Scaffold candidates. This command does not search the literature. |
 | `improve <system.yaml> -C <candidates.yaml> --chain <module:factory> -b <observed.csv> -O <output>` | Run the bounded replacement loop. |
 | `experiments <autoresearch.jsonl>` | Render an experiment tree. |
 | `optimize <system.yaml> <optimization.yaml> --workdir <path>` | Start or resume whole-system optimization. |
-| `campaign` | Run experimental deterministic campaigns with supplied trusted adapters. See [the campaign guide](docs/campaigns.md). |
-| `agents` | Run supplied workflows with scripted or explicitly configured Codex hosts and inspect their evidence. Generated source needs separate qualification and trusted admission. See [worker workflows](docs/agents.md). |
 
 The [workflow guide](docs/workflow.md) describes the Python interfaces. The Claude agent and
 research skills under `.claude/` provide an agent entry point to the same package.
@@ -150,7 +149,3 @@ and explicit validation limits.
 
 BSD-3-Clause. Copyright (c) 2025, Battelle Memorial Institute. Research skills adapt feynman.is and
 alphaXiv's openresearch-cli. See [NOTICE](NOTICE) for attribution.
-
-The experimental `utility` commands validate and prepare comparison records, seal
-selections and verify offline evidence. Independent confirmation, live suite
-routes and comparative utility remain unfinished. See [Utility comparisons](docs/utility.md).

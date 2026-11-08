@@ -5,9 +5,12 @@ description: Investigate alternatives for a model component and produce a cited 
 
 # Research candidate replacements
 
-Find changes worth testing in the connected system. Read `docs/model-improvement.md` for the
-proposed method assessment and `docs/workflow.md` for the execution contract. Component ranking is
-an initial clue, not proof of the cause of system error.
+Find changes worth testing in the connected system. Run `autoengineering triage` (or
+`autoengineering.triage.triage_system`) first to inspect component compute shares, downstream
+sensitivity, and Emulator/Swap ROI, and read `VISION.md`, `docs/model-improvement.md`, and
+`docs/workflow.md`. Component ranking is an initial clue; empirical sensitivity probing and
+triage determine whether a component warrants parameter calibration, a physics swap, or an AI
+emulator.
 
 This skill adapts feynman's research workflow. See `NOTICE`. Use only tools available in the current
 session. The package itself does not search for sources or call an LLM.

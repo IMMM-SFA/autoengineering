@@ -1,6 +1,0 @@
-{
-  "prepare": "python -m examples.utility.guest_numeric_control prepare outputs/guest-inference-smoke-fixture-v1 outputs/guest-resources-v3 examples/utility/prepared-inference-environment-v5 outputs/guest-numeric-control-v2 --resource-digest e899a83865a1ae3619af3fcfbbf68b204525566f168350ffa258582556a6df8b",
-  "execute": "python -m examples.utility.guest_numeric_control execute outputs/guest-numeric-control-v2 --expected-digest 4cdf9f75075c057411afcd211cee4214f993b4c0ea0d3bca555b5b55e045a546",
-  "regression": "python -m pytest tests/test_utility_guest_numeric_control.py tests/test_utility_guest_bootstrap.py tests/test_utility_container_output_validation.py -q -p no:cacheprovider --basetemp=/private/tmp/autoengineering-guest-numeric-regression-v1 --junitxml=examples/utility/verification-guest-numeric-control-v1/regression.xml",
-  "environment": "existing default Pixi Python 3.12; original pinned local derivative image; no image acquisition or dependency installation"
-}

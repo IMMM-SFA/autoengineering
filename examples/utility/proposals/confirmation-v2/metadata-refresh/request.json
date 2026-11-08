@@ -1,8 +1,0 @@
-{
-  "url": "https://oedi-data-lake.s3.amazonaws.com/pvdaq/2023-solar-data-prize/2107_OEDI/metadata/2107_system_metadata.json",
-  "method": "GET",
-  "timeout_seconds": 10,
-  "maximum_bytes": 131072,
-  "credentials": false,
-  "purpose": "system/equipment/channel metadata only; no observation files"
-}

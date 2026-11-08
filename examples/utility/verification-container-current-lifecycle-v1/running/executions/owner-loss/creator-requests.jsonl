@@ -1,6 +1,0 @@
-{"method":"POST","path":"/containers/create?name=ae-private-rmse-cf2a7b55db3f42c2b4ca7b30b93fe9a2"}
-{"method":"GET","path":"/containers/cca7138e310d4ab1fcf6601b04915778200b00971808a6cafd862ba4cd46e20e/json"}
-{"method":"POST","path":"/containers/cca7138e310d4ab1fcf6601b04915778200b00971808a6cafd862ba4cd46e20e/start"}
-{"method":"GET","path":"/containers/cca7138e310d4ab1fcf6601b04915778200b00971808a6cafd862ba4cd46e20e/json"}
-{"method":"POST","path":"/containers/cca7138e310d4ab1fcf6601b04915778200b00971808a6cafd862ba4cd46e20e/pause"}
-{"method":"GET","path":"/containers/cca7138e310d4ab1fcf6601b04915778200b00971808a6cafd862ba4cd46e20e/json"}

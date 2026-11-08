@@ -1,9 +1,0 @@
-{
-  "focused_tests_passed": 74,
-  "documentation_tests_passed": 19,
-  "full_lint_passed": true,
-  "core_source_changed": false,
-  "new_private_source_accesses": 0,
-  "full_default_suite_rerun": false,
-  "complete_interruption_matrix": false
-}

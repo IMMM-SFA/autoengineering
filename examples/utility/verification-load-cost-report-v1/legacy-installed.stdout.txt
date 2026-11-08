@@ -1,1 +1,0 @@
-{"mode": "legacy", "installed_core_only": true, "legacy_cli_bytes_exact": true, "current_cost_json_markdown_verify_reconstructed": false, "examples_imported": false, "new_model_calls": 0, "private_source_reads": 0, "new_processes_after_initialization": 0, "network": 0, "full_cost_evidence": false, "task_admitted": false}

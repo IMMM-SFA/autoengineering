@@ -1,8 +1,0 @@
-{
-  "status": "passed",
-  "new_science_reservations": 0,
-  "new_observations": 0,
-  "new_batch_events": 0,
-  "fresh_modelled_energy_GWh": 37.06343379120568,
-  "scope": "fresh installed interpreter, completed-case receipt verification; no executor or model dispatch"
-}

@@ -1,2 +1,0 @@
-Running synthetic control: output-overrun
-{"all_requested_controls_passed": true, "image_pulls": 0, "platform_scope": "local Linux ARM64 only", "private_data_reads": 0, "private_scoring_qualified": false, "provider_calls": 0, "remaining": ["network/host-path negative controls", "timeout/cancellation/owner-loss tests", "lost acknowledgement and relocated offline verification", "task/data admission"], "schema": "utility-local-container-controls-v1"}

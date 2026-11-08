@@ -35,7 +35,12 @@ from autoengineering.execute.swap import swap_component
 from autoengineering.research.candidates import Candidate
 from autoengineering.research.experiment import ExperimentNode, ExperimentTree
 from autoengineering.system.graph import System
-from autoengineering.validate.compare import ValidationResult, validate_arrays
+from autoengineering.validate.compare import (
+    PhysicalCheck,
+    ValidationResult,
+    evaluate_physical_checks,
+    validate_arrays,
+)
 
 # run_chain(system) -> {output_name: array}
 RunChain = Callable[[System], dict[str, np.ndarray]]
@@ -88,6 +93,11 @@ def _target_met(results: list[ValidationResult], target: dict[str, float]) -> bo
     return True
 
 
+def _metric_loss(metric: str, value: float) -> float:
+    """Loss direction for secondary degradation comparisons (lower is better)."""
+    return -value if metric in ("nse", "kge", "correlation") else abs(value)
+
+
 def auto_improve(
     system: System,
     run_chain: RunChain,
@@ -98,6 +108,9 @@ def auto_improve(
     metrics: list[str] | None = None,
     thresholds: dict[str, float] | None = None,
     target: dict[str, float] | None = None,
+    physical_checks: list[PhysicalCheck] | None = None,
+    max_degradation: dict[str, float] | None = None,
+    veto_on_threshold_failure: bool = False,
     max_iterations: int = 20,
     workdir: str | Path = "outputs",
     slug: str = "auto-improve",
@@ -119,6 +132,12 @@ def auto_improve(
         thresholds: Pass/fail thresholds passed to ``validate_arrays``.
         target: Optional satisficing stop, e.g. ``{"nse": 0.5}``. When met, the
             loop stops early.
+        physical_checks: Optional list of :class:`PhysicalCheck` invariants that
+            act as hard vetoes on candidate retention.
+        max_degradation: Optional dict of ``{metric: max_allowed_loss_increase}``
+            relative to the parent system (e.g. ``{"relative_bias": 0.05}``).
+        veto_on_threshold_failure: When True, any failing threshold in
+            ``thresholds`` vetoes candidate retention even if scalar fitness rises.
         max_iterations: Upper bound on candidates evaluated (bounded loop).
         workdir: Directory for ``autoresearch.md`` / ``autoresearch.jsonl`` / CHANGELOG.
         slug: Short label used in artifact headers.
@@ -128,6 +147,8 @@ def auto_improve(
     """
     metrics = metrics or ["rmse", "bias", "nse", "kge"]
     thresholds = thresholds or {}
+    physical_checks = list(physical_checks or [])
+    max_degradation = dict(max_degradation or {})
     candidates = list(candidates or [])
     workdir = Path(workdir)
     workdir.mkdir(parents=True, exist_ok=True)
@@ -202,8 +223,46 @@ def auto_improve(
                 continue
 
             score = _fitness(trial_results)
-            improved = score > parent.score
-            status = "kept" if improved else "reverted"
+            trial_metrics = _metric_dict(trial_results)
+            veto_reasons: list[str] = []
+
+            if physical_checks:
+                check_results = evaluate_physical_checks(trial_out, physical_checks)
+                for cr in check_results:
+                    if cr.required and not cr.passed:
+                        veto_reasons.append(f"physical check '{cr.name}' failed ({cr.reason})")
+
+            if veto_on_threshold_failure:
+                for r in trial_results:
+                    if r.status == "fail":
+                        veto_reasons.append(
+                            f"threshold failed on '{r.metric}' ({r.value:.4f} vs {r.threshold})"
+                        )
+
+            if max_degradation:
+                for m_name, tol in max_degradation.items():
+                    if m_name in trial_metrics and m_name in parent.metrics:
+                        loss_delta = _metric_loss(m_name, trial_metrics[m_name]) - _metric_loss(
+                            m_name, parent.metrics[m_name]
+                        )
+                        if loss_delta > tol:
+                            veto_reasons.append(
+                                f"secondary degradation on '{m_name}' ({loss_delta:.4f} > {tol})"
+                            )
+
+            improved = (score > parent.score) and not veto_reasons
+            if veto_reasons:
+                status = "vetoed"
+            elif improved:
+                status = "kept"
+            else:
+                status = "reverted"
+
+            notes = cand.rationale
+            if veto_reasons:
+                veto_msg = "VETOED: " + "; ".join(veto_reasons)
+                notes = f"{notes} | {veto_msg}" if notes else veto_msg
+
             node = ExperimentNode(
                 id=node_id,
                 component=cand.name,
@@ -212,9 +271,9 @@ def auto_improve(
                 results=trial_results,
                 score=score,
                 status=status,
-                metrics=_metric_dict(trial_results),
+                metrics=trial_metrics,
                 sources=list(cand.sources),
-                notes=cand.rationale,
+                notes=notes,
             )
             tree.add_child(parent.id, node)
             systems[node_id] = trial_system
@@ -222,6 +281,8 @@ def auto_improve(
             log.append(f"## Iter {i}: swap `{cand.name}` (from `{parent.candidate}`)")
             log.append("Result: " + ", ".join(f"{r.metric}={r.value:.4f}" for r in trial_results))
             log.append(f"Fitness {score:.4f} vs parent {parent.score:.4f} -> **{status.upper()}**")
+            if veto_reasons:
+                log.append(f"Guardrail veto: {'; '.join(veto_reasons)}")
             if cand.rationale:
                 log.append(f"Rationale: {cand.rationale}")
             log.append("")

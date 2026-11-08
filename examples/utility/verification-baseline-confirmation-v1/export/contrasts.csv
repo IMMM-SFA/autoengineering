@@ -1,2 +1,0 @@
-task_id,regime,route_id,comparator_id,outcome,units,assigned_pairs,valid_pairs,missing_pairs,mean_gain,interval_lower,interval_upper,verdict,repetition_verdict,dependence_complete,efficiency_verdict,efficiency_basis,scientific_claim_scope
-task,fixed_evaluations,multi,conventional,power,W,1,1,0,0.0,,,inconclusive,inconclusive,False,inconclusive,,unresolved dependence scope

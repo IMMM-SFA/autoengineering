@@ -1,7 +1,0 @@
-{
-  "wheel_sha256": "11c2f4619c4450054ad678bea5fcdba29a36779f698d031a5e261053c9750e58",
-  "core_python_files_byte_matched": 196,
-  "new_worker_included": true,
-  "platform_scope": "local POSIX packaging test; actual Linux enforcement evidence is separate",
-  "private_scoring_qualified": false
-}
