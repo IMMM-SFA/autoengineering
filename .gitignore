@@ -300,3 +300,7 @@ cleanup.lock
 
 # Local large model data bundles (e.g., IM3 CONUS NetCDF/NPZ archives)
 /data/
+
+# Downloaded reference PDFs (not for the repo)
+background_research/pdfs/
+background-research/pdfs/
