@@ -297,3 +297,6 @@ cleanup.lock
 
 # Private consolidated study inputs and execution state.
 /outputs/consolidated-execution-v*/
+
+# Local large model data bundles (e.g., IM3 CONUS NetCDF/NPZ archives)
+/data/
