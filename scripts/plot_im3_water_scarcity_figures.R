@@ -62,10 +62,21 @@ par(mfrow = c(1, 2), bg = "white", col.axis = ET_CHARCOAL, col.lab = ET_CHARCOAL
     col.main = ET_CHARCOAL, family = "sans")
 
 # Panel (a): 9 Sub-Components Ordered by Compute Share [Sort Key]
-par(mar = c(5.2, 16.8, 3.8, 2.2))
+par(mar = c(5.2, 10.6, 3.8, 2.2))
 tc <- d$triage_components_sorted
 idx_rev <- rev(seq_len(nrow(tc)))
-comp_names <- tc$component[idx_rev]
+plain_map <- c(
+  "lsm_subsurface_drainage"                    = "Deep Soil & Baseflow\n(CLM5 / ELMv3)",
+  "lsm_canopy_snow_et"                         = "Canopy, Snow & ET\n(CLM5 / ELMv3)",
+  "lsm_surface_infiltration"                   = "Surface Infiltration\n(CLM5 / ELMv3)",
+  "mosart_channel_network_routing"             = "Main Channel Routing\n(mosartwmpy)",
+  "mosart_reservoir_demand_wm"                 = "Reservoir & Dam Mgmt\n(mosartwmpy)",
+  "mosart_hillslope_tributary_routing"         = "Hillslope & Tributaries\n(mosartwmpy)",
+  "tethys_irrigation_downscaler"               = "Agricultural Irrigation\n(Tethys)",
+  "tethys_thermoelectric_industrial_downscaler"= "Power-Plant & Ind. Water\n(Tethys)",
+  "tethys_municipal_domestic_downscaler"       = "Municipal Water Supply\n(Tethys)"
+)
+comp_names <- unname(plain_map[tc$component[idx_rev]])
 cost_share_pct <- tc$compute_share[idx_rev] * 100.0
 sens_scaled <- tc$downstream_sensitivity[idx_rev] * 100.0
 
@@ -527,15 +538,16 @@ par(mfrow = c(1, 2), bg = "white", col.axis = ET_CHARCOAL, col.lab = ET_CHARCOAL
 
 # Panel (a): HPC Cost vs Regulated Dam Skill Pareto Frontier
 par(mar = c(5.2, 4.8, 3.8, 1.5))
-plot(c(0, 265), c(0.06, 0.56), type = "n",
+plot(c(0, 265), c(0.06, 0.57), type = "n",
      xlab = "Single-Run Computational Cost (NERSC HPC Node-Hours per 35-Yr CONUS Run)",
      ylab = "Regulated Dam Streamflow Skill (Median KGE Across 518 Gauges)",
      main = "(a) Cost-Accuracy Pareto Frontier: Internal Physics vs. Targeted & Whole Emulators",
      cex.axis = 0.88, cex.lab = 0.94, cex.main = 0.98)
 grid(nx = NULL, ny = NULL, col = "#dcd7cd", lty = "dotted")
 
-rect(0, 0.07, 132, 0.155, col = adjustcolor(ET_TERRA, alpha.f = 0.15), border = ET_TERRA)
-text(66, 0.134, labels = "Fast but Scientifically Broken Trap", col = ET_TERRA_B, font = 2, cex = 0.78)
+rect(0, 0.068, 136, 0.155, col = adjustcolor(ET_TERRA, alpha.f = 0.15), border = ET_TERRA)
+text(68, 0.136, labels = "Fast but Scientifically Broken Trap", col = ET_TERRA_B, font = 2, cex = 0.75)
+text(10, 0.104, labels = "Blind Whole-LSM Emu (3.3h, Reg=0.106)", pos = 4, cex = 0.72, col = ET_TERRA_B, font = 2)
 
 st_kept <- st[st$status %in% c("baseline", "kept"), ]
 lines(st_kept$hpc_node_hours, st_kept$median_gauge_kge_regulated,
@@ -551,17 +563,15 @@ points(cf$hpc_node_hours[6], cf$regulated_kge[6], col = ET_SLATE, pch = 15, cex 
 points(cf$hpc_node_hours[5], cf$regulated_kge[5], col = ET_TEAL,  pch = 17, cex = 1.7)
 points(cf$hpc_node_hours[4], cf$regulated_kge[4], col = ET_PINE,  pch = 19, cex = 1.8)
 
-text(cf$hpc_node_hours[8] + 6,  cf$regulated_kge[8] - 0.015,
-     labels = "Blind Whole-LSM Emulator (3.3h, Reg KGE=0.106)", pos = 4, cex = 0.74, col = ET_TERRA_B, font = 2)
-text(cf$hpc_node_hours[7] - 4,  cf$regulated_kge[7] - 0.032,
-     labels = "0. Baseline Chain (243.3h, Reg KGE=0.168)", pos = 2, cex = 0.74, col = ET_CHARCOAL)
-text(cf$hpc_node_hours[6] + 6,  cf$regulated_kge[6] - 0.018,
+text(262, 0.125,
+     labels = "0. Baseline Chain (243.3h, Reg=0.168)", pos = 2, cex = 0.73, col = ET_CHARCOAL, font = 2)
+text(cf$hpc_node_hours[6] + 6,  cf$regulated_kge[6] - 0.022,
      labels = "Last-Resort Whole-LSM Emulator After Fixes (3.3h, Reg KGE=0.387, CONUS=0.900)",
-     pos = 4, cex = 0.74, col = ET_SLATE_B, font = 2)
-text(cf$hpc_node_hours[5] - 18, cf$regulated_kge[5] + 0.028,
+     pos = 4, cex = 0.73, col = ET_SLATE_B, font = 2)
+text(4, 0.494,
      labels = "Targeted Vadose Sub-Emulator (111.3h, Reg KGE=0.456, CONUS=0.907)",
-     cex = 0.74, col = ET_TEAL, font = 2)
-text(cf$hpc_node_hours[4] - 5,  cf$regulated_kge[4] + 0.025,
+     pos = 4, cex = 0.74, col = ET_TEAL, font = 2)
+text(258, 0.538,
      labels = "Retained 9-Subcomponent Physics (216.3h, Reg KGE=0.507, CONUS=0.909)",
      pos = 2, cex = 0.76, col = ET_PINE_B, font = 2)
 

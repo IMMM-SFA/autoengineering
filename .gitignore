@@ -304,3 +304,6 @@ cleanup.lock
 # Downloaded reference PDFs (not for the repo)
 background_research/pdfs/
 background-research/pdfs/
+
+# rv local R package library (rv.lock and rv/scripts/ are tracked)
+rv/library/

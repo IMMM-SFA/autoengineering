@@ -1,9 +1,7 @@
 #!/usr/bin/env Rscript
 # =============================================================================
 # Complete AGU Poster Data Figure Suite (Figures 3, 4, 5, 6, and 7)
-# Combines all visual diagnostics from the initial conference deck into
-# high-resolution 200-DPI Cairo PNGs in the Waterology Earth-Tone Palette.
-# Usage: Rscript scripts/plot_agu_poster_figures.R
+# Run via rv: rv run scripts/plot_agu_poster_figures.R
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -15,13 +13,6 @@ poster_dir <- "reports/agu-poster-im3-assessment-2026-11-20"
 fig_dir <- file.path(poster_dir, "figures")
 dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
 file.copy(json_src, file.path(poster_dir, "im3_water_scarcity_results.json"), overwrite = TRUE)
-
-# Remove older 5-figure filenames if present so directory stays clean
-unlink(file.path(fig_dir, c(
-  "fig3_poster_triage_and_process_attribution.png",
-  "fig4_poster_physical_process_diagnostics.png",
-  "fig5_poster_practical_savings_and_uq_capacity.png"
-)))
 
 d <- fromJSON(json_src, simplifyDataFrame = TRUE)
 
@@ -45,19 +36,35 @@ ET_TERRA_B  <- "#853023"
 ET_SAGE_B   <- "#49695b"
 ET_PLUM_B   <- "#543452"
 
+# Helper: Map internal component IDs to wrapped 2-line plain-English labels
+plain_comp_labels <- function(comp_vec) {
+  mapping <- c(
+    "lsm_subsurface_drainage"                    = "Deep Soil & Baseflow\n(CLM5 / ELMv3)",
+    "lsm_canopy_snow_et"                         = "Canopy, Snow & ET\n(CLM5 / ELMv3)",
+    "lsm_surface_infiltration"                   = "Surface Infiltration\n(CLM5 / ELMv3)",
+    "mosart_channel_network_routing"             = "Main Channel Routing\n(mosartwmpy)",
+    "mosart_reservoir_demand_wm"                 = "Reservoir & Dam Mgmt\n(mosartwmpy)",
+    "mosart_hillslope_tributary_routing"         = "Hillslope & Tributaries\n(mosartwmpy)",
+    "tethys_irrigation_downscaler"               = "Agricultural Irrigation\n(Tethys)",
+    "tethys_thermoelectric_industrial_downscaler"= "Power-Plant & Ind. Water\n(Tethys)",
+    "tethys_municipal_domestic_downscaler"       = "Municipal Water Supply\n(Tethys)"
+  )
+  unname(mapping[comp_vec])
+}
+
 # =============================================================================
 # Figure 3: Triage Decoupling & The 12-Step Sub-Component Progression Waterfall
 # =============================================================================
 png(file.path(fig_dir, "fig3_triage_and_stepwise_progression.png"),
-    width = 3300, height = 1320, res = 200, type = "cairo")
+    width = 3300, height = 1340, res = 200, type = "cairo")
 par(mfrow = c(1, 2), bg = "white", col.axis = ET_CHARCOAL, col.lab = ET_CHARCOAL,
     col.main = ET_CHARCOAL, family = "sans")
 
-# Panel (a): 9 Sub-Components Ordered by Compute Share [Sort Key]
-par(mar = c(5.2, 16.8, 3.8, 2.0))
+# Panel (a): 9 Sub-Components with Wrapped Plain-English Labels Ordered by Compute Share [Sort Key]
+par(mar = c(5.2, 10.6, 3.8, 1.8))
 tc <- d$triage_components_sorted
 idx_rev <- rev(seq_len(nrow(tc)))
-comp_names <- tc$component[idx_rev]
+comp_names_plain <- plain_comp_labels(tc$component[idx_rev])
 cost_share_pct <- tc$compute_share[idx_rev] * 100.0
 sens_scaled <- tc$downstream_sensitivity[idx_rev] * 100.0
 
@@ -66,55 +73,55 @@ bp3a <- barplot(
   mat_fig3a,
   beside = TRUE,
   horiz = TRUE,
-  names.arg = comp_names,
+  names.arg = comp_names_plain,
   las = 1,
   col = c(ET_SLATE, ET_OCHRE),
   border = c(ET_SLATE_B, ET_OCHRE_B),
-  xlim = c(0, 96),
+  xlim = c(0, 92),
   ylim = c(0, 29.5),
   xlab = "Share of Total Compute Budget (%)  /  Downstream Sensitivity (|dKGE| x 100)",
   main = "(a) Sub-Component Triage: Compute Cost [Sort Key] vs. Sensitivity",
   cex.names = 0.80,
   cex.axis = 0.88,
-  cex.lab = 0.90,
-  cex.main = 0.96
+  cex.lab = 0.92,
+  cex.main = 0.98
 )
 grid(nx = NULL, ny = NA, col = "#dcd7cd", lty = "dotted")
 for (i in seq_len(ncol(bp3a))) {
   text(cost_share_pct[i] + 0.9, bp3a[1, i],
        labels = sprintf("%.1f%%", cost_share_pct[i]),
-       pos = 4, cex = 0.72, col = ET_SLATE_B, font = 2, xpd = TRUE)
+       pos = 4, cex = 0.74, col = ET_SLATE_B, font = 2, xpd = TRUE)
   text(sens_scaled[i] + 0.9, bp3a[2, i],
        labels = sprintf("%.1f", sens_scaled[i]),
-       pos = 4, cex = 0.70, col = ET_OCHRE_B, font = 1, xpd = TRUE)
+       pos = 4, cex = 0.72, col = ET_OCHRE_B, font = 1, xpd = TRUE)
 }
-legend(x = 18, y = 16.0,
+legend(x = 20, y = 16.2,
        legend = c("HPC Compute Share (% of 243.3 Node-Hrs) [Sort Key]",
                   "Downstream Streamflow Sensitivity (|dKGE| x 100)"),
        fill = c(ET_SLATE, ET_OCHRE),
        border = c(ET_SLATE_B, ET_OCHRE_B),
-       bg = "white", box.col = "#dcd7cd", cex = 0.74)
+       bg = "white", box.col = "#dcd7cd", cex = 0.76)
 
-# Panel (b): Step-by-Step 12-Stage Progression (Horizontal Bar Waterfall from Initial Figure 2)
-par(mar = c(5.2, 16.5, 3.8, 2.2))
+# Panel (b): Step-by-Step 12-Stage Progression (Aligned Right Column, Zero Line Overlaps)
+par(mar = c(5.2, 11.4, 3.8, 1.8))
 st <- d$stages
 n_st <- nrow(st)
 st_rev <- rev(seq_len(n_st))
 
 friendly_stage <- c(
-  "0. Baseline (CLM5 + Tethys 2.1 + MOSART)",
-  "1. Satellite Phenology ET (CLM5-SP)",
-  "2. ELMv3 Crop LULCC & Snowmelt ET",
-  "3. Uncalibrated ELMv3 Infiltration",
-  "4. Calibrated Frozen-Soil Infiltration",
-  "5. Non-Negative Power-Law Baseflow",
-  "6. Unconstrained Neural Vadose Surrogate",
-  "7. Tethys 2.2 Canal Loss & GW Shares",
-  "8. Power-Plant Cooling Return Ratios",
-  "9. Municipal Urban Expansion (<3% Flow)",
-  "10. Repair 1,690 Missing Slope Cells",
-  "11. Small-Basin Sub-Grid Area Filter",
-  "12. Broman Dam Rules & Return Flows"
+  "0. Baseline Chain",
+  "1. Satellite Phenology ET",
+  "2. ELMv3 Crop & Snow ET",
+  "3. Uncalibrated Infiltration",
+  "4. Calibrated Infiltration",
+  "5. Non-Negative Baseflow",
+  "6. Unconstrained Neural Soil",
+  "7. Tethys 2.2 Canal & GW",
+  "8. Power-Plant Return Flow",
+  "9. Municipal Water (<3%)",
+  "10. Fix Missing Grid Slopes",
+  "11. Small-Basin Area Filter",
+  "12. Broman Dam & Return Flow"
 )[st_rev]
 
 kge_raw <- st$conus_kge[st_rev]
@@ -134,17 +141,17 @@ bp3b <- barplot(
   las = 1,
   col = bar_cols,
   border = bar_bords,
-  xlim = c(0, 1.88),
+  xlim = c(0, 1.85),
   ylim = c(-2.6, 15.8),
   xlab = "Pooled CONUS Streamflow Skill (KGE) & Regime Summary",
   main = "(b) 12-Candidate Progression & Physical Guardrail Vetoes",
-  cex.names = 0.76,
+  cex.names = 0.80,
   cex.axis = 0.88,
-  cex.lab = 0.90,
-  cex.main = 0.95
+  cex.lab = 0.92,
+  cex.main = 0.98
 )
 grid(nx = NULL, ny = NA, col = "#dcd7cd", lty = "dotted")
-segments(st$conus_kge[1], 0, st$conus_kge[1], 15.6, col = ET_SLATE_B, lty = 3, lwd = 1.4)
+segments(st$conus_kge[1], 0, st$conus_kge[1], 15.6, col = ET_SLATE_B, lty = 3, lwd = 1.5)
 
 for (i in seq_len(n_st)) {
   idx_orig <- st_rev[i]
@@ -163,7 +170,13 @@ for (i in seq_len(n_st)) {
             st_row$median_gauge_kge_small_basins,
             st_row$median_gauge_kge_regulated)
   }
-  text(kge_plt[i] + 0.02, bp3b[i], labels = detail, pos = 4, cex = 0.64,
+  # Place text strictly to the right of both the bar end and the 0.8471 baseline reference line
+  x_lbl <- max(kge_plt[i], 0.88) + 0.02
+  if (kge_plt[i] < 0.86) {
+    segments(kge_plt[i] + 0.01, bp3b[i], x_lbl - 0.01, bp3b[i],
+             col = adjustcolor(bar_bords[i], alpha.f = 0.55), lty = 3, lwd = 1.2)
+  }
+  text(x_lbl, bp3b[i], labels = detail, pos = 4, cex = 0.68,
        col = bar_bords[i],
        font = if (st_row$status %in% c("vetoed", "kept") && idx_orig %in% c(4, 7, 12, 13)) 2 else 1,
        xpd = TRUE)
@@ -175,7 +188,7 @@ legend("bottomright",
                   "Unfixed Baseline Reference"),
        fill = c(ET_PINE, ET_OCHRE, ET_TERRA, ET_SLATE),
        border = c(ET_PINE_B, ET_OCHRE_B, ET_TERRA_B, ET_SLATE_B),
-       ncol = 2, bg = "white", box.col = "#dcd7cd", cex = 0.68)
+       ncol = 2, bg = "white", box.col = "#dcd7cd", cex = 0.70)
 dev.off()
 
 # =============================================================================
@@ -343,11 +356,16 @@ png(file.path(fig_dir, "fig6_sectoral_return_flows_and_water_scarcity.png"),
 par(mfrow = c(1, 2), bg = "white", col.axis = ET_CHARCOAL, col.lab = ET_CHARCOAL,
     col.main = ET_CHARCOAL, family = "sans")
 
-# Panel (a): Sectoral Consumed Water vs. Returned Water (Stacked Horizontal Bar Chart from Initial Figure 5)
-par(mar = c(5.5, 14.2, 3.8, 2.0))
+# Panel (a): Sectoral Consumed Water vs. Returned Water
+par(mar = c(5.5, 11.6, 3.8, 1.8))
 swb <- d$sectoral_water_balance
 swb_rev <- rev(seq_len(nrow(swb)))
-sec_labels <- swb$short_label[swb_rev]
+sec_labels <- c(
+  "Power-Plant & Ind.\n(CERF Cooling)",
+  "Irrigation: Baseline\n(Tethys 2.1, No Return)",
+  "Irrigation: Repaired\n(Tethys 2.2 + Return)",
+  "Municipal Supply\n(<3% Flow: Low ROI)"
+)[swb_rev]
 mat_sec <- rbind(swb$consumed_km3_yr[swb_rev], swb$returned_km3_yr[swb_rev])
 
 bp6a <- barplot(
@@ -362,7 +380,7 @@ bp6a <- barplot(
   ylim = c(-1.1, 5.4),
   xlab = "Mean Annual Basin Water Volume (km3/yr: Consumed vs. Returned to River)",
   main = "(a) Tethys Sectoral Water Balance: Consumed vs. Returned Flow",
-  cex.names = 0.78,
+  cex.names = 0.80,
   cex.axis = 0.88,
   cex.lab = 0.90,
   cex.main = 0.96
@@ -380,18 +398,18 @@ for (i in seq_len(length(bp6a))) {
     sprintf("WD: %.1f | Consumed: %.1f | Returned: %.1f km3/yr (%.0f%% Return)",
             tot_w, r_row$consumed_km3_yr, r_row$returned_km3_yr, r_row$return_fraction_pct)
   }
-  text(tot_w + 2.5, bp6a[i], labels = lbl, pos = 4, cex = 0.66,
+  text(tot_w + 2.5, bp6a[i], labels = lbl, pos = 4, cex = 0.68,
        col = ET_CHARCOAL, font = if (idx_o %in% c(1, 3)) 2 else 1, xpd = TRUE)
 }
 
-# Inset Audit Banner for GRanD Reservoir release_min (Issue I-22) at bottom of Panel (a)
+# Inset Audit Banner for GRanD Reservoir release_min at bottom of Panel (a)
 rect(2, -0.95, 232, -0.05, col = "#fdf2f0", border = ET_TERRA, lwd = 1.4)
 text(5, -0.32,
      labels = "GRanD Dam Audit: 1,847 / 1,863 baseline dams had NEGATIVE release_min (down to -7.9 m3/s).",
-     pos = 4, cex = 0.62, col = ET_TERRA_B, font = 2, xpd = TRUE)
+     pos = 4, cex = 0.64, col = ET_TERRA_B, font = 2, xpd = TRUE)
 text(5, -0.70,
      labels = "Repaired Broman 9505v4 enforces release_min >= 0.0 m3/s across all 1,863 dams (0 negative).",
-     pos = 4, cex = 0.62, col = ET_PINE_B, font = 2, xpd = TRUE)
+     pos = 4, cex = 0.64, col = ET_PINE_B, font = 2, xpd = TRUE)
 
 legend("topright",
        legend = c("Consumed Water (Evaporated / Transpired: Permanently Removed)",
@@ -449,18 +467,20 @@ png(file.path(fig_dir, "fig7_emulator_comparison_pareto_and_uq_savings.png"),
 par(mfrow = c(1, 2), bg = "white", col.axis = ET_CHARCOAL, col.lab = ET_CHARCOAL,
     col.main = ET_CHARCOAL, family = "sans")
 
-# Panel (a): HPC Cost vs Regulated Dam Skill & Retained Physical Process Modules
+# Panel (a): HPC Cost vs Regulated Dam Skill (Zero Label Overlaps)
 par(mar = c(5.2, 4.8, 3.8, 1.5))
 cf <- d$cross_family_comparison
-plot(c(0, 265), c(0.06, 0.56), type = "n",
+plot(c(0, 265), c(0.06, 0.57), type = "n",
      xlab = "Single-Run Computational Cost (NERSC HPC Node-Hours per 35-Yr CONUS Run)",
      ylab = "Regulated Dam Streamflow Skill (Median KGE Across 518 Gauges)",
      main = "(a) Cost-Accuracy Pareto Frontier: Process Fixes vs. Targeted & Whole Emulators",
      cex.axis = 0.88, cex.lab = 0.94, cex.main = 0.96)
 grid(nx = NULL, ny = NULL, col = "#dcd7cd", lty = "dotted")
 
-rect(0, 0.07, 128, 0.155, col = adjustcolor(ET_TERRA, alpha.f = 0.15), border = ET_TERRA)
-text(64, 0.134, labels = "Fast but Scientifically Broken Trap", col = ET_TERRA_B, font = 2, cex = 0.75)
+# Shaded trap box kept compact (x = 0..136) with both lines strictly inside
+rect(0, 0.068, 136, 0.155, col = adjustcolor(ET_TERRA, alpha.f = 0.15), border = ET_TERRA)
+text(68, 0.136, labels = "Fast but Scientifically Broken Trap", col = ET_TERRA_B, font = 2, cex = 0.75)
+text(10, 0.104, labels = "Blind Whole-LSM Emu (3.3h, Reg=0.106)", pos = 4, cex = 0.72, col = ET_TERRA_B, font = 2)
 
 st_kept <- st[st$status %in% c("baseline", "kept"), ]
 lines(st_kept$hpc_node_hours, st_kept$median_gauge_kge_regulated,
@@ -476,19 +496,25 @@ points(cf$hpc_node_hours[6], cf$regulated_kge[6], col = ET_SLATE, pch = 15, cex 
 points(cf$hpc_node_hours[5], cf$regulated_kge[5], col = ET_TEAL,  pch = 17, cex = 1.7)
 points(cf$hpc_node_hours[4], cf$regulated_kge[4], col = ET_PINE,  pch = 19, cex = 1.8)
 
-text(cf$hpc_node_hours[8] + 6,  cf$regulated_kge[8] - 0.015,
-     labels = "Blind Whole-LSM Emulator (3.3h, Reg KGE=0.106, Small=0.004)", pos = 4, cex = 0.72, col = ET_TERRA_B, font = 2)
-text(cf$hpc_node_hours[7] - 4,  cf$regulated_kge[7] - 0.032,
-     labels = "0. Unfixed Baseline (243.3h, 9/9 Phys, Reg=0.168)", pos = 2, cex = 0.72, col = ET_CHARCOAL)
-text(cf$hpc_node_hours[6] + 6,  cf$regulated_kge[6] - 0.018,
+# Place Baseline label well to the right of x=136 so it never touches the red box
+text(262, 0.125,
+     labels = "0. Unfixed Baseline (243.3h, Reg=0.168)",
+     pos = 2, cex = 0.73, col = ET_CHARCOAL, font = 2)
+
+# Place Last-Resort Whole-LSM Emulator below-right of (3.3, 0.387)
+text(cf$hpc_node_hours[6] + 6, cf$regulated_kge[6] - 0.022,
      labels = "Last-Resort Whole-LSM Emulator After Fixes (3.3h, 6/9 Phys, Reg=0.387)",
-     pos = 4, cex = 0.72, col = ET_SLATE_B, font = 2)
-text(cf$hpc_node_hours[5] - 18, cf$regulated_kge[5] + 0.028,
+     pos = 4, cex = 0.73, col = ET_SLATE_B, font = 2)
+
+# Place Targeted Vadose Sub-Emulator ABOVE the Pareto line, left-aligned at x=4 so it never clips or crosses the line
+text(4, 0.494,
      labels = "Targeted Vadose Sub-Emulator (111.3h, 8/9 Phys, Reg=0.456)",
-     cex = 0.74, col = ET_TEAL, font = 2)
-text(cf$hpc_node_hours[4] - 5,  cf$regulated_kge[4] + 0.025,
+     pos = 4, cex = 0.74, col = ET_TEAL, font = 2)
+
+# Place Full 9-Module Repaired Physics cleanly ABOVE the peak at (216.3, 0.507)
+text(258, 0.538,
      labels = "Full 9-Module Repaired Physics (216.3h, 9/9 Phys, Reg=0.507)",
-     pos = 2, cex = 0.75, col = ET_PINE_B, font = 2)
+     pos = 2, cex = 0.76, col = ET_PINE_B, font = 2)
 
 # Panel (b): Cumulative Campaign HPC Cost Across Ensemble Size (N = 1..50 Runs) & UQ Capacity
 par(mar = c(5.2, 4.8, 3.8, 1.8))
@@ -515,7 +541,6 @@ points(cb$n_runs, cb$retained_physics_hpc_hours / 1000.0, col = ET_PINE,  pch = 
 points(cb$n_runs, cb$targeted_vadose_emulator_hpc_hours / 1000.0, col = ET_TEAL, pch = 17, cex = 1.0)
 points(cb$n_runs, cb$last_resort_whole_lsm_emulator_hpc_hours / 1000.0, col = ET_SLATE, pch = 15, cex = 1.0)
 
-# Callout annotations at N=50 right edge
 text(49, 11.4, labels = "-1,350h Saved", col = ET_PINE_B, font = 2, cex = 0.72, pos = 2)
 text(49, 6.2,  labels = "-6,592h Saved (2.2x UQ Runs)", col = ET_TEAL, font = 2, cex = 0.74, pos = 2)
 text(49, 0.85, labels = "-11,985h Saved (72.7x UQ Runs)", col = ET_SLATE_B, font = 2, cex = 0.74, pos = 2)
@@ -532,4 +557,4 @@ legend("topleft",
        bg = "white", box.col = "#dcd7cd", cex = 0.71)
 dev.off()
 
-cat("Generated complete 5-data-figure AGU poster suite (Figures 3..7) in", fig_dir, "\n")
+cat("Generated complete 5-data-figure AGU poster suite (Figures 3..7) via rv in", fig_dir, "\n")

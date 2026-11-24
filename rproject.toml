@@ -1,0 +1,12 @@
+# R package manifest for `rv` (https://github.com/A2-ai/rv).
+[project]
+name = "autoengineering"
+r_version = "4.6"
+
+repositories = [
+    { alias = "CRAN", url = "https://packagemanager.posit.co/cran/latest" },
+]
+
+dependencies = [
+    "jsonlite",
+]
