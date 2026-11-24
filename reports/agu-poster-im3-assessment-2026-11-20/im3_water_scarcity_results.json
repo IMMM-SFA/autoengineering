@@ -19,7 +19,7 @@
     {
       "component": "lsm_subsurface_drainage",
       "model_type": "land_surface_physics",
-      "local_runtime_seconds": 0.019684,
+      "local_runtime_seconds": 0.016161,
       "upstream_hpc_hours": 120.0,
       "compute_share": 0.4932,
       "downstream_sensitivity": 0.0424,
@@ -56,7 +56,7 @@
     {
       "component": "lsm_canopy_snow_et",
       "model_type": "land_surface_physics",
-      "local_runtime_seconds": 0.022067,
+      "local_runtime_seconds": 0.016322,
       "upstream_hpc_hours": 68.0,
       "compute_share": 0.2795,
       "downstream_sensitivity": 0.067,
@@ -93,7 +93,7 @@
     {
       "component": "lsm_surface_infiltration",
       "model_type": "land_surface_physics",
-      "local_runtime_seconds": 0.02098,
+      "local_runtime_seconds": 0.015095,
       "upstream_hpc_hours": 52.0,
       "compute_share": 0.2137,
       "downstream_sensitivity": 0.0263,
@@ -130,7 +130,7 @@
     {
       "component": "mosart_reservoir_demand_wm",
       "model_type": "water_management",
-      "local_runtime_seconds": 0.019935,
+      "local_runtime_seconds": 0.016441,
       "upstream_hpc_hours": 0.9,
       "compute_share": 0.0037,
       "downstream_sensitivity": 0.7389,
@@ -167,7 +167,7 @@
     {
       "component": "mosart_channel_network_routing",
       "model_type": "river_routing",
-      "local_runtime_seconds": 0.016732,
+      "local_runtime_seconds": 0.016632,
       "upstream_hpc_hours": 0.9,
       "compute_share": 0.0037,
       "downstream_sensitivity": 0.0669,
@@ -204,7 +204,7 @@
     {
       "component": "mosart_hillslope_tributary_routing",
       "model_type": "river_routing",
-      "local_runtime_seconds": 0.024073,
+      "local_runtime_seconds": 0.01566,
       "upstream_hpc_hours": 0.7,
       "compute_share": 0.0029,
       "downstream_sensitivity": 0.067,
@@ -241,7 +241,7 @@
     {
       "component": "tethys_irrigation_downscaler",
       "model_type": "demand_downscaling",
-      "local_runtime_seconds": 0.023104,
+      "local_runtime_seconds": 0.016955,
       "upstream_hpc_hours": 0.45,
       "compute_share": 0.0018,
       "downstream_sensitivity": 0.2236,
@@ -278,7 +278,7 @@
     {
       "component": "tethys_thermoelectric_industrial_downscaler",
       "model_type": "demand_downscaling",
-      "local_runtime_seconds": 0.022704,
+      "local_runtime_seconds": 0.016586,
       "upstream_hpc_hours": 0.2,
       "compute_share": 0.0008,
       "downstream_sensitivity": 0.378,
@@ -315,7 +315,7 @@
     {
       "component": "tethys_municipal_domestic_downscaler",
       "model_type": "demand_downscaling",
-      "local_runtime_seconds": 0.020714,
+      "local_runtime_seconds": 0.01957,
       "upstream_hpc_hours": 0.15,
       "compute_share": 0.0006,
       "downstream_sensitivity": 0.3125,
@@ -10833,6 +10833,51 @@
       "retained_9subcomponent_km3_yr": 5.995
     }
   ],
+  "sectoral_water_balance": [
+    {
+      "sector_id": "1. Thermoelectric Power & Industrial (CERF Cooling)",
+      "short_label": "Thermoelectric & Industry\n(CERF Once-Through/Tower)",
+      "withdrawal_km3_yr": 145.4,
+      "consumed_km3_yr": 8.7,
+      "returned_km3_yr": 136.7,
+      "return_fraction_pct": 94.0,
+      "assessment_disposition": "KEPT (Stage 8: +0.035 Reg KGE from returning cooling water)"
+    },
+    {
+      "sector_id": "2. Agricultural Irrigation: Tethys 2.1.0 Baseline (Unadjusted)",
+      "short_label": "Irrigation: Tethys 2.1.0\n(Baseline, No Return Credited)",
+      "withdrawal_km3_yr": 47.8,
+      "consumed_km3_yr": 30.9,
+      "returned_km3_yr": 16.9,
+      "return_fraction_pct": 35.4,
+      "assessment_disposition": "BASELINE DEFECT (Omitted 0.83 canal factor & extracted 100% of withdrawal)"
+    },
+    {
+      "sector_id": "3. Agricultural Irrigation: Tethys 2.2.0 (Canal Fix + Return Flow)",
+      "short_label": "Irrigation: Tethys 2.2.0\n(0.83 Canal Factor + Return)",
+      "withdrawal_km3_yr": 21.0,
+      "consumed_km3_yr": 16.4,
+      "returned_km3_yr": 4.7,
+      "return_fraction_pct": 22.2,
+      "assessment_disposition": "KEPT (Stage 7 & 12: Cuts false irrigation deficit by -23.9%)"
+    },
+    {
+      "sector_id": "4. Municipal & Domestic Supply (Urban/Rural Population)",
+      "short_label": "Municipal & Domestic\n(<3% of Flow: Low-ROI Revert)",
+      "withdrawal_km3_yr": 41.0,
+      "consumed_km3_yr": 5.3,
+      "returned_km3_yr": 35.7,
+      "return_fraction_pct": 87.0,
+      "assessment_disposition": "REVERTED (Stage 9: Negligible impact on streamflow; deprioritize)"
+    }
+  ],
+  "reservoir_release_audit": {
+    "n_dams_total": 1863,
+    "n_dams_negative_baseline_20230629": 1847,
+    "min_release_baseline_m3s": -7.91,
+    "n_dams_negative_repaired_9505v4": 0,
+    "min_release_repaired_m3s": 0.0
+  },
   "campaign_breakeven": [
     {
       "n_runs": 1,

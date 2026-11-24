@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile and verify the two AGU poster TikZ flowcharts (Figures 1 & 2) to SVG and 300-DPI PNG."""
+"""Compile and verify the two AGU poster TikZ flowcharts (Figures 1 & 2) at 450 DPI on white."""
 
 from __future__ import annotations
 
@@ -27,12 +27,12 @@ TIKZ_FIG1 = r"""
 % caption: Autoengineering four-stage assessment workflow for coupled Earth-system model chains.
 \begin{tikzpicture}[
   node distance=1.4cm and 1.8cm,
-  card/.style={text width=4.65cm, minimum height=1.78cm, align=center}
+  card/.style={text width=4.68cm, minimum height=1.82cm, align=center}
 ]
-  % Stage I: Declarative Sub-Component Graph & Telemetry
-  \node[iobox, card] (s1_mid) {\textbf{1b. Sub-Component DAG}\\(\code{system.yaml}: typed ports,\\internal modules, couplings)};
-  \node[storebox, card, left=1.1cm of s1_mid] (s1_left) {\textbf{1a. Benchmark \& Telemetry}\\(1,190 USGS gauges, NERSC\\node-hrs, physical bounds)};
-  \node[iobox, card, right=1.1cm of s1_mid] (s1_right) {\textbf{1c. Candidate Process Pool}\\(\code{candidates.yaml}: process\\parameterizations \& surrogates)};
+  % Stage I: Map the Coupled Model Chain & Telemetry
+  \node[iobox, card] (s1_mid) {\textbf{1b. Sub-Component Graph}\\(\code{system.yaml}: breaks macro-models\\into internal process modules)};
+  \node[storebox, card, left=1.1cm of s1_mid] (s1_left) {\textbf{1a. Observations \& Costs}\\(1,190 USGS stream gauges,\\NERSC node-hrs, physical bounds)};
+  \node[iobox, card, right=1.1cm of s1_mid] (s1_right) {\textbf{1c. Candidate Process Pool}\\(\code{candidates.yaml}: alternative\\physics, bug fixes \& surrogates)};
   \coordinate (g1_pad) at ([yshift=0.38cm]s1_left.north);
 
   \draw[flow] (s1_left.east) -- (s1_mid.west);
@@ -41,12 +41,12 @@ TIKZ_FIG1 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(s1_left)(s1_mid)(s1_right)(g1_pad), inner sep=11pt] (G1) {};
   \end{scope}
-  \node[grouptitle] at (G1.north west) {I. Declarative Sub-Component Decomposition \& Telemetry Ingestion};
+  \node[grouptitle] at (G1.north west) {Stage I. Map the Coupled Model Chain, Internal Process Modules \& Compute Costs};
 
-  % Stage II: Coupled Triage & Sensitivity Engine
-  \node[rulebox, card, below=1.95cm of s1_mid] (s2_mid) {\textbf{2b. Decoupling Matrix}\\(Compute share $C_i/C_{\text{tot}}$ vs.\\sensitivity $S_i$; break-even $N_i^*$)};
-  \node[procbox, card, left=1.1cm of s2_mid] (s2_left) {\textbf{2a. Port Perturbation Probe}\\($\pm 10\%$ flux perturbation\\across topological order)};
-  \node[condbox, card, right=1.1cm of s2_mid] (s2_right) {\textbf{2c. Prioritization Triage}\\(\code{fix\_physics} vs. \code{sub\_emulate}\\vs. \code{deprioritize})};
+  % Stage II: Cost vs. Sensitivity Triage
+  \node[rulebox, card, below=1.95cm of s1_mid] (s2_mid) {\textbf{2b. Cost vs. Sensitivity Matrix}\\(Compares \% HPC cost against\\downstream impact \& break-even $N^*$)};
+  \node[procbox, card, left=1.1cm of s2_mid] (s2_left) {\textbf{2a. Perturbation Sensitivity}\\(Perturbs each module's output\\by $\pm 10\%$ through the chain)};
+  \node[condbox, card, right=1.1cm of s2_mid] (s2_right) {\textbf{2c. Triage Recommendation}\\(\textbf{Fix Process Physics} vs. \textbf{Emulate}\\vs. \textbf{Deprioritize Low-ROI})};
   \coordinate (g2_pad) at ([yshift=0.38cm]s2_left.north);
 
   \draw[flow] (s2_left.east) -- (s2_mid.west);
@@ -55,12 +55,12 @@ TIKZ_FIG1 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(s2_left)(s2_mid)(s2_right)(g2_pad), inner sep=11pt] (G2) {};
   \end{scope}
-  \node[grouptitle] at (G2.north west) {II. Coupled Bottleneck Triage \& Sensitivity Assessment (\code{autoengineering triage})};
+  \node[grouptitle] at (G2.north west) {Stage II. Coupled Bottleneck Triage: Where Is Compute Spent vs. Where Do Errors Originate?};
 
-  % Stage III: Physics-Guarded Sub-Component Probe & Attribution Loop
-  \node[condbox, card, below=1.95cm of s2_mid] (s3_mid) {\textbf{3b. Hard Physical Guardrails}\\(\code{PhysicalCheck}: $Q_{\text{DRAI}} \ge 0$,\\$|Q_{10}\text{ PBIAS}| \le 25\%$, mass balance)};
-  \node[stagebox, card, left=1.1cm of s3_mid] (s3_left) {\textbf{3a. Sub-Component Swap}\\(Trial DAG execution across\\process \& surrogate variants)};
-  \node[rulebox, card, right=1.1cm of s3_mid] (s3_right) {\textbf{3c. Attribution Disposition}\\(\textbf{KEPT $\checkmark$} / \textbf{REVERTED $\times$}\\or \textbf{VETOED $\oslash$} + provenance)};
+  % Stage III: Physics-Guarded Sub-Component Testing
+  \node[condbox, card, below=1.95cm of s2_mid] (s3_mid) {\textbf{3b. Hard Physical Guardrails}\\(Checks mass balance, non-negative\\baseflow $Q_{\text{DRAI}}\ge 0$, drought bias)};
+  \node[stagebox, card, left=1.1cm of s3_mid] (s3_left) {\textbf{3a. Sub-Component Trial Swap}\\(Tests one internal process fix\\or targeted surrogate at a time)};
+  \node[rulebox, card, right=1.1cm of s3_mid] (s3_right) {\textbf{3c. Transparent Disposition}\\(\textbf{KEPT $\checkmark$} / \textbf{REVERTED $\times$}\\or \textbf{VETOED $\oslash$} if unphysical)};
   \coordinate (g3_pad) at ([yshift=0.38cm]s3_left.north);
 
   \draw[flow] (s3_left.east) -- (s3_mid.west);
@@ -69,12 +69,12 @@ TIKZ_FIG1 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(s3_left)(s3_mid)(s3_right)(g3_pad), inner sep=11pt] (G3) {};
   \end{scope}
-  \node[grouptitle] at (G3.north west) {III. Physics-Guarded Sub-Component Attribution Loop (\code{autoengineering improve})};
+  \node[grouptitle] at (G3.north west) {Stage III. Physics-Guarded Attribution Loop: Test Process Fixes \& Vetoes Unphysical Surrogates};
 
   % Stage IV: Multi-Dimensional Stakeholder Assessment Report
-  \node[juncbox, card, below=1.95cm of s3_mid] (s4_mid) {\textbf{4b. For Project PIs}\\(Cross-model error attribution,\\UQ ensemble capacity $N_{\text{UQ}}$)};
-  \node[juncbox, card, left=1.1cm of s4_mid] (s4_left) {\textbf{4a. For Domain Modelers}\\(Process parameterization fixes,\\physical vetoes \& defect audit)};
-  \node[juncbox, card, right=1.1cm of s4_mid] (s4_right) {\textbf{4c. For Program Managers}\\(HPC node-hr ROI, Pareto knee,\\where \emph{not} to invest effort)};
+  \node[juncbox, card, below=1.95cm of s3_mid] (s4_mid) {\textbf{4b. For Project PIs}\\(Cross-model error attribution \&\\UQ ensemble capacity per 10k hrs)};
+  \node[juncbox, card, left=1.1cm of s4_mid] (s4_left) {\textbf{4a. For Domain Modelers}\\(Specific parameterization fixes,\\data bugs \& physical veto logs)};
+  \node[juncbox, card, right=1.1cm of s4_mid] (s4_right) {\textbf{4c. For Program Managers}\\(HPC node-hr savings, Pareto knee\\\& where \emph{not} to spend effort)};
   \coordinate (g4_pad) at ([yshift=0.38cm]s4_left.north);
 
   \draw[flow] (s4_left.east) -- (s4_mid.west);
@@ -83,7 +83,7 @@ TIKZ_FIG1 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(s4_left)(s4_mid)(s4_right)(g4_pad), inner sep=11pt] (G4) {};
   \end{scope}
-  \node[grouptitle] at (G4.north west) {IV. Multi-Dimensional Stakeholder Assessment Deliverable (Portable Report Bundle)};
+  \node[grouptitle] at (G4.north west) {Stage IV. Actionable Assessment Report for Modelers, Project PIs \& Program Managers};
 
   % Vertical group-to-group connectors anchored to center column X
   \draw[flow] (s1_mid.center |- G1.south) -- (s2_mid.center |- G2.north);
@@ -99,12 +99,12 @@ TIKZ_FIG2 = r"""
 % caption: Sub-component assessment architecture for the DOE IM3 CONUS water-scarcity modeling chain.
 \begin{tikzpicture}[
   node distance=1.35cm and 1.6cm,
-  mcard/.style={text width=4.68cm, minimum height=2.12cm, align=center}
+  mcard/.style={text width=4.68cm, minimum height=2.16cm, align=center}
 ]
   % Row 1: CLM5 / ELMv3 Land Surface Hydrology (240.0h = 98.6% HPC)
-  \node[stagebox, mcard] (lsm2) {\textbf{2. Surface Infiltration}\\(\code{52.0h = 21.4\% HPC}, $S=2.63$)\\Uncalibrated ELMv3 \textbf{VETOED $\oslash$}\\($Q_{10}=+40\%$); \code{fover} \textbf{KEPT $\checkmark$}};
-  \node[stagebox, mcard, left=1.05cm of lsm2] (lsm1) {\textbf{1. Canopy / Snow / ET}\\(\code{68.0h = 28.0\% HPC}, $S=6.70$)\\CLM5-SP \textbf{REVERTED $\times$};\\ELMv3 Demeter \textbf{KEPT $\checkmark$}};
-  \node[rulebox, mcard, right=1.05cm of lsm2] (lsm3) {\textbf{3. Subsurface Vadose}\\(\code{120.0h = 49.3\% HPC}, $S=4.24$)\\Fixes 124 neg $Q_{\text{DRAI}}$ (\code{I-25}) \textbf{KEPT $\checkmark$};\\\textbf{\#1 Sub-Emulator Target} ($N^*=1$)};
+  \node[stagebox, mcard] (lsm2) {\textbf{2. Surface Infiltration}\\(\code{52.0h = 21.4\% HPC}, Sens $=2.6$)\\Uncalibrated ELMv3 \textbf{VETOED $\oslash$}\\($+40\%$ drought bias); Calibrated \textbf{KEPT $\checkmark$}};
+  \node[stagebox, mcard, left=1.05cm of lsm2] (lsm1) {\textbf{1. Canopy, Snow \& ET}\\(\code{68.0h = 28.0\% HPC}, Sens $=6.7$)\\Satellite phenology \textbf{REVERTED $\times$};\\ELMv3 crop/snow physics \textbf{KEPT $\checkmark$}};
+  \node[rulebox, mcard, right=1.05cm of lsm2] (lsm3) {\textbf{3. Deep Soil \& Baseflow}\\(\code{120.0h = 49.3\% HPC}, Sens $=4.2$)\\Fixes negative baseflow \textbf{KEPT $\checkmark$};\\\textbf{\#1 Sub-Emulator Target} ($-54\%$ HPC)};
   \coordinate (glsm_pad) at ([yshift=0.38cm]lsm1.north);
 
   \draw[flow] (lsm1.east) -- (lsm2.west);
@@ -113,12 +113,12 @@ TIKZ_FIG2 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(lsm1)(lsm2)(lsm3)(glsm_pad), inner sep=11pt] (GLSM) {};
   \end{scope}
-  \node[grouptitle] at (GLSM.north west) {Macro-Model 1: CLM5 / ELMv3 Land Surface Hydrology (240.0 NERSC Node-Hrs/Run = 98.6\% of Compute)};
+  \node[grouptitle] at (GLSM.north west) {Model 1: CLM5 / ELMv3 Land Surface Model (240.0 NERSC Node-Hrs/Run = 98.6\% of Compute)};
 
   % Row 2: Tethys Sectoral Water-Demand Downscaling (0.8h = 0.3% HPC)
-  \node[procbox, mcard, below=1.95cm of lsm2] (tet2) {\textbf{5. Thermoelectric \& Ind.}\\(\code{0.20h = 0.08\% HPC}, $S=37.80$)\\0-LMP CERF cooling return\\ratios (\code{I-08/I-09}) \textbf{KEPT $\checkmark$}};
-  \node[procbox, mcard, left=1.05cm of tet2] (tet1) {\textbf{4. Irrigation Downscaler}\\(\code{0.45h = 0.18\% HPC}, $S=22.36$)\\0.829937 canal efficiency (\code{I-07})\\\& USGS Method 2 \textbf{KEPT $\checkmark$}};
-  \node[condbox, mcard, right=1.05cm of tet2] (tet3) {\textbf{6. Municipal / Domestic}\\(\code{0.15h = 0.06\% HPC}, $S=31.25$)\\$<3\%$ of basin flow ($\Delta\text{KGE}=0$);\\\textbf{REVERTED $\times$ (Low-ROI Warning)}};
+  \node[procbox, mcard, below=1.95cm of lsm2] (tet2) {\textbf{5. Power-Plant \& Ind. Water}\\(\code{0.20h = 0.08\% HPC}, Sens $=37.8$)\\Separates once-through cooling\\return water from towers \textbf{KEPT $\checkmark$}};
+  \node[procbox, mcard, left=1.05cm of tet2] (tet1) {\textbf{4. Agricultural Irrigation}\\(\code{0.45h = 0.18\% HPC}, Sens $=22.4$)\\Adds $0.83$ canal efficiency \&\\USGS groundwater shares \textbf{KEPT $\checkmark$}};
+  \node[condbox, mcard, right=1.05cm of tet2] (tet3) {\textbf{6. Municipal \& Domestic}\\(\code{0.15h = 0.06\% HPC}, Sens $=31.2$)\\$<3\%$ of river flow ($\Delta\text{KGE}=0$);\\\textbf{REVERTED $\times$ (Low-ROI Warning)}};
   \coordinate (gtet_pad) at ([yshift=0.38cm]tet1.north);
 
   \draw[flow] (tet1.east) -- (tet2.west);
@@ -127,12 +127,12 @@ TIKZ_FIG2 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(tet1)(tet2)(tet3)(gtet_pad), inner sep=11pt] (GTET) {};
   \end{scope}
-  \node[grouptitle] at (GTET.north west) {Macro-Model 2: Tethys Spatiotemporal Sectoral Demand Downscaling (0.8 Node-Hrs/Run = 0.3\% of Compute)};
+  \node[grouptitle] at (GTET.north west) {Model 2: Tethys Sectoral Water-Demand Downscaling (0.8 Node-Hrs/Run = 0.3\% of Compute)};
 
   % Row 3: mosartwmpy River Routing & Water Management (2.5h = 1.0% HPC)
-  \node[procbox, mcard, below=1.95cm of tet2] (mos2) {\textbf{8. Channel Network Routing}\\(\code{0.90h = 0.37\% HPC}, $S=6.69$)\\Sub-grid area filter (\code{\#129}, $\le 4$c):\\\textbf{$+2,600\%$ Small-Basin KGE $\checkmark$}};
-  \node[procbox, mcard, left=1.05cm of mos2] (mos1) {\textbf{7. Hillslope \& Tributary}\\(\code{0.70h = 0.29\% HPC}, $S=6.70$)\\Repairs 1,690 \code{hslp/rslp=NaN}\\land cells (\code{I-23}) \textbf{KEPT $\checkmark$}};
-  \node[rulebox, mcard, right=1.05cm of mos2] (mos3) {\textbf{9. Reservoir \& Demand WM}\\(\code{0.90h = 0.37\% HPC}, \textbf{$S=73.89$})\\Broman \code{9505v4} + $\text{release\_min}\ge 0$\\+ return flows: \textbf{$+202\%$ Reg KGE $\checkmark$}};
+  \node[procbox, mcard, below=1.95cm of tet2] (mos2) {\textbf{8. Main Channel Network}\\(\code{0.90h = 0.37\% HPC}, Sens $=6.7$)\\Fixes $0.125^\circ$ grid area mismatch\\in small basins: \textbf{$+2,600\%$ KGE $\checkmark$}};
+  \node[procbox, mcard, left=1.05cm of mos2] (mos1) {\textbf{7. Hillslope \& Tributaries}\\(\code{0.70h = 0.29\% HPC}, Sens $=6.7$)\\Repairs 1,690 missing (\code{NaN})\\grid slope cells \textbf{KEPT $\checkmark$}};
+  \node[rulebox, mcard, right=1.05cm of mos2] (mos3) {\textbf{9. Reservoir \& Demand Mgmt}\\(\code{0.90h = 0.37\% HPC}, \textbf{Sens $=73.9$})\\Fixes 1,847 negative dam floors +\\returns unconsumed water: \textbf{$+202\%$ KGE $\checkmark$}};
   \coordinate (gmos_pad) at ([yshift=0.38cm]mos1.north);
 
   \draw[flow] (mos1.east) -- (mos2.west);
@@ -141,12 +141,12 @@ TIKZ_FIG2 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(mos1)(mos2)(mos3)(gmos_pad), inner sep=11pt] (GMOS) {};
   \end{scope}
-  \node[grouptitle] at (GMOS.north west) {Macro-Model 3: mosartwmpy River Routing \& Water Management (2.5 Node-Hrs/Run = 1.0\% of Compute)};
+  \node[grouptitle] at (GMOS.north west) {Model 3: mosartwmpy River Routing \& Water Management (2.5 Node-Hrs/Run = 1.0\% of Compute)};
 
   % Row 4: Multi-Dimensional Assessment Outcomes Across 1,190 CONUS Gauges
-  \node[juncbox, mcard, below=1.95cm of mos2] (out2) {\textbf{Process Fidelity \& Deficit}\\CONUS KGE: \textbf{0.847 $\rightarrow$ 0.909}\\Unmet Demand: \textbf{$-86.2\%$} (5.97 $\text{km}^3$/yr)};
-  \node[juncbox, mcard, left=1.05cm of out2] (out1) {\textbf{Regime Bottlenecks Solved}\\Small-Basin ($\le 4$c): \textbf{0.013 $\rightarrow$ 0.337}\\Regulated Dams: \textbf{0.168 $\rightarrow$ 0.507}};
-  \node[juncbox, mcard, right=1.05cm of out2] (out3) {\textbf{HPC \& UQ Capacity ROI}\\Vadose Sub-Emu: \textbf{$-54.2\%$ HPC} ($2.2\times$ UQ)\\Whole-LSM (Last Resort): \textbf{$-98.5\%$ HPC}};
+  \node[juncbox, mcard, below=1.95cm of mos2] (out2) {\textbf{Water-Scarcity Accuracy}\\CONUS KGE: \textbf{0.847 $\rightarrow$ 0.909}\\False Deficit Cut: \textbf{$-86.2\%$} ($5.97\text{ km}^3$/yr)};
+  \node[juncbox, mcard, left=1.05cm of out2] (out1) {\textbf{Physical Regimes Repaired}\\Small Headwaters: \textbf{0.013 $\rightarrow$ 0.337}\\Regulated Dams: \textbf{0.168 $\rightarrow$ 0.507}};
+  \node[juncbox, mcard, right=1.05cm of out2] (out3) {\textbf{Compute \& UQ Ensemble Gain}\\Vadose Sub-Emu: \textbf{$-54.2\%$ HPC} ($2.2\times$ UQ)\\Whole-LSM (Last Resort): \textbf{$-98.5\%$ HPC}};
   \coordinate (gout_pad) at ([yshift=0.38cm]out1.north);
 
   \draw[flow] (out1.east) -- (out2.west);
@@ -155,7 +155,7 @@ TIKZ_FIG2 = r"""
   \begin{scope}[on background layer]
     \node[group, fit=(out1)(out2)(out3)(gout_pad), inner sep=11pt] (GOUT) {};
   \end{scope}
-  \node[grouptitle] at (GOUT.north west) {Assessment Summary Across 1,190 USGS 70/70 CONUS Gauges (1981--2015, 672 Natural + 518 Regulated)};
+  \node[grouptitle] at (GOUT.north west) {Assessment Outcome Across 1,190 USGS Stream Gauges (1981--2015: 672 Natural + 518 Regulated)};
 
   % Vertical connectors anchored to center column X
   \draw[flow] (lsm2.center |- GLSM.south) -- (tet2.center |- GTET.north);
@@ -166,7 +166,7 @@ TIKZ_FIG2 = r"""
 
 
 def compile_tikz_pdf_and_png(raw_tikz: str, out_stem: Path) -> None:
-    """Compile a TikZ block using print Earth-Tone palette to PDF, SVG, and 300-DPI PNG."""
+    """Compile a TikZ block using print Earth-Tone palette to PDF, SVG, and 450-DPI white PNG."""
     _ = compile_tikz_to_svg(raw_tikz, STY_PATH, context_label=out_stem.name)
 
     lines = [
@@ -211,7 +211,6 @@ def compile_tikz_pdf_and_png(raw_tikz: str, out_stem: Path) -> None:
         )
         svg_str = (tmp / "diagram.svg").read_text(encoding="utf-8")
         check_tikz_svg_overlaps(svg_str, context_label=f"{out_stem.name} (print SVG)")
-        # Ensure standalone SVG has an explicit white background rect for poster printing
         svg_white = svg_str.replace(
             "<g id='page1'>",
             "<g id='page1'>\n<rect x='-10000' y='-10000' width='20000' height='20000' fill='#ffffff'/>",
